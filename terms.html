@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="Terms & Conditions - KabaddiOne Premium Kabaddi Scoreboard App">
+    <meta name="description" content="Terms & Conditions for KabaddiOne, the all-in-one kabaddi scoreboard app. Read before using the app.">
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="https://kabaddione.github.io/terms-and-conditions">
+    <meta property="og:title" content="Terms & Conditions - KabaddiOne Scoreboard App">
+    <meta property="og:description" content="Read the terms and conditions for using KabaddiOne.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kabaddione.github.io/terms-and-conditions">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>Terms & Conditions – KabaddiOne</title>
+
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f24;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --accent: #FF5E3A;
+            --accent-glow: #FF3D10;
+            --accent-secondary: #FFB830;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0c8;
+            --text-muted: #7a7a95;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(255, 94, 58, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --shadow-glow: 0 0 40px rgba(255, 94, 58, 0.25);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --max-width: 1200px;
+            --nav-height: 72px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Background Orbs (same as main theme) */
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            animation: orbFloat 18s ease-in-out infinite;
+        }
+        .bg-orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -15%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        .bg-orb:nth-child(2) {
+            width: 450px;
+            height: 450px;
+            background: #6C3CE0;
+            top: 50%;
+            right: -12%;
+            animation-delay: -6s;
+            animation-duration: 20s;
+        }
+        .bg-orb:nth-child(3) {
+            width: 350px;
+            height: 350px;
+            background: var(--accent-secondary);
+            bottom: -10%;
+            left: 20%;
+            animation-delay: -12s;
+            animation-duration: 16s;
+        }
+        .bg-orb:nth-child(4) {
+            width: 300px;
+            height: 300px;
+            background: #FF3D70;
+            top: 25%;
+            left: 50%;
+            animation-delay: -3s;
+            animation-duration: 22s;
+        }
+        @keyframes orbFloat {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(60px, -40px) scale(1.15);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, -30px) scale(1.1);
+            }
+        }
+
+        /* Navigation (identical to main) */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            height: var(--nav-height);
+            transition: var(--transition-smooth);
+            background: transparent;
+        }
+        .nav.scrolled {
+            background: rgba(10, 10, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .nav-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            z-index: 1001;
+        }
+        .nav-logo .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-glow);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 94, 58, 0.35);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 94, 58, 0.65);
+            }
+        }
+        .nav-logo span {
+            background: linear-gradient(135deg, #fff, #ddd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: var(--transition-smooth);
+        }
+        .nav-links a:hover {
+            color: #fff;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-cta-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            color: #fff !important;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            text-decoration: none;
+            transition: var(--transition-bounce) !important;
+            box-shadow: 0 4px 18px rgba(255, 94, 58, 0.35);
+            white-space: nowrap;
+        }
+        .nav-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(255, 94, 58, 0.5);
+        }
+        .nav-cta-btn::after {
+            display: none !important;
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            background: none;
+            border: none;
+            padding: 8px;
+        }
+        .hamburger span {
+            width: 26px;
+            height: 2.5px;
+            background: #fff;
+            border-radius: 2px;
+            transition: var(--transition-smooth);
+            display: block;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Content Section (same card style) */
+        .legal-section {
+            position: relative;
+            z-index: 1;
+            padding: calc(var(--nav-height) + 40px) 24px 60px;
+            display: flex;
+            justify-content: center;
+        }
+        .legal-card {
+            max-width: 800px;
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .legal-card h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .legal-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 32px 0 12px;
+            letter-spacing: -0.5px;
+            border-left: 3px solid var(--accent);
+            padding-left: 14px;
+        }
+        .legal-card p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+        .legal-card a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .legal-card a:hover {
+            border-bottom-color: var(--accent);
+        }
+        .contact-email {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 6px 18px;
+            display: inline-block;
+            color: var(--accent-secondary);
+            font-weight: 600;
+            margin: 4px 0;
+            word-break: break-all;
+        }
+        .last-updated {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-subtle);
+            margin: 24px 0;
+        }
+
+        /* Footer (identical to main) */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 40px 24px 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .footer-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .footer-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            font-family: var(--font-heading);
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: var(--transition-fast);
+        }
+        .footer-links a:hover {
+            color: #fff;
+        }
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 999;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+            box-shadow: 0 6px 20px rgba(255, 94, 58, 0.4);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(255, 94, 58, 0.55);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75%;
+                max-width: 320px;
+                height: 100vh;
+                background: rgba(15, 15, 36, 0.97);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                gap: 28px;
+                transition: var(--transition-smooth);
+                padding: 40px;
+                border-left: 1px solid var(--border-subtle);
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .nav-links a {
+                font-size: 1.1rem;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .legal-card {
+                padding: 30px 20px;
+                border-radius: var(--radius-md);
+            }
+            .legal-card h1 {
+                font-size: 1.6rem;
+            }
+            .legal-card h2 {
+                font-size: 1.2rem;
+            }
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-links {
+                justify-content: center;
+            }
+        }
+        @media (max-width: 480px) {
+            .legal-card {
+                padding: 24px 16px;
+            }
+            .legal-section {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+    </div>
+
+    <!-- Navigation (same as landing page) -->
+    <nav class="nav" id="navbar" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" aria-label="KabaddiOne Home">
+                <div class="logo-icon">🏆</div>
+                <span>KabaddiOne</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#sounds">Sounds</a></li>
+                <li><a href="index.html#how-it-works">How It Works</a></li>
+                <li><a href="index.html#download" class="nav-cta-btn">Download</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Terms & Conditions Content -->
+    <main class="legal-section">
+        <div class="legal-card">
+            <h1>Terms & Conditions</h1>
+            <p class="last-updated">Effective Date: 2026-05-21</p>
+            <p>
+                These terms and conditions apply to the <strong>KabaddiOne: Scoreboard App</strong> for mobile devices that was created by <strong>Gaurav Arts</strong> as an Ad Supported service.
+            </p>
+            <p>
+                Upon downloading or utilizing the Application, you are automatically agreeing to the following terms. It is strongly advised that you thoroughly read and understand these terms prior to using the Application.
+            </p>
+            <p>
+                Unauthorized copying, modification of the Application, any part of the Application, or our trademarks is strictly prohibited. Any attempts to extract the source code of the Application, translate the Application into other languages, or create derivative versions are not permitted. All trademarks, copyrights, database rights, and other intellectual property rights related to the Application remain the property of the Service Provider.
+            </p>
+            <p>
+                The Service Provider is dedicated to ensuring that the Application is as beneficial and efficient as possible. As such, they reserve the right to modify the Application or charge for their services at any time and for any reason. The Service Provider assures you that any charges for the Application or its services will be clearly communicated to you.
+            </p>
+            <p>
+                The Application stores and processes personal data that you have provided to the Service Provider in order to provide the Service. It is your responsibility to maintain the security of your phone and access to the Application. The Service Provider strongly advises against jailbreaking or rooting your phone, which involves removing software restrictions and limitations imposed by the official operating system of your device. Such actions could expose your phone to malware, viruses, malicious programs, compromise your phone's security features, and may result in the Application not functioning correctly or at all.
+            </p>
+            <p>
+                Please be aware that the Service Provider does not assume responsibility for certain aspects. Some functions of the Application require an active internet connection, which can be Wi-Fi or provided by your mobile network provider. The Service Provider cannot be held responsible if the Application does not function at full capacity due to lack of access to Wi-Fi or if you have exhausted your data allowance.
+            </p>
+            <p>
+                If you are using the application outside of a Wi-Fi area, please be aware that your mobile network provider's agreement terms still apply. Consequently, you may incur charges from your mobile provider for data usage during the connection to the application, or other third-party charges. By using the application, you accept responsibility for any such charges, including roaming data charges if you use the application outside of your home territory (i.e., region or country) without disabling data roaming. If you are not the bill payer for the device on which you are using the application, they assume that you have obtained permission from the bill payer.
+            </p>
+            <p>
+                Similarly, the Service Provider cannot always assume responsibility for your usage of the application. For instance, it is your responsibility to ensure that your device remains charged. If your device runs out of battery and you are unable to access the Service, the Service Provider cannot be held responsible.
+            </p>
+            <p>
+                In terms of the Service Provider's responsibility for your use of the application, it is important to note that while they strive to ensure that it is updated and accurate at all times, they do rely on third parties to provide information to them so that they can make it available to you. The Service Provider accepts no liability for any loss, direct or indirect, that you experience as a result of relying entirely on this functionality of the application.
+            </p>
+            <p>
+                The Service Provider may wish to update the application at some point. The application is currently available as per the requirements for the operating system (and for any additional systems they decide to extend the availability of the application to) may change, and you will need to download the updates if you want to continue using the application. The Service Provider does not guarantee that it will always update the application so that it is relevant to you and/or compatible with the particular operating system version installed on your device. However, you agree to always accept updates to the application when offered to you. The Service Provider may also wish to cease providing the application and may terminate its use at any time without providing termination notice to you. Unless they inform you otherwise, upon any termination, (a) the rights and licenses granted to you in these terms will end; (b) you must cease using the application, and (if necessary) delete it from your device.
+            </p>
+
+            <h2>Changes to These Terms and Conditions</h2>
+            <p>
+                The Service Provider may periodically update their Terms and Conditions. Therefore, you are advised to review this page regularly for any changes. The Service Provider will notify you of any changes by posting the new Terms and Conditions on this page.
+            </p>
+            <p>These terms and conditions are effective as of 2026-05-21.</p>
+
+            <h2>Contact Us</h2>
+            <p>
+                If you have any questions or suggestions about the Terms and Conditions, please do not hesitate to contact the Service Provider at
+                <a href="mailto:care.Kabaddione@gmail.com" class="contact-email">care.Kabaddione@gmail.com</a>.
+            </p>
+
+            <hr>
+            <p style="text-align:center; color: var(--text-muted); font-size:0.85rem;">
+                © 2026 Gaurav Arts · KabaddiOne Scoreboard App
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer (same as main) -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-logo">🏆 KabaddiOne</div>
+            <div class="footer-links">
+                <a href="index.html#features">Features</a>
+                <a href="index.html#sounds">Sounds</a>
+                <a href="index.html#how-it-works">How It Works</a>
+                <a href="index.html#download">Download</a>
+                <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="terms-and-conditions.html">Terms & Conditions</a>
+                <a href="mailto:Kabaddione.support@gmail.com">Contact</a>
+            </div>
+            <p class="footer-copy">© 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
+
+    <script>
+        (function() {
+            const navbar = document.getElementById('navbar');
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const backToTop = document.getElementById('backToTop');
+            const allNavLinks = navLinks.querySelectorAll('a');
+
+            hamburger.addEventListener('click', function() {
+                const isActive = navLinks.classList.toggle('active');
+                hamburger.classList.toggle('active');
+                hamburger.setAttribute('aria-expanded', isActive);
+                document.body.style.overflow = isActive ? 'hidden' : '';
+            });
+
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            function updateNavbar() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            window.addEventListener('scroll', updateNavbar, { passive: true });
+            updateNavbar();
+
+            function updateBackToTop() {
+                if (window.scrollY > 600) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            }
+            window.addEventListener('scroll', updateBackToTop, { passive: true });
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            updateBackToTop();
+        })();
+    </script>
+</body>
+</html>
