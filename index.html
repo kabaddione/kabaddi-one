@@ -23,7 +23,6 @@
     <meta name="theme-color" content="#0a0a1a">
     <title>KabaddiOne - Premium All-in-One Kabaddi Scoreboard App | Play Store</title>
 
-    <!-- JSON-LD Structured Data for SoftwareApplication -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -32,16 +31,8 @@
             "operatingSystem": "Android",
             "applicationCategory": "SportsApplication",
             "description": "Premium all-in-one kabaddi scoreboard app with auto result calculator, super tackle, do-or-die, all out, coin toss, simulator sounds, and modern UI.",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "INR"
-            },
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "1250"
-            }
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+            "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "1250" }
         }
     </script>
 
@@ -153,7 +144,6 @@
             animation-delay: -3s;
             animation-duration: 22s;
         }
-
         @keyframes orbFloat {
             0%,
             100% {
@@ -239,16 +229,17 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 28px;
             list-style: none;
         }
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: var(--transition-fast);
             position: relative;
+            white-space: nowrap;
         }
         .nav-links a::after {
             content: '';
@@ -277,7 +268,6 @@
             text-decoration: none;
             transition: var(--transition-bounce) !important;
             box-shadow: 0 4px 18px rgba(255, 94, 58, 0.35);
-            white-space: nowrap;
         }
         .nav-cta-btn:hover {
             transform: translateY(-2px);
@@ -471,7 +461,7 @@
             margin-top: 2px;
         }
 
-        /* Phone Mockup */
+        /* Phone Mockup (Portrait - Hero) */
         .phone-mockup-wrapper {
             display: flex;
             justify-content: center;
@@ -634,7 +624,6 @@
                 box-shadow: 0 0 100px rgba(255, 94, 58, 0.35);
             }
         }
-
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -758,6 +747,384 @@
             margin-top: 10px;
             letter-spacing: 1px;
             text-transform: uppercase;
+        }
+
+        /* ============ DEDICATED AUTO FEATURE SECTIONS ============ */
+        .auto-feature-section {
+            position: relative;
+            z-index: 1;
+            padding: 70px 24px;
+            overflow: hidden;
+        }
+        .auto-feature-section.alt-bg {
+            background: var(--bg-secondary);
+        }
+        .auto-feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+        .auto-feature-grid.reverse {
+            direction: rtl;
+        }
+        .auto-feature-grid.reverse>* {
+            direction: ltr;
+        }
+        .auto-feature-text {
+            max-width: 500px;
+        }
+        .auto-feature-text .feature-number {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .auto-feature-text h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        .auto-feature-text h2 .highlight {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .auto-feature-text p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        .auto-feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .auto-feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .auto-feature-list li .check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 94, 58, 0.2);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        /* Landscape Phone Mockup for Auto Features */
+        .landscape-mockup-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .landscape-mockup {
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 16/9;
+            background: #1a1a2e;
+            border-radius: 24px;
+            border: 3px solid #2a2a40;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55), 0 0 50px rgba(255, 94, 58, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+            min-height: 260px;
+        }
+        .landscape-mockup .lm-notch {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 80px;
+            background: #0a0a1a;
+            border-radius: 0 12px 12px 0;
+            z-index: 2;
+        }
+        .landscape-mockup .lm-screen {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            background: linear-gradient(135deg, #0d0d22 0%, #111130 100%);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .landscape-mockup video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+        .lm-video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .lm-video-placeholder .lm-play-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 94, 58, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            z-index: 2;
+            animation: playPulse 2s ease-in-out infinite;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 94, 58, 0.5);
+        }
+        @keyframes playPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 94, 58, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 94, 58, 0.7);
+            }
+        }
+        .lm-video-placeholder .lm-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 1px;
+            z-index: 2;
+            text-transform: uppercase;
+        }
+        /* Animated background for placeholder */
+        .lm-animated-bg {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .lm-animated-bg .lm-score-display {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            font-family: var(--font-heading);
+        }
+        .lm-score-display .lm-team {
+            text-align: center;
+        }
+        .lm-score-display .lm-team-name {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .lm-score-display .lm-team-score {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+        }
+        .lm-score-display .lm-vs {
+            font-size: 0.7rem;
+            color: var(--accent);
+            font-weight: 800;
+        }
+        .lm-flash-overlay {
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            animation: flashOverlay 3s ease-in-out infinite;
+            pointer-events: none;
+            border-radius: 16px;
+        }
+        @keyframes flashOverlay {
+            0%,
+            70%,
+            100% {
+                background: transparent;
+            }
+            75%,
+            85% {
+                background: rgba(255, 94, 58, 0.15);
+            }
+        }
+        .lm-badge-pop {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--accent);
+            color: #fff;
+            font-weight: 900;
+            font-size: 0.8rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            animation: badgePopIn 3s ease-in-out infinite;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 3;
+        }
+        @keyframes badgePopIn {
+            0%,
+            65% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            72% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            95%,
+            100% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+        }
+        /* Coin toss specific */
+        .lm-coin-anim {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFB830, #F0C040);
+            border: 3px solid #d4a020;
+            animation: coinFlip 2s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #5a3e00;
+            box-shadow: 0 8px 24px rgba(240, 192, 64, 0.4);
+        }
+        @keyframes coinFlip {
+            0% {
+                transform: rotateY(0deg) scale(1);
+            }
+            25% {
+                transform: rotateY(720deg) scale(1.15);
+            }
+            50% {
+                transform: rotateY(1440deg) scale(1);
+            }
+            75% {
+                transform: rotateY(720deg) scale(1.15);
+            }
+            100% {
+                transform: rotateY(0deg) scale(1);
+            }
+        }
+        /* Result celebration */
+        .lm-celebration {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .lm-confetti {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 2px;
+            animation: confettiFall 2.5s ease-in-out infinite;
+        }
+        .lm-confetti:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+            background: #FF5E3A;
+        }
+        .lm-confetti:nth-child(2) {
+            left: 25%;
+            animation-delay: 0.3s;
+            background: #FFB830;
+        }
+        .lm-confetti:nth-child(3) {
+            left: 40%;
+            animation-delay: 0.6s;
+            background: #6C3CE0;
+        }
+        .lm-confetti:nth-child(4) {
+            left: 55%;
+            animation-delay: 0.9s;
+            background: #FF3D70;
+        }
+        .lm-confetti:nth-child(5) {
+            left: 70%;
+            animation-delay: 1.2s;
+            background: #F0C040;
+        }
+        .lm-confetti:nth-child(6) {
+            left: 85%;
+            animation-delay: 1.5s;
+            background: #FF5E3A;
+        }
+        .lm-confetti:nth-child(7) {
+            left: 15%;
+            animation-delay: 1.8s;
+            background: #6C3CE0;
+        }
+        .lm-confetti:nth-child(8) {
+            left: 60%;
+            animation-delay: 2.1s;
+            background: #FFB830;
+        }
+        @keyframes confettiFall {
+            0% {
+                top: -10%;
+                opacity: 1;
+                transform: rotate(0deg) translateX(0);
+            }
+            100% {
+                top: 110%;
+                opacity: 0;
+                transform: rotate(720deg) translateX(30px);
+            }
+        }
+        .lm-glow-ring-landscape {
+            position: absolute;
+            inset: -15px;
+            border-radius: 30px;
+            background: transparent;
+            box-shadow: 0 0 60px rgba(255, 94, 58, 0.18);
+            pointer-events: none;
+            animation: glowRingPulse 3s ease-in-out infinite;
         }
 
         /* ============ SOUND SECTION ============ */
@@ -1118,6 +1485,24 @@
                 top: 8px;
                 border-radius: 0 0 14px 14px;
             }
+            .auto-feature-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+                text-align: center;
+            }
+            .auto-feature-grid.reverse {
+                direction: ltr;
+            }
+            .auto-feature-text {
+                max-width: 100%;
+            }
+            .auto-feature-list {
+                align-items: center;
+            }
+            .landscape-mockup {
+                max-width: 420px;
+                min-height: 220px;
+            }
             .sound-showcase {
                 grid-template-columns: 1fr;
             }
@@ -1171,9 +1556,23 @@
             .section {
                 padding: 50px 16px;
             }
+            .auto-feature-section {
+                padding: 50px 16px;
+            }
             .cta-card {
                 padding: 36px 20px;
                 border-radius: var(--radius-lg);
+            }
+            .landscape-mockup {
+                max-width: 360px;
+                min-height: 190px;
+                border-radius: 18px;
+            }
+            .landscape-mockup .lm-screen {
+                border-radius: 14px;
+            }
+            .lm-score-display .lm-team-score {
+                font-size: 2rem;
             }
         }
         @media (max-width: 480px) {
@@ -1225,6 +1624,32 @@
             .footer-links {
                 justify-content: center;
             }
+            .landscape-mockup {
+                max-width: 300px;
+                min-height: 160px;
+                border-radius: 14px;
+            }
+            .landscape-mockup .lm-screen {
+                border-radius: 10px;
+            }
+            .landscape-mockup .lm-notch {
+                width: 10px;
+                height: 50px;
+                border-radius: 0 6px 6px 0;
+            }
+            .lm-score-display .lm-team-score {
+                font-size: 1.6rem;
+            }
+            .lm-score-display .lm-team-name {
+                font-size: 0.5rem;
+            }
+            .auto-feature-text h2 {
+                font-size: 1.3rem;
+            }
+            .lm-badge-pop {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+            }
         }
     </style>
 </head>
@@ -1247,6 +1672,7 @@
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#features">Features</a></li>
+                <li><a href="#auto-super-tackle">Smart Auto</a></li>
                 <li><a href="#sounds">Sounds</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#download" class="nav-cta-btn">Download</a></li>
@@ -1292,7 +1718,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Phone Mockup -->
             <div class="phone-mockup-wrapper">
                 <div class="phone-glow-ring"></div>
                 <div class="phone-mockup">
@@ -1301,15 +1726,9 @@
                         <div class="app-header">KabaddiOne</div>
                         <div class="match-title">Pro League · Final</div>
                         <div class="phone-teams">
-                            <div class="phone-team">
-                                <div class="t-name">Eagles</div>
-                                <div class="t-score">32</div>
-                            </div>
+                            <div class="phone-team"><div class="t-name">Eagles</div><div class="t-score">32</div></div>
                             <div class="phone-vs">VS</div>
-                            <div class="phone-team">
-                                <div class="t-name">Tigers</div>
-                                <div class="t-score">28</div>
-                            </div>
+                            <div class="phone-team"><div class="t-name">Tigers</div><div class="t-score">28</div></div>
                         </div>
                         <div class="phone-timer">⏱ 12:34</div>
                         <div class="phone-indicators">
@@ -1324,7 +1743,7 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Features Grid Section -->
     <section class="section" id="features" aria-labelledby="features-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -1380,6 +1799,202 @@
                     <h3>Foul & Card Counter</h3>
                     <p>Track fouls, yellow cards, and red cards — keep full disciplinary records on the scoreboard.</p>
                     <span class="feature-badge">Pro</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== -->
+    <!-- DEDICATED AUTO FEATURE SECTIONS -->
+    <!-- ==================== -->
+
+    <!-- 1. Auto Super Tackle -->
+    <section class="auto-feature-section alt-bg" id="auto-super-tackle" aria-labelledby="st-heading">
+        <div class="auto-feature-grid">
+            <div class="auto-feature-text reveal">
+                <div class="feature-number">01 · Auto Detection</div>
+                <h2 id="st-heading">Auto <span class="highlight">Super Tackle</span> Detection</h2>
+                <p>When a defender brings down the raider with 3 or fewer defenders on the mat, KabaddiOne instantly detects the Super Tackle — flashing the screen, playing the roar sound, and awarding <strong>+2 bonus points</strong> automatically. No second-guessing, no manual toggles.</p>
+                <ul class="auto-feature-list">
+                    <li><span class="check-icon">✓</span> Automatic +2 bonus point calculation</li>
+                    <li><span class="check-icon">✓</span> Visual flash & "SUPER TACKLE" badge pop</li>
+                    <li><span class="check-icon">✓</span> Dedicated roar sound effect</li>
+                    <li><span class="check-icon">✓</span> Match log entry with timestamp</li>
+                </ul>
+            </div>
+            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                <div class="lm-glow-ring-landscape"></div>
+                <div class="landscape-mockup">
+                    <div class="lm-notch"></div>
+                    <div class="lm-screen">
+                        <div class="lm-video-placeholder">
+                            <div class="lm-animated-bg">
+                                <div class="lm-score-display">
+                                    <div class="lm-team"><div class="lm-team-name">Eagles</div><div class="lm-team-score">24</div></div>
+                                    <div class="lm-vs">VS</div>
+                                    <div class="lm-team"><div class="lm-team-name">Tigers</div><div class="lm-team-score">20</div></div>
+                                </div>
+                                <div class="lm-flash-overlay"></div>
+                                <div class="lm-badge-pop" style="animation-delay:0.5s;">⚡ SUPER TACKLE +2</div>
+                            </div>
+                            <div class="lm-play-btn">▶</div>
+                            <div class="lm-label">Auto Super Tackle Demo</div>
+                        </div>
+                        <!-- Replace src with your actual video: -->
+                        <!-- <video src="videos/super-tackle-demo.mp4" autoplay muted loop playsinline></video> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Auto Do-or-Die Raid -->
+    <section class="auto-feature-section" id="auto-do-or-die" aria-labelledby="dod-heading">
+        <div class="auto-feature-grid reverse">
+            <div class="auto-feature-text reveal">
+                <div class="feature-number">02 · Critical Moment</div>
+                <h2 id="dod-heading">Auto <span class="highlight">Do-or-Die</span> Raid Tracker</h2>
+                <p>When a team fails to score on two consecutive raids, the third raid is automatically flagged as a <strong>Do-or-Die</strong>. KabaddiOne triggers the siren sound, activates a special countdown timer, and applies the correct points outcome — all without you touching a setting.</p>
+                <ul class="auto-feature-list">
+                    <li><span class="check-icon">✓</span> Automatic 2-raid empty streak detection</li>
+                    <li><span class="check-icon">✓</span> Do-or-Die siren sound activation</li>
+                    <li><span class="check-icon">✓</span> Visual "DO OR DIE" banner with glow</li>
+                    <li><span class="check-icon">✓</span> Auto point deduction on failed raid</li>
+                </ul>
+            </div>
+            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                <div class="lm-glow-ring-landscape"></div>
+                <div class="landscape-mockup">
+                    <div class="lm-notch"></div>
+                    <div class="lm-screen">
+                        <div class="lm-video-placeholder">
+                            <div class="lm-animated-bg">
+                                <div class="lm-score-display">
+                                    <div class="lm-team"><div class="lm-team-name">Raiders</div><div class="lm-team-score">18</div></div>
+                                    <div class="lm-vs">VS</div>
+                                    <div class="lm-team"><div class="lm-team-name">Defenders</div><div class="lm-team-score">22</div></div>
+                                </div>
+                                <div class="lm-flash-overlay" style="animation-duration:2s;"></div>
+                                <div class="lm-badge-pop" style="background:#FF3D70;animation-delay:0.8s;animation-duration:2.5s;">🎯 DO OR DIE</div>
+                            </div>
+                            <div class="lm-play-btn">▶</div>
+                            <div class="lm-label">Auto Do-or-Die Demo</div>
+                        </div>
+                        <!-- <video src="videos/do-or-die-demo.mp4" autoplay muted loop playsinline></video> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Auto All Out -->
+    <section class="auto-feature-section alt-bg" id="auto-all-out" aria-labelledby="ao-heading">
+        <div class="auto-feature-grid">
+            <div class="auto-feature-text reveal">
+                <div class="feature-number">03 · Game Changer</div>
+                <h2 id="ao-heading">Auto <span class="highlight">All Out</span> Detection</h2>
+                <p>The moment a team loses all 7 players, KabaddiOne instantly detects the <strong>All Out</strong>. It blares the buzzer, awards <strong>+2 bonus points</strong> to the opposing team, and resets the player counter — all in a split second. The animated screen flash makes the moment unforgettable.</p>
+                <ul class="auto-feature-list">
+                    <li><span class="check-icon">✓</span> Instant zero-player detection</li>
+                    <li><span class="check-icon">✓</span> Automatic +2 bonus to opponent</li>
+                    <li><span class="check-icon">✓</span> Full-team revival with reset counter</li>
+                    <li><span class="check-icon">✓</span> "ALL OUT" buzzer + screen shake animation</li>
+                </ul>
+            </div>
+            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                <div class="lm-glow-ring-landscape"></div>
+                <div class="landscape-mockup">
+                    <div class="lm-notch"></div>
+                    <div class="lm-screen">
+                        <div class="lm-video-placeholder">
+                            <div class="lm-animated-bg">
+                                <div class="lm-score-display">
+                                    <div class="lm-team"><div class="lm-team-name">Eagles</div><div class="lm-team-score">30</div></div>
+                                    <div class="lm-vs">VS</div>
+                                    <div class="lm-team"><div class="lm-team-name">Tigers</div><div class="lm-team-score">12</div></div>
+                                </div>
+                                <div class="lm-flash-overlay" style="animation-duration:4s;"></div>
+                                <div class="lm-badge-pop" style="background:#FF0000;animation-delay:1s;animation-duration:3.5s;font-size:1rem;">🔴 ALL OUT +2</div>
+                            </div>
+                            <div class="lm-play-btn">▶</div>
+                            <div class="lm-label">Auto All Out Demo</div>
+                        </div>
+                        <!-- <video src="videos/all-out-demo.mp4" autoplay muted loop playsinline></video> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. In-built Toss Coin -->
+    <section class="auto-feature-section" id="auto-coin-toss" aria-labelledby="ct-heading">
+        <div class="auto-feature-grid reverse">
+            <div class="auto-feature-text reveal">
+                <div class="feature-number">04 · Fair Start</div>
+                <h2 id="ct-heading">In-Built <span class="highlight">Coin Toss</span></h2>
+                <p>Forget hunting for a physical coin. KabaddiOne's built-in toss simulator is fair, fast, and fun. Tap once to flip — the coin spins with realistic physics animation, lands on <strong>Heads or Tails</strong>, and the winner gets to choose raid or side. Perfect for professional matches and casual games alike.</p>
+                <ul class="auto-feature-list">
+                    <li><span class="check-icon">✓</span> One-tap coin flip with animation</li>
+                    <li><span class="check-icon">✓</span> Random Heads/Tails result</li>
+                    <li><span class="check-icon">✓</span> Winner selection prompt</li>
+                    <li><span class="check-icon">✓</span> Match log: "Toss won by Eagles"</li>
+                </ul>
+            </div>
+            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                <div class="lm-glow-ring-landscape"></div>
+                <div class="landscape-mockup">
+                    <div class="lm-notch"></div>
+                    <div class="lm-screen">
+                        <div class="lm-video-placeholder" style="background:linear-gradient(135deg,#0d0d22,#1a1030);">
+                            <div class="lm-coin-anim">₹</div>
+                            <div class="lm-label" style="margin-top:12px;">Tap to Flip Coin</div>
+                        </div>
+                        <!-- <video src="videos/coin-toss-demo.mp4" autoplay muted loop playsinline></video> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Auto Match Result Calculator -->
+    <section class="auto-feature-section alt-bg" id="auto-result" aria-labelledby="mr-heading">
+        <div class="auto-feature-grid">
+            <div class="auto-feature-text reveal">
+                <div class="feature-number">05 · Instant Finish</div>
+                <h2 id="mr-heading">Auto <span class="highlight">Match Result</span> Calculator</h2>
+                <p>When the final whistle blows, KabaddiOne instantly computes the final score, determines the winner, and displays it with a <strong>stunning celebration animation</strong> complete with confetti, sound effects, and a match summary. No manual math — just tap and celebrate.</p>
+                <ul class="auto-feature-list">
+                    <li><span class="check-icon">✓</span> Automatic winner declaration</li>
+                    <li><span class="check-icon">✓</span> Confetti celebration animation</li>
+                    <li><span class="check-icon">✓</span> Full match summary screen</li>
+                    <li><span class="check-icon">✓</span> Shareable result card</li>
+                </ul>
+            </div>
+            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                <div class="lm-glow-ring-landscape"></div>
+                <div class="landscape-mockup">
+                    <div class="lm-notch"></div>
+                    <div class="lm-screen">
+                        <div class="lm-video-placeholder">
+                            <div class="lm-animated-bg">
+                                <div class="lm-score-display">
+                                    <div class="lm-team"><div class="lm-team-name">Eagles</div><div class="lm-team-score" style="color:#F0C040;">38</div></div>
+                                    <div class="lm-vs">VS</div>
+                                    <div class="lm-team"><div class="lm-team-name">Tigers</div><div class="lm-team-score">32</div></div>
+                                </div>
+                                <div class="lm-celebration">
+                                    <div class="lm-confetti"></div><div class="lm-confetti"></div>
+                                    <div class="lm-confetti"></div><div class="lm-confetti"></div>
+                                    <div class="lm-confetti"></div><div class="lm-confetti"></div>
+                                    <div class="lm-confetti"></div><div class="lm-confetti"></div>
+                                </div>
+                                <div class="lm-badge-pop" style="background:#F0C040;color:#0a0a1a;animation-delay:0.3s;animation-duration:4s;">🏆 EAGLES WIN!</div>
+                            </div>
+                            <div class="lm-play-btn">▶</div>
+                            <div class="lm-label">Auto Result Demo</div>
+                        </div>
+                        <!-- <video src="videos/result-demo.mp4" autoplay muted loop playsinline></video> -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1463,24 +2078,23 @@
             <div class="footer-logo">🏆 KabaddiOne</div>
             <div class="footer-links">
                 <a href="#features">Features</a>
+                <a href="#auto-super-tackle">Smart Auto</a>
                 <a href="#sounds">Sounds</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#download">Download</a>
                 <a href="/privacy.html">Privacy Policy</a>
                 <a href="/terms.html">Terms & Conditions</a>
-                <a href="#">Contact</a>
+                <a href="mailto:Kabaddione.support@gmail.com">Contact</a>
             </div>
             <p class="footer-copy">© 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.</p>
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
+    <!-- Back to Top -->
     <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
 
-    <!-- JavaScript -->
     <script>
         (function() {
-            // DOM Elements
             const navbar = document.getElementById('navbar');
             const hamburger = document.getElementById('hamburger');
             const navLinks = document.getElementById('navLinks');
@@ -1488,15 +2102,13 @@
             const allNavLinks = navLinks.querySelectorAll('a');
             const revealElements = document.querySelectorAll('.reveal');
 
-            // --- Mobile Menu Toggle ---
+            // Mobile menu
             hamburger.addEventListener('click', function() {
                 const isActive = navLinks.classList.toggle('active');
                 hamburger.classList.toggle('active');
                 hamburger.setAttribute('aria-expanded', isActive);
                 document.body.style.overflow = isActive ? 'hidden' : '';
             });
-
-            // Close mobile menu when a link is clicked
             allNavLinks.forEach(link => {
                 link.addEventListener('click', () => {
                     navLinks.classList.remove('active');
@@ -1506,38 +2118,25 @@
                 });
             });
 
-            // --- Navbar Scroll Effect ---
+            // Navbar scroll
             function updateNavbar() {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
+                if (window.scrollY > 50) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
             }
             window.addEventListener('scroll', updateNavbar, { passive: true });
-            updateNavbar(); // initial check
+            updateNavbar();
 
-            // --- Back to Top Button ---
+            // Back to top
             function updateBackToTop() {
-                if (window.scrollY > 600) {
-                    backToTop.classList.add('visible');
-                } else {
-                    backToTop.classList.remove('visible');
-                }
+                if (window.scrollY > 600) backToTop.classList.add('visible');
+                else backToTop.classList.remove('visible');
             }
             window.addEventListener('scroll', updateBackToTop, { passive: true });
-            backToTop.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
             updateBackToTop();
 
-            // --- Scroll Reveal Animations (Intersection Observer) ---
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px 0px -60px 0px',
-                threshold: 0.1
-            };
-
+            // Reveal animations
+            const observerOptions = { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 };
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1546,10 +2145,9 @@
                     }
                 });
             }, observerOptions);
-
             revealElements.forEach(el => revealObserver.observe(el));
 
-            // --- Smooth Scroll for all anchor links ---
+            // Smooth scroll
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
                     const targetId = this.getAttribute('href');
@@ -1558,21 +2156,18 @@
                     if (target) {
                         e.preventDefault();
                         const navHeight = navbar.offsetHeight;
-                        const targetPosition = target.getBoundingClientRect().top + window
-                            .pageYOffset - navHeight - 10;
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
                         window.scrollTo({ top: targetPosition, behavior: 'smooth' });
                     }
                 });
             });
 
-            // --- Active nav link highlight on scroll ---
+            // Active nav highlight
             const sections = document.querySelectorAll('section[id]');
             const navAnchors = document.querySelectorAll('.nav-links a:not(.nav-cta-btn)');
-
             function highlightNavOnScroll() {
                 let current = '';
                 const scrollPos = window.scrollY + navbar.offsetHeight + 100;
-
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
                     const sectionHeight = section.offsetHeight;
@@ -1580,21 +2175,27 @@
                         current = section.getAttribute('id');
                     }
                 });
-
                 navAnchors.forEach(anchor => {
                     anchor.style.color = '';
-                    if (anchor.getAttribute('href') === '#' + current) {
-                        anchor.style.color = '#ffffff';
-                    }
+                    if (anchor.getAttribute('href') === '#' + current) anchor.style.color = '#ffffff';
                 });
             }
             window.addEventListener('scroll', highlightNavOnScroll, { passive: true });
 
+            // Video placeholder click - simulate play (users can replace with real video)
+            document.querySelectorAll('.lm-video-placeholder').forEach(placeholder => {
+                placeholder.addEventListener('click', function() {
+                    const playBtn = this.querySelector('.lm-play-btn');
+                    const label = this.querySelector('.lm-label');
+                    if (playBtn) playBtn.style.opacity = '0';
+                    if (label) label.textContent = '▶ Playing...';
+                    // When real videos are added, the <video> tag will handle autoplay
+                });
+            });
+
             console.log('%c🏆 KabaddiOne Landing Page Ready %c| %cPremium Kabaddi Scoreboard App',
-                'color:#FF5E3A;font-weight:bold;font-size:1.1em;',
-                '',
-                'color:#b0b0c8;');
-            console.log('%cAll features loaded • SEO optimized • Fully responsive',
+                'color:#FF5E3A;font-weight:bold;font-size:1.1em;', '', 'color:#b0b0c8;');
+            console.log('%c5 Auto Feature Sections • Video-Ready Mockups • SEO Optimized',
                 'color:#7a7a95;font-size:0.85em;');
         })();
     </script>
