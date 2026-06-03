@@ -560,6 +560,72 @@
             .landscape-mockup .lm-screen { border-radius: 10px; }
             .landscape-mockup .lm-notch { width: 10px; height: 50px; border-radius: 0 6px 6px 0; }
         }
+
+        /* ============ LANGUAGES SECTION ============ */
+.languages-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 24px;
+    background: var(--bg-primary);
+}
+
+.langs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.lang-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 24px 16px;
+    text-align: center;
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.lang-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-glow);
+    box-shadow: var(--shadow-card), 0 0 30px rgba(255,94,58,0.12);
+}
+
+.lang-card .lang-flag {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.lang-card .lang-name {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+}
+
+.lang-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: var(--transition-smooth);
+}
+
+.lang-card:hover::before {
+    opacity: 1;
+}
+        
     </style>
 </head>
 <body>
@@ -860,6 +926,59 @@
         </div>
     </section>
 
+    <!-- Supported Languages Section -->
+<section class="languages-section" id="languages" aria-labelledby="languages-heading">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-tag">Global Reach</span>
+            <h2 id="languages-heading">Your Language, <span class="highlight">Your Game</span></h2>
+            <p>KabaddiOne speaks 11 languages — making professional kabaddi scoring accessible to everyone, everywhere.</p>
+        </div>
+        <div class="langs-grid reveal reveal-delay-1">
+            <div class="lang-card">
+                <span class="lang-flag">🇬🇧</span>
+                <div class="lang-name">English</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇮🇳</span>
+                <div class="lang-name">Hindi</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇧🇩</span>
+                <div class="lang-name">Bengali</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🌴</span> <!-- No official Malayalam flag emoji, using a cultural icon -->
+                <div class="lang-name">Malayalam</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇱🇰</span> <!-- Tamil widely spoken in Sri Lanka, flag closest available -->
+                <div class="lang-name">Tamil</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇮🇳</span>
+                <div class="lang-name">Telugu</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇮🇳</span>
+                <div class="lang-name">Kannada</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇯🇵</span>
+                <div class="lang-name">Japanese</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇰🇷</span>
+                <div class="lang-name">Korean</div>
+            </div>
+            <div class="lang-card">
+                <span class="lang-flag">🇸🇦</span>
+                <div class="lang-name">Arabic</div>
+            </div>
+        </div>
+    </div>
+</section>
+
     <!-- How It Works -->
     <section class="section" id="how-it-works" aria-labelledby="how-heading">
         <div class="container">
@@ -917,6 +1036,7 @@
                 <a href="#features">Features</a>
                 <a href="#auto-super-tackle">Smart Auto</a>
                 <a href="#sounds">Sounds</a>
+                <a href="#languages">Languages</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#download">Download</a>
                 <a href="privacy.html">Privacy Policy</a>
