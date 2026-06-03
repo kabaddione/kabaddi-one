@@ -638,7 +638,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative; /* required for the overlay */
+    position: relative;
 }
 
 .lang-flag img {
@@ -647,7 +647,7 @@
     object-fit: cover;
 }
 
-/* White tint overlay */
+/* White tint overlay – makes all flags look uniform */
 .lang-flag::after {
     content: '';
     position: absolute;
@@ -655,14 +655,14 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.3); /* adjust opacity for tint strength */
-    border-radius: 50%; /* match the container */
-    pointer-events: none; /* allows hover etc. to pass through */
+    background: rgba(255, 255, 255, 1);  /* Adjust opacity as needed */
+    border-radius: 50%;
+    pointer-events: none;
 }
 
 .lang-card:hover .lang-flag {
     border-color: var(--accent);
-}      
+}    
         
     </style>
 </head>
@@ -1023,7 +1023,7 @@
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-ko.png" alt="Korean" />
+                    <img src="images/flag-ko.png" alt="Korean" />
                 </div>
                 <div class="lang-name">Korean</div>
             </div>
