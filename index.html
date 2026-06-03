@@ -647,18 +647,6 @@
     object-fit: cover;
 }
 
-/* White tint overlay – makes all flags look uniform */
-.lang-flag::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 1);  /* Adjust opacity as needed */
-    border-radius: 50%;
-    pointer-events: none;
-}
 
 .lang-card:hover .lang-flag {
     border-color: var(--accent);
