@@ -314,6 +314,7 @@
             max-width: 460px; animation: fadeInUp 0.8s ease-out 0.2s both; line-height: 1.7;
         }
         .hero-buttons { display: flex; flex-wrap: wrap; gap: 14px; animation: fadeInUp 0.8s ease-out 0.3s both; }
+        .btn-outline {background-image: none; background-color: transparent; color: rgb(232, 230, 227); text-decoration-color: currentcolor; border: 2px solid var(--darkreader-border--accent);}
         .btn-primary {
             display: inline-flex; align-items: center; gap: 10px;
             background: linear-gradient(135deg, var(--accent), #FF3D10);
@@ -704,7 +705,7 @@
                         <i class="fa-brands fa-google-play"></i>
                         Download on Play Store
                     </a>
-                    <a href="#features" class="btn-secondary">Explore Features</a>
+                    <a href="#features" class="btn-outline">Explore Features</a>
                 </div>
                 <div class="hero-stats">
                     <div class="hero-stat">
@@ -716,8 +717,12 @@
                         <div class="stat-label">Downloads</div>
                     </div>
                     <div class="hero-stat">
+                        <div class="stat-num">10</div>
+                        <div class="stat-label">Languages</div>
+                    </div>
+                    <div class="hero-stat">
                         <div class="stat-num">15+</div>
-                        <div class="stat-label">Features</div>
+                        <div class="stat-label">Sound Effects</div>
                     </div>
                 </div>
             </div>
