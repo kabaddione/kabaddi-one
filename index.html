@@ -570,14 +570,16 @@
 }
 
 .langs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
     max-width: 900px;
     margin: 0 auto;
 }
 
 .lang-card {
+    width: 140px;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-md);
@@ -1037,7 +1039,6 @@
                 <a href="#auto-super-tackle">Smart Auto</a>
                 <a href="#sounds">Sounds</a>
                 <a href="#languages">Languages</a>
-                <a href="#how-it-works">How It Works</a>
                 <a href="#download">Download</a>
                 <a href="privacy.html">Privacy Policy</a>
                 <a href="terms.html">Terms & Conditions</a>
