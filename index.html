@@ -638,6 +638,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative; /* required for the overlay */
 }
 
 .lang-flag img {
@@ -646,9 +647,22 @@
     object-fit: cover;
 }
 
+/* White tint overlay */
+.lang-flag::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3); /* adjust opacity for tint strength */
+    border-radius: 50%; /* match the container */
+    pointer-events: none; /* allows hover etc. to pass through */
+}
+
 .lang-card:hover .lang-flag {
     border-color: var(--accent);
-}        
+}      
         
     </style>
 </head>
@@ -961,49 +975,49 @@
         <div class="langs-grid reveal reveal-delay-1">
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-en.png" alt="English" />
+                    <img src="images/flag-en.png" alt="English" />
                 </div>
                 <div class="lang-name">English</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-hi.png" alt="Hindi" />
+                    <img src="images/flag-hi.png" alt="Hindi" />
                 </div>
                 <div class="lang-name">Hindi</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-bn.png" alt="Bengali" />
+                    <img src="images/flag-bn.png" alt="Bengali" />
                 </div>
                 <div class="lang-name">Bengali</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-ml.png" alt="Malayalam" />
+                    <img src="images/flag-ml.png" alt="Malayalam" />
                 </div>
                 <div class="lang-name">Malayalam</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-ta.png" alt="Tamil" />
+                    <img src="images/flag-ta.png" alt="Tamil" />
                 </div>
                 <div class="lang-name">Tamil</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-te.png" alt="Telugu" />
+                    <img src="images/flag-te.png" alt="Telugu" />
                 </div>
                 <div class="lang-name">Telugu</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-kn.png" alt="Kannada" />
+                    <img src="images/flag-kn.png" alt="Kannada" />
                 </div>
                 <div class="lang-name">Kannada</div>
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-ja.png" alt="Japanese" />
+                    <img src="images/flag-ja.png" alt="Japanese" />
                 </div>
                 <div class="lang-name">Japanese</div>
             </div>
@@ -1015,7 +1029,7 @@
             </div>
             <div class="lang-card">
                 <div class="lang-flag">
-                    <img src="images/flags/flag-ar.png" alt="Arabic" />
+                    <img src="images/flag-ar.png" alt="Arabic" />
                 </div>
                 <div class="lang-name">Arabic</div>
             </div>
