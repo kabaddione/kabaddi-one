@@ -25,7 +25,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
@@ -36,23 +36,9 @@
       gtag('config', 'G-YRYC0NEP1H');
     </script>
     
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            "name": "KabaddiOne",
-            "operatingSystem": "Android",
-            "applicationCategory": "SportsApplication",
-            "description": "Premium all-in-one kabaddi scoreboard app with auto result calculator, super tackle, do-or-die, all out, coin toss, simulator sounds, and modern UI.",
-            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
-            "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "1250" }
-        }
-    </script>
-
     <style>
         :root {
-            /* Matched exactly to the reference images */
-            --bg-base: #0d0822;
+            var(--bg-base): #0d0822;
             --bg-gradient-top: #5240a1;
             --bg-surface: #15121e;
             --text-main: #FFFFFF;
@@ -71,7 +57,7 @@
         
         html { 
             scroll-behavior: smooth; 
-            background: var(--bg-base); 
+            background: #0d0822; 
             color: var(--text-main); 
             font-family: var(--font-main);
             overflow-x: hidden;
@@ -85,7 +71,7 @@
            ======================================================== */
         .ambient-bg {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -2; background: radial-gradient(circle at 50% -10%, var(--bg-gradient-top) 0%, var(--bg-base) 60%);
+            z-index: -2; background: radial-gradient(circle at 50% -10%, var(--bg-gradient-top) 0%, #0d0822 60%);
         }
         .stars {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
@@ -120,33 +106,51 @@
             transition: all 0.4s var(--ease-out-expo); border-bottom: 1px solid transparent;
         }
         .navbar.scrolled {
-            padding: 16px 0; background: rgba(13, 8, 34, 0.85);
+            padding: 16px 0; background: rgba(13, 8, 34, 0.95);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
         .brand { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: 500; color: #fff; text-decoration: none; }
-        .brand img { height: 32px; }
-        .nav-menu { display: flex; gap: 32px; align-items: center; }
+        .brand img { height: 32px; border-radius: 6px; }
+        .nav-menu { display: flex; gap: 32px; align-items: center; transition: all 0.3s ease; }
         .nav-menu a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: opacity 0.3s; }
         .nav-menu a:hover { opacity: 0.7; }
         .nav-cta { background: #fff; color: #000 !important; padding: 8px 20px; border-radius: 50px; font-weight: 600 !important; }
-        .hamburger { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; }
-        .hamburger span { width: 30px; height: 2px; background: #fff; }
+        
+        .hamburger { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; z-index: 1001; }
+        .hamburger span { width: 30px; height: 2px; background: #fff; transition: all 0.3s ease; transform-origin: left; }
 
         @media(max-width: 768px) {
-            .nav-menu { display: none; } .hamburger { display: flex; }
+            .nav-menu {
+                position: absolute; top: 100%; left: 0; width: 100%; background: rgba(13, 8, 34, 0.98);
+                flex-direction: column; padding: 30px 24px; gap: 24px;
+                opacity: 0; visibility: hidden; transform: translateY(-20px);
+                border-bottom: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px);
+            }
+            .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
+            .hamburger { display: flex; }
+            .hamburger.active span:nth-child(1) { transform: rotate(45deg); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: rotate(-45deg); }
         }
 
         /* ========================================================
-           HERO SECTION (IMAGE 1 STYLE)
+           HERO SECTION (SUPERCONSCIOUS STYLE)
            ======================================================== */
         .hero {
-            padding-top: 140px; min-height: 100vh; display: flex; flex-direction: column;
+            padding-top: 150px; min-height: 100vh; display: flex; flex-direction: column;
             align-items: center; text-align: center; position: relative; overflow: hidden;
         }
-        .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 500; line-height: 1.1; letter-spacing: -1px; margin-bottom: 16px; z-index: 10; }
-        .hero p { font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--text-muted); margin-bottom: 30px; z-index: 10; font-weight: 400; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .hero h1 { 
+            font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 300; line-height: 1.1; 
+            margin-bottom: 16px; z-index: 10; font-family: var(--font-main);
+        }
+        .hero p { 
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem); color: var(--text-muted); 
+            margin-bottom: 30px; z-index: 10; font-weight: 400; max-width: 600px; 
+            margin-left: auto; margin-right: auto; 
+        }
         
         .hero-phone-wrapper { position: relative; margin-top: 20px; perspective: 1200px; z-index: 10; display: flex; justify-content: center; }
         .hero-phone-blob {
@@ -157,12 +161,12 @@
         }
 
         .iphone-pro-3d {
-            position: relative; width: 320px; height: 650px; border-radius: 48px; background: #000;
-            transform: rotateX(15deg) rotateY(-18deg) rotateZ(8deg);
+            position: relative; width: 340px; height: 690px; border-radius: 48px; background: #000;
+            transform: rotateX(20deg) rotateY(-22deg) rotateZ(8deg);
             box-shadow: -25px 35px 60px rgba(0,0,0,0.8), inset 3px 3px 6px rgba(255,255,255,0.2), inset -2px -2px 6px rgba(255,255,255,0.1), inset 0 0 0 10px #111, 0 0 40px rgba(138, 99, 229, 0.4);
             transform-style: preserve-3d; transition: transform 0.5s ease;
         }
-        .iphone-pro-3d:hover { transform: rotateX(10deg) rotateY(-10deg) rotateZ(4deg) translateY(-10px); }
+        .iphone-pro-3d:hover { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateY(-10px); }
         .iphone-pro-3d::before { content: ''; position: absolute; left: -4px; top: 130px; width: 4px; height: 30px; background: #555; border-radius: 4px 0 0 4px; box-shadow: 0 55px 0 #555, 0 120px 0 #555; }
         .iphone-pro-3d::after { content: ''; position: absolute; right: -4px; top: 170px; width: 4px; height: 70px; background: #555; border-radius: 0 4px 4px 0; }
         .dynamic-island { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 100px; height: 28px; background: #000; border-radius: 20px; z-index: 20; }
@@ -170,22 +174,25 @@
         .iphone-screen img { width: 115%; object-fit: cover; margin-top: -30px; }
         .screen-glare { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border-radius: 38px; pointer-events: none; z-index: 30; background: linear-gradient(110deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%); }
 
-        .hero-bottom-info { margin-top: 60px; z-index: 10; }
-        .hero-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
-        .hero-stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; backdrop-filter: blur(10px); font-size: 0.9rem; font-weight: 600; color: #fff; }
-        .hero-stat span { color: var(--accent-secondary); margin-right: 5px; }
-        
-        .btn-white { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #000; padding: 16px 40px; border-radius: 100px; font-weight: 700; font-size: 1.1rem; text-decoration: none; transition: transform 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .hero-bottom-info { margin-top: 60px; z-index: 10; margin-bottom: 40px; }
+        .btn-white { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #000; padding: 18px 46px; border-radius: 100px; font-weight: 700; font-size: 1.1rem; text-decoration: none; transition: transform 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .btn-white:hover { transform: scale(1.05); }
 
         @media(max-width: 768px) {
-            .iphone-pro-3d { transform: rotateX(10deg) rotateY(-10deg) rotateZ(5deg); width: 280px; height: 570px; }
+            .hero { padding-top: 100px; }
+            .hero h1 { font-size: 3.2rem; }
+            /* Adjusted Mobile 3D Transform to keep the beautiful tilt but fit the screen */
+            .iphone-pro-3d { 
+                transform: scale(0.8) rotateX(25deg) rotateY(-20deg) rotateZ(8deg); 
+                transform-origin: top center; 
+                margin-bottom: -120px; /* pull up bottom content since scaled */
+            }
+            .iphone-pro-3d:hover { transform: scale(0.8) rotateX(25deg) rotateY(-20deg) rotateZ(8deg); }
             .hero-phone-blob { width: 350px; height: 350px; }
-            .hero-stats { gap: 10px; } .hero-stat { font-size: 0.8rem; padding: 8px 16px; }
         }
 
         /* ========================================================
-           BENTO GRID SECTION (ALL 8 FEATURES - IMAGE 2 STYLE)
+           BENTO GRID SECTION
            ======================================================== */
         .section { padding: 100px 24px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 5; }
         .bento-header { text-align: center; margin-bottom: 60px; }
@@ -214,7 +221,7 @@
         @media(max-width: 600px) { .bento-grid { grid-template-columns: 1fr; } .col-span-2 { grid-column: span 1; } }
 
         /* ========================================================
-           PRESENTATION ROWS (ALL 5 VIDEOS + MOBILE FIX)
+           PRESENTATION ROWS
            ======================================================== */
         .feature-row { display: flex; align-items: center; gap: 60px; padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.05); }
         .feature-row:nth-child(even) { flex-direction: row-reverse; }
@@ -242,30 +249,53 @@
         }
 
         /* ========================================================
-           SOUND MODULE (WITH LIST RESTORED)
+           SOUND MODULE (FIXED FOR MOBILE IMAGE 3)
            ======================================================== */
-        .sound-module { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 60px; display: flex; gap: 40px; align-items: center; box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.2); }
-        .sound-content { flex: 1.5; }
-        .sound-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
-        .sound-list li { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
-        .sound-list i { color: var(--accent-secondary); }
-        .eq-bars { display: flex; align-items: flex-end; gap: 8px; height: 100px; flex: 1; justify-content: center; }
-        .bar { width: 16px; background: #fff; border-radius: 8px; animation: eq 1s ease-in-out infinite alternate; }
+        .sound-module { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 60px; display: flex; gap: 60px; align-items: center; box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.2); }
+        .sound-content { flex: 1; }
+        
+        /* Styled exactly like image 3 */
+        .sound-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
+        .sound-list li { background: rgba(255,255,255,0.03); padding: 18px 24px; border-radius: 16px; font-size: 1.05rem; font-weight: 500; display: flex; align-items: center; gap: 16px; transition: background 0.3s; }
+        .sound-list li:hover { background: rgba(255,255,255,0.06); }
+        .sound-list i { color: var(--accent-secondary); font-size: 1.2rem; }
+        
+        .sound-visuals { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 200px; }
+        .eq-bars { display: flex; align-items: flex-end; justify-content: center; gap: 12px; height: 120px; width: 100%; }
+        .bar { width: 18px; background: #fff; border-radius: 8px; animation: eq 1s ease-in-out infinite alternate; }
         .bar:nth-child(even) { background: var(--accent-primary); }
         .bar:nth-child(1) { height: 40%; animation-delay: 0s; } .bar:nth-child(2) { height: 80%; animation-delay: 0.1s; } .bar:nth-child(3) { height: 50%; animation-delay: 0.2s; } .bar:nth-child(4) { height: 100%; animation-delay: 0.3s; } .bar:nth-child(5) { height: 60%; animation-delay: 0.4s; } .bar:nth-child(6) { height: 90%; animation-delay: 0.5s; }
-        @keyframes eq { 0% { transform: scaleY(0.7); } 100% { transform: scaleY(1.2); } }
+        @keyframes eq { 0% { transform: scaleY(0.5); } 100% { transform: scaleY(1.2); } }
         
-        @media(max-width: 768px) { .sound-module { flex-direction: column; padding: 40px 20px; } .sound-list { grid-template-columns: 1fr; } }
+        @media(max-width: 768px) { 
+            .sound-module { flex-direction: column; padding: 40px 20px; }
+            .sound-visuals { min-height: 150px; margin-top: 20px; }
+            .eq-bars { height: 100px; }
+        }
 
         /* ========================================================
-           LANGUAGES CHIPS
+           LANGUAGES SECTION (MODERN GRID CARDS)
            ======================================================== */
-        .lang-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 900px; margin: 0 auto; }
-        .lang-chip { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 100px; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.95rem; transition: background 0.3s; }
-        .lang-chip:hover { background: rgba(255,255,255,0.15); } .lang-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+        .lang-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px; max-width: 1000px; margin: 0 auto; margin-top: 40px;
+        }
+        .lang-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px; padding: 24px 16px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 14px; transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .lang-card:hover {
+            background: rgba(255,255,255,0.06); transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .lang-card img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .lang-card span { font-weight: 600; font-size: 1rem; color: #fff; }
 
         /* ========================================================
-           HOW IT WORKS & CTA / QR CODE (RESTORED)
+           HOW IT WORKS & CTA
            ======================================================== */
         .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 40px; }
         .step-card { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); padding: 40px 24px; border-radius: 24px; text-align: center; box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.1); }
@@ -280,7 +310,7 @@
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
 
         /* ========================================================
-           FOOTER (RESTORED FULL LINKS)
+           FOOTER
            ======================================================== */
         .footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 80px 24px 40px; margin-top: 80px; }
         .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
@@ -316,17 +346,17 @@
                 <a href="#how-it-works">How It Works</a>
                 <a href="/download.html" class="nav-cta">Download</a>
             </div>
-            <button class="hamburger">
+            <button class="hamburger" id="mobile-menu-btn" aria-label="Toggle navigation">
                 <span></span><span></span><span></span>
             </button>
         </div>
     </nav>
 
     <section class="hero">
-        <h1>kabaddione</h1>
-        <p>The Premium All-in-One Kabaddi Scoreboard App</p>
+        <h1 data-scroll>kabaddione</h1>
+        <p data-scroll class="delay-100">The Premium All-in-One Kabaddi Scoreboard App</p>
         
-        <div class="hero-phone-wrapper">
+        <div class="hero-phone-wrapper" data-scroll class="delay-200">
             <div class="hero-phone-blob"></div>
             <div class="iphone-pro-3d">
                 <div class="dynamic-island"></div>
@@ -337,16 +367,10 @@
             </div>
         </div>
 
-        <div class="hero-bottom-info">
-            <div class="hero-stats">
-                <div class="hero-stat"><span>★</span> 4.8 Rating</div>
-                <div class="hero-stat"><span>↓</span> 10K+ Downloads</div>
-                <div class="hero-stat"><span>🌐</span> 10 Languages</div>
-                <div class="hero-stat"><span>🎵</span> 15+ Sounds</div>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Automate your match from toss to triumph.</p>
+        <div class="hero-bottom-info" data-scroll>
+            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 20px;">Coming in beta Spring 2026<br>Automate your match from toss to triumph.</p>
             <a href="https://play.google.com/store/apps/details?id=com.kabaddione.scoreboard" class="btn-white">
-                <i class="fa-brands fa-google-play"></i> Get it on Play Store
+                Download Free
             </a>
         </div>
     </section>
@@ -363,43 +387,36 @@
                 <h3>Auto Super Tackle Tracker</h3>
                 <p>Built-in Super Tackle detection with automatic bonus points and visual highlights. Detects 3 or fewer defenders automatically.</p>
             </div>
-            
             <div class="bento-card" data-scroll>
                 <div class="bento-icon-wrapper"><i class="fas fa-sync-alt"></i></div>
                 <h3>Auto Team Swap</h3>
                 <p>Teams switch sides automatically at half-time — no manual input, zero confusion.</p>
             </div>
-            
             <div class="bento-card" data-scroll>
                 <div class="bento-icon-wrapper"><i class="fas fa-medal"></i></div>
                 <h3>Auto Result Calculator</h3>
                 <p>Final scores are computed instantly at match end and displayed with a celebration animation.</p>
             </div>
-
             <div class="bento-card" data-scroll>
                 <div class="bento-icon-wrapper"><i class="fas fa-bullseye"></i></div>
                 <h3>Do-or-Die Raid</h3>
                 <p>Dedicated Do-or-Die mode with siren sound and automatic score impact calculation.</p>
             </div>
-            
             <div class="bento-card" data-scroll>
                 <div class="bento-icon-wrapper"><i class="fas fa-users-slash"></i></div>
                 <h3>All Out Detection</h3>
                 <p>Instant detection when a team loses all players, applying +2 bonus points automatically.</p>
             </div>
-            
             <div class="bento-card" data-scroll>
                 <div class="bento-icon-wrapper"><i class="fas fa-coins"></i></div>
                 <h3>In-Built Coin Toss</h3>
                 <p>Fair coin toss to start every match professionally — no physical coin needed.</p>
             </div>
-            
             <div class="bento-card" data-scroll>
                 <div class="bento-icon-wrapper"><i class="fas fa-stopwatch"></i></div>
                 <h3>Timeout & Substitute</h3>
                 <p>Manage timeouts and player substitutions seamlessly with dedicated controls.</p>
             </div>
-
             <div class="bento-card solid-accent col-span-2" data-scroll>
                 <div class="bento-icon-wrapper" style="background:#000; border:none; color:#fff;"><i class="fas fa-square" style="color:#F0C040;"></i></div>
                 <h3 style="color:#fff;">Foul & Card Counter</h3>
@@ -523,27 +540,30 @@
                     <li><i class="fas fa-volume-up"></i> Match End Celebration</li>
                 </ul>
             </div>
-            <div class="eq-bars">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="sound-visuals">
+                <div class="eq-bars">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
             </div>
         </div>
     </section>
 
     <section class="section text-center" id="languages">
         <div class="feature-label" data-scroll>Global Reach</div>
-        <h2 style="font-size: 2rem; margin-bottom: 40px; font-weight: 600;" data-scroll>Your Language, Your Game</h2>
-        <div class="lang-container" data-scroll>
-            <div class="lang-chip"><img src="images/flag-en.png" alt="EN"> English</div>
-            <div class="lang-chip"><img src="images/flag-hi.png" alt="HI"> Hindi</div>
-            <div class="lang-chip"><img src="images/flag-bn.png" alt="BN"> Bengali</div>
-            <div class="lang-chip"><img src="images/flag-ml.png" alt="ML"> Malayalam</div>
-            <div class="lang-chip"><img src="images/flag-ta.png" alt="TA"> Tamil</div>
-            <div class="lang-chip"><img src="images/flag-te.png" alt="TE"> Telugu</div>
-            <div class="lang-chip"><img src="images/flag-kn.png" alt="KN"> Kannada</div>
-            <div class="lang-chip"><img src="images/flag-ja.png" alt="JA"> Japanese</div>
-            <div class="lang-chip"><img src="images/flag-ko.png" alt="KO"> Korean</div>
-            <div class="lang-chip"><img src="images/flag-ar.png" alt="AR"> Arabic</div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: 600;" data-scroll>Your Language, Your Game</h2>
+        
+        <div class="lang-grid" data-scroll>
+            <div class="lang-card"><img src="images/flag-en.png" alt="English"><span>English</span></div>
+            <div class="lang-card"><img src="images/flag-hi.png" alt="Hindi"><span>Hindi</span></div>
+            <div class="lang-card"><img src="images/flag-bn.png" alt="Bengali"><span>Bengali</span></div>
+            <div class="lang-card"><img src="images/flag-ml.png" alt="Malayalam"><span>Malayalam</span></div>
+            <div class="lang-card"><img src="images/flag-ta.png" alt="Tamil"><span>Tamil</span></div>
+            <div class="lang-card"><img src="images/flag-te.png" alt="Telugu"><span>Telugu</span></div>
+            <div class="lang-card"><img src="images/flag-kn.png" alt="Kannada"><span>Kannada</span></div>
+            <div class="lang-card"><img src="images/flag-ja.png" alt="Japanese"><span>Japanese</span></div>
+            <div class="lang-card"><img src="images/flag-ko.png" alt="Korean"><span>Korean</span></div>
+            <div class="lang-card"><img src="images/flag-ar.png" alt="Arabic"><span>Arabic</span></div>
         </div>
     </section>
 
@@ -630,12 +650,32 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Navbar Scroll Logic
             const navbar = document.getElementById('navbar');
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) navbar.classList.add('scrolled');
                 else navbar.classList.remove('scrolled');
             });
 
+            // Mobile Hamburger Menu Toggle
+            const hamburger = document.getElementById('mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            const navLinks = document.querySelectorAll('.nav-menu a');
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking a link
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                });
+            });
+
+            // Intersection Observer for scroll animations
             const observerOptions = { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.1 };
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
