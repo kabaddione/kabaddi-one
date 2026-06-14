@@ -36,12 +36,25 @@
       gtag('config', 'G-YRYC0NEP1H');
     </script>
     
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "KabaddiOne",
+            "operatingSystem": "Android",
+            "applicationCategory": "SportsApplication",
+            "description": "Premium all-in-one kabaddi scoreboard app with auto result calculator, super tackle, do-or-die, all out, coin toss, simulator sounds, and modern UI.",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+            "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "1250" }
+        }
+    </script>
+
     <style>
         :root {
             /* Matched exactly to the reference images */
             --bg-base: #0d0822;
             --bg-gradient-top: #5240a1;
-            --bg-surface: #120e1f;
+            --bg-surface: #15121e;
             --text-main: #FFFFFF;
             --text-muted: #a19db5;
             
@@ -71,15 +84,11 @@
            BACKGROUND (GRADIENT & STARS)
            ======================================================== */
         .ambient-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -2;
-            background: radial-gradient(circle at 50% -10%, var(--bg-gradient-top) 0%, var(--bg-base) 60%);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2; background: radial-gradient(circle at 50% -10%, var(--bg-gradient-top) 0%, var(--bg-base) 60%);
         }
         .stars {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
             background-image: 
                 radial-gradient(1px 1px at 10% 10%, #fff 100%, transparent),
                 radial-gradient(1.5px 1.5px at 20% 30%, #fff 100%, transparent),
@@ -89,356 +98,203 @@
                 radial-gradient(1.5px 1.5px at 70% 60%, rgba(255,255,255,0.8) 100%, transparent),
                 radial-gradient(1px 1px at 80% 90%, #fff 100%, transparent),
                 radial-gradient(2px 2px at 90% 20%, rgba(255,255,255,0.6) 100%, transparent);
-            background-size: 200px 200px;
-            opacity: 0.4;
+            background-size: 200px 200px; opacity: 0.4;
         }
 
         /* ========================================================
            SCROLL ANIMATIONS
            ======================================================== */
         [data-scroll] {
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 0; transform: translateY(30px);
             transition: opacity 1s var(--ease-out-expo), transform 1s var(--ease-out-expo);
             will-change: opacity, transform;
         }
-        [data-scroll].is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        [data-scroll].is-visible { opacity: 1; transform: translateY(0); }
+        .delay-100 { transition-delay: 0.1s; } .delay-200 { transition-delay: 0.2s; }
 
         /* ========================================================
            NAVIGATION
            ======================================================== */
         .navbar {
-            position: fixed; top: 0; left: 0; width: 100%;
-            padding: 24px 0; z-index: 1000;
-            transition: all 0.4s var(--ease-out-expo);
-            border-bottom: 1px solid transparent;
+            position: fixed; top: 0; left: 0; width: 100%; padding: 24px 0; z-index: 1000;
+            transition: all 0.4s var(--ease-out-expo); border-bottom: 1px solid transparent;
         }
         .navbar.scrolled {
             padding: 16px 0; background: rgba(13, 8, 34, 0.85);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .nav-container {
-            max-width: 1200px; margin: 0 auto; padding: 0 24px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .brand {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 1.5rem; font-weight: 500; color: #fff; text-decoration: none;
-        }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: 500; color: #fff; text-decoration: none; }
         .brand img { height: 32px; }
         .nav-menu { display: flex; gap: 32px; align-items: center; }
-        .nav-menu a {
-            color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: 500;
-            transition: opacity 0.3s;
-        }
+        .nav-menu a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: opacity 0.3s; }
         .nav-menu a:hover { opacity: 0.7; }
-        .hamburger {
-            display: none; flex-direction: column; gap: 6px;
-            background: none; border: none; cursor: pointer;
-        }
+        .nav-cta { background: #fff; color: #000 !important; padding: 8px 20px; border-radius: 50px; font-weight: 600 !important; }
+        .hamburger { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; }
         .hamburger span { width: 30px; height: 2px; background: #fff; }
 
         @media(max-width: 768px) {
-            .nav-menu { display: none; }
-            .hamburger { display: flex; }
+            .nav-menu { display: none; } .hamburger { display: flex; }
         }
 
         /* ========================================================
-           HERO SECTION (MATCHING IMAGE 1)
+           HERO SECTION (IMAGE 1 STYLE)
            ======================================================== */
         .hero {
-            padding-top: 140px; min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center; position: relative; overflow: hidden;
+            padding-top: 140px; min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; text-align: center; position: relative; overflow: hidden;
         }
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 500;
-            line-height: 1.1; letter-spacing: -1px; margin-bottom: 16px;
-            z-index: 10;
-        }
-        .hero p {
-            font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--text-muted);
-            margin-bottom: 40px; z-index: 10; font-weight: 400;
-        }
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 500; line-height: 1.1; letter-spacing: -1px; margin-bottom: 16px; z-index: 10; }
+        .hero p { font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--text-muted); margin-bottom: 30px; z-index: 10; font-weight: 400; max-width: 600px; margin-left: auto; margin-right: auto; }
         
-        .hero-phone-wrapper {
-            position: relative;
-            margin-top: 20px;
-            perspective: 1200px;
-            z-index: 10;
-            display: flex; justify-content: center;
-        }
-        
-        /* 3D Glowing background Blob for Phone */
+        .hero-phone-wrapper { position: relative; margin-top: 20px; perspective: 1200px; z-index: 10; display: flex; justify-content: center; }
         .hero-phone-blob {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, #3e1e91 0%, rgba(62,30,145,0) 70%);
-            border-radius: 50%;
-            z-index: -1;
-            filter: blur(40px);
-            opacity: 0.8;
-            /* Add dotted texture to match reference */
-            background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
-            background-size: 20px 20px;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 500px; height: 500px; background: radial-gradient(circle, #3e1e91 0%, rgba(62,30,145,0) 70%);
+            border-radius: 50%; z-index: -1; filter: blur(40px); opacity: 0.8;
+            background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px); background-size: 20px 20px;
         }
 
-        /* Real 3D Phone Mockup */
         .iphone-pro-3d {
-            position: relative;
-            width: 320px; height: 650px;
-            border-radius: 48px;
-            background: #000;
+            position: relative; width: 320px; height: 650px; border-radius: 48px; background: #000;
             transform: rotateX(15deg) rotateY(-18deg) rotateZ(8deg);
-            box-shadow: 
-                -25px 35px 60px rgba(0,0,0,0.8),
-                inset 3px 3px 6px rgba(255,255,255,0.2), /* light edge */
-                inset -2px -2px 6px rgba(255,255,255,0.1),
-                inset 0 0 0 10px #111, /* inner black bezel */
-                0 0 40px rgba(138, 99, 229, 0.4);
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease;
+            box-shadow: -25px 35px 60px rgba(0,0,0,0.8), inset 3px 3px 6px rgba(255,255,255,0.2), inset -2px -2px 6px rgba(255,255,255,0.1), inset 0 0 0 10px #111, 0 0 40px rgba(138, 99, 229, 0.4);
+            transform-style: preserve-3d; transition: transform 0.5s ease;
         }
-        .iphone-pro-3d:hover {
-            transform: rotateX(10deg) rotateY(-10deg) rotateZ(4deg) translateY(-10px);
-        }
-        
-        /* Phone Hardware Buttons */
-        .iphone-pro-3d::before {
-            content: ''; position: absolute; left: -4px; top: 130px;
-            width: 4px; height: 30px; background: #555; border-radius: 4px 0 0 4px;
-            box-shadow: 0 55px 0 #555, 0 120px 0 #555;
-        }
-        .iphone-pro-3d::after {
-            content: ''; position: absolute; right: -4px; top: 170px;
-            width: 4px; height: 70px; background: #555; border-radius: 0 4px 4px 0;
-        }
-
-        .dynamic-island {
-            position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
-            width: 100px; height: 28px; background: #000;
-            border-radius: 20px; z-index: 20;
-        }
-
-        .iphone-screen {
-            position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border-radius: 38px; background: #120e1f; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .iphone-pro-3d:hover { transform: rotateX(10deg) rotateY(-10deg) rotateZ(4deg) translateY(-10px); }
+        .iphone-pro-3d::before { content: ''; position: absolute; left: -4px; top: 130px; width: 4px; height: 30px; background: #555; border-radius: 4px 0 0 4px; box-shadow: 0 55px 0 #555, 0 120px 0 #555; }
+        .iphone-pro-3d::after { content: ''; position: absolute; right: -4px; top: 170px; width: 4px; height: 70px; background: #555; border-radius: 0 4px 4px 0; }
+        .dynamic-island { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 100px; height: 28px; background: #000; border-radius: 20px; z-index: 20; }
+        .iphone-screen { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border-radius: 38px; background: #120e1f; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .iphone-screen img { width: 115%; object-fit: cover; margin-top: -30px; }
-        
-        /* Screen Glare */
-        .screen-glare {
-            position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border-radius: 38px; pointer-events: none; z-index: 30;
-            background: linear-gradient(110deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%);
-        }
+        .screen-glare { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border-radius: 38px; pointer-events: none; z-index: 30; background: linear-gradient(110deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%); }
 
-        .hero-bottom-info {
-            margin-top: 60px; z-index: 10;
-        }
-        .hero-bottom-info p {
-            font-size: 1.2rem; color: #fff; margin-bottom: 10px;
-        }
-        .btn-white {
-            display: inline-block; background: #fff; color: #000;
-            padding: 16px 40px; border-radius: 100px; font-weight: 600; font-size: 1.1rem;
-            text-decoration: none; transition: transform 0.3s; margin-top: 10px;
-        }
+        .hero-bottom-info { margin-top: 60px; z-index: 10; }
+        .hero-stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+        .hero-stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; backdrop-filter: blur(10px); font-size: 0.9rem; font-weight: 600; color: #fff; }
+        .hero-stat span { color: var(--accent-secondary); margin-right: 5px; }
+        
+        .btn-white { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #000; padding: 16px 40px; border-radius: 100px; font-weight: 700; font-size: 1.1rem; text-decoration: none; transition: transform 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .btn-white:hover { transform: scale(1.05); }
 
         @media(max-width: 768px) {
             .iphone-pro-3d { transform: rotateX(10deg) rotateY(-10deg) rotateZ(5deg); width: 280px; height: 570px; }
             .hero-phone-blob { width: 350px; height: 350px; }
+            .hero-stats { gap: 10px; } .hero-stat { font-size: 0.8rem; padding: 8px 16px; }
         }
 
         /* ========================================================
-           BENTO GRID SECTION (MATCHING IMAGE 2)
+           BENTO GRID SECTION (ALL 8 FEATURES - IMAGE 2 STYLE)
            ======================================================== */
         .section { padding: 100px 24px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 5; }
-        
         .bento-header { text-align: center; margin-bottom: 60px; }
-        .bento-header h2 {
-            font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 700;
-            line-height: 1.1; letter-spacing: -2px;
-        }
-        .bento-header h2 .serif-italic {
-            font-family: var(--font-serif); font-style: italic; font-weight: 600;
-            color: var(--text-muted); font-size: 1.1em;
-        }
+        .bento-header h2 { font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -2px; }
+        .bento-header h2 .serif-italic { font-family: var(--font-serif); font-style: italic; font-weight: 600; color: var(--text-muted); font-size: 1.1em; }
 
-        .bento-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 24px; grid-auto-rows: minmax(280px, auto);
-        }
-        
+        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .bento-card {
-            background: #15121e; /* Deep dark purple-black */
-            border-radius: 32px;
-            padding: 40px;
-            position: relative;
-            display: flex; flex-direction: column;
-            border: 1px solid rgba(255,255,255,0.03);
-            /* The signature glowing top/left border from the screenshot */
-            box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.4), 
-                        0 20px 40px rgba(0,0,0,0.5);
-            overflow: hidden;
-            transition: transform 0.3s ease;
+            background: var(--bg-surface); border-radius: 32px; padding: 40px; position: relative; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.4), 0 20px 40px rgba(0,0,0,0.5); overflow: hidden; transition: transform 0.3s ease;
         }
         .bento-card:hover { transform: translateY(-5px); }
-        
-        /* Subtle card background pattern/glow */
-        .bento-card::after {
-            content: ''; position: absolute; bottom: -20%; right: -20%;
-            width: 150%; height: 150%;
-            background: radial-gradient(circle at center, transparent 30%, rgba(255,255,255,0.02) 31%, transparent 32%);
-            background-size: 60px 60px; pointer-events: none; opacity: 0.5;
-        }
+        .bento-card::after { content: ''; position: absolute; bottom: -20%; right: -20%; width: 150%; height: 150%; background: radial-gradient(circle at center, transparent 30%, rgba(255,255,255,0.02) 31%, transparent 32%); background-size: 60px 60px; pointer-events: none; opacity: 0.5; }
 
-        .bento-icon-wrapper {
-            width: 56px; height: 56px; border-radius: 50%;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; color: var(--accent-secondary); margin-bottom: 24px;
-        }
-        .bento-card h3 {
-            font-size: 1.5rem; font-weight: 600; margin-bottom: 12px;
-            line-height: 1.3; color: #fff;
-        }
-        .bento-card p {
-            color: var(--text-muted); font-size: 1.05rem; line-height: 1.6;
-        }
+        .bento-icon-wrapper { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--accent-secondary); margin-bottom: 24px; }
+        .bento-card h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 12px; line-height: 1.3; color: #fff; }
+        .bento-card p { color: var(--text-muted); font-size: 1rem; line-height: 1.6; }
 
         .col-span-2 { grid-column: span 2; }
         
-        /* Special Solid Color Card (like the purple AI assist in image) */
-        .bento-card.solid-accent {
-            background: var(--accent-primary);
-            box-shadow: 0 20px 40px rgba(138, 99, 229, 0.3);
-            border: none;
-            justify-content: center; align-items: center; text-align: center;
-        }
-        .bento-card.solid-accent .bento-icon-wrapper {
-            background: #000; color: #fff; border: none; margin-bottom: 16px;
-        }
-        .bento-card.solid-accent h3 { color: #fff; font-size: 1.2rem; }
+        .bento-card.solid-accent { background: var(--accent-primary); box-shadow: 0 20px 40px rgba(138, 99, 229, 0.3); border: none; justify-content: center; align-items: center; text-align: center; }
+        .bento-card.solid-accent .bento-icon-wrapper { background: #000; color: #fff; border: none; margin-bottom: 16px; }
+        .bento-card.solid-accent h3, .bento-card.solid-accent p { color: #fff; }
 
-        @media(max-width: 900px) {
-            .bento-grid { grid-template-columns: repeat(2, 1fr); }
-            .col-span-2 { grid-column: span 2; }
-        }
-        @media(max-width: 600px) {
-            .bento-grid { grid-template-columns: 1fr; }
-            .col-span-2 { grid-column: span 1; }
-        }
+        @media(max-width: 900px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } .col-span-2 { grid-column: span 2; } }
+        @media(max-width: 600px) { .bento-grid { grid-template-columns: 1fr; } .col-span-2 { grid-column: span 1; } }
 
         /* ========================================================
-           FIXED MOBILE MOCKUPS FOR FEATURE ROWS
+           PRESENTATION ROWS (ALL 5 VIDEOS + MOBILE FIX)
            ======================================================== */
-        .feature-row {
-            display: flex; align-items: center; gap: 60px;
-            padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.05);
-        }
+        .feature-row { display: flex; align-items: center; gap: 60px; padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.05); }
         .feature-row:nth-child(even) { flex-direction: row-reverse; }
-        
         .feature-content { flex: 1; }
+        .feature-label { display: inline-block; padding: 6px 16px; border-radius: 100px; background: rgba(255,255,255,0.05); color: var(--accent-secondary); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
         .feature-content h2 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; margin-bottom: 20px; line-height: 1.1; }
         .feature-content p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; }
-        
         .feature-list { list-style: none; }
         .feature-list li { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; color: #ddd; font-weight: 500; }
         .feature-list i { color: var(--accent-secondary); font-size: 1.2rem; }
 
-        /* The Fix: Responsive Box for Mobile Landscape Phones */
-        .feature-visual {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-        
-        /* Using aspect-ratio makes it bulletproof on all screen sizes */
+        .feature-visual { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; }
         .responsive-landscape-mockup {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            aspect-ratio: 19.5 / 9; /* Standard phone ratio */
-            background: #000;
-            border-radius: 32px;
-            box-shadow: inset 0 0 0 2px #444, inset 0 0 0 8px #111, 0 20px 40px rgba(0,0,0,0.5);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
+            position: relative; width: 100%; max-width: 500px; aspect-ratio: 19.5 / 9; background: #000; border-radius: 32px;
+            box-shadow: inset 0 0 0 2px #444, inset 0 0 0 8px #111, 0 20px 40px rgba(0,0,0,0.5); overflow: hidden; display: flex; align-items: center;
         }
-        .responsive-landscape-mockup .dynamic-island-landscape {
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            width: 24px; height: 80px; background: #000; border-radius: 12px; z-index: 10;
-        }
-        .responsive-landscape-mockup video {
-            position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
-            width: calc(100% - 16px); height: calc(100% - 16px);
-            border-radius: 24px; object-fit: cover; background: #120e1f;
-        }
+        .responsive-landscape-mockup .dynamic-island-landscape { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 24px; height: 80px; background: #000; border-radius: 12px; z-index: 10; }
+        .responsive-landscape-mockup video { position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; width: calc(100% - 16px); height: calc(100% - 16px); border-radius: 24px; object-fit: cover; background: #120e1f; }
 
         @media(max-width: 900px) {
             .feature-row, .feature-row:nth-child(even) { flex-direction: column; text-align: center; gap: 40px; }
             .feature-visual { max-width: 100%; padding: 0 10px; }
             .feature-list li { justify-content: center; }
-            .responsive-landscape-mockup { border-radius: 20px; }
-            .responsive-landscape-mockup video { border-radius: 12px; }
+            .responsive-landscape-mockup { border-radius: 20px; } .responsive-landscape-mockup video { border-radius: 12px; }
         }
 
         /* ========================================================
-           SOUND EQUALIZER
+           SOUND MODULE (WITH LIST RESTORED)
            ======================================================== */
-        .sound-module {
-            background: #15121e; border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 32px; padding: 60px; display: flex; gap: 40px; align-items: center;
-            box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.2);
-        }
+        .sound-module { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 60px; display: flex; gap: 40px; align-items: center; box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.2); }
+        .sound-content { flex: 1.5; }
+        .sound-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+        .sound-list li { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .sound-list i { color: var(--accent-secondary); }
         .eq-bars { display: flex; align-items: flex-end; gap: 8px; height: 100px; flex: 1; justify-content: center; }
         .bar { width: 16px; background: #fff; border-radius: 8px; animation: eq 1s ease-in-out infinite alternate; }
         .bar:nth-child(even) { background: var(--accent-primary); }
-        .bar:nth-child(1) { height: 40%; animation-delay: 0s; } .bar:nth-child(2) { height: 80%; animation-delay: 0.1s; }
-        .bar:nth-child(3) { height: 50%; animation-delay: 0.2s; } .bar:nth-child(4) { height: 100%; animation-delay: 0.3s; }
-        .bar:nth-child(5) { height: 60%; animation-delay: 0.4s; } .bar:nth-child(6) { height: 90%; animation-delay: 0.5s; }
+        .bar:nth-child(1) { height: 40%; animation-delay: 0s; } .bar:nth-child(2) { height: 80%; animation-delay: 0.1s; } .bar:nth-child(3) { height: 50%; animation-delay: 0.2s; } .bar:nth-child(4) { height: 100%; animation-delay: 0.3s; } .bar:nth-child(5) { height: 60%; animation-delay: 0.4s; } .bar:nth-child(6) { height: 90%; animation-delay: 0.5s; }
         @keyframes eq { 0% { transform: scaleY(0.7); } 100% { transform: scaleY(1.2); } }
         
-        @media(max-width: 768px) { .sound-module { flex-direction: column; padding: 40px 20px; text-align: center; } }
+        @media(max-width: 768px) { .sound-module { flex-direction: column; padding: 40px 20px; } .sound-list { grid-template-columns: 1fr; } }
 
         /* ========================================================
            LANGUAGES CHIPS
            ======================================================== */
-        .lang-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 800px; margin: 0 auto; }
-        .lang-chip {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 20px; border-radius: 100px; display: flex; align-items: center; gap: 10px;
-            font-weight: 500; font-size: 0.95rem; transition: background 0.3s;
-        }
-        .lang-chip:hover { background: rgba(255,255,255,0.15); }
-        .lang-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+        .lang-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 900px; margin: 0 auto; }
+        .lang-chip { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 100px; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.95rem; transition: background 0.3s; }
+        .lang-chip:hover { background: rgba(255,255,255,0.15); } .lang-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
 
         /* ========================================================
-           FOOTER
+           HOW IT WORKS & CTA / QR CODE (RESTORED)
+           ======================================================== */
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 40px; }
+        .step-card { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); padding: 40px 24px; border-radius: 24px; text-align: center; box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.1); }
+        .step-number { width: 50px; height: 50px; background: var(--accent-primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; margin: 0 auto 20px; }
+        .step-card h3 { font-size: 1.2rem; margin-bottom: 10px; } .step-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .cta-section { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 60px 40px; text-align: center; box-shadow: inset 1px 1px 0px 0px rgba(150, 100, 255, 0.4); margin-top: 60px; }
+        .cta-section h2 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; margin-bottom: 20px; }
+        .qr-wrapper { margin-top: 40px; display: none; }
+        @media(min-width: 769px) { .qr-wrapper { display: block; } }
+        .qr-box { background: #fff; width: 180px; height: 180px; padding: 10px; border-radius: 16px; margin: 0 auto 16px; }
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* ========================================================
+           FOOTER (RESTORED FULL LINKS)
            ======================================================== */
         .footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 80px 24px 40px; margin-top: 80px; }
         .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
         .footer-brand h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
         .footer-brand img { height: 28px; border-radius: 6px; }
-        .footer-brand p { color: var(--text-muted); max-width: 320px; font-size: 0.95rem; }
+        .footer-brand p { color: var(--text-muted); max-width: 320px; font-size: 0.95rem; margin-bottom: 24px; }
+        .social-links { display: flex; gap: 16px; }
+        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: color 0.3s; }
+        .social-links a:hover { color: #fff; }
         .footer-links h4 { font-size: 1.1rem; margin-bottom: 20px; font-weight: 600; }
         .footer-links ul { list-style: none; display: grid; gap: 12px; }
         .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.3s; font-size: 0.95rem; }
         .footer-links a:hover { color: #fff; }
         .footer-bottom { text-align: center; color: var(--text-muted); margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
-
         @media(max-width: 768px) { .footer-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -450,23 +306,25 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#" class="brand">
-                <img src="images/kabaddione_logo.png" alt="KabaddiOne">
+                <img src="images/kabaddione_logo.png" alt="KabaddiOne"> KabaddiOne
             </a>
             <div class="nav-menu">
                 <a href="#features">Features</a>
                 <a href="#automation">Smart Auto</a>
-                <a href="#sounds">Audio</a>
+                <a href="#sounds">Sounds</a>
+                <a href="#languages">Languages</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="/download.html" class="nav-cta">Download</a>
             </div>
             <button class="hamburger">
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
     </nav>
 
     <section class="hero">
         <h1>kabaddione</h1>
-        <p>The Premium Scoreboard App</p>
+        <p>The Premium All-in-One Kabaddi Scoreboard App</p>
         
         <div class="hero-phone-wrapper">
             <div class="hero-phone-blob"></div>
@@ -480,57 +338,72 @@
         </div>
 
         <div class="hero-bottom-info">
-            <p>Available for Android devices</p>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Automate your match from toss to triumph.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><span>★</span> 4.8 Rating</div>
+                <div class="hero-stat"><span>↓</span> 10K+ Downloads</div>
+                <div class="hero-stat"><span>🌐</span> 10 Languages</div>
+                <div class="hero-stat"><span>🎵</span> 15+ Sounds</div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Automate your match from toss to triumph.</p>
             <a href="https://play.google.com/store/apps/details?id=com.kabaddione.scoreboard" class="btn-white">
-                Download Free
+                <i class="fa-brands fa-google-play"></i> Get it on Play Store
             </a>
         </div>
     </section>
 
     <section class="section" id="features">
         <div class="bento-header" data-scroll>
-            <h2>Upgrade Your<br><span class="serif-italic">Match</span></h2>
+            <h2>Upgrade Your<br><span class="serif-italic">Match Reality</span></h2>
+            <p style="color: var(--text-muted); margin-top: 16px;">Everything you need, entirely automated.</p>
         </div>
 
         <div class="bento-grid">
             <div class="bento-card col-span-2" data-scroll>
-                <div class="bento-icon-wrapper">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3>Auto Super Tackle & All-Out</h3>
-                <p>Built-in logic recognizes the defender count. If a tackle succeeds with 3 or fewer on the mat, it assigns +2 points. When the mat clears, the All-Out buzzer fires and resets the squad automatically.</p>
+                <div class="bento-icon-wrapper"><i class="fas fa-bolt"></i></div>
+                <h3>Auto Super Tackle Tracker</h3>
+                <p>Built-in Super Tackle detection with automatic bonus points and visual highlights. Detects 3 or fewer defenders automatically.</p>
             </div>
             
             <div class="bento-card" data-scroll>
-                <div class="bento-icon-wrapper">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
+                <div class="bento-icon-wrapper"><i class="fas fa-sync-alt"></i></div>
                 <h3>Auto Team Swap</h3>
-                <p>When the half-time whistle blows, teams switch sides automatically on the display.</p>
+                <p>Teams switch sides automatically at half-time — no manual input, zero confusion.</p>
             </div>
             
             <div class="bento-card" data-scroll>
-                <div class="bento-icon-wrapper">
-                    <i class="fas fa-coins"></i>
-                </div>
-                <h3>Digital Toss</h3>
-                <p>Physics-based coin flip simulator for fair and instant raid/court selections.</p>
-            </div>
-            
-            <div class="bento-card" data-scroll>
-                <div class="bento-icon-wrapper">
-                    <i class="fas fa-bullseye"></i>
-                </div>
-                <h3>Do-or-Die Logic</h3>
-                <p>Monitors empty raids and triggers the Do-or-Die siren automatically on the 3rd attempt.</p>
+                <div class="bento-icon-wrapper"><i class="fas fa-medal"></i></div>
+                <h3>Auto Result Calculator</h3>
+                <p>Final scores are computed instantly at match end and displayed with a celebration animation.</p>
             </div>
 
-            <div class="bento-card solid-accent" data-scroll>
-                <div class="bento-icon-wrapper">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <h3>Result Engine</h3>
+            <div class="bento-card" data-scroll>
+                <div class="bento-icon-wrapper"><i class="fas fa-bullseye"></i></div>
+                <h3>Do-or-Die Raid</h3>
+                <p>Dedicated Do-or-Die mode with siren sound and automatic score impact calculation.</p>
+            </div>
+            
+            <div class="bento-card" data-scroll>
+                <div class="bento-icon-wrapper"><i class="fas fa-users-slash"></i></div>
+                <h3>All Out Detection</h3>
+                <p>Instant detection when a team loses all players, applying +2 bonus points automatically.</p>
+            </div>
+            
+            <div class="bento-card" data-scroll>
+                <div class="bento-icon-wrapper"><i class="fas fa-coins"></i></div>
+                <h3>In-Built Coin Toss</h3>
+                <p>Fair coin toss to start every match professionally — no physical coin needed.</p>
+            </div>
+            
+            <div class="bento-card" data-scroll>
+                <div class="bento-icon-wrapper"><i class="fas fa-stopwatch"></i></div>
+                <h3>Timeout & Substitute</h3>
+                <p>Manage timeouts and player substitutions seamlessly with dedicated controls.</p>
+            </div>
+
+            <div class="bento-card solid-accent col-span-2" data-scroll>
+                <div class="bento-icon-wrapper" style="background:#000; border:none; color:#fff;"><i class="fas fa-square" style="color:#F0C040;"></i></div>
+                <h3 style="color:#fff;">Foul & Card Counter</h3>
+                <p style="color:rgba(255,255,255,0.8);">Track fouls, yellow cards, and red cards. Keep full disciplinary records directly on the live scoreboard.</p>
             </div>
         </div>
     </section>
@@ -539,12 +412,13 @@
         
         <div class="feature-row">
             <div class="feature-content" data-scroll>
-                <h2>Super Tackle Automation.</h2>
-                <p>KabaddiOne automatically identifies a Super Tackle scenario based on player count on the mat. No manual toggles needed.</p>
+                <div class="feature-label">01 · Auto Detection</div>
+                <h2>Auto Super Tackle Detection</h2>
+                <p>When a defender brings down the raider with 3 or fewer defenders on the mat, KabaddiOne instantly detects the Super Tackle.</p>
                 <ul class="feature-list">
-                    <li><i class="fas fa-check-circle"></i> +2 bonus points assigned automatically</li>
-                    <li><i class="fas fa-check-circle"></i> Screen flashes with badge pop</li>
-                    <li><i class="fas fa-check-circle"></i> Dedicated roar audio effect</li>
+                    <li><i class="fas fa-check-circle"></i> Automatic +2 bonus point calculation</li>
+                    <li><i class="fas fa-check-circle"></i> Visual flash & "SUPER TACKLE" badge pop</li>
+                    <li><i class="fas fa-check-circle"></i> Dedicated roar sound effect</li>
                 </ul>
             </div>
             <div class="feature-visual" data-scroll>
@@ -557,12 +431,13 @@
 
         <div class="feature-row">
             <div class="feature-content" data-scroll>
-                <h2>Do-or-Die Tracking.</h2>
-                <p>Stop counting empty raids. The system monitors raid outcomes and flags the third consecutive attempt instantly.</p>
+                <div class="feature-label">02 · Critical Moment</div>
+                <h2>Auto Do-or-Die Raid Tracker</h2>
+                <p>When a team fails to score on two consecutive raids, the third raid is automatically flagged as a Do-or-Die.</p>
                 <ul class="feature-list">
-                    <li><i class="fas fa-check-circle"></i> Siren activates on the third raid</li>
-                    <li><i class="fas fa-check-circle"></i> Unique countdown timer layout</li>
-                    <li><i class="fas fa-check-circle"></i> Point deduction handled on fail</li>
+                    <li><i class="fas fa-check-circle"></i> Automatic 2-raid empty streak detection</li>
+                    <li><i class="fas fa-check-circle"></i> Do-or-Die siren sound activation</li>
+                    <li><i class="fas fa-check-circle"></i> Auto point deduction on failed raid</li>
                 </ul>
             </div>
             <div class="feature-visual" data-scroll>
@@ -575,12 +450,13 @@
 
         <div class="feature-row">
             <div class="feature-content" data-scroll>
-                <h2>All-Out Execution.</h2>
-                <p>When a team is wiped off the mat, the app takes over. It registers the All-Out, awards the bonus points, and resets the full squad.</p>
+                <div class="feature-label">03 · Game Changer</div>
+                <h2>Auto All Out Detection</h2>
+                <p>The moment a team loses all 7 players, KabaddiOne instantly detects the All Out, blares the buzzer, and awards bonus points.</p>
                 <ul class="feature-list">
-                    <li><i class="fas fa-check-circle"></i> Instant +2 bonus logic</li>
-                    <li><i class="fas fa-check-circle"></i> Full team revival counter reset</li>
-                    <li><i class="fas fa-check-circle"></i> Haptic feedback and buzzer animation</li>
+                    <li><i class="fas fa-check-circle"></i> Instant zero-player detection</li>
+                    <li><i class="fas fa-check-circle"></i> Automatic +2 bonus to opponent</li>
+                    <li><i class="fas fa-check-circle"></i> "ALL OUT" buzzer + screen shake animation</li>
                 </ul>
             </div>
             <div class="feature-visual" data-scroll>
@@ -590,14 +466,62 @@
                 </div>
             </div>
         </div>
+        
+        <div class="feature-row">
+            <div class="feature-content" data-scroll>
+                <div class="feature-label">04 · Fair Start</div>
+                <h2>In-Built Coin Toss</h2>
+                <p>Forget hunting for a physical coin. KabaddiOne's built-in toss simulator is fair, fast, and features realistic physics.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> One-tap coin flip with animation</li>
+                    <li><i class="fas fa-check-circle"></i> Random Heads/Tails result</li>
+                    <li><i class="fas fa-check-circle"></i> Match log: "Toss won by Eagles"</li>
+                </ul>
+            </div>
+            <div class="feature-visual" data-scroll>
+                <div class="responsive-landscape-mockup">
+                    <div class="dynamic-island-landscape"></div>
+                    <video src="video/toss.mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content" data-scroll>
+                <div class="feature-label">05 · Instant Finish</div>
+                <h2>Auto Match Result Calculator</h2>
+                <p>When the final whistle blows, KabaddiOne instantly computes the final score and displays it with a stunning celebration animation.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Automatic winner declaration</li>
+                    <li><i class="fas fa-check-circle"></i> Confetti celebration animation</li>
+                    <li><i class="fas fa-check-circle"></i> Shareable result card</li>
+                </ul>
+            </div>
+            <div class="feature-visual" data-scroll>
+                <div class="responsive-landscape-mockup">
+                    <div class="dynamic-island-landscape"></div>
+                    <video src="video/result.mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+        </div>
 
     </section>
 
     <section class="section" id="sounds">
         <div class="sound-module" data-scroll>
-            <div style="flex: 2;">
-                <h2 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Stadium soundscapes in your pocket.</h2>
-                <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6;">15+ highly mastered audio cues including Do-or-Die sirens, All-Out buzzers, tackle roars, and referee whistles.</p>
+            <div class="sound-content">
+                <div class="feature-label">Immersive Audio</div>
+                <h2 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Dedicated Simulator Sounds</h2>
+                <p style="color: var(--text-muted); font-size: 1.05rem;">High-quality audio cues for every match situation bring the stadium atmosphere to your device.</p>
+                
+                <ul class="sound-list">
+                    <li><i class="fas fa-volume-up"></i> Do-or-Die Raid Siren</li>
+                    <li><i class="fas fa-volume-up"></i> Super Tackle Roar</li>
+                    <li><i class="fas fa-volume-up"></i> All Out Buzzer</li>
+                    <li><i class="fas fa-volume-up"></i> 30-Sec Raid Countdown</li>
+                    <li><i class="fas fa-volume-up"></i> Successful Tackle Chime</li>
+                    <li><i class="fas fa-volume-up"></i> Match End Celebration</li>
+                </ul>
             </div>
             <div class="eq-bars">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -606,8 +530,9 @@
         </div>
     </section>
 
-    <section class="section text-center">
-        <h2 style="font-size: 2rem; margin-bottom: 40px; font-weight: 600;" data-scroll>Available Worldwide</h2>
+    <section class="section text-center" id="languages">
+        <div class="feature-label" data-scroll>Global Reach</div>
+        <h2 style="font-size: 2rem; margin-bottom: 40px; font-weight: 600;" data-scroll>Your Language, Your Game</h2>
         <div class="lang-container" data-scroll>
             <div class="lang-chip"><img src="images/flag-en.png" alt="EN"> English</div>
             <div class="lang-chip"><img src="images/flag-hi.png" alt="HI"> Hindi</div>
@@ -622,18 +547,69 @@
         </div>
     </section>
 
+    <section class="section" id="how-it-works">
+        <div class="bento-header" data-scroll>
+            <h2>How <span class="serif-italic">KabaddiOne</span> Works</h2>
+            <p style="color: var(--text-muted); margin-top: 16px;">Three simple steps to transform your kabaddi match experience.</p>
+        </div>
+        <div class="steps-grid" data-scroll>
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Download & Install</h3>
+                <p>Get KabaddiOne from the Google Play Store — lightweight, fast, and ready to go.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Set Up Your Match</h3>
+                <p>Enter team names, set match time, toss the coin — everything is intuitive and quick.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Score Like a Pro</h3>
+                <p>Tap to score, let automation handle the rest. Enjoy immersive sounds and auto results!</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="cta-section" data-scroll>
+            <div style="color: #F0C040; font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 10px;">★★★★★</div>
+            <h2>Ready to Elevate Your Kabaddi Match?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Join thousands of kabaddi enthusiasts using KabaddiOne.</p>
+            
+            <a href="https://play.google.com/store/apps/details?id=com.kabaddione.scoreboard" class="btn-white">
+                <i class="fa-brands fa-google-play"></i> Download on Google Play
+            </a>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 20px;">⭐ 4.8 · 10K+ Downloads · Free</p>
+
+            <div class="qr-wrapper">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Scan to Download</p>
+                <div class="qr-box">
+                    <img src="images/qr-code.png" alt="Scan QR code">
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-brand">
                 <h3><img src="images/kabaddione_logo.png" alt="Logo"> KabaddiOne</h3>
                 <p>The premium, all-in-one digital scoreboard designed exclusively for professional and casual Kabaddi matches.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com/kabaddioneapp" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/kabaddioneapp" target="_blank" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://instagram.com/kabaddioneapp" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com/@kabaddioneapp" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
             </div>
             <div class="footer-links">
                 <h4>Product</h4>
                 <ul>
                     <li><a href="#features">Features</a></li>
-                    <li><a href="#automation">Automation</a></li>
-                    <li><a href="#sounds">Audio</a></li>
+                    <li><a href="#automation">Smart Auto</a></li>
+                    <li><a href="#sounds">Sounds</a></li>
+                    <li><a href="#languages">Languages</a></li>
                     <li><a href="/download.html">Download App</a></li>
                 </ul>
             </div>
@@ -642,12 +618,13 @@
                 <ul>
                     <li><a href="privacy.html">Privacy Policy</a></li>
                     <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="sitemap.xml">Sitemap</a></li>
                     <li><a href="contact.html">Contact Us</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            © 2026 KabaddiOne. All rights reserved.
+            © 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.
         </div>
     </footer>
 
