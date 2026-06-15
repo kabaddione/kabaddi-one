@@ -105,6 +105,8 @@
         .section { position: relative; z-index: 1; padding: 80px 24px; }
         .container { max-width: var(--max-width); margin: 0 auto; }
 
+        .hero-content > video {object-fit: cover; z-index: -100; background-position: 50%; background-size: cover; width: 100%; height: 100%; margin: auto; position: absolute;inset: -100%;}
+
         /* ============ HERO ============ */
         .hero { min-height: 100vh; display: flex; align-items: center; padding-top: var(--nav-height); position: relative; z-index: 1; }
         .hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; width: 100%; }
@@ -405,6 +407,9 @@
     <section class="hero section" aria-labelledby="hero-heading">
         <div class="container">
             <div class="hero-content">
+                <video id="heroVideo" loop="" playsinline="" autoplay="" muted="" data-action="video" loading="lazy">
+                <source src="https://dl.dropboxusercontent.com/s/7hfmpplgj4dxqp1dynv7h/hero-bg.mp4?rlkey=w6un8bm0vm8hxlscbd8rljr1c&amp;st=l98ewe0x&amp;dl=0" data-wf-ignore="true">
+                </video>
                 <div class="hero-badge">
                     <span class="badge-dot"></span> PREMIUM KABADDI SCOREBOARD
                 </div>
