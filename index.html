@@ -107,47 +107,81 @@
 
         .hero-content > video {object-fit: cover; z-index: -100; background-position: 50%; background-size: cover; width: 100%; height: 100%; margin: auto; position: absolute;inset: -100%;}
 
-        /* ============ HERO ============ */
-        .hero { min-height: 100vh; display: flex; align-items: center; padding-top: var(--nav-height); position: relative; z-index: 1; }
-        .hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; width: 100%; }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: var(--nav-height);
+            position: relative;
+            z-index: 1;
+            overflow: hidden; /* important for video containment */
+        }
+        /* Video background overlay */
+        .hero-video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .hero-video-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Semi‑transparent overlay for text readability */
+        .hero-video-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 26, 0.55); /* dark tint */
+            backdrop-filter: blur(2px);
+        }
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
         .hero-content { max-width: 580px; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 50px; padding: 8px 18px; font-size: 0.85rem; font-weight: 600; color: var(--accent-secondary); margin-bottom: 24px; animation: fadeInUp 0.8s ease-out; letter-spacing: 0.5px; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 50px; padding: 8px 18px; font-size: 0.85rem; font-weight: 600; color: var(--accent-secondary); margin-bottom: 24px; animation: fadeInUp 0.8s ease-out; letter-spacing: 0.5px; backdrop-filter: blur(5px); }
         .hero-badge .badge-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: badgePulse 2s ease-in-out infinite; }
         @keyframes badgePulse { 0%,100% { opacity: 1; box-shadow: 0 0 6px var(--accent); } 50% { opacity: 0.4; box-shadow: 0 0 16px var(--accent); } }
         .hero h1 { font-family: var(--font-heading); font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; animation: fadeInUp 0.8s ease-out 0.1s both; }
         .hero h1 .gradient-text { background: linear-gradient(135deg, var(--accent), var(--accent-secondary), #FF6B4A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .hero-desc { font-size: 1.15rem; color: var(--text-secondary); margin-bottom: 32px; max-width: 460px; animation: fadeInUp 0.8s ease-out 0.2s both; line-height: 1.7; }
+        .hero-desc { font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 32px; max-width: 460px; animation: fadeInUp 0.8s ease-out 0.2s both; line-height: 1.7; }
         .hero-buttons { display: flex; flex-wrap: wrap; gap: 14px; animation: fadeInUp 0.8s ease-out 0.3s both; }
         .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--accent), #FF3D10); color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); box-shadow: 0 6px 24px rgba(255, 94, 58, 0.4); border: none; cursor: pointer; letter-spacing: 0.3px; }
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(255, 94, 58, 0.55); }
-        .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: var(--glass-bg); color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); cursor: pointer; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); transform: translateY(-3px); }
+        .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); border: 2px solid rgba(255,94,58,0.5); backdrop-filter: blur(10px); cursor: pointer; }
+        .btn-secondary:hover { background: rgba(255,94,58,0.15); border-color: var(--accent); transform: translateY(-3px); }
         .hero-stats { display: flex; gap: 32px; margin-top: 36px; animation: fadeInUp 0.8s ease-out 0.4s both; }
         .hero-stat { text-align: center; }
         .hero-stat .stat-num { font-size: 2rem; font-weight: 900; color: var(--accent); font-family: var(--font-heading); }
-        .hero-stat .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .hero-stat .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
-        /* Phone Mockup */
-        .phone-mockup-wrapper { display: flex; justify-content: center; align-items: center; animation: fadeInUp 0.8s ease-out 0.3s both, phoneFloat 6s ease-in-out infinite; position: relative; }
+        /* Phone Mockup (floating image) */
+        .phone-mockup-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: phoneFloat 6s ease-in-out infinite;
+            position: relative;
+        }
+        .phone-image {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6));
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
         @keyframes phoneFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
-        .phone-mockup { width: 280px; height: 560px; background: #1a1a2e; border-radius: 36px; border: 3px solid #2a2a40; box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(255,94,58,0.15), inset 0 0 0 1px rgba(255,255,255,0.05); position: relative; overflow: hidden; }
-        .phone-notch { position: absolute; top: 0px; left: 50%; transform: translateX(-50%); width: 100px; height: 26px; background: #0a0a1a; border-radius: 0 0 20px 20px; z-index: 2; }
-        .phone-screen { position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; background: linear-gradient(180deg, #0d0d22 0%, #111130 100%); border-radius: 28px; padding: 40px 16px 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
-        .phone-screen .app-header { font-size: 0.7rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-        .phone-screen .match-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; }
-        .phone-teams { display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-bottom: 10px; }
-        .phone-team { text-align: center; flex: 1; }
-        .phone-team .t-name { font-size: 0.7rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-        .phone-team .t-score { font-size: 2.2rem; font-weight: 900; color: #fff; font-family: var(--font-heading); line-height: 1; }
-        .phone-vs { font-size: 0.7rem; color: var(--accent); font-weight: 800; align-self: center; }
-        .phone-timer { background: rgba(255,94,58,0.2); border: 1px solid rgba(255,94,58,0.4); border-radius: 20px; padding: 4px 16px; font-size: 0.8rem; font-weight: 700; color: var(--accent); margin: 8px 0 12px; animation: timerGlow 2s ease-in-out infinite; }
-        @keyframes timerGlow { 0%,100% { box-shadow: 0 0 8px rgba(255,94,58,0.3); } 50% { box-shadow: 0 0 20px rgba(255,94,58,0.6); } }
-        .phone-indicators { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-        .phone-indicator { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
-        .phone-indicator.active { background: rgba(255,184,48,0.2); color: var(--accent-secondary); animation: indicatorFlash 1.5s ease-in-out infinite; }
-        @keyframes indicatorFlash { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
-        .phone-glow-ring { position: absolute; inset: -20px; border-radius: 50px; background: transparent; box-shadow: 0 0 80px rgba(255,94,58,0.2); pointer-events: none; animation: glowRingPulse 3s ease-in-out infinite; }
-        @keyframes glowRingPulse { 0%,100% { box-shadow: 0 0 60px rgba(255,94,58,0.15); } 50% { box-shadow: 0 0 100px rgba(255,94,58,0.35); } }
         @keyframes fadeInUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
 
         /* ============ SECTION HEADERS ============ */
@@ -403,13 +437,16 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section (NEW) -->
     <section class="hero section" aria-labelledby="hero-heading">
+        <!-- Video Background -->
+        <div class="hero-video-bg">
+            <video autoplay muted loop playsinline>
+                <source src="https://dl.dropboxusercontent.com/s/7hfmpplgj4dxqp1dynv7h/hero-bg.mp4?rlkey=w6un8bm0vm8hxlscbd8rljr1c&st=l98ewe0x&dl=0" type="video/mp4">
+            </video>
+        </div>
         <div class="container">
             <div class="hero-content">
-                <video id="heroVideo" loop="" playsinline="" autoplay="" muted="" data-action="video" loading="lazy">
-                <source src="https://dl.dropboxusercontent.com/s/7hfmpplgj4dxqp1dynv7h/hero-bg.mp4?rlkey=w6un8bm0vm8hxlscbd8rljr1c&amp;st=l98ewe0x&amp;dl=0" data-wf-ignore="true">
-                </video>
                 <div class="hero-badge">
                     <span class="badge-dot"></span> PREMIUM KABADDI SCOREBOARD
                 </div>
@@ -422,7 +459,7 @@
                         <i class="fa-brands fa-google-play"></i>
                         Download on Play Store
                     </a>
-                    <a href="#features" class="btn-secondary" style="border: 2px solid rgb(161,29,0);">Explore Features</a>
+                    <a href="#features" class="btn-secondary">Explore Features</a>
                 </div>
                 <div class="hero-stats">
                     <div class="hero-stat">
@@ -444,13 +481,10 @@
                 </div>
             </div>
             <div class="phone-mockup-wrapper">
-                <div class="phone-glow-ring"></div>
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                       <img src="images/app_screenshorts_main.png" alt="KabaddiOne Logo" style="width: 116%; object-fit: initial; margin-top: -47px;">
-                    </div>
-                </div>
+                <img src="https://cdn.prod.website-files.com/682d7c4461a6cad665ede828/682d7c4461a6cad665ede87c_hero-mobile.webp" 
+                     alt="KabaddiOne mobile app" 
+                     class="phone-image" 
+                     loading="eager">
             </div>
         </div>
     </section>
