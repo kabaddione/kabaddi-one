@@ -24,7 +24,6 @@
     <title>KabaddiOne - Premium All-in-One Kabaddi Scoreboard App | Play Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -204,13 +203,11 @@
 
         /* ============ DEDICATED AUTO FEATURE SECTIONS ============ */
         .auto-feature-section { position: relative; z-index: 1; padding: 70px 24px; overflow: hidden; }
-        .auto-feature-section.alt-bg { background: var(--bg-secondary); }
         .auto-feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; max-width: var(--max-width); margin: 0 auto; }
         .auto-feature-grid.reverse { direction: rtl; } .auto-feature-grid.reverse > * { direction: ltr; }
         .auto-feature-text { max-width: 500px; }
         .auto-feature-text .feature-number { font-family: var(--font-heading); font-size: 0.75rem; font-weight: 800; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
         .auto-feature-text h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 16px; line-height: 1.2; }
-        .auto-feature-text h2 .highlight { background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .auto-feature-text p { color: var(--text-secondary); font-size: 1rem; margin-bottom: 20px; line-height: 1.7; }
         .auto-feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
         .auto-feature-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
@@ -222,7 +219,6 @@
         .landscape-mockup .lm-notch { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 18px; height: 80px; background: #0a0a1a; border-radius: 0 12px 12px 0; z-index: 2; }
         .landscape-mockup .lm-screen { position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; background: linear-gradient(135deg, #0d0d22 0%, #111130 100%); border-radius: 18px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .landscape-mockup video { width: 100%; height: 100%; object-fit: initial; border-radius: 16px; }
-        .lm-glow-ring-landscape { position: absolute; inset: -15px; border-radius: 30px; background: transparent; box-shadow: 0 0 60px rgba(255,94,58,0.18); pointer-events: none; animation: glowRingPulse 3s ease-in-out infinite; }
 
         /* ============ SOUND SECTION ============ */
         .sound-section { background: var(--bg-secondary); position: relative; z-index: 1; }
@@ -400,11 +396,194 @@
         .lang-flag { width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; position: relative; }
         .lang-flag img { width: 100%; height: 100%; object-fit: cover; }
         .lang-card:hover .lang-flag { border-color: var(--accent); }
+
+        /* ========================================================
+           SUPERCONSCIOUS STYLE OVERRIDES FOR FEATURE SECTIONS
+           ======================================================== */
+        .super-style {
+            padding: 40px 24px;
+        }
+        .super-card {
+            background: #080511;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 60px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px rgba(0,0,0,0.5);
+        }
+        /* Thin gradient border simulation */
+        .super-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,94,58,0.5), rgba(108,60,224,0.5));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .super-stars {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(1px 1px at 10% 10%, rgba(255,255,255,0.8) 100%, transparent),
+                              radial-gradient(1.5px 1.5px at 30% 40%, rgba(255,255,255,0.6) 100%, transparent),
+                              radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.9) 100%, transparent),
+                              radial-gradient(2px 2px at 80% 20%, rgba(255,255,255,0.4) 100%, transparent);
+            background-size: 150px 150px;
+            opacity: 0.5;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .super-style .auto-feature-grid {
+            position: relative;
+            z-index: 2;
+            gap: 60px;
+        }
+        .super-style .feature-number {
+            color: #c9a6ff; 
+            font-family: var(--font-body);
+            font-weight: 500;
+            letter-spacing: 0px;
+            text-transform: none;
+            font-size: 1.05rem;
+            margin-bottom: 16px;
+        }
+        .super-style .auto-feature-text h2 {
+            font-weight: 400; 
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        .super-style .auto-feature-text h2 .highlight {
+            background: none;
+            -webkit-text-fill-color: #fff;
+            color: #fff;
+        }
+        .super-style .auto-feature-text p {
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        .super-style .auto-feature-list li {
+            font-weight: 300;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* 3D Landscape Mockup */
+        .super-style .landscape-mockup-wrapper {
+            perspective: 1200px;
+        }
+        .super-blob {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%; height: 150%;
+            background: radial-gradient(ellipse, rgba(42, 19, 156, 0.8) 0%, rgba(10,10,26,0) 70%);
+            filter: blur(50px);
+            z-index: -1;
+        }
+        .super-3d-mockup {
+            transform: rotateX(15deg) rotateY(-20deg) rotateZ(5deg);
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 
+                -20px 30px 50px rgba(0,0,0,0.8), 
+                inset 2px 2px 4px rgba(255,255,255,0.15), 
+                inset -2px -2px 4px rgba(255,255,255,0.05),
+                inset 0 0 0 3px #1a1a2e; 
+            background: #000;
+            border: none;
+            border-radius: 28px;
+            overflow: visible; /* to allow buttons out */
+        }
+        .super-3d-mockup:hover {
+            transform: rotateX(8deg) rotateY(-10deg) rotateZ(2deg) translateY(-10px);
+        }
+        .auto-feature-grid.reverse .super-3d-mockup {
+            transform: rotateX(15deg) rotateY(20deg) rotateZ(-5deg);
+            box-shadow: 
+                20px 30px 50px rgba(0,0,0,0.8), 
+                inset -2px 2px 4px rgba(255,255,255,0.15), 
+                inset 2px -2px 4px rgba(255,255,255,0.05),
+                inset 0 0 0 3px #1a1a2e;
+        }
+        .auto-feature-grid.reverse .super-3d-mockup:hover {
+            transform: rotateX(8deg) rotateY(10deg) rotateZ(-2deg) translateY(-10px);
+        }
+        
+        /* Hardware buttons */
+        .super-3d-mockup::before {
+            content: ''; position: absolute; left: 100px; top: -3px;
+            width: 40px; height: 3px; background: #444; border-radius: 4px 4px 0 0;
+            box-shadow: 60px 0 0 #444;
+        }
+        .super-3d-mockup::after {
+            content: ''; position: absolute; right: 80px; top: -3px;
+            width: 50px; height: 3px; background: #444; border-radius: 4px 4px 0 0;
+        }
+        .auto-feature-grid.reverse .super-3d-mockup::before {
+            left: auto; right: 100px; bottom: -3px; top: auto;
+            border-radius: 0 0 4px 4px; box-shadow: -60px 0 0 #444;
+        }
+        .auto-feature-grid.reverse .super-3d-mockup::after {
+            right: auto; left: 80px; bottom: -3px; top: auto;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .super-3d-mockup .lm-notch {
+            background: #000;
+            border-radius: 0 12px 12px 0;
+            width: 20px;
+            height: 90px;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: none;
+        }
+        .auto-feature-grid.reverse .super-3d-mockup .lm-notch {
+            left: auto; right: 0;
+            border-radius: 12px 0 0 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-right: none;
+        }
+
+        .super-3d-mockup .lm-screen {
+            top: 8px; left: 8px; right: 8px; bottom: 8px;
+            border-radius: 20px;
+            background: #000;
+            overflow: hidden; /* to contain video */
+        }
+        
+        @media (max-width: 1024px) {
+            .super-card { padding: 40px; }
+            .super-3d-mockup { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg); }
+            .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(15deg) rotateY(15deg) rotateZ(-5deg); }
+        }
+        @media (max-width: 768px) {
+            .super-card { padding: 30px 20px; }
+            .super-style .auto-feature-grid { gap: 40px; }
+            .super-3d-mockup { transform: rotateX(20deg) rotateY(-10deg) rotateZ(5deg); max-width: 100%; width:100%; aspect-ratio: 19.5/9; min-height: auto;}
+            .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(20deg) rotateY(10deg) rotateZ(-5deg); }
+            .super-blob { width: 150%; height: 150%; }
+            .super-3d-mockup .lm-notch { width: 14px; height: 60px; }
+            /* remove absolute positioning on video for mobile to fit purely to ratio */
+            .super-3d-mockup .lm-screen video { width: 100%; height: 100%; position: relative; }
+        }
+        @media (max-width: 480px) {
+            .super-style { padding: 40px 16px; }
+            .super-card { padding: 24px 16px; }
+            .super-3d-mockup { transform: rotateX(15deg) rotateY(-5deg) rotateZ(2deg); }
+            .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(15deg) rotateY(5deg) rotateZ(-2deg); }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Background Orbs -->
     <div class="bg-orbs" aria-hidden="true">
         <div class="bg-orb"></div>
         <div class="bg-orb"></div>
@@ -412,7 +591,6 @@
         <div class="bg-orb"></div>
     </div>
 
-    <!-- Navigation (logo image + white text) -->
     <nav class="nav" id="navbar" aria-label="Main navigation">
         <div class="nav-inner">
             <a href="#" class="nav-logo" aria-label="KabaddiOne Home">
@@ -437,9 +615,7 @@
         </div>
     </nav>
 
-    <!-- Hero Section (NEW) -->
     <section class="hero section" aria-labelledby="hero-heading">
-        <!-- Video Background -->
         <div class="hero-video-bg">
             <video autoplay muted loop playsinline>
                 <source src="https://dl.dropboxusercontent.com/s/7hfmpplgj4dxqp1dynv7h/hero-bg.mp4?rlkey=w6un8bm0vm8hxlscbd8rljr1c&st=l98ewe0x&dl=0" type="video/mp4">
@@ -489,7 +665,6 @@
         </div>
     </section>
 
-    <!-- Features Grid Section -->
     <section class="section" id="features" aria-labelledby="features-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -550,137 +725,146 @@
         </div>
     </section>
 
-    <!-- 1. Auto Super Tackle -->
-    <section class="auto-feature-section alt-bg" id="auto-super-tackle" aria-labelledby="st-heading">
-        <div class="auto-feature-grid">
-            <div class="auto-feature-text reveal">
-                <div class="feature-number">01 · Auto Detection</div>
-                <h2 id="st-heading">Auto <span class="highlight">Super Tackle</span> Detection</h2>
-                <p>When a defender brings down the raider with 3 or fewer defenders on the mat, KabaddiOne instantly detects the Super Tackle — flashing the screen, playing the roar sound, and awarding <strong>+2 bonus points</strong> automatically. No second-guessing, no manual toggles.</p>
-                <ul class="auto-feature-list">
-                    <li><span class="check-icon">✓</span> Automatic +2 bonus point calculation</li>
-                    <li><span class="check-icon">✓</span> Visual flash & "SUPER TACKLE" badge pop</li>
-                    <li><span class="check-icon">✓</span> Dedicated roar sound effect</li>
-                    <li><span class="check-icon">✓</span> Match log entry with timestamp</li>
-                </ul>
-            </div>
-            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
-                <div class="lm-glow-ring-landscape"></div>
-                <div class="landscape-mockup">
-                    <div class="lm-notch"></div>
-                    <div class="lm-screen">
-                        <video src="video/super_tackle.mp4" autoplay muted loop playsinline></video>
+    <section class="auto-feature-section super-style" id="auto-super-tackle" aria-labelledby="st-heading">
+        <div class="super-card">
+            <div class="super-stars"></div>
+            <div class="auto-feature-grid">
+                <div class="auto-feature-text reveal">
+                    <div class="feature-number">01 · Auto Detection</div>
+                    <h2 id="st-heading">Auto <span class="highlight">Super Tackle</span> Detection</h2>
+                    <p>When a defender brings down the raider with 3 or fewer defenders on the mat, KabaddiOne instantly detects the Super Tackle — flashing the screen, playing the roar sound, and awarding <strong>+2 bonus points</strong> automatically. No second-guessing, no manual toggles.</p>
+                    <ul class="auto-feature-list">
+                        <li><span class="check-icon">✓</span> Automatic +2 bonus point calculation</li>
+                        <li><span class="check-icon">✓</span> Visual flash & "SUPER TACKLE" badge pop</li>
+                        <li><span class="check-icon">✓</span> Dedicated roar sound effect</li>
+                        <li><span class="check-icon">✓</span> Match log entry with timestamp</li>
+                    </ul>
+                </div>
+                <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                    <div class="super-blob"></div>
+                    <div class="landscape-mockup super-3d-mockup">
+                        <div class="lm-notch"></div>
+                        <div class="lm-screen">
+                            <video src="video/super_tackle.mp4" autoplay muted loop playsinline></video>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 2. Auto Do-or-Die Raid -->
-    <section class="auto-feature-section" id="auto-do-or-die" aria-labelledby="dod-heading">
-        <div class="auto-feature-grid reverse">
-            <div class="auto-feature-text reveal">
-                <div class="feature-number">02 · Critical Moment</div>
-                <h2 id="dod-heading">Auto <span class="highlight">Do-or-Die</span> Raid Tracker</h2>
-                <p>When a team fails to score on two consecutive raids, the third raid is automatically flagged as a <strong>Do-or-Die</strong>. KabaddiOne triggers the siren sound, activates a special countdown timer, and applies the correct points outcome — all without you touching a setting.</p>
-                <ul class="auto-feature-list">
-                    <li><span class="check-icon">✓</span> Automatic 2-raid empty streak detection</li>
-                    <li><span class="check-icon">✓</span> Do-or-Die siren sound activation</li>
-                    <li><span class="check-icon">✓</span> Visual "DO OR DIE" banner with glow</li>
-                    <li><span class="check-icon">✓</span> Auto point deduction on failed raid</li>
-                </ul>
-            </div>
-            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
-                <div class="lm-glow-ring-landscape"></div>
-                <div class="landscape-mockup">
-                    <div class="lm-notch"></div>
-                    <div class="lm-screen">
-                        <video src="video/do_or_die.mp4" autoplay muted loop playsinline></video>
+    <section class="auto-feature-section super-style" id="auto-do-or-die" aria-labelledby="dod-heading">
+        <div class="super-card">
+            <div class="super-stars"></div>
+            <div class="auto-feature-grid reverse">
+                <div class="auto-feature-text reveal">
+                    <div class="feature-number">02 · Critical Moment</div>
+                    <h2 id="dod-heading">Auto <span class="highlight">Do-or-Die</span> Raid Tracker</h2>
+                    <p>When a team fails to score on two consecutive raids, the third raid is automatically flagged as a <strong>Do-or-Die</strong>. KabaddiOne triggers the siren sound, activates a special countdown timer, and applies the correct points outcome — all without you touching a setting.</p>
+                    <ul class="auto-feature-list">
+                        <li><span class="check-icon">✓</span> Automatic 2-raid empty streak detection</li>
+                        <li><span class="check-icon">✓</span> Do-or-Die siren sound activation</li>
+                        <li><span class="check-icon">✓</span> Visual "DO OR DIE" banner with glow</li>
+                        <li><span class="check-icon">✓</span> Auto point deduction on failed raid</li>
+                    </ul>
+                </div>
+                <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                    <div class="super-blob"></div>
+                    <div class="landscape-mockup super-3d-mockup">
+                        <div class="lm-notch"></div>
+                        <div class="lm-screen">
+                            <video src="video/do_or_die.mp4" autoplay muted loop playsinline></video>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 3. Auto All Out -->
-    <section class="auto-feature-section alt-bg" id="auto-all-out" aria-labelledby="ao-heading">
-        <div class="auto-feature-grid">
-            <div class="auto-feature-text reveal">
-                <div class="feature-number">03 · Game Changer</div>
-                <h2 id="ao-heading">Auto <span class="highlight">All Out</span> Detection</h2>
-                <p>The moment a team loses all 7 players, KabaddiOne instantly detects the <strong>All Out</strong>. It blares the buzzer, awards <strong>+2 bonus points</strong> to the opposing team, and resets the player counter — all in a split second. The animated screen flash makes the moment unforgettable.</p>
-                <ul class="auto-feature-list">
-                    <li><span class="check-icon">✓</span> Instant zero-player detection</li>
-                    <li><span class="check-icon">✓</span> Automatic +2 bonus to opponent</li>
-                    <li><span class="check-icon">✓</span> Full-team revival with reset counter</li>
-                    <li><span class="check-icon">✓</span> "ALL OUT" buzzer + screen shake animation</li>
-                </ul>
-            </div>
-            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
-                <div class="lm-glow-ring-landscape"></div>
-                <div class="landscape-mockup">
-                    <div class="lm-notch"></div>
-                    <div class="lm-screen">
-                        <video src="video/all_out.mp4" autoplay muted loop playsinline></video>
+    <section class="auto-feature-section super-style" id="auto-all-out" aria-labelledby="ao-heading">
+        <div class="super-card">
+            <div class="super-stars"></div>
+            <div class="auto-feature-grid">
+                <div class="auto-feature-text reveal">
+                    <div class="feature-number">03 · Game Changer</div>
+                    <h2 id="ao-heading">Auto <span class="highlight">All Out</span> Detection</h2>
+                    <p>The moment a team loses all 7 players, KabaddiOne instantly detects the <strong>All Out</strong>. It blares the buzzer, awards <strong>+2 bonus points</strong> to the opposing team, and resets the player counter — all in a split second. The animated screen flash makes the moment unforgettable.</p>
+                    <ul class="auto-feature-list">
+                        <li><span class="check-icon">✓</span> Instant zero-player detection</li>
+                        <li><span class="check-icon">✓</span> Automatic +2 bonus to opponent</li>
+                        <li><span class="check-icon">✓</span> Full-team revival with reset counter</li>
+                        <li><span class="check-icon">✓</span> "ALL OUT" buzzer + screen shake animation</li>
+                    </ul>
+                </div>
+                <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                    <div class="super-blob"></div>
+                    <div class="landscape-mockup super-3d-mockup">
+                        <div class="lm-notch"></div>
+                        <div class="lm-screen">
+                            <video src="video/all_out.mp4" autoplay muted loop playsinline></video>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 4. In-built Coin Toss -->
-    <section class="auto-feature-section" id="auto-coin-toss" aria-labelledby="ct-heading">
-        <div class="auto-feature-grid reverse">
-            <div class="auto-feature-text reveal">
-                <div class="feature-number">04 · Fair Start</div>
-                <h2 id="ct-heading">In-Built <span class="highlight">Coin Toss</span></h2>
-                <p>Forget hunting for a physical coin. KabaddiOne's built-in toss simulator is fair, fast, and fun. Tap once to flip — the coin spins with realistic physics animation, lands on <strong>Heads or Tails</strong>, and the winner gets to choose raid or side. Perfect for professional matches and casual games alike.</p>
-                <ul class="auto-feature-list">
-                    <li><span class="check-icon">✓</span> One-tap coin flip with animation</li>
-                    <li><span class="check-icon">✓</span> Random Heads/Tails result</li>
-                    <li><span class="check-icon">✓</span> Winner selection prompt</li>
-                    <li><span class="check-icon">✓</span> Match log: "Toss won by Eagles"</li>
-                </ul>
-            </div>
-            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
-                <div class="lm-glow-ring-landscape"></div>
-                <div class="landscape-mockup">
-                    <div class="lm-notch"></div>
-                    <div class="lm-screen">
-                        <video src="video/toss.mp4" autoplay muted loop playsinline></video>
+    <section class="auto-feature-section super-style" id="auto-coin-toss" aria-labelledby="ct-heading">
+        <div class="super-card">
+            <div class="super-stars"></div>
+            <div class="auto-feature-grid reverse">
+                <div class="auto-feature-text reveal">
+                    <div class="feature-number">04 · Fair Start</div>
+                    <h2 id="ct-heading">In-Built <span class="highlight">Coin Toss</span></h2>
+                    <p>Forget hunting for a physical coin. KabaddiOne's built-in toss simulator is fair, fast, and fun. Tap once to flip — the coin spins with realistic physics animation, lands on <strong>Heads or Tails</strong>, and the winner gets to choose raid or side. Perfect for professional matches and casual games alike.</p>
+                    <ul class="auto-feature-list">
+                        <li><span class="check-icon">✓</span> One-tap coin flip with animation</li>
+                        <li><span class="check-icon">✓</span> Random Heads/Tails result</li>
+                        <li><span class="check-icon">✓</span> Winner selection prompt</li>
+                        <li><span class="check-icon">✓</span> Match log: "Toss won by Eagles"</li>
+                    </ul>
+                </div>
+                <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                    <div class="super-blob"></div>
+                    <div class="landscape-mockup super-3d-mockup">
+                        <div class="lm-notch"></div>
+                        <div class="lm-screen">
+                            <video src="video/toss.mp4" autoplay muted loop playsinline></video>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 5. Auto Match Result Calculator -->
-    <section class="auto-feature-section alt-bg" id="auto-result" aria-labelledby="mr-heading">
-        <div class="auto-feature-grid">
-            <div class="auto-feature-text reveal">
-                <div class="feature-number">05 · Instant Finish</div>
-                <h2 id="mr-heading">Auto <span class="highlight">Match Result</span> Calculator</h2>
-                <p>When the final whistle blows, KabaddiOne instantly computes the final score, determines the winner, and displays it with a <strong>stunning celebration animation</strong> complete with confetti, sound effects, and a match summary. No manual math — just tap and celebrate.</p>
-                <ul class="auto-feature-list">
-                    <li><span class="check-icon">✓</span> Automatic winner declaration</li>
-                    <li><span class="check-icon">✓</span> Confetti celebration animation</li>
-                    <li><span class="check-icon">✓</span> Full match summary screen</li>
-                    <li><span class="check-icon">✓</span> Shareable result card</li>
-                </ul>
-            </div>
-            <div class="landscape-mockup-wrapper reveal reveal-delay-2">
-                <div class="lm-glow-ring-landscape"></div>
-                <div class="landscape-mockup">
-                    <div class="lm-notch"></div>
-                    <div class="lm-screen">
-                        <video src="video/result.mp4" autoplay muted loop playsinline></video>
+    <section class="auto-feature-section super-style" id="auto-result" aria-labelledby="mr-heading">
+        <div class="super-card">
+            <div class="super-stars"></div>
+            <div class="auto-feature-grid">
+                <div class="auto-feature-text reveal">
+                    <div class="feature-number">05 · Instant Finish</div>
+                    <h2 id="mr-heading">Auto <span class="highlight">Match Result</span> Calculator</h2>
+                    <p>When the final whistle blows, KabaddiOne instantly computes the final score, determines the winner, and displays it with a <strong>stunning celebration animation</strong> complete with confetti, sound effects, and a match summary. No manual math — just tap and celebrate.</p>
+                    <ul class="auto-feature-list">
+                        <li><span class="check-icon">✓</span> Automatic winner declaration</li>
+                        <li><span class="check-icon">✓</span> Confetti celebration animation</li>
+                        <li><span class="check-icon">✓</span> Full match summary screen</li>
+                        <li><span class="check-icon">✓</span> Shareable result card</li>
+                    </ul>
+                </div>
+                <div class="landscape-mockup-wrapper reveal reveal-delay-2">
+                    <div class="super-blob"></div>
+                    <div class="landscape-mockup super-3d-mockup">
+                        <div class="lm-notch"></div>
+                        <div class="lm-screen">
+                            <video src="video/result.mp4" autoplay muted loop playsinline></video>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sound Section -->
     <section class="section sound-section" id="sounds" aria-labelledby="sounds-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -708,7 +892,6 @@
         </div>
     </section>
 
-    <!-- Supported Languages Section -->
     <section class="languages-section" id="languages" aria-labelledby="languages-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -781,7 +964,6 @@
         </div>
     </section>
 
-    <!-- How It Works -->
     <section class="section" id="how-it-works" aria-labelledby="how-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -809,7 +991,6 @@
         </div>
     </section>
 
-    <!-- CTA / Download Section -->
     <section class="section cta-section" id="download" aria-labelledby="cta-heading">
         <div class="container">
             <div class="cta-card reveal">
@@ -825,13 +1006,11 @@
         </div>
     </section>
 
-    <!-- 📱 QR Code Section (Desktop only) -->
     <section class="qr-section" id="qr-download" aria-labelledby="qr-heading">
         <div class="container">
             <div class="qr-card reveal">
                 <h2 id="qr-heading" class="section-tag" style="display:block; margin-bottom:16px;">Scan to Download</h2>
                 <div class="qr-image">
-                    <!-- Replace with your actual QR code image -->
                     <img src="images/qr-code.png" alt="Scan QR code to download KabaddiOne on Google Play">
                 </div>
                 <h3>Point your phone camera here</h3>
@@ -840,7 +1019,6 @@
         </div>
     </section>
 
-    <!-- Footer (with social icons + sitemap) -->
     <footer class="footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-logo">
@@ -870,7 +1048,6 @@
         </div>
     </footer>
 
-    <!-- Back to Top -->
     <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
 
     <script>
