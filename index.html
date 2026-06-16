@@ -111,46 +111,43 @@
         .section { position: relative; z-index: 1; padding: 80px 24px; }
         .container { max-width: var(--max-width); margin: 0 auto; }
 
-        .hero-content > video {object-fit: cover; z-index: -100; background-position: 50%; background-size: cover; width: 100%; height: 100%; margin: auto; position: absolute;inset: -100%;}
+        /* ============ HERO SECTION – FIXED VIDEO SCALING ============ */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: var(--nav-height);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
 
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding-top: var(--nav-height);
-            position: relative;
-            z-index: 1;
-            overflow: hidden; /* important for video containment */
-        }
-        /* Video background overlay */
-        .hero-video-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        .hero-video-bg video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Safari hardware acceleration fix for object-fit */
-            -webkit-transform: translate3d(0,0,0);
-            transform: translate3d(0,0,0);
-        }
-        /* Semi‑transparent overlay for text readability */
-        .hero-video-bg::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 10, 26, 0.55); /* dark tint */
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-        }
+/* Remove the broken .hero-content > video rule completely */
+
+.hero-video-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero-video-bg video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Dark overlay for text readability (compatible colour) */
+.hero-video-bg::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 71, 0.55);   /* safe fallback */
+    background: rgb(0 0 71 / 55%);      /* modern syntax */
+}
         .hero .container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -167,12 +164,12 @@
         .hero h1 { font-family: var(--font-heading); font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; animation: fadeInUp 0.8s ease-out 0.1s both; }
         
         .hero h1 .gradient-text { 
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary), #FF6B4A); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            background-clip: text; 
-            display: inline-block; /* Safari text clip fix */
-        }
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary), #FF6B4A);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;                 /* universal, overrides -webkit-text-fill-color */
+    -webkit-text-fill-color: transparent; /* still keep for safety */
+}
         
         .hero-desc { font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 32px; max-width: 460px; animation: fadeInUp 0.8s ease-out 0.2s both; line-height: 1.7; }
         .hero-buttons { display: flex; flex-wrap: wrap; gap: 14px; animation: fadeInUp 0.8s ease-out 0.3s both; }
@@ -499,11 +496,11 @@
             font-weight: bold;
         }
         .super-style .auto-feature-text h2 .highlight {
-            -webkit-text-fill-color: transparent;
-            background: radial-gradient(rgb(227, 143, 255), rgb(51, 34, 252)) padding-box text;
-            background-clip: text;
-            display: inline-block; /* Safari text clip fix */
-        }
+            -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background: radial-gradient(rgb(227, 143, 255), rgb(51, 34, 252)) padding-box text;
+}
         .super-style .auto-feature-text p {
             color: rgba(255,255,255,0.7);
             font-weight: 300;
