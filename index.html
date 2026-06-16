@@ -128,6 +128,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center; /* FIXED for mobile */
         }
         /* Semi‑transparent overlay for text readability */
         .hero-video-bg::after {
@@ -406,6 +407,7 @@
             background-image: url("https://cdn.prod.website-files.com/682d7c4461a6cad665ede828/682d7c4461a6cad665ede886_stack-bg.webp");
             background-repeat: no-repeat;
             background-size: cover;
+            background-position: center; /* FIXED for mobile scaling */
             border-radius: 24px;
             position: relative;
             overflow: hidden;
@@ -567,7 +569,10 @@
             .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(15deg) rotateY(15deg) rotateZ(-5deg); }
         }
         @media (max-width: 768px) {
-            .super-card { padding: 30px 20px; }
+            .super-card { 
+                padding: 30px 20px; 
+                background-size: 100% 100%; /* FIXED for mobile background scaling */
+            }
             .super-style .auto-feature-grid { gap: 40px; }
             .super-3d-mockup { transform: rotateX(20deg) rotateY(-10deg) rotateZ(5deg); max-width: 100%; width:100%; aspect-ratio: 19.5/9; min-height: auto;}
             .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(20deg) rotateY(10deg) rotateZ(-5deg); }
