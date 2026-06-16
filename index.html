@@ -646,8 +646,8 @@
         .super-3d-mockup .lm-notch {
             background: #000;
             border-radius: 0 12px 12px 0;
-            width: 10px;
-            height: 40px;
+            width: 20px;
+            height: 90px;
             z-index: 10;
             border: 1px solid rgba(255,255,255,0.05);
             border-left: none;
@@ -664,6 +664,33 @@
             border-radius: 20px;
             background: #000;
             overflow: hidden; /* to contain video */
+        }
+        
+        @media (max-width: 1024px) {
+            .super-card { padding: 40px; }
+            .super-3d-mockup { transform: rotateX(15deg) rotateY(-15deg) rotateZ(5deg); }
+            .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(15deg) rotateY(15deg) rotateZ(-5deg); }
+        }
+        @media (max-width: 768px) {
+            /* Fixes the background image extreme zooming on mobile */
+            .super-card { 
+                padding: 30px 20px;
+                background-size: 100% auto;
+                background-position: top center;
+                background-color: #080511; 
+            }
+            .super-style .auto-feature-grid { gap: 40px; }
+            .super-3d-mockup { transform: rotateX(20deg) rotateY(-10deg) rotateZ(5deg); max-width: 100%; width:100%; aspect-ratio: 19.5/9; min-height: auto;}
+            .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(20deg) rotateY(10deg) rotateZ(-5deg); }
+            .super-blob { width: 150%; height: 150%; }
+            .super-3d-mockup .lm-notch { width: 14px; height: 60px; }
+            .super-3d-mockup .lm-screen video { width: 100%; height: 100%; position: relative; }
+        }
+        @media (max-width: 480px) {
+            .super-style { padding: 40px 16px; }
+            .super-card { padding: 24px 16px; }
+            .super-3d-mockup { transform: rotateX(15deg) rotateY(-5deg) rotateZ(2deg); }
+            .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(15deg) rotateY(5deg) rotateZ(-2deg); }
         }
     </style>
 </head>
