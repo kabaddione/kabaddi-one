@@ -207,9 +207,20 @@
         /* ============ FEATURES GRID ============ */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .feature-card { 
-            background: 
-           url('https://cdn.prod.website-files.com/682d7c4…/682d7c4…_how-work-card-star.png') no-repeat center center / contain, 
-           var(--glass-bg);
+            /* 1. Set the background color */
+    background-color: var(--glass-bg);
+    
+    /* 2. Set the image */
+    background-image: url('https://cdn.prod.website-files.com/682d7c4461a6cad665ede828/682d7c4461a6cad665ede889_how-work-card-star.png'); 
+    
+    /* 3. Push it to the bottom right */
+    background-position: right bottom; 
+    
+    /* 4. Stop it from tiling */
+    background-repeat: no-repeat; 
+    
+    /* 5. Set the size (use 'auto', 'contain', or a specific size like '80px') */
+    background-size: auto;
             border: 1px solid var(--glass-border); 
             border-radius: var(--radius-md); 
             padding: 28px 24px; 
