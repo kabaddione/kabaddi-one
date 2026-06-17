@@ -208,21 +208,7 @@
 
         /* ============ FEATURES GRID ============ */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .feature-card { 
-            /* 1. Set the background color */
-    background-color: #1a1a1a;
-    
-    /* 2. Set the image */
-    background-image: url('https://cdn.prod.website-files.com/682d7c4461a6cad665ede828/682d7c4461a6cad665ede889_how-work-card-star.png'); 
-    
-    /* 3. Push it to the bottom right */
-    background-position: 150px 150px; 
-    
-    /* 4. Stop it from tiling */
-    background-repeat: no-repeat; 
-    
-    /* 5. Set the size (use 'auto', 'contain', or a specific size like '80px') */
-    background-size: 250px auto;
+        .feature-card { background-color: #1a1a1a; background-image: url('https://cdn.prod.website-files.com/682d7c4461a6cad665ede828/682d7c4461a6cad665ede889_how-work-card-star.png'); background-position: 150px 150px; background-repeat: no-repeat; background-size: 250px auto;
             border: 1px solid var(--glass-border); 
             border-radius: var(--radius-md); 
             padding: 28px 24px; 
@@ -367,7 +353,7 @@ mask-composite: exclude;
 pointer-events: none;
 z-index: 5 }
         .lang-card:hover::before { opacity: 1; }
-        .lang-flag { width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; position: relative; }
+        .lang-flag { width: 48px; height: 48px; margin: 0 auto 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
         .lang-flag img { width: 100%; height: 100%; object-fit: cover; }
         .lang-card:hover .lang-flag { border-color: var(--accent); }
 
