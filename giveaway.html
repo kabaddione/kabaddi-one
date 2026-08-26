@@ -906,10 +906,8 @@
             });
 
             // ========== COUNTDOWN TIMER ==========
-            // Set target date: 14 days from now (change as needed)
-            const targetDate = new Date();
-            targetDate.setDate(targetDate.getDate() + 14);
-            targetDate.setHours(23, 59, 59, 0);
+            // Set a fixed target date and time (change as needed)
+            const targetDate = new Date('2026-10-31T23:59:59');
 
             function updateCountdown() {
                 const now = new Date().getTime();
