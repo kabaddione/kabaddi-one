@@ -1643,20 +1643,21 @@
 
         // ─── 2. FIREBASE CONFIG (REPLACE WITH YOUR OWN) ──────────────
         const firebaseConfig = {
-            apiKey: "AIzaSyYourAPIKeyHere",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
-        };
+  apiKey: "AIzaSyCoRGEpOh7g3Lz1cD_7Jxwa3GBs4iHScPM",
+  authDomain: "giveaway-page-33b24.firebaseapp.com",
+  projectId: "giveaway-page-33b24",
+  storageBucket: "giveaway-page-33b24.firebasestorage.app",
+  messagingSenderId: "206621729453",
+  appId: "1:206621729453:web:76a06adeaf64cb76479c24",
+  measurementId: "G-R8JGMJTJV9"
+};
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // ─── 3. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
         // Set this to your desired end date/time (e.g., Dec 31, 2026 23:59:59 UTC)
-        const END_TIMESTAMP = 1735689600000; // Dec 31, 2026 23:59:59 GMT
+        const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
 
         // ─── 4. COUNTDOWN LOGIC ──────────────────────────────────────
         const cdDays = document.getElementById('cdDays');
