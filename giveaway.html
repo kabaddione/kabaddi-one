@@ -1609,29 +1609,26 @@
         import {
             getFirestore,
             collection,
-            addDoc,
-            serverTimestamp,
-            query,
-            where,
-            getDocs
+            doc,
+            setDoc,
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ─── 2. FIREBASE CONFIG (REPLACE WITH YOUR OWN) ──────────────
+        // ─── 2. FIREBASE CONFIG ──────────────────────────────
         const firebaseConfig = {
-  apiKey: "AIzaSyCoRGEpOh7g3Lz1cD_7Jxwa3GBs4iHScPM",
-  authDomain: "giveaway-page-33b24.firebaseapp.com",
-  projectId: "giveaway-page-33b24",
-  storageBucket: "giveaway-page-33b24.firebasestorage.app",
-  messagingSenderId: "206621729453",
-  appId: "1:206621729453:web:76a06adeaf64cb76479c24",
-  measurementId: "G-R8JGMJTJV9"
-};
+            apiKey: "AIzaSyCoRGEpOh7g3Lz1cD_7Jxwa3GBs4iHScPM",
+            authDomain: "giveaway-page-33b24.firebaseapp.com",
+            projectId: "giveaway-page-33b24",
+            storageBucket: "giveaway-page-33b24.firebasestorage.app",
+            messagingSenderId: "206621729453",
+            appId: "1:206621729453:web:76a06adeaf64cb76479c24",
+            measurementId: "G-R8JGMJTJV9"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // ─── 3. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
-        // Set this to your desired end date/time (e.g., Dec 31, 2026 23:59:59 UTC)
         const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
 
         // ─── 4. COUNTDOWN LOGIC ──────────────────────────────────────
@@ -1679,7 +1676,7 @@
         updateTimer();
         countdownInterval = setInterval(updateTimer, 1000);
 
-        // ─── 5. FORM SUBMISSION WITH DUPLICATE CHECK ────────────────
+        // ─── 5. SECURE FORM SUBMISSION (NO READS REQUIRED) ─────────────
         const form = document.getElementById('giveawayForm');
         const formSuccess = document.getElementById('formSuccess');
         const entryName = document.getElementById('entryName');
@@ -1700,58 +1697,51 @@
                 return;
             }
 
-            // Basic Instagram handle validation
             if (!insta.startsWith('@')) {
                 alert('Instagram Handle must start with "@" (e.g. @username)');
                 return;
             }
 
-            // Disable button during submission
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
-                // ── Check for duplicate entry (same Instagram or email) ──
-                const qInsta = query(collection(db, "giveaway_entries"), where("instagramHandle", "==", insta));
-                const qEmail = query(collection(db, "giveaway_entries"), where("email", "==", email));
+                // We use the Instagram Handle as the UNIQUE Document ID 
+                // (Removing the @ and making it lowercase to ensure consistency)
+                const uniqueId = insta.replace('@', '').toLowerCase();
+                
+                // Point directly to this specific custom ID
+                const entryRef = doc(db, "giveaway_entries", uniqueId);
 
-                const [snapInsta, snapEmail] = await Promise.all([getDocs(qInsta), getDocs(qEmail)]);
-
-                if (!snapInsta.empty) {
-                    alert('This Instagram handle has already been entered. Only one entry per person.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Entry &amp; Join';
-                    return;
-                }
-
-                if (!snapEmail.empty) {
-                    alert('This email address has already been used. Only one entry per person.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Entry &amp; Join';
-                    return;
-                }
-
-                // ── Write to Firestore ──
-                await addDoc(collection(db, "giveaway_entries"), {
+                // This write will FAIL if the document ID already exists based on our security rules!
+                await setDoc(entryRef, {
                     name: name,
                     instagramHandle: insta,
                     postUrl: postUrl,
                     email: email,
                     submittedAt: serverTimestamp(),
-                    status: "pending_verification", // admin will verify the post
+                    status: "pending_verification",
                     contestEnded: false
                 });
 
-                // ── Show success ──
+                // Show success
                 form.style.display = 'none';
                 formSuccess.classList.add('show');
                 formSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             } catch (error) {
-                console.error("Firebase submission error:", error);
-                alert('Something went wrong. Please check your connection and try again.');
+                // If the security rules block it, it throws a 'permission-denied' error.
+                // We know exactly what that means: The ID already exists!
+                if (error.code === 'permission-denied') {
+                    alert('This Instagram Handle has already been entered! Only one entry per person is allowed.');
+                } else {
+                    console.error("Firebase submission error:", error);
+                    alert('Something went wrong. Please check your connection and try again.');
+                }
+                
+                // Reset button
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Entry &amp; Join';
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Entry & Join';
             }
         });
 
@@ -1762,7 +1752,6 @@
         const backToTop = document.getElementById('backToTop');
         const allNavLinks = navLinks.querySelectorAll('a');
 
-        // Hamburger toggle
         hamburger.addEventListener('click', function() {
             const isActive = navLinks.classList.toggle('active');
             hamburger.classList.toggle('active');
@@ -1779,7 +1768,6 @@
             });
         });
 
-        // Navbar scroll effect
         function updateNavbar() {
             if (window.scrollY > 50) navbar.classList.add('scrolled');
             else navbar.classList.remove('scrolled');
@@ -1787,7 +1775,6 @@
         window.addEventListener('scroll', updateNavbar, { passive: true });
         updateNavbar();
 
-        // Back to top
         function updateBackToTop() {
             if (window.scrollY > 600) backToTop.classList.add('visible');
             else backToTop.classList.remove('visible');
@@ -1849,7 +1836,7 @@
 
         console.log('%c🏆 KabaddiOne Giveaway Page Ready %c| %cWin Premium Prizes',
             'color:#39FF14;font-weight:bold;font-size:1.1em;', '', 'color:#00FFFF;');
-        console.log('%c🔥 Firebase backend connected. Entries are being stored securely.',
+        console.log('%c🔥 Firebase backend connected. Maximum Security rules applied.',
             'color:#b0b0c8;');
     </script>
 
