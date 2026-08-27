@@ -4,987 +4,380 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="favicon.png">
-    <link rel="shortcut icon" href="favicon.png" type="image/png">
     <meta name="title" content="KabaddiOne Giveaway - Win Premium Prizes">
-    <meta name="description" content="Enter the KabaddiOne giveaway to win premium prizes. Live countdown, winner announcements, and easy participation. Download KabaddiOne now!">
-    <meta name="keywords" content="KabaddiOne giveaway, kabaddi app giveaway, win prizes, kabaddi scoreboard giveaway, KabaddiOne winners">
-    <meta name="author" content="KabaddiOne">
-    <meta name="robots" content="index, follow">
+    <meta name="description" content="Enter the KabaddiOne giveaway to win premium prizes. Live countdown, winner announcements, and easy participation.">
     <meta name="theme-color" content="#0a0a1a">
     <title>KabaddiOne Giveaway - Win Premium Prizes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-YRYC0NEP1H');
-    </script>
-
     <style>
         :root {
-            --bg-primary: #0a0a1a; --bg-secondary: #0f0f24; --bg-card: rgba(255, 255, 255, 0.03);
-            --accent: #FF5E3A; --accent-glow: #FF3D10; --accent-secondary: #FFB830;
-            --gold: #F0C040;
-            --text-primary: #ffffff; --text-secondary: #b0b0c8; --text-muted: #7a7a95;
-            --border-subtle: rgba(255, 255, 255, 0.08); --border-glow: rgba(255, 94, 58, 0.4);
-            --glass-bg: rgba(255, 255, 255, 0.04); --glass-border: rgba(255, 255, 255, 0.1);
-            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-xl: 36px;
-            --shadow-glow: 0 0 40px rgba(255, 94, 58, 0.25); --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-primary: #0a0a1a; --bg-secondary: #0f0f24; 
+            --accent: #FF5E3A; --accent-secondary: #FFB830;
+            --text-primary: #ffffff; --text-secondary: #b0b0c8;
+            --border-subtle: rgba(255, 255, 255, 0.08);
             --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-heading: 'Segoe UI', system-ui, sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
             --max-width: 1200px; --nav-height: 72px;
+            
+            /* APP MATCHING VARIABLES */
+            --app-purple: #4A0E4E;
+            --app-dark-purple: #3A004A;
         }
 
-        *,
-        *::before,
-        *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body { font-family: var(--font-body); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
 
-        html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-
-        body { font-family: var(--font-body); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; min-height: 100vh; }
-
-        /* ============ ANIMATED BACKGROUND ORBS ============ */
-        .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-        .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; -webkit-backface-visibility: hidden; backface-visibility: hidden; -webkit-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0); will-change: transform; }
-        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; animation-delay: 0s; }
-        .bg-orb:nth-child(2) { width: 450px; height: 450px; background: #6C3CE0; top: 50%; right: -12%; animation-delay: -6s; animation-duration: 20s; }
-        .bg-orb:nth-child(3) { width: 350px; height: 350px; background: var(--accent-secondary); bottom: -10%; left: 20%; animation-delay: -12s; animation-duration: 16s; }
-        .bg-orb:nth-child(4) { width: 300px; height: 300px; background: #FF3D70; top: 25%; left: 50%; animation-delay: -3s; animation-duration: 22s; }
-        @keyframes orbFloat { 0%,100% { transform: translate3d(0, 0, 0) scale(1); } 25% { transform: translate3d(60px, -40px, 0) scale(1.15); } 50% { transform: translate3d(-30px, 50px, 0) scale(0.9); } 75% { transform: translate3d(-50px, -30px, 0) scale(1.1); } }
-
-        /* ============ NAVIGATION ============ */
-        .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); transition: var(--transition-smooth); background: transparent; }
-        .nav.scrolled { background: rgba(10, 10, 26, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+        /* ============ NAVIGATION (Dark Theme Retained) ============ */
+        .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); background: rgba(10, 10, 26, 0.95); border-bottom: 1px solid var(--border-subtle); }
         .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 100%; }
-        .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; text-decoration: none; letter-spacing: -0.5px; z-index: 1001; }
-        .nav-logo .logo-icon { width: 38px; height: 38px; background: none; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: var(--shadow-glow); animation: logoPulse 3s ease-in-out infinite; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; text-decoration: none; }
+        .nav-logo .logo-icon { width: 38px; height: 38px; border-radius: 12px; overflow: hidden; }
         .nav-logo .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
-        @keyframes logoPulse { 0%,100% { box-shadow: 0 0 20px rgba(255, 94, 58, 0.35); } 50% { box-shadow: 0 0 40px rgba(255, 94, 58, 0.65); } }
-        .nav-logo span { color: #ffffff; -webkit-text-fill-color: #ffffff; background: none; }
         .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-        .nav-links a { color: #ffffff; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: var(--transition-fast); position: relative; white-space: nowrap; }
-        .nav-links a::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 0; height: 2px; background: var(--accent); border-radius: 2px; transition: var(--transition-smooth); }
-        .nav-links a:hover { color: #fff; }
-        .nav-links a:hover::after { width: 100%; }
-        .nav-links a.nav-active { color: var(--accent); }
-        .nav-links a.nav-active::after { width: 100%; }
-        .nav-cta-btn { background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #fff !important; padding: 10px 22px; border-radius: 50px; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none; transition: var(--transition-bounce) !important; box-shadow: 0 4px 18px rgba(255, 94, 58, 0.35); }
-        .nav-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255, 94, 58, 0.5); }
-        .nav-cta-btn::after { display: none !important; }
-        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1001; background: none; border: none; padding: 8px; }
-        .hamburger span { width: 26px; height: 2.5px; background: #fff; border-radius: 2px; transition: var(--transition-smooth); display: block; }
-        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-        .hamburger.active span:nth-child(2) { opacity: 0; }
-        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+        .nav-links a { color: #ffffff; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .nav-cta-btn { background: linear-gradient(135deg, var(--accent), #FF3D10); padding: 10px 22px; border-radius: 50px; font-weight: 600; }
 
-        /* ============ SECTIONS ============ */
-        .section { position: relative; z-index: 1; padding: 80px 24px; }
-        .container { max-width: var(--max-width); margin: 0 auto; }
-
-        /* ============ GIVEAWAY HERO / COUNTDOWN ============ */
-        .giveaway-hero {
-            padding-top: calc(var(--nav-height) + 60px);
-            padding-bottom: 40px;
+        /* ============ PREMIUM APP-STYLE MAIN SECTION ============ */
+        .app-replica-section {
+            padding: calc(var(--nav-height) + 60px) 24px 80px;
+            background: var(--bg-primary);
+            position: relative;
+        }
+        
+        .premium-white-box {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
             text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        .giveaway-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent-secondary);
-            margin-bottom: 24px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            animation: fadeInUp 0.8s ease-out;
-            letter-spacing: 0.5px;
-        }
-        .giveaway-badge .badge-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: badgePulse 2s ease-in-out infinite; }
-        @keyframes badgePulse { 0%,100% { opacity: 1; box-shadow: 0 0 6px var(--accent); } 50% { opacity: 0.4; box-shadow: 0 0 16px var(--accent); } }
-        .giveaway-hero h1 {
-            font-family: var(--font-heading);
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 900;
-            line-height: 1.15;
-            letter-spacing: -1px;
-            margin-bottom: 16px;
-        }
-        .giveaway-hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary), #FF6B4A);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-        .giveaway-hero .hero-desc {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 560px;
-            margin: 0 auto 30px;
-            line-height: 1.7;
         }
 
-        /* Countdown clock */
-        .countdown-wrapper {
-            max-width: 620px;
-            margin: 0 auto 40px;
-            background: var(--glass-bg);
-            border: 1px solid var(--border-glow);
-            border-radius: var(--radius-lg);
-            padding: 32px 24px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-card), 0 0 40px rgba(255, 94, 58, 0.08);
-            position: relative;
-            overflow: hidden;
-        }
-        .countdown-wrapper::before {
-            content: '';
+        .giveaway-badge-img {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent);
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: auto;
+            z-index: 10;
+            filter: drop-shadow(0 12px 10px rgba(0,0,0,0.3));
         }
-        .countdown-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent-secondary);
-            margin-bottom: 20px;
-        }
-        .countdown-timer {
+
+        /* TIMER STYLING EXACT MATCH */
+        .timer-grid {
             display: flex;
-            gap: 14px;
             justify-content: center;
-            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 30px;
         }
-        .countdown-unit {
+        .timer-unit {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 80px;
         }
-        .countdown-unit .cd-value {
-            font-family: var(--font-heading);
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.1;
-        }
-        .countdown-unit .cd-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        .countdown-separator {
-            display: flex;
-            align-items: center;
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--accent);
-            opacity: 0.6;
-        }
-
-        /* ============ PRIZE SECTION ============ */
-        .prize-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 32px;
-        }
-        .prize-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-md);
-            padding: 30px 24px;
-            text-align: center;
-            transition: var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .prize-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-card), 0 0 30px rgba(255, 94, 58, 0.1);
-            border-color: var(--border-glow);
-        }
-        .prize-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0;
-            transition: var(--transition-smooth);
-        }
-        .prize-card:hover::before { opacity: 1; }
-        .prize-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
+        .timer-box {
+            width: 75px;
+            height: 60px;
+            background: var(--app-purple);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            margin: 0 auto 16px;
-            color: #ddb5fc;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.03);
+            font-size: 32px;
+            font-weight: 900;
+            color: #FFFFFF;
+            font-family: var(--font-heading);
+            position: relative;
         }
-        .prize-card h3 { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
-        .prize-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-        .prize-value {
-            display: inline-block;
-            margin-top: 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: var(--accent-secondary);
-            border: 1px solid rgba(255, 184, 48, 0.3);
-            background: rgba(255, 184, 48, 0.08);
+        /* Neon Gradient Border via Pseudo-element */
+        .timer-box::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(to right, #39FF14, #00FFFF);
+            border-radius: 14px;
+            z-index: -1;
+        }
+        .timer-label {
+            color: var(--app-purple);
+            font-size: 13px;
+            font-weight: 800;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        /* 5 LUCKY WINNERS TEXT MATCH */
+        .hero-graphics {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .promo-img { width: 150px; height: auto; object-fit: contain; }
+        
+        .central-text { display: flex; flex-direction: column; align-items: center; }
+        
+        .lucky-text {
+            font-size: 42px;
+            font-weight: 900;
+            font-family: var(--font-heading);
+            background: linear-gradient(to right, #39FF14, #00FFFF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--app-purple);
+            filter: drop-shadow(2px 2px 0px var(--app-purple));
+            line-height: 1.1;
+            margin-bottom: 5px;
+        }
+        
+        .winners-desc {
+            color: var(--app-dark-purple);
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+        
+        .worth-text {
+            color: var(--app-dark-purple);
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        /* ACTION BUTTON MATCH */
+        .join-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: linear-gradient(to right, #39FF14, #00FFFF);
+            color: var(--app-dark-purple);
+            font-size: 22px;
+            font-weight: 900;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--app-dark-purple);
+            text-decoration: none;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .join-btn:hover { transform: scale(1.02); }
+        .join-btn.disabled {
+            background: linear-gradient(to right, rgba(57,255,20,0.5), rgba(0,255,255,0.5));
+            border-color: rgba(58,0,74,0.5);
+            color: rgba(58,0,74,0.8);
+            font-size: 18px;
         }
 
         /* ============ HOW TO ENTER ============ */
-        .enter-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-top: 32px; }
-        .enter-step {
-            text-align: center;
-            padding: 28px 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-md);
-            transition: var(--transition-smooth);
-            position: relative;
-        }
-        .enter-step:hover { transform: translateY(-4px); border-color: var(--border-glow); box-shadow: var(--shadow-card); }
-        .step-num {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
-            color: #fff;
-            font-weight: 900;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
-            box-shadow: var(--shadow-glow);
-        }
-        .enter-step h3 { font-weight: 700; font-size: 1rem; margin-bottom: 6px; font-family: var(--font-heading); }
-        .enter-step p { font-size: 0.85rem; color: var(--text-muted); }
+        .rules-container { margin-top: 40px; text-align: left; background: #F8F9FA; padding: 24px; border-radius: 16px; border: 1px solid #E0E0E0; }
+        .rules-container h3 { color: var(--app-dark-purple); margin-bottom: 16px; font-size: 1.2rem; }
+        .step-item { display: flex; gap: 12px; margin-bottom: 12px; color: #333; font-weight: 600; font-size: 0.95rem; }
+        .step-num { width: 24px; height: 24px; background: var(--app-purple); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
 
         /* ============ ENTRY FORM ============ */
-        .entry-section { max-width: 620px; margin: 0 auto; }
-        .entry-form {
-            background: var(--glass-bg);
-            border: 1px solid var(--border-glow);
-            border-radius: var(--radius-lg);
-            padding: 40px 32px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-card), 0 0 40px rgba(255, 94, 58, 0.08);
-        }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-sm);
-            color: #fff;
-            font-size: 1rem;
-            font-family: var(--font-body);
-            transition: var(--transition-fast);
-            outline: none;
-        }
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 94, 58, 0.15);
-        }
-        .form-group select option { background: #1a1a2e; color: #fff; }
-        .entry-form .btn-primary { width: 100%; justify-content: center; margin-top: 10px; }
-        .form-success {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            background: rgba(76, 175, 80, 0.1);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            border-radius: var(--radius-md);
-            margin-top: 20px;
-        }
-        .form-success.show { display: block; }
-        .form-success i { font-size: 2.5rem; color: #4CAF50; margin-bottom: 10px; }
-        .form-success h3 { color: #4CAF50; font-weight: 700; margin-bottom: 6px; }
-        .form-success p { color: var(--text-secondary); font-size: 0.9rem; }
+        .entry-form-wrapper { margin-top: 30px; text-align: left; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--app-dark-purple); margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 14px; border: 2px solid #E0E0E0; border-radius: 12px; font-size: 1rem; font-family: var(--font-body); color: #333; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--app-purple); }
+        
+        .form-success { display: none; text-align: center; padding: 20px; background: #E8F5E9; border-radius: 12px; color: #2E7D32; font-weight: bold; margin-top: 20px; border: 2px solid #81C784; }
 
-        /* ============ WINNERS SECTION ============ */
-        .winners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 32px; }
-        .winner-card {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-md);
-            padding: 20px 24px;
-            transition: var(--transition-smooth);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .winner-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glow);
-            box-shadow: var(--shadow-card);
-        }
-        .winner-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 1.2rem;
-            color: #fff;
-            flex-shrink: 0;
-        }
-        .winner-info h4 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; font-family: var(--font-heading); }
-        .winner-info .winner-prize { font-size: 0.85rem; color: var(--accent-secondary); font-weight: 600; }
-        .winner-info .winner-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-        .winner-badge { margin-left: auto; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; color: #ddb5fc; border: 1px solid rgba(255, 255, 255, 0.2); white-space: nowrap; }
+        /* ============ FOOTER (Dark Theme Retained) ============ */
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px; color: var(--text-muted); text-align: center; }
 
-        /* ============ RULES ============ */
-        .rules-list {
-            max-width: 700px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            text-align: left;
-        }
-        .rules-list li {
-            display: flex;
-            gap: 12px;
-            padding: 14px 18px;
-            background: var(--glass-bg);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            list-style: none;
-        }
-        .rules-list li .rule-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            background: rgba(255, 94, 58, 0.15);
-            color: var(--accent);
-            flex-shrink: 0;
-        }
-
-        /* ============ SECTION HEADERS (reuse) ============ */
-        .section-header { text-align: center; margin-bottom: 48px; }
-        .section-tag { display: inline-block; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-        .section-header h2 { font-family: var(--font-heading); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900; letter-spacing: -1px; line-height: 1.2; margin-bottom: 12px; }
-        .section-header h2 .highlight { background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .section-header p { color: var(--text-secondary); max-width: 550px; margin: 0 auto; font-size: 1rem; }
-
-        /* ============ CTA SECTION ============ */
-        .cta-section { text-align: center; position: relative; z-index: 1; }
-        .cta-card { background: linear-gradient(135deg, rgba(255,94,58,0.1), rgba(255,184,48,0.08)); border: 1px solid var(--border-glow); border-radius: var(--radius-xl); padding: 56px 32px; max-width: 700px; margin: 0 auto; position: relative; overflow: hidden; }
-        .cta-card::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(255,94,58,0.06) 0%, transparent 60%); animation: ctaShimmer 8s linear infinite; pointer-events: none; }
-        @keyframes ctaShimmer { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .cta-card h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 900; margin-bottom: 12px; position: relative; z-index: 1; }
-        .cta-card p { color: var(--text-secondary); margin-bottom: 28px; position: relative; z-index: 1; }
-        .cta-card .btn-primary { font-size: 1.1rem; padding: 16px 36px; position: relative; z-index: 1; }
-
-        /* ============ BUTTONS ============ */
-        .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--accent), #FF3D10); color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); box-shadow: 0 6px 24px rgba(255, 94, 58, 0.4); border: none; cursor: pointer; letter-spacing: 0.3px; }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(255, 94, 58, 0.55); }
-        .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); border: 2px solid rgba(255,94,58,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); cursor: pointer; }
-        .btn-secondary:hover { background: rgba(255,94,58,0.15); border-color: var(--accent); transform: translateY(-3px); }
-
-        /* ============ FOOTER ============ */
-        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; position: relative; z-index: 1; }
-        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; }
-        .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: #fff; font-family: var(--font-heading); }
-        .footer-logo .logo-icon { width: 38px; height: 38px; background: none; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: var(--shadow-glow); animation: logoPulse 3s ease-in-out infinite; }
-        .footer-logo .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .footer-logo img { height: 30px; width: auto; }
-        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; transition: var(--transition-fast); }
-        .footer-links a:hover { color: #fff; }
-        .social-links { display: flex; gap: 16px; align-items: center; }
-        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: var(--transition-fast); text-decoration: none; }
-        .social-links a:hover { color: var(--accent); }
-        .footer-copy { color: var(--text-muted); font-size: 0.8rem; text-align: center; width: 100%; margin-top: 16px; }
-
-        /* ============ REVEAL ANIMATIONS ============ */
-        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-        .reveal-delay-1 { transition-delay: 0.1s; }
-        .reveal-delay-2 { transition-delay: 0.2s; }
-        .reveal-delay-3 { transition-delay: 0.3s; }
-        .reveal-delay-4 { transition-delay: 0.4s; }
-
-        @keyframes fadeInUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
-
-        /* ============ BACK TO TOP ============ */
-        .back-to-top { position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 46px; height: 46px; border-radius: 50%; background: var(--accent); color: #fff; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition-smooth); box-shadow: 0 6px 20px rgba(255,94,58,0.4); }
-        .back-to-top.visible { opacity: 1; pointer-events: auto; }
-        .back-to-top:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(255,94,58,0.55); }
-
-        /* ============ RESPONSIVE ============ */
-        @media (max-width: 1024px) {
-            .hero .container { grid-template-columns: 1fr; text-align: center; }
-            .auto-feature-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
-            .sound-showcase { grid-template-columns: 1fr; }
-        }
         @media (max-width: 768px) {
-            .nav-links { position: fixed; top: 0; right: -100%; width: 75%; max-width: 320px; height: 100vh; background: rgba(15,15,36,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); flex-direction: column; justify-content: center; gap: 28px; transition: var(--transition-smooth); padding: 40px; border-left: 1px solid var(--border-subtle); }
-            .nav-links.active { right: 0; }
-            .nav-links a { font-size: 1.1rem; }
-            .hamburger { display: flex; }
-            .section { padding: 50px 16px; }
-            .giveaway-hero { padding-top: calc(var(--nav-height) + 40px); padding-bottom: 30px; }
-            .countdown-wrapper { padding: 24px 16px; }
-            .countdown-unit { min-width: 65px; }
-            .countdown-separator { font-size: 1.5rem; }
-            .entry-form { padding: 28px 18px; }
-            .winners-grid { grid-template-columns: 1fr; }
-            .prize-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
-            .enter-steps { grid-template-columns: 1fr; }
-            .cta-card { padding: 36px 20px; border-radius: var(--radius-lg); }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
-            .footer-inner { flex-direction: column; align-items: center; text-align: center; }
-            .footer-links { justify-content: center; }
-            .social-links { justify-content: center; }
-            .rules-list li { padding: 12px 14px; }
-        }
-        @media (max-width: 480px) {
-            .giveaway-hero h1 { font-size: 1.6rem; }
-            .giveaway-hero .hero-desc { font-size: 0.9rem; }
-            .countdown-unit { min-width: 55px; }
-            .countdown-unit .cd-value { font-size: 1.5rem; }
-            .countdown-unit .cd-label { font-size: 0.6rem; }
-            .prize-grid { grid-template-columns: 1fr; }
-            .winner-card { flex-direction: column; text-align: center; }
-            .winner-badge { margin-left: 0; }
+            .premium-white-box { padding: 40px 20px 24px; }
+            .hero-graphics { flex-direction: column; gap: 10px; }
+            .promo-img { width: 120px; }
+            .timer-box { width: 55px; height: 50px; font-size: 24px; }
+            .lucky-text { font-size: 32px; }
+            .winners-desc { font-size: 16px; }
+            .worth-text { font-size: 22px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-orbs" aria-hidden="true">
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-        <div class="bg-orb"></div>
-    </div>
-
-    <!-- ============ NAVIGATION ============ -->
-    <nav class="nav" id="navbar" aria-label="Main navigation">
+    <!-- NAVIGATION -->
+    <nav class="nav">
         <div class="nav-inner">
-            <a href="index.html" class="nav-logo" aria-label="KabaddiOne Home">
-                <div class="logo-icon">
-                    <img src="images/kabaddione_logo.png" alt="KabaddiOne Logo">
-                </div>
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><img src="images/kabaddione_logo.png" alt="Logo"></div>
                 <span>KabaddiOne</span>
             </a>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="index.html#features">Features</a></li>
-                <li><a href="index.html#auto-super-tackle">Smart Auto</a></li>
-                <li><a href="index.html#sounds">Sounds</a></li>
-                <li><a href="index.html#languages">Languages</a></li>
-                <li><a href="giveaway.html" class="nav-active">Giveaway</a></li>
-                <li><a href="download.html" class="nav-cta-btn">Download</a></li>
+            <ul class="nav-links">
+                <li><a href="download.html" class="nav-cta-btn">Download App</a></li>
             </ul>
-            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </div>
     </nav>
 
-    <!-- ============ GIVEAWAY HERO / COUNTDOWN ============ -->
-    <section class="giveaway-hero" aria-labelledby="giveaway-heading">
-        <div class="container">
-            <div class="giveaway-badge">
-                <span class="badge-dot"></span> KABADDIONE MEGA GIVEAWAY
-            </div>
-            <h1 id="giveaway-heading">Win <span class="gradient-text">Premium Prizes</span> with KabaddiOne</h1>
-            <p class="hero-desc">
-                Join our exclusive giveaway and stand a chance to win amazing prizes. Enter now — the clock is ticking!
-            </p>
+    <!-- PREMIUM WHITE BOX SECTION -->
+    <section class="app-replica-section">
+        <div class="premium-white-box">
+            <img src="images/giveaway.png" alt="Giveaway Contest" class="giveaway-badge-img">
 
-            <!-- Premium Countdown Clock -->
-            <div class="countdown-wrapper reveal">
-                <div class="countdown-label">
-                    <i class="fa-solid fa-clock"></i> Contest end in
-                </div>
-                <div class="countdown-timer" id="countdownTimer">
-                    <div class="countdown-unit">
-                        <span class="cd-value" id="cdDays">00</span>
-                        <span class="cd-label">Days</span>
-                    </div>
-                    <div class="countdown-separator">:</div>
-                    <div class="countdown-unit">
-                        <span class="cd-value" id="cdHours">00</span>
-                        <span class="cd-label">Hours</span>
-                    </div>
-                    <div class="countdown-separator">:</div>
-                    <div class="countdown-unit">
-                        <span class="cd-value" id="cdMinutes">00</span>
-                        <span class="cd-label">Minutes</span>
-                    </div>
-                    <div class="countdown-separator">:</div>
-                    <div class="countdown-unit">
-                        <span class="cd-value" id="cdSeconds">00</span>
-                        <span class="cd-label">Seconds</span>
-                    </div>
-                </div>
+            <div class="timer-grid">
+                <div class="timer-unit"><div class="timer-box" id="cdDays">00</div><div class="timer-label">Days</div></div>
+                <div class="timer-unit"><div class="timer-box" id="cdHours">00</div><div class="timer-label">Hours</div></div>
+                <div class="timer-unit"><div class="timer-box" id="cdMinutes">00</div><div class="timer-label">Minutes</div></div>
+                <div class="timer-unit"><div class="timer-box" id="cdSeconds">00</div><div class="timer-label">Seconds</div></div>
             </div>
 
-            <a href="#enter" class="btn-primary">
-                <i class="fa-solid fa-gift"></i>
-                Enter Giveaway Now
-            </a>
-        </div>
-    </section>
-
-    <!-- ============ PRIZES ============ -->
-    <section class="section" id="prizes" aria-labelledby="prizes-heading">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-tag">What's at Stake</span>
-                <h2 id="prizes-heading">Amazing <span class="highlight">Prizes</span> Await You</h2>
-                <p>We're giving away premium rewards to lucky KabaddiOne users. Here's what you can win.</p>
-            </div>
-            <div class="prize-grid">
-                <div class="prize-card reveal reveal-delay-1">
-                    <div class="prize-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <h3>1st Prize</h3>
-                    <p>Latest Android Smartphone + KabaddiOne Premium Lifetime</p>
-                    <span class="prize-value">₹25,000 Value</span>
+            <div class="hero-graphics">
+                <img src="images/giveaway_winner.png" class="promo-img" alt="Winner">
+                <div class="central-text">
+                    <div class="lucky-text">5 Lucky</div>
+                    <div class="winners-desc">Winners Will Win A<br>KabaddiOne Pro Subscription</div>
+                    <div class="worth-text">Worth ₹599</div>
                 </div>
-                <div class="prize-card reveal reveal-delay-2">
-                    <div class="prize-icon"><i class="fa-solid fa-headphones"></i></div>
-                    <h3>2nd Prize</h3>
-                    <p>Premium Wireless Earbuds + KabaddiOne Premium 1 Year</p>
-                    <span class="prize-value">₹8,000 Value</span>
-                </div>
-                <div class="prize-card reveal reveal-delay-3">
-                    <div class="prize-icon"><i class="fa-solid fa-shirt"></i></div>
-                    <h3>3rd Prize</h3>
-                    <p>Exclusive KabaddiOne Merchandise Kit + Stickers Pack</p>
-                    <span class="prize-value">₹3,000 Value</span>
-                </div>
-                <div class="prize-card reveal reveal-delay-4">
-                    <div class="prize-icon"><i class="fa-solid fa-gift"></i></div>
-                    <h3>Consolation</h3>
-                    <p>50 Lucky Winners get KabaddiOne Premium for 3 Months</p>
-                    <span class="prize-value">₹299 Value Each</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ HOW TO ENTER ============ -->
-    <section class="section" id="how-to-enter" aria-labelledby="enter-heading" style="background: var(--bg-secondary);">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-tag">Participation Made Easy</span>
-                <h2 id="enter-heading">How to <span class="highlight">Enter</span> the Giveaway</h2>
-                <p>Three simple steps to get your name in the draw. No purchase necessary.</p>
-            </div>
-            <div class="enter-steps">
-                <div class="enter-step reveal reveal-delay-1">
-                    <div class="step-num">1</div>
-                    <h3>Download KabaddiOne</h3>
-                    <p>Get the app free from the Google Play Store</p>
-                </div>
-                <div class="enter-step reveal reveal-delay-2">
-                    <div class="step-num">2</div>
-                    <h3>Play & Share</h3>
-                    <p>Use the app and share your match scorecard with friends</p>
-                </div>
-                <div class="enter-step reveal reveal-delay-3">
-                    <div class="step-num">3</div>
-                    <h3>Fill the Form</h3>
-                    <p>Submit your details below to enter the lucky draw</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ ENTRY FORM ============ -->
-    <section class="section" id="enter" aria-labelledby="entry-heading">
-        <div class="container entry-section">
-            <div class="section-header reveal">
-                <span class="section-tag">Enter Now</span>
-                <h2 id="entry-heading">Participate <span class="highlight">Today</span></h2>
-                <p>Fill in the form below to enter the giveaway. Fields marked * are required.</p>
+                <img src="images/giveaway_pro.png" class="promo-img" alt="Pro Access">
             </div>
 
-            <div class="entry-form reveal reveal-delay-1">
-                <form id="giveawayForm" onsubmit="return false;">
+            <!-- Rules -->
+            <div class="rules-container">
+                <h3>How to Enter:</h3>
+                <div class="step-item"><div class="step-num">1</div> Download KabaddiOne from the Play Store.</div>
+                <div class="step-item"><div class="step-num">2</div> Generate a match scorecard and post it to your Instagram Story or Feed.</div>
+                <div class="step-item"><div class="step-num">3</div> Tag @KabaddiOneApp in the post.</div>
+                <div class="step-item"><div class="step-num">4</div> Submit your Instagram Handle below to verify your entry!</div>
+            </div>
+
+            <!-- Entry Form -->
+            <div class="entry-form-wrapper" id="formWrapper">
+                <form id="giveawayForm">
                     <div class="form-group">
-                        <label for="fullName">Full Name *</label>
-                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                        <label>Full Name</label>
+                        <input type="text" id="entryName" required placeholder="Enter your name">
                     </div>
                     <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                        <label>Instagram Handle (For Verification)</label>
+                        <input type="text" id="entryInsta" required placeholder="@username">
                     </div>
                     <div class="form-group">
-                        <label for="phone">Mobile Number (optional)</label>
-                        <input type="tel" id="phone" name="phone" placeholder="Enter your WhatsApp number">
+                        <label>Email Address</label>
+                        <input type="email" id="entryEmail" required placeholder="Where we send the prize code">
                     </div>
-                    <div class="form-group">
-                        <label for="referral">How did you hear about us?</label>
-                        <select id="referral" name="referral">
-                            <option value="">Select an option</option>
-                            <option value="playstore">Google Play Store</option>
-                            <option value="social">Social Media</option>
-                            <option value="friend">Friend / Family</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-primary" id="submitBtn">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        Submit Entry
-                    </button>
+                    <button type="submit" class="join-btn" id="submitBtn">Submit Entry & Join</button>
                 </form>
-
                 <div class="form-success" id="formSuccess">
-                    <i class="fa-solid fa-check-circle"></i>
-                    <h3>Entry Submitted Successfully!</h3>
-                    <p>You're now in the running. Winners will be announced when the countdown reaches zero. Good luck!</p>
+                    <i class="fa-solid fa-circle-check"></i> Entry Confirmed! Keep your Instagram post up until the timer ends. Good luck!
                 </div>
             </div>
+
+            <button class="join-btn disabled" id="endedBtn" style="display: none; margin-top: 30px;">
+                Contest is over. See Winners
+            </button>
         </div>
     </section>
 
-    <!-- ============ WINNERS ============ -->
-    <section class="section" id="winners" aria-labelledby="winners-heading" style="background: var(--bg-secondary);">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-tag">Hall of Fame</span>
-                <h2 id="winners-heading">Previous <span class="highlight">Winners</span></h2>
-                <p>Congratulations to our past giveaway winners. You could be next!</p>
-            </div>
-            <div class="winners-grid">
-                <div class="winner-card reveal reveal-delay-1">
-                    <div class="winner-avatar">AK</div>
-                    <div class="winner-info">
-                        <h4>Ankit Kumar</h4>
-                        <div class="winner-prize">1st Prize — Smartphone</div>
-                        <div class="winner-date">March 2026</div>
-                    </div>
-                    <span class="winner-badge">Winner</span>
-                </div>
-                <div class="winner-card reveal reveal-delay-2">
-                    <div class="winner-avatar">PS</div>
-                    <div class="winner-info">
-                        <h4>Priya Sharma</h4>
-                        <div class="winner-prize">2nd Prize — Earbuds</div>
-                        <div class="winner-date">February 2026</div>
-                    </div>
-                    <span class="winner-badge">Winner</span>
-                </div>
-                <div class="winner-card reveal reveal-delay-3">
-                    <div class="winner-avatar">RV</div>
-                    <div class="winner-info">
-                        <h4>Rahul Verma</h4>
-                        <div class="winner-prize">3rd Prize — Merch Kit</div>
-                        <div class="winner-date">January 2026</div>
-                    </div>
-                    <span class="winner-badge">Winner</span>
-                </div>
-                <div class="winner-card reveal reveal-delay-4">
-                    <div class="winner-avatar">SN</div>
-                    <div class="winner-info">
-                        <h4>Sneha Nair</h4>
-                        <div class="winner-prize">Consolation — Premium 3M</div>
-                        <div class="winner-date">December 2025</div>
-                    </div>
-                    <span class="winner-badge">Winner</span>
-                </div>
-                <div class="winner-card reveal reveal-delay-1">
-                    <div class="winner-avatar">MJ</div>
-                    <div class="winner-info">
-                        <h4>Mohammed Javed</h4>
-                        <div class="winner-prize">Consolation — Premium 3M</div>
-                        <div class="winner-date">November 2025</div>
-                    </div>
-                    <span class="winner-badge">Winner</span>
-                </div>
-                <div class="winner-card reveal reveal-delay-2">
-                    <div class="winner-avatar">DD</div>
-                    <div class="winner-info">
-                        <h4>Deepak Das</h4>
-                        <div class="winner-prize">Consolation — Premium 3M</div>
-                        <div class="winner-date">October 2025</div>
-                    </div>
-                    <span class="winner-badge">Winner</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ RULES ============ -->
-    <section class="section" id="rules" aria-labelledby="rules-heading">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-tag">Fair Play</span>
-                <h2 id="rules-heading">Giveaway <span class="highlight">Rules</span></h2>
-                <p>Please read the rules carefully before participating.</p>
-            </div>
-            <ul class="rules-list reveal reveal-delay-1">
-                <li><span class="rule-icon"><i class="fa-solid fa-check"></i></span> The giveaway is open to all Android users aged 18 and above.</li>
-                <li><span class="rule-icon"><i class="fa-solid fa-check"></i></span> Only one entry per person. Duplicate entries will be disqualified.</li>
-                <li><span class="rule-icon"><i class="fa-solid fa-check"></i></span> Winners will be selected randomly and announced after the countdown ends.</li>
-                <li><span class="rule-icon"><i class="fa-solid fa-check"></i></span> Winners will be notified via email or WhatsApp within 7 days of announcement.</li>
-                <li><span class="rule-icon"><i class="fa-solid fa-check"></i></span> Prizes are non-transferable and cannot be exchanged for cash.</li>
-                <li><span class="rule-icon"><i class="fa-solid fa-check"></i></span> KabaddiOne reserves the right to modify or cancel the giveaway at any time.</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- ============ CTA SECTION ============ -->
-    <section class="section cta-section" id="download" aria-labelledby="cta-heading">
-        <div class="container">
-            <div class="cta-card reveal">
-                <div class="rating-stars" style="color: var(--accent-secondary); font-size: 1.3rem; letter-spacing: 3px; margin-bottom: 8px;">★★★★★</div>
-                <h2 id="cta-heading">Don't Miss Your Chance to Win!</h2>
-                <p>Download KabaddiOne today, enter the giveaway, and join thousands of happy users.</p>
-                <a href="https://play.google.com/store/apps/details?id=com.kabaddione.scoreboard" class="btn-primary" aria-label="Download KabaddiOne on Google Play Store">
-                    <i class="fa-brands fa-google-play"></i>
-                    Download on Google Play
-                </a>
-                <p style="margin-top:12px; font-size:0.85rem; color: var(--text-muted);">⭐ 4.8 · 10K+ Downloads · Free</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ FOOTER ============ -->
-    <footer class="footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-logo">
-                <div class="logo-icon">
-                    <img src="images/kabaddione_logo.png" alt="KabaddiOne">
-                </div>
-                <span>KabaddiOne</span>
-            </div>
-            <div class="footer-links">
-                <a href="index.html#features">Features</a>
-                <a href="index.html#auto-super-tackle">Smart Auto</a>
-                <a href="index.html#sounds">Sounds</a>
-                <a href="index.html#languages">Languages</a>
-                <a href="giveaway.html">Giveaway</a>
-                <a href="download.html">Download</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms & Conditions</a>
-                <a href="sitemap.xml">Sitemap</a>
-                <a href="contact.html">Contact Us</a>
-            </div>
-            <div class="social-links">
-                <a href="https://facebook.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://twitter.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                <a href="https://instagram.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://youtube.com/@kabaddioneapp" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-            </div>
-            <p class="footer-copy">© 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.</p>
-        </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2026 KabaddiOne. The premium all-in-one kabaddi scoreboard app.</p>
     </footer>
 
-    <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top"><i class="fa-solid fa-up-long"></i></button>
+    <!-- ========================================== -->
+    <!-- FIREBASE BACKEND & COUNTDOWN LOGIC -->
+    <!-- ========================================== -->
+    <script type="module">
+        // 🚨 1. IMPORT FIREBASE v10 SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <script>
-        (function() {
-            // ========== NAV ==========
-            const navbar = document.getElementById('navbar');
-            const hamburger = document.getElementById('hamburger');
-            const navLinks = document.getElementById('navLinks');
-            const backToTop = document.getElementById('backToTop');
-            const allNavLinks = navLinks.querySelectorAll('a');
+        // 🚨 2. YOUR FIREBASE CONFIGURATION (REPLACE THIS WITH YOUR KEYS)
+        const firebaseConfig = {
+            apiKey: "AIzaSyYourAPIKeyHere...",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
 
-            hamburger.addEventListener('click', function() {
-                const isActive = navLinks.classList.toggle('active');
-                hamburger.classList.toggle('active');
-                hamburger.setAttribute('aria-expanded', isActive);
-                document.body.style.overflow = isActive ? 'hidden' : '';
-            });
-            allNavLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                    hamburger.classList.remove('active');
-                    hamburger.setAttribute('aria-expanded', 'false');
-                    document.body.style.overflow = '';
-                });
-            });
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-            function updateNavbar() {
-                if (window.scrollY > 50) navbar.classList.add('scrolled');
-                else navbar.classList.remove('scrolled');
+        // 🚨 3. SET THE END TIME (Same exact Unix Timestamp you put in Remote Config)
+        const endTimestamp = 1735689600000; // Example: Dec 31, 2026
+
+        // 🚨 4. COUNTDOWN LOGIC
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = endTimestamp - now;
+
+            if (distance <= 0) {
+                document.getElementById('cdDays').textContent = '00';
+                document.getElementById('cdHours').textContent = '00';
+                document.getElementById('cdMinutes').textContent = '00';
+                document.getElementById('cdSeconds').textContent = '00';
+                
+                // Hide Form, Show Ended Button
+                document.getElementById('formWrapper').style.display = 'none';
+                const endedBtn = document.getElementById('endedBtn');
+                endedBtn.style.display = 'block';
+                endedBtn.onclick = () => window.location.href = 'giveaway-winners.html';
+                
+                return;
             }
-            window.addEventListener('scroll', updateNavbar, { passive: true });
-            updateNavbar();
 
-            // ========== BACK TO TOP ==========
-            function updateBackToTop() {
-                if (window.scrollY > 600) backToTop.classList.add('visible');
-                else backToTop.classList.remove('visible');
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+            document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // 🚨 5. FORM SUBMISSION LOGIC
+        const form = document.getElementById('giveawayForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formSuccess = document.getElementById('formSuccess');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+
+            const name = document.getElementById('entryName').value.trim();
+            const instaHandle = document.getElementById('entryInsta').value.trim();
+            const email = document.getElementById('entryEmail').value.trim();
+
+            try {
+                // Write entry to Firestore Database
+                await addDoc(collection(db, "giveaway_entries"), {
+                    name: name,
+                    instagramHandle: instaHandle,
+                    email: email,
+                    submittedAt: serverTimestamp(),
+                    status: "pending_verification"
+                });
+
+                form.style.display = 'none';
+                formSuccess.style.display = 'block';
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Something went wrong. Please check your connection and try again.");
+                submitBtn.textContent = 'Submit Entry & Join';
+                submitBtn.disabled = false;
             }
-            window.addEventListener('scroll', updateBackToTop, { passive: true });
-            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-            updateBackToTop();
-
-            // ========== REVEAL ANIMATIONS ==========
-            const revealElements = document.querySelectorAll('.reveal');
-            const observerOptions = { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 };
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                        revealObserver.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-            revealElements.forEach(el => revealObserver.observe(el));
-
-            // ========== SMOOTH SCROLL ==========
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    const target = document.querySelector(targetId);
-                    if (target) {
-                        e.preventDefault();
-                        const navHeight = navbar.offsetHeight;
-                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
-                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-                    }
-                });
-            });
-
-            // ========== COUNTDOWN TIMER ==========
-            // Set a fixed target date and time (change as needed)
-            const targetDate = new Date('2026-10-31T23:59:59');
-
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = targetDate.getTime() - now;
-
-                if (distance < 0) {
-                    document.getElementById('cdDays').textContent = '00';
-                    document.getElementById('cdHours').textContent = '00';
-                    document.getElementById('cdMinutes').textContent = '00';
-                    document.getElementById('cdSeconds').textContent = '00';
-                    return;
-                }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
-                document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
-                document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
-                document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
-            }
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-
-            // ========== ENTRY FORM ==========
-            const giveawayForm = document.getElementById('giveawayForm');
-            const formSuccess = document.getElementById('formSuccess');
-            const submitBtn = document.getElementById('submitBtn');
-
-            giveawayForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const fullName = document.getElementById('fullName').value.trim();
-                const email = document.getElementById('email').value.trim();
-
-                if (!fullName || !email) {
-                    alert('Please fill in the required fields.');
-                    return;
-                }
-
-                // Simulate submission
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
-
-                setTimeout(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Entry';
-                    formSuccess.classList.add('show');
-                    giveawayForm.reset();
-                    formSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 1500);
-            });
-
-            // ========== NAV HIGHLIGHT ==========
-            const sections = document.querySelectorAll('section[id]');
-            const navAnchors = document.querySelectorAll('.nav-links a:not(.nav-cta-btn):not(.nav-active)');
-            function highlightNavOnScroll() {
-                let current = '';
-                const scrollPos = window.scrollY + navbar.offsetHeight + 100;
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.offsetHeight;
-                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                        current = section.getAttribute('id');
-                    }
-                });
-                navAnchors.forEach(anchor => {
-                    anchor.style.color = '';
-                    if (anchor.getAttribute('href') === '#' + current) anchor.style.color = '#ffffff';
-                });
-            }
-            window.addEventListener('scroll', highlightNavOnScroll, { passive: true });
-
-            console.log('%c🏆 KabaddiOne Giveaway Page Ready %c| %cWin Premium Prizes',
-                'color:#FF5E3A;font-weight:bold;font-size:1.1em;', '', 'color:#b0b0c8;');
-        })();
+        });
     </script>
 </body>
 </html>
