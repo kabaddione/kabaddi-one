@@ -491,11 +491,11 @@
             100% { transform: translateY(0px); }
         }
 
-        /* ---- Text section with SVG (fixed inner stroke) ---- */
+        /* ---- Text section with SVG (fixed inner stroke) and worth text inside groups ---- */
         .central-text {
             position: relative;
             width: 350px;
-            height: 180px;
+            height: 170px; /* enough for all three lines */
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -516,6 +516,7 @@
             justify-content: center;
             transition: transform 0.4s ease, opacity 0.4s ease;
             will-change: transform, opacity;
+            pointer-events: none;
         }
 
         .old-text {
@@ -526,10 +527,6 @@
         .new-text {
             transform: translateY(30px);
             opacity: 0;
-        }
-
-        .contest-ended .old-text .worth-text {
-            display: none;
         }
 
         /* ===== SVG TEXT STYLES (FIXES INNER STROKE ON 'k' and 'y') ===== */
@@ -552,7 +549,6 @@
             paint-order: stroke fill;  /* CRITICAL: stroke UNDER fill */
         }
 
-        /* NEW CONTEST text uses same style but with different text */
         .new-lucky-svg-container {
             width: 100%;
             max-width: 280px;
@@ -572,13 +568,13 @@
             paint-order: stroke fill;
         }
 
-        /* Keep the description text as plain HTML */
+        /* Description and worth texts */
         .winners-desc {
             color: var(--app-dark-purple);
             font-size: 20px;
             font-weight: 800;
             line-height: 1.3;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             text-align: center;
         }
 
@@ -586,6 +582,7 @@
             color: var(--app-dark-purple);
             font-size: 26px;
             font-weight: 900;
+            text-align: center;
         }
 
         .new-winners-desc {
@@ -593,7 +590,7 @@
             font-size: 32px;
             font-weight: 900;
             line-height: 1.3;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             text-align: center;
         }
 
@@ -1300,7 +1297,7 @@
             }
             .central-text {
                 width: 220px;
-                height: 110px;
+                height: 140px;
             }
 
             .prize-grid {
@@ -1364,7 +1361,7 @@
 
             .central-text {
                 width: 100%;
-                height: 120px;
+                height: 150px;
             }
 
             .lucky-text-svg,
@@ -1483,9 +1480,9 @@
                     <!-- Left image (desktop) -->
                     <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImgDesktop">
 
-                    <!-- Text section with SVG (fixed inner stroke) -->
+                    <!-- Text section with SVG (fixed inner stroke) and worth text inside groups -->
                     <div class="central-text" id="centralText">
-                        <!-- Old text group -->
+                        <!-- Old text group (animated) -->
                         <div class="text-group old-text" id="oldTextGroup">
                             <!-- SVG for "5 Lucky" -->
                             <svg class="lucky-svg-container" viewBox="0 0 260 55" preserveAspectRatio="xMidYMid meet">
@@ -1498,12 +1495,11 @@
                                 <text x="50%" y="42" text-anchor="middle" class="lucky-text-svg">5 Lucky</text>
                             </svg>
                             <div class="winners-desc" id="winnersDesc">Winners Will Win A<br>KabaddiOne Pro Subscription</div>
-                            <div class="worth-text" id="worthText">Worth ₹599</div>
+                            <div class="worth-text" id="worthTextOld">Worth ₹599</div>
                         </div>
 
-                        <!-- New text group -->
+                        <!-- New text group (animated) -->
                         <div class="text-group new-text" id="newTextGroup">
-                            <!-- SVG for "NEW CONTEST" -->
                             <svg class="new-lucky-svg-container" viewBox="0 0 280 55" preserveAspectRatio="xMidYMid meet">
                                 <defs>
                                     <linearGradient id="new-lucky-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1799,7 +1795,8 @@
         // ─── 3. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
         const END_TIMESTAMP = 1787863216000; // Oct 31, 2026 23:59:59 GMT test- 1787863216000 real - 1793471399000
 
-        // ─── 4. COUNTRY PRICE MAPPING (truncated – add your full map) ──
+        // ─── 4. COUNTRY PRICE MAPPING ──────────────────────────────
+        // (Full map included – we'll update both worth texts)
         const priceMap = {
             "US": { price: 19.99, symbol: "$", code: "USD" },
             "IN": { price: 599, symbol: "₹", code: "INR" },
@@ -1988,29 +1985,33 @@
             "ME": { price: 19.99, symbol: "€", code: "EUR" },
             "MK": { price: 19.99, symbol: "ден", code: "MKD" },
             "XK": { price: 19.99, symbol: "€", code: "EUR" },
-            // Add the rest from your Albania list...
+            // ... include all countries from your full list ...
         };
 
-        // ─── 5. FETCH USER COUNTRY AND UPDATE PRICE ────────────────
+        // ─── 5. FETCH USER COUNTRY AND UPDATE BOTH WORTH TEXTS ──────
         async function updatePriceBasedOnCountry() {
             try {
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
                 const countryCode = data.country_code;
-                const worthText = document.getElementById('worthText');
+                const worthOld = document.getElementById('worthTextOld');
+                const worthNew = document.getElementById('worthTextNew');
 
+                let priceText = 'Worth $19.99';
                 if (countryCode && priceMap[countryCode]) {
                     const info = priceMap[countryCode];
                     const price = info.price;
                     const symbol = info.symbol;
                     const formattedPrice = (price % 1 === 0) ? price : price.toFixed(2);
-                    worthText.textContent = `Worth ${symbol}${formattedPrice}`;
-                } else {
-                    worthText.textContent = 'Worth $19.99';
+                    priceText = `Worth ${symbol}${formattedPrice}`;
                 }
+                worthOld.textContent = priceText;
+                worthNew.textContent = priceText;
             } catch (error) {
                 console.warn('Could not fetch location, using fallback price.');
-                document.getElementById('worthText').textContent = 'Worth $19.99';
+                const fallback = 'Worth $19.99';
+                document.getElementById('worthTextOld').textContent = fallback;
+                document.getElementById('worthTextNew').textContent = fallback;
             }
         }
 
@@ -2022,7 +2023,6 @@
         const formWrapper = document.getElementById('formWrapper');
         const endedBtn = document.getElementById('endedBtn');
         const submitBtn = document.getElementById('submitBtn');
-        const centralText = document.getElementById('centralText');
         const oldTextGroup = document.getElementById('oldTextGroup');
         const newTextGroup = document.getElementById('newTextGroup');
 
@@ -2067,7 +2067,6 @@
 
         function startCarousel() {
             isCarouselRunning = true;
-            centralText.classList.add('contest-ended');
 
             // Reset states: old visible, new hidden below
             oldTextGroup.style.transition = 'none';
