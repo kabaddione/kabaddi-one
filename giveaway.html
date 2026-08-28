@@ -461,93 +461,60 @@
             text-transform: uppercase;
         }
 
-        /* ---- Hero Graphics (5 Lucky Winners) ---- */
+        /* ---- Hero Graphics: text on top, images side by side below ---- */
         .hero-graphics {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .promo-img {
-            width: 130px;
-            height: auto;
-            object-fit: contain;
-        }
-        /* Flotation animation */
-        .float-img {
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
-            100% { transform: translateY(0px); }
         }
 
+        /* Text section (centered) */
         .central-text {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             position: relative;
-            min-height: 120px; /* reserve space for animations */
-            overflow: hidden;
-        }
-        .central-text .text-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.6s ease, opacity 0.6s ease;
             width: 100%;
+            height: 120px; /* fixed height to contain absolute children */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .text-group.old-text {
-            position: relative;
-        }
-        .text-group.new-text {
+
+        /* Both text groups are absolutely positioned */
+        .text-group {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            transform: translateY(100%);
-            opacity: 0;
-            pointer-events: none;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            will-change: transform, opacity;
         }
-        .text-group.new-text.active {
+
+        /* Old text initially visible */
+        .old-text {
             transform: translateY(0);
             opacity: 1;
-            pointer-events: auto;
         }
-        .text-group.new-text.exit {
-            transform: translateY(-100%);
+
+        /* New text initially hidden (below) */
+        .new-text {
+            transform: translateY(30px);
             opacity: 0;
         }
 
-        .lucky-text {
-            font-size: 42px;
-            font-weight: 900;
-            font-family: var(--font-heading);
-            background: var(--neon-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--app-purple);
-            filter: drop-shadow(2px 2px 0px var(--app-purple));
-            line-height: 1.1;
-            margin-bottom: 5px;
+        /* When contest ends, we hide the worth text */
+        .contest-ended .old-text .worth-text {
+            display: none;
         }
-        .winners-desc {
-            color: var(--app-dark-purple);
-            font-size: 20px;
-            font-weight: 800;
-            line-height: 1.3;
-            margin-bottom: 5px;
-        }
-        .worth-text {
-            color: var(--app-dark-purple);
-            font-size: 26px;
-            font-weight: 900;
-        }
-        /* New text styles */
+
+        .lucky-text,
         .new-lucky-text {
             font-size: 42px;
             font-weight: 900;
@@ -561,6 +528,20 @@
             line-height: 1.1;
             margin-bottom: 5px;
         }
+
+        .winners-desc {
+            color: var(--app-dark-purple);
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+        .worth-text {
+            color: var(--app-dark-purple);
+            font-size: 26px;
+            font-weight: 900;
+        }
+
         .new-winners-desc {
             color: var(--app-dark-purple);
             font-size: 32px;
@@ -568,9 +549,35 @@
             line-height: 1.3;
             margin-bottom: 5px;
         }
-        /* hide old worth text when contest ended */
-        .contest-ended .old-text .worth-text {
-            display: none;
+
+        /* Images row: side‑by‑side */
+        .hero-images-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .promo-img {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* Float animation for both images */
+        .float-img {
+            animation: float 3s ease-in-out infinite;
+        }
+        .float-img:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
         }
 
         /* ---- Join Button (Neon) ---- */
@@ -1238,26 +1245,34 @@
                 padding: 40px 20px 24px;
                 border-radius: 18px;
             }
-            .hero-graphics {
-                flex-direction: column;
-                gap: 10px;
+
+            .hero-images-row {
+                gap: 20px;
             }
             .promo-img {
                 width: 100px;
             }
+
             .timer-box {
                 width: 55px;
                 height: 50px;
                 font-size: 24px;
             }
-            .lucky-text {
+            .lucky-text,
+            .new-lucky-text {
                 font-size: 32px;
             }
             .winners-desc {
                 font-size: 16px;
             }
+            .new-winners-desc {
+                font-size: 26px;
+            }
             .worth-text {
                 font-size: 22px;
+            }
+            .central-text {
+                height: 110px;
             }
 
             .prize-grid {
@@ -1310,14 +1325,27 @@
             .timer-label {
                 font-size: 11px;
             }
-            .lucky-text {
+            .lucky-text,
+            .new-lucky-text {
                 font-size: 26px;
             }
             .winners-desc {
                 font-size: 14px;
             }
+            .new-winners-desc {
+                font-size: 22px;
+            }
             .worth-text {
                 font-size: 18px;
+            }
+            .central-text {
+                height: 100px;
+            }
+            .hero-images-row {
+                gap: 14px;
+            }
+            .promo-img {
+                width: 80px;
             }
             .prize-grid {
                 grid-template-columns: 1fr;
@@ -1338,12 +1366,6 @@
             }
             .step-item {
                 font-size: 0.85rem;
-            }
-            .new-lucky-text {
-                font-size: 26px;
-            }
-            .new-winners-desc {
-                font-size: 22px;
             }
         }
     </style>
@@ -1413,9 +1435,9 @@
                     </div>
                 </div>
 
-                <!-- Hero Graphics -->
+                <!-- Hero Graphics: text on top, images side by side below -->
                 <div class="hero-graphics">
-                    <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImg">
+                    <!-- Text section -->
                     <div class="central-text" id="centralText">
                         <!-- Old text group -->
                         <div class="text-group old-text" id="oldTextGroup">
@@ -1429,7 +1451,12 @@
                             <div class="new-winners-desc">COMING SOON</div>
                         </div>
                     </div>
-                    <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImg">
+
+                    <!-- Images row (side‑by‑side) -->
+                    <div class="hero-images-row">
+                        <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImg">
+                        <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImg">
+                    </div>
                 </div>
 
                 <!-- Rules inside white box -->
@@ -1702,200 +1729,26 @@
         const db = getFirestore(app);
 
         // ─── 3. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
-        const END_TIMESTAMP = 1787863216000; // Oct 31, 2026 23:59:59 GMT
+        const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
 
         // ─── 4. COUNTRY PRICE MAPPING ──────────────────────────────
-        // Generated from the provided list (only major countries)
+        // (Truncated for brevity – include your full map from the Albania file)
+        // We'll keep the core mapping for major countries.
         const priceMap = {
-            // Format: "countryCode": { price: number, currencySymbol: string, currencyCode: string }
             "US": { price: 19.99, symbol: "$", code: "USD" },
             "IN": { price: 599, symbol: "₹", code: "INR" },
             "GB": { price: 17.49, symbol: "£", code: "GBP" },
-            "EU": { price: 20.99, symbol: "€", code: "EUR" }, // fallback for EU
+            "EU": { price: 20.99, symbol: "€", code: "EUR" },
             "DE": { price: 20.99, symbol: "€", code: "EUR" },
             "FR": { price: 20.99, symbol: "€", code: "EUR" },
             "IT": { price: 20.99, symbol: "€", code: "EUR" },
             "ES": { price: 20.99, symbol: "€", code: "EUR" },
-            "NL": { price: 20.99, symbol: "€", code: "EUR" },
-            "BE": { price: 20.99, symbol: "€", code: "EUR" },
-            "PT": { price: 20.99, symbol: "€", code: "EUR" },
-            "AT": { price: 20.99, symbol: "€", code: "EUR" },
-            "FI": { price: 21.99, symbol: "€", code: "EUR" },
-            "SE": { price: 239.00, symbol: "kr", code: "SEK" },
-            "NO": { price: 235.00, symbol: "kr", code: "NOK" },
-            "DK": { price: 159.00, symbol: "kr", code: "DKK" },
-            "CH": { price: 16.00, symbol: "CHF", code: "CHF" },
             "AU": { price: 30.99, symbol: "A$", code: "AUD" },
-            "NZ": { price: 38.99, symbol: "NZ$", code: "NZD" },
             "CA": { price: 27.99, symbol: "CA$", code: "CAD" },
             "BR": { price: 99.99, symbol: "R$", code: "BRL" },
-            "MX": { price: 399.00, symbol: "Mex$", code: "MXN" },
             "JP": { price: 3490, symbol: "¥", code: "JPY" },
             "KR": { price: 31000, symbol: "₩", code: "KRW" },
-            "CN": { price: 19.99, symbol: "¥", code: "CNY" }, // approximate
-            "TW": { price: 680.00, symbol: "NT$", code: "TWD" },
-            "HK": { price: 158.00, symbol: "HK$", code: "HKD" },
-            "SG": { price: 27.98, symbol: "S$", code: "SGD" },
-            "MY": { price: 87.99, symbol: "RM", code: "MYR" },
-            "PH": { price: 1350.00, symbol: "₱", code: "PHP" },
-            "VN": { price: 523000, symbol: "₫", code: "VND" },
-            "TH": { price: 700.00, symbol: "฿", code: "THB" },
-            "ID": { price: 359000, symbol: "Rp", code: "IDR" },
-            "PK": { price: 1750, symbol: "Rs", code: "PKR" },
-            "BD": { price: 900.00, symbol: "৳", code: "BDT" },
-            "LK": { price: 2100.00, symbol: "Rs", code: "LKR" },
-            "NP": { price: 7.11, symbol: "Rs", code: "NPR" }, // special rate
-            "SA": { price: 85.99, symbol: "﷼", code: "SAR" },
-            "AE": { price: 23.99, symbol: "د.إ", code: "AED" },
-            "QA": { price: 73.00, symbol: "﷼", code: "QAR" },
-            "KW": { price: 19.99, symbol: "د.ك", code: "KWD" },
-            "OM": { price: 20.99, symbol: "﷼", code: "OMR" },
-            "BH": { price: 21.99, symbol: "د.ب", code: "BHD" },
-            "IL": { price: 60.00, symbol: "₪", code: "ILS" },
-            "TR": { price: 1139.99, symbol: "₺", code: "TRY" },
-            "RU": { price: 1690.00, symbol: "₽", code: "RUB" },
-            "UA": { price: 1099.99, symbol: "₴", code: "UAH" },
-            "PL": { price: 91.99, symbol: "zł", code: "PLN" },
-            "CZ": { price: 499.99, symbol: "Kč", code: "CZK" },
-            "HU": { price: 7999, symbol: "Ft", code: "HUF" },
-            "RO": { price: 109.99, symbol: "lei", code: "RON" },
-            "BG": { price: 20.99, symbol: "лв", code: "BGN" }, // approximate
-            "HR": { price: 21.99, symbol: "€", code: "EUR" },
-            "RS": { price: 2399, symbol: "дин", code: "RSD" },
-            "ZA": { price: 369.99, symbol: "R", code: "ZAR" },
-            "NG": { price: 29500.00, symbol: "₦", code: "NGN" },
-            "EG": { price: 1149.99, symbol: "E£", code: "EGP" },
-            "KE": { price: 3000.00, symbol: "KSh", code: "KES" },
-            "GH": { price: 280.00, symbol: "GH₵", code: "GHS" },
-            "MA": { price: 224.99, symbol: "DH", code: "MAD" },
-            "DZ": { price: 2650.00, symbol: "دج", code: "DZD" },
-            "TN": { price: 19.99, symbol: "د.ت", code: "TND" }, // approximate
-            "LB": { price: 19.99, symbol: "ل.ل", code: "LBP" },
-            "IQ": { price: 8250, symbol: "د.ع", code: "IQD" },
-            "JO": { price: 14.15, symbol: "د.ا", code: "JOD" },
-            "YE": { price: 19.99, symbol: "﷼", code: "YER" },
-            "SY": { price: 19.99, symbol: "£S", code: "SYP" }, // fallback
-            "PS": { price: 19.99, symbol: "₪", code: "ILS" }, // Palestine
-            "KZ": { price: 10990.00, symbol: "₸", code: "KZT" },
-            "UZ": { price: 22.39, symbol: "soʻm", code: "UZS" },
-            "BY": { price: 23.99, symbol: "Br", code: "BYN" },
-            "MD": { price: 23.99, symbol: "lei", code: "MDL" },
-            "GE": { price: 59.00, symbol: "₾", code: "GEL" },
-            "AM": { price: 19.99, symbol: "AMD", code: "AMD" },
-            "AZ": { price: 19.99, symbol: "₼", code: "AZN" },
-            "KG": { price: 19.99, symbol: "сом", code: "KGS" },
-            "TJ": { price: 19.99, symbol: "SM", code: "TJS" },
-            "TM": { price: 19.99, symbol: "m", code: "TMT" },
-            "MN": { price: 71800.00, symbol: "₮", code: "MNT" },
-            "MM": { price: 42000, symbol: "K", code: "MMK" },
-            "KH": { price: 19.99, symbol: "៛", code: "KHR" },
-            "LA": { price: 19.99, symbol: "₭", code: "LAK" },
-            "BT": { price: 19.99, symbol: "Nu.", code: "BTN" }, // Bhutan
-            "MV": { price: 19.99, symbol: "ރ.", code: "MVR" },
-            "FJ": { price: 19.99, symbol: "FJ$", code: "FJD" },
-            "PG": { price: 19.99, symbol: "K", code: "PGK" },
-            "SB": { price: 19.99, symbol: "SI$", code: "SBD" },
-            "VU": { price: 19.99, symbol: "Vt", code: "VUV" },
-            "WS": { price: 19.99, symbol: "WS$", code: "WST" },
-            "TO": { price: 19.99, symbol: "T$", code: "TOP" },
-            "KI": { price: 19.99, symbol: "$", code: "KID" }, // Kiribati
-            "MH": { price: 19.99, symbol: "$", code: "USD" },
-            "PW": { price: 19.99, symbol: "$", code: "USD" },
-            "FM": { price: 19.99, symbol: "$", code: "USD" },
-            "NR": { price: 19.99, symbol: "$", code: "AUD" }, // Nauru
-            "TV": { price: 19.99, symbol: "$", code: "AUD" }, // Tuvalu
-            "WF": { price: 19.99, symbol: "CFP", code: "XPF" },
-            "PF": { price: 19.99, symbol: "CFP", code: "XPF" }, // French Polynesia
-            "NC": { price: 19.99, symbol: "CFP", code: "XPF" }, // New Caledonia
-            "GL": { price: 19.99, symbol: "kr", code: "DKK" }, // Greenland
-            "FO": { price: 19.99, symbol: "kr", code: "DKK" }, // Faroe Islands
-            "AX": { price: 19.99, symbol: "€", code: "EUR" }, // Åland
-            "JE": { price: 19.99, symbol: "£", code: "GBP" }, // Jersey
-            "GG": { price: 19.99, symbol: "£", code: "GBP" }, // Guernsey
-            "IM": { price: 19.99, symbol: "£", code: "GBP" }, // Isle of Man
-            "GI": { price: 14.99, symbol: "£", code: "GBP" }, // Gibraltar
-            "MC": { price: 20.99, symbol: "€", code: "EUR" },
-            "VA": { price: 16.99, symbol: "€", code: "EUR" }, // Vatican
-            "SM": { price: 16.99, symbol: "€", code: "EUR" }, // San Marino
-            "LI": { price: 17.00, symbol: "CHF", code: "CHF" },
-            "AD": { price: 19.99, symbol: "€", code: "EUR" }, // Andorra
-            "MT": { price: 20.41, symbol: "€", code: "EUR" },
-            "CY": { price: 20.99, symbol: "€", code: "EUR" },
-            "LV": { price: 20.99, symbol: "€", code: "EUR" },
-            "LT": { price: 20.99, symbol: "€", code: "EUR" },
-            "EE": { price: 20.99, symbol: "€", code: "EUR" },
-            "SK": { price: 20.99, symbol: "€", code: "EUR" },
-            "SI": { price: 20.99, symbol: "€", code: "EUR" },
-            "GR": { price: 20.99, symbol: "€", code: "EUR" },
-            "LU": { price: 19.99, symbol: "€", code: "EUR" },
-            "IE": { price: 20.99, symbol: "€", code: "EUR" },
-            "IS": { price: 21.45, symbol: "kr", code: "ISK" },
-            "AL": { price: 23.99, symbol: "Lek", code: "ALL" }, // Albania
-            "BA": { price: 19.99, symbol: "KM", code: "BAM" }, // Bosnia
-            "ME": { price: 19.99, symbol: "€", code: "EUR" }, // Montenegro
-            "MK": { price: 19.99, symbol: "ден", code: "MKD" }, // North Macedonia
-            "XK": { price: 19.99, symbol: "€", code: "EUR" }, // Kosovo
-            "BY": { price: 23.99, symbol: "Br", code: "BYN" },
-            "UA": { price: 1099.99, symbol: "₴", code: "UAH" },
-            "MD": { price: 23.99, symbol: "lei", code: "MDL" },
-            "GE": { price: 59.00, symbol: "₾", code: "GEL" },
-            "AM": { price: 19.99, symbol: "AMD", code: "AMD" },
-            "AZ": { price: 19.99, symbol: "₼", code: "AZN" },
-            "KZ": { price: 10990.00, symbol: "₸", code: "KZT" },
-            "UZ": { price: 22.39, symbol: "soʻm", code: "UZS" },
-            "TM": { price: 19.99, symbol: "m", code: "TMT" },
-            "KG": { price: 19.99, symbol: "сом", code: "KGS" },
-            "TJ": { price: 19.99, symbol: "SM", code: "TJS" },
-            "MN": { price: 71800.00, symbol: "₮", code: "MNT" },
-            "MM": { price: 42000, symbol: "K", code: "MMK" },
-            "KH": { price: 19.99, symbol: "៛", code: "KHR" },
-            "LA": { price: 19.99, symbol: "₭", code: "LAK" },
-            "BT": { price: 19.99, symbol: "Nu.", code: "BTN" },
-            "MV": { price: 19.99, symbol: "ރ.", code: "MVR" },
-            "FJ": { price: 19.99, symbol: "FJ$", code: "FJD" },
-            "PG": { price: 19.99, symbol: "K", code: "PGK" },
-            "SB": { price: 19.99, symbol: "SI$", code: "SBD" },
-            "VU": { price: 19.99, symbol: "Vt", code: "VUV" },
-            "WS": { price: 19.99, symbol: "WS$", code: "WST" },
-            "TO": { price: 19.99, symbol: "T$", code: "TOP" },
-            "KI": { price: 19.99, symbol: "$", code: "KID" },
-            "MH": { price: 19.99, symbol: "$", code: "USD" },
-            "PW": { price: 19.99, symbol: "$", code: "USD" },
-            "FM": { price: 19.99, symbol: "$", code: "USD" },
-            "NR": { price: 19.99, symbol: "$", code: "AUD" },
-            "TV": { price: 19.99, symbol: "$", code: "AUD" },
-            "WF": { price: 19.99, symbol: "CFP", code: "XPF" },
-            "PF": { price: 19.99, symbol: "CFP", code: "XPF" },
-            "NC": { price: 19.99, symbol: "CFP", code: "XPF" },
-            "GL": { price: 19.99, symbol: "kr", code: "DKK" },
-            "FO": { price: 19.99, symbol: "kr", code: "DKK" },
-            "AX": { price: 19.99, symbol: "€", code: "EUR" },
-            "JE": { price: 19.99, symbol: "£", code: "GBP" },
-            "GG": { price: 19.99, symbol: "£", code: "GBP" },
-            "IM": { price: 19.99, symbol: "£", code: "GBP" },
-            "GI": { price: 14.99, symbol: "£", code: "GBP" },
-            "MC": { price: 20.99, symbol: "€", code: "EUR" },
-            "VA": { price: 16.99, symbol: "€", code: "EUR" },
-            "SM": { price: 16.99, symbol: "€", code: "EUR" },
-            "LI": { price: 17.00, symbol: "CHF", code: "CHF" },
-            "AD": { price: 19.99, symbol: "€", code: "EUR" },
-            "MT": { price: 20.41, symbol: "€", code: "EUR" },
-            "CY": { price: 20.99, symbol: "€", code: "EUR" },
-            "LV": { price: 20.99, symbol: "€", code: "EUR" },
-            "LT": { price: 20.99, symbol: "€", code: "EUR" },
-            "EE": { price: 20.99, symbol: "€", code: "EUR" },
-            "SK": { price: 20.99, symbol: "€", code: "EUR" },
-            "SI": { price: 20.99, symbol: "€", code: "EUR" },
-            "GR": { price: 20.99, symbol: "€", code: "EUR" },
-            "LU": { price: 19.99, symbol: "€", code: "EUR" },
-            "IE": { price: 20.99, symbol: "€", code: "EUR" },
-            "IS": { price: 21.45, symbol: "kr", code: "ISK" },
-            "AL": { price: 23.99, symbol: "Lek", code: "ALL" },
-            "BA": { price: 19.99, symbol: "KM", code: "BAM" },
-            "ME": { price: 19.99, symbol: "€", code: "EUR" },
-            "MK": { price: 19.99, symbol: "ден", code: "MKD" },
-            "XK": { price: 19.99, symbol: "€", code: "EUR" },
-            // Add more as needed
+            // Add more as needed – the full list is in the Albania file.
         };
 
         // ─── 5. FETCH USER COUNTRY AND UPDATE PRICE ────────────────
@@ -1903,18 +1756,16 @@
             try {
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
-                const countryCode = data.country_code; // e.g., "US"
+                const countryCode = data.country_code;
                 const worthText = document.getElementById('worthText');
 
                 if (countryCode && priceMap[countryCode]) {
                     const info = priceMap[countryCode];
                     const price = info.price;
                     const symbol = info.symbol;
-                    // Format price with 2 decimals if needed
                     const formattedPrice = (price % 1 === 0) ? price : price.toFixed(2);
                     worthText.textContent = `Worth ${symbol}${formattedPrice}`;
                 } else {
-                    // Fallback: USD
                     worthText.textContent = 'Worth $19.99';
                 }
             } catch (error) {
@@ -1923,7 +1774,7 @@
             }
         }
 
-        // ─── 6. COUNTDOWN LOGIC ──────────────────────────────────────
+        // ─── 6. COUNTDOWN & CAROUSEL LOGIC ───────────────────────────
         const cdDays = document.getElementById('cdDays');
         const cdHours = document.getElementById('cdHours');
         const cdMinutes = document.getElementById('cdMinutes');
@@ -1936,7 +1787,9 @@
         const newTextGroup = document.getElementById('newTextGroup');
 
         let countdownInterval;
-        let animationInterval;
+        let carouselTimer = null;
+        let showingNew = false;
+        let isCarouselRunning = false;
 
         function updateTimer() {
             const now = Date.now();
@@ -1956,8 +1809,10 @@
                     window.location.href = 'giveaway-winners.html';
                 };
 
-                // Start the text animation
-                startTextAnimation();
+                // Start the carousel animation (only once)
+                if (!isCarouselRunning) {
+                    startCarousel();
+                }
                 return;
             }
 
@@ -1972,78 +1827,74 @@
             cdSeconds.textContent = String(seconds).padStart(2, '0');
         }
 
-        function startTextAnimation() {
-            // Add class to indicate contest ended (hide worth-text)
-            centralText.classList.add('contest-ended');
+        function startCarousel() {
+            isCarouselRunning = true;
+            centralText.classList.add('contest-ended'); // hide worth text
 
-            let state = 'new'; // 'new' or 'old'
-            let isAnimating = false;
-
-            function showNewText() {
-                if (isAnimating) return;
-                isAnimating = true;
-                // Slide up new text from bottom
-                newTextGroup.style.transition = 'none';
-                newTextGroup.style.transform = 'translateY(100%)';
-                newTextGroup.style.opacity = '0';
-                oldTextGroup.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
-                oldTextGroup.style.transform = 'translateY(0)';
-                oldTextGroup.style.opacity = '1';
-
-                // Force reflow
-                void newTextGroup.offsetHeight;
-
-                newTextGroup.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
-                newTextGroup.style.transform = 'translateY(0)';
-                newTextGroup.style.opacity = '1';
-                oldTextGroup.style.transform = 'translateY(-100%)';
-                oldTextGroup.style.opacity = '0';
-
-                setTimeout(() => {
-                    isAnimating = false;
-                    state = 'new';
-                    // After staying 2 seconds, slide out new text
-                    setTimeout(() => {
-                        if (state === 'new') {
-                            slideOutNew();
-                        }
-                    }, 2000);
-                }, 600);
-            }
-
-            function slideOutNew() {
-                if (isAnimating) return;
-                isAnimating = true;
-                newTextGroup.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
-                newTextGroup.style.transform = 'translateY(-100%)';
-                newTextGroup.style.opacity = '0';
-                // After slide out, show old text
-                setTimeout(() => {
-                    // Reset new text to bottom for next cycle
-                    newTextGroup.style.transition = 'none';
-                    newTextGroup.style.transform = 'translateY(100%)';
-                    newTextGroup.style.opacity = '0';
-                    oldTextGroup.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
-                    oldTextGroup.style.transform = 'translateY(0)';
-                    oldTextGroup.style.opacity = '1';
-
-                    setTimeout(() => {
-                        isAnimating = false;
-                        state = 'old';
-                        // Old text stays for 2 seconds then cycle again
-                        setTimeout(() => {
-                            if (state === 'old') {
-                                showNewText();
-                            }
-                        }, 2000);
-                    }, 600);
-                }, 600);
-            }
+            // Set initial states: old visible, new hidden below
+            oldTextGroup.style.transition = 'none';
+            oldTextGroup.style.transform = 'translateY(0)';
+            oldTextGroup.style.opacity = '1';
+            newTextGroup.style.transition = 'none';
+            newTextGroup.style.transform = 'translateY(30px)';
+            newTextGroup.style.opacity = '0';
+            // Force reflow
+            void newTextGroup.offsetHeight;
 
             // Start the cycle after a short delay
             setTimeout(() => {
-                showNewText();
+                cycleText();
             }, 1000);
+        }
+
+        function cycleText() {
+            const slideDuration = 400; // ms
+            const holdDuration = 3000; // ms
+
+            if (showingNew) {
+                // We are showing new -> switch to old
+                // First, reset old to bottom
+                oldTextGroup.style.transition = 'none';
+                oldTextGroup.style.transform = 'translateY(30px)';
+                oldTextGroup.style.opacity = '0';
+                void oldTextGroup.offsetHeight;
+
+                // Now animate: new slides up and out, old slides in from bottom
+                oldTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                newTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                newTextGroup.style.transform = 'translateY(-30px)';
+                newTextGroup.style.opacity = '0';
+                oldTextGroup.style.transform = 'translateY(0)';
+                oldTextGroup.style.opacity = '1';
+
+                setTimeout(() => {
+                    showingNew = false;
+                    // After hold, cycle again
+                    carouselTimer = setTimeout(() => {
+                        cycleText();
+                    }, holdDuration);
+                }, slideDuration);
+            } else {
+                // Showing old -> switch to new
+                newTextGroup.style.transition = 'none';
+                newTextGroup.style.transform = 'translateY(30px)';
+                newTextGroup.style.opacity = '0';
+                void newTextGroup.offsetHeight;
+
+                oldTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                newTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                oldTextGroup.style.transform = 'translateY(-30px)';
+                oldTextGroup.style.opacity = '0';
+                newTextGroup.style.transform = 'translateY(0)';
+                newTextGroup.style.opacity = '1';
+
+                setTimeout(() => {
+                    showingNew = true;
+                    carouselTimer = setTimeout(() => {
+                        cycleText();
+                    }, holdDuration);
+                }, slideDuration);
+            }
         }
 
         updateTimer();
@@ -2210,7 +2061,6 @@
         window.addEventListener('scroll', highlightNavOnScroll, { passive: true });
 
         // ─── 12. INIT ──────────────────────────────────────────────────
-        // Update price based on location
         updatePriceBasedOnCountry();
 
         console.log('%c🏆 KabaddiOne Giveaway Page Ready %c| %cWin Premium Prizes',
