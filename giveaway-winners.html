@@ -198,7 +198,7 @@
         .section-header p { color: var(--text-secondary); max-width: 580px; margin: 0 auto; font-size: 1rem; }
 
         /* ============================================================
-           HERO — CURRENT WINNERS SECTION
+           HERO — CURRENT WINNERS SECTION (PENDING STATE)
            ============================================================ */
         .winners-hero {
             padding-top: calc(var(--nav-height) + 60px);
@@ -216,47 +216,28 @@
             50% { transform: translateY(-10px); }
         }
 
-        .current-winners-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px; margin-top: 40px;
-        }
-        .winner-featured-card {
+        .pending-announcement-card {
             background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg); padding: 28px 24px; text-align: left;
+            border-radius: var(--radius-lg); padding: 48px 24px; text-align: center;
+            max-width: 600px; margin: 0 auto;
             position: relative; overflow: hidden; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            transition: var(--transition-smooth); display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.05);
         }
-        .winner-featured-card:hover {
-            transform: translateY(-6px); border-color: rgba(57, 255, 20, 0.4);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(57, 255, 20, 0.15);
-        }
-        .winner-featured-card::before {
+        .pending-announcement-card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
             background: var(--neon-gradient);
         }
-        .winner-top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .winner-rank-badge {
-            background: rgba(240, 192, 64, 0.15); color: var(--gold); border: 1px solid rgba(240, 192, 64, 0.3);
-            padding: 4px 14px; border-radius: 30px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;
-            display: flex; align-items: center; gap: 6px;
+        .pending-announcement-card h3 {
+            font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 16px;
         }
-        .winner-profile { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-        .winner-avatar-lg {
-            width: 60px; height: 60px; border-radius: 50%; background: var(--neon-gradient);
-            color: var(--app-dark-purple); font-weight: 900; font-size: 1.5rem; display: flex;
-            align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3);
+        .pending-announcement-card p {
+            font-size: 1rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;
         }
-        .winner-meta h3 { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; color: #fff; }
-        .winner-meta p { font-size: 0.85rem; color: var(--neon-cyan); font-weight: 600; }
-        .winner-meta span { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 2px; }
-
-        .prize-claimed-box {
-            background: rgba(10, 10, 26, 0.6); border: 1px dashed rgba(57, 255, 20, 0.3);
-            border-radius: var(--radius-sm); padding: 12px 16px; display: flex; align-items: center;
-            justify-content: space-between; margin-top: 12px;
+        .date-box {
+            display: inline-block; background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.3);
+            color: var(--neon-cyan); font-weight: 800; font-size: 1.2rem; padding: 12px 24px; border-radius: 12px;
+            letter-spacing: 0.5px;
         }
-        .prize-claimed-box .prize-title { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
-        .prize-claimed-box .status-tag { font-size: 0.75rem; font-weight: 800; color: var(--neon-green); text-transform: uppercase; }
 
         /* ============================================================
            PAST WINNERS DROPDOWN ARCHIVE
@@ -282,29 +263,30 @@
         .custom-select-box option { background-color: var(--bg-secondary); color: #fff; padding: 10px; }
 
         .past-winners-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;
+            display: grid; grid-template-columns: 1fr; gap: 20px;
         }
-        .past-winner-card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px;
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: var(--transition-smooth);
+        
+        /* Empty State Styling */
+        .empty-archive-state {
+            text-align: center; padding: 50px 20px; background: var(--glass-bg);
+            border-radius: var(--radius-md); border: 1px dashed var(--border-subtle);
         }
-        .past-winner-card:hover { transform: translateY(-4px); border-color: rgba(0, 255, 255, 0.25); }
-        .past-avatar {
-            width: 46px; height: 46px; border-radius: 50%; background: var(--app-purple);
-            border: 2px solid var(--neon-cyan); color: #fff; font-weight: 800; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        .empty-archive-state i {
+            font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; opacity: 0.5;
         }
-        .past-info h4 { font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-heading); }
-        .past-info p { font-size: 0.8rem; color: var(--neon-green); font-weight: 600; }
-        .past-info span { font-size: 0.72rem; color: var(--text-muted); }
+        .empty-archive-state h3 {
+            color: #fff; font-size: 1.2rem; margin-bottom: 8px; font-family: var(--font-heading);
+        }
+        .empty-archive-state p {
+            color: var(--text-muted); font-size: 0.95rem; max-width: 400px; margin: 0 auto;
+        }
 
         /* ============================================================
-           4-STEP PROMO / COUPON REDEMPTION GUIDE
+           4-STEP PROMO / COUPON REDEMPTION GUIDE (LANDSCAPE)
            ============================================================ */
         .promo-guide-section { position: relative; z-index: 1; }
         .steps-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 28px; margin-top: 40px;
         }
         .step-card {
@@ -321,29 +303,42 @@
             box-shadow: 0 4px 18px rgba(57, 255, 20, 0.3);
         }
 
-        /* App Screenshot Mockup Frame */
-        .app-screenshot-frame {
-            width: 100%; max-width: 180px; height: 320px; background: #000;
-            border: 4px solid #2a2a40; border-radius: 24px; margin: 16px 0;
+        /* App Screenshot Mockup Frame (LANDSCAPE MODE) */
+        .app-screenshot-frame-landscape {
+            width: 100%; max-width: 340px; aspect-ratio: 19.5/9; background: #000;
+            border: 4px solid #2a2a40; border-radius: 20px; margin: 16px auto;
             position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 12px; text-align: center;
+            display: flex; align-items: center; justify-content: center;
         }
-        .app-screen-mock {
-            width: 100%; height: 100%; background: #14142B; border-radius: 16px;
-            padding: 12px 10px; display: flex; flex-direction: column; justify-content: space-around;
-            align-items: center; border: 1px solid rgba(255, 255, 255, 0.05);
+        .landscape-notch {
+            position: absolute; left: -1px; top: 50%; transform: translateY(-50%);
+            width: 16px; height: 50px; background: #0a0a1a; border-radius: 0 10px 10px 0; z-index: 10;
+        }
+        .app-screen-mock-landscape {
+            position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+            background: #14142B; border-radius: 14px; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .app-screen-mock-landscape img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.6; /* Dimmed slightly so overlay text is readable if no image */
+        }
+        
+        /* Fallback UI overlay if no real image is provided yet */
+        .mock-overlay { 
+            position: absolute; inset:0; display:flex; flex-direction:column; 
+            justify-content:center; align-items:center; z-index: 5; pointer-events: none;
+            background: rgba(20, 20, 43, 0.5); /* dark tint */
         }
         .mock-ui-btn {
             background: var(--neon-gradient); color: var(--app-dark-purple); font-weight: 800;
-            font-size: 0.7rem; padding: 8px 12px; border-radius: 20px; width: 100%; text-align: center;
+            font-size: 0.7rem; padding: 6px 14px; border-radius: 20px; text-align: center; margin-top: 10px;
         }
         .mock-ui-input {
-            width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px dashed var(--neon-cyan);
-            border-radius: 8px; padding: 6px; font-size: 0.65rem; color: var(--neon-green); font-weight: 700;
+            background: rgba(0, 0, 0, 0.6); border: 1px dashed var(--neon-cyan);
+            border-radius: 8px; padding: 6px 12px; font-size: 0.7rem; color: var(--neon-green); font-weight: 700;
         }
-        .mock-ui-icon { font-size: 2rem; color: var(--neon-cyan); }
-        .mock-screen-title { font-size: 0.75rem; font-weight: 800; color: #fff; }
+        .mock-ui-icon { font-size: 1.8rem; color: var(--neon-cyan); margin-bottom: 8px;}
+        .mock-screen-title { font-size: 0.8rem; font-weight: 800; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
         .step-card h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; color: #fff; }
         .step-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
@@ -408,9 +403,7 @@
             .hamburger { display: flex; }
             .section { padding: 50px 16px; }
             .winners-hero { padding-top: calc(var(--nav-height) + 50px); }
-            .current-winners-grid { grid-template-columns: 1fr; }
             .steps-container { grid-template-columns: 1fr; }
-            .past-winners-grid { grid-template-columns: 1fr; }
             .footer-inner { flex-direction: column; align-items: center; text-align: center; }
             .footer-links, .social-links { justify-content: center; }
         }
@@ -450,193 +443,121 @@
 
     <section class="winners-hero">
         <div class="container">
-            <div class="hero-trophy-badge">
-                <i class="fa-solid fa-trophy"></i>
-            </div>
-            <div class="section-header">
-                <span class="section-tag">🎉 Official Announcement</span>
-                <h2>Current Contest <span class="highlight">Winners</span></h2>
-                <p>Congratulations to our 5 lucky winners! Coupon codes have been sent directly to your registered emails.</p>
+            
+            <div class="section-header reveal">
+                <span class="section-tag">⏳ Results Pending</span>
+                <h2>Our First Contest <span class="highlight">Winners</span></h2>
+                <p>The results for our very first KabaddiOne giveaway will be declared on <strong>Sunday, November 8, 2026</strong>. Stay tuned!</p>
             </div>
 
-            <div class="current-winners-grid">
-                <div class="winner-featured-card">
-                    <div class="winner-top-bar">
-                        <span class="winner-rank-badge"><i class="fa-solid fa-crown"></i> Winner #1</span>
-                        <i class="fa-solid fa-circle-check" style="color:var(--neon-green); font-size: 1.2rem;"></i>
-                    </div>
-                    <div class="winner-profile">
-                        <div class="winner-avatar-lg">R</div>
-                        <div class="winner-meta">
-                            <h3>Rahul Sharma</h3>
-                            <p>@rahul_kabaddi_fan</p>
-                            <span>Verified Entry • Instagram</span>
-                        </div>
-                    </div>
-                    <div class="prize-claimed-box">
-                        <span class="prize-title">KabaddiOne Pro (1 Year)</span>
-                        <span class="status-tag">Code Sent</span>
-                    </div>
+            <div class="pending-announcement-card reveal reveal-delay-1">
+                <div class="hero-trophy-badge">
+                    <i class="fa-solid fa-hourglass-half"></i>
                 </div>
-
-                <div class="winner-featured-card">
-                    <div class="winner-top-bar">
-                        <span class="winner-rank-badge"><i class="fa-solid fa-crown"></i> Winner #2</span>
-                        <i class="fa-solid fa-circle-check" style="color:var(--neon-green); font-size: 1.2rem;"></i>
-                    </div>
-                    <div class="winner-profile">
-                        <div class="winner-avatar-lg">A</div>
-                        <div class="winner-meta">
-                            <h3>Amit Kumar</h3>
-                            <p>@amit_raider_07</p>
-                            <span>Verified Entry • Facebook</span>
-                        </div>
-                    </div>
-                    <div class="prize-claimed-box">
-                        <span class="prize-title">KabaddiOne Pro (1 Year)</span>
-                        <span class="status-tag">Code Sent</span>
-                    </div>
-                </div>
-
-                <div class="winner-featured-card">
-                    <div class="winner-top-bar">
-                        <span class="winner-rank-badge"><i class="fa-solid fa-crown"></i> Winner #3</span>
-                        <i class="fa-solid fa-crown"></i> Winner #3</span>
-                        <i class="fa-solid fa-circle-check" style="color:var(--neon-green); font-size: 1.2rem;"></i>
-                    </div>
-                    <div class="winner-profile">
-                        <div class="winner-avatar-lg">P</div>
-                        <div class="winner-meta">
-                            <h3>Priya Singh</h3>
-                            <p>@priya_sports_lover</p>
-                            <span>Verified Entry • X (Twitter)</span>
-                        </div>
-                    </div>
-                    <div class="prize-claimed-box">
-                        <span class="prize-title">KabaddiOne Pro (1 Year)</span>
-                        <span class="status-tag">Code Sent</span>
-                    </div>
-                </div>
-
-                <div class="winner-featured-card">
-                    <div class="winner-top-bar">
-                        <span class="winner-rank-badge"><i class="fa-solid fa-crown"></i> Winner #4</span>
-                        <i class="fa-solid fa-circle-check" style="color:var(--neon-green); font-size: 1.2rem;"></i>
-                    </div>
-                    <div class="winner-profile">
-                        <div class="winner-avatar-lg">V</div>
-                        <div class="winner-meta">
-                            <h3>Vikram Patel</h3>
-                            <p>@vikram_pro_kabaddi</p>
-                            <span>Verified Entry • Instagram</span>
-                        </div>
-                    </div>
-                    <div class="prize-claimed-box">
-                        <span class="prize-title">KabaddiOne Pro (1 Year)</span>
-                        <span class="status-tag">Code Sent</span>
-                    </div>
-                </div>
-
-                <div class="winner-featured-card">
-                    <div class="winner-top-bar">
-                        <span class="winner-rank-badge"><i class="fa-solid fa-crown"></i> Winner #5</span>
-                        <i class="fa-solid fa-circle-check" style="color:var(--neon-green); font-size: 1.2rem;"></i>
-                    </div>
-                    <div class="winner-profile">
-                        <div class="winner-avatar-lg">S</div>
-                        <div class="winner-meta">
-                            <h3>Suresh Yadav</h3>
-                            <p>@suresh_yadav_buxar</p>
-                            <span>Verified Entry • Instagram</span>
-                        </div>
-                    </div>
-                    <div class="prize-claimed-box">
-                        <span class="prize-title">KabaddiOne Pro (1 Year)</span>
-                        <span class="status-tag">Code Sent</span>
-                    </div>
+                <h3>Winner Announcement on Nov 8, 2026</h3>
+                <p>We are currently evaluating all the valid entries. Check back here on Sunday, November 8, 2026, to see if you are one of the 5 lucky winners to get KabaddiOne Pro for free!</p>
+                <div class="date-box">
+                    08 NOV 2026
                 </div>
             </div>
+
         </div>
     </section>
 
     <section class="section past-winners-section" id="past-winners">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header reveal">
                 <span class="section-tag">📜 Hall of Fame</span>
                 <h2>Past Giveaway <span class="highlight">Winners Archive</span></h2>
                 <p>Select a previous contest draw from the dropdown to view past lucky winners.</p>
             </div>
 
-            <div class="archive-filter-wrapper">
+            <div class="archive-filter-wrapper reveal reveal-delay-1">
                 <label for="contestSelect" class="custom-select-label"><i class="fa-solid fa-filter" style="margin-right:6px;"></i> Select Giveaway Draw:</label>
                 <select id="contestSelect" class="custom-select-box" onchange="filterPastWinners()">
-                    <option value="draw-2026-july">Draw #04 — July 2026 (Monsoon Special)</option>
-                    <option value="draw-2026-june">Draw #03 — June 2026 (Launch Event @ Ram Rekha Ghat)</option>
-                    <option value="draw-2026-may">Draw #02 — May 2026 (Pro Feature Launch)</option>
-                    <option value="draw-2026-april">Draw #01 — April 2026 (IPL Season Giveaway)</option>
+                    <option value="none">Draw #01 — Pending (Nov 2026)</option>
                 </select>
             </div>
 
-            <div class="past-winners-grid" id="pastWinnersGrid">
+            <div class="past-winners-grid reveal reveal-delay-2" id="pastWinnersGrid">
                 </div>
         </div>
     </section>
 
     <section class="section promo-guide-section" id="how-to-redeem">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header reveal">
                 <span class="section-tag">🎁 Coupon Redemption</span>
                 <h2>How to Get <span class="highlight">KabaddiOne Pro Free</span></h2>
                 <p>Got a winning promo code? Follow this simple 4-step guide to unlock all Pro features inside the app at ₹0 checkout!</p>
             </div>
 
             <div class="steps-container">
-                <div class="step-card">
+                <div class="step-card reveal reveal-delay-1">
                     <div class="step-badge">1</div>
-                    <div class="app-screenshot-frame">
-                        <div class="app-screen-mock">
-                            <i class="fa-solid fa-mobile-screen mock-ui-icon"></i>
-                            <div class="mock-screen-title">KabaddiOne App</div>
-                            <div class="mock-ui-btn">Open App Menu</div>
+                    <div class="app-screenshot-frame-landscape">
+                        <div class="landscape-notch"></div>
+                        <div class="app-screen-mock-landscape">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-bars mock-ui-icon"></i>
+                                <div class="mock-screen-title">Open App Menu</div>
+                            </div>
                         </div>
                     </div>
-                    <h3>Open KabaddiOne</h3>
-                    <p>Open the KabaddiOne app on your phone and tap on the top menu or the <strong>"Upgrade to Pro"</strong> banner on the home screen.</p>
+                    <h3>Open KabaddiOne Menu</h3>
+                    <p>Open the KabaddiOne app on your phone and tap on the top menu icon to view options.</p>
                 </div>
 
-                <div class="step-card">
+                <div class="step-card reveal reveal-delay-2">
                     <div class="step-badge">2</div>
-                    <div class="app-screenshot-frame">
-                        <div class="app-screen-mock">
-                            <i class="fa-solid fa-crown mock-ui-icon" style="color:var(--gold);"></i>
-                            <div class="mock-screen-title">Pro Subscription</div>
-                            <div class="mock-ui-btn" style="background:var(--accent); color:#fff;">Select Pro Plan</div>
+                    <div class="app-screenshot-frame-landscape">
+                        <div class="landscape-notch"></div>
+                        <div class="app-screen-mock-landscape">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-crown mock-ui-icon" style="color:var(--gold);"></i>
+                                <div class="mock-screen-title">Pro Subscription</div>
+                                <div class="mock-ui-btn" style="background:var(--accent); color:#fff;">Select Pro Plan</div>
+                            </div>
                         </div>
                     </div>
                     <h3>Choose Pro Plan</h3>
-                    <p>Select the <strong>KabaddiOne Pro 1-Year Pass</strong> option to proceed to the checkout screen.</p>
+                    <p>Select the <strong>KabaddiOne Pro 1-Year Pass</strong> option to proceed to the secure checkout screen.</p>
                 </div>
 
-                <div class="step-card">
+                <div class="step-card reveal reveal-delay-3">
                     <div class="step-badge">3</div>
-                    <div class="app-screenshot-frame">
-                        <div class="app-screen-mock">
-                            <i class="fa-solid fa-ticket mock-ui-icon"></i>
-                            <div class="mock-ui-input">PROMO: KABADDI100</div>
-                            <div class="mock-ui-btn">Apply Coupon</div>
+                    <div class="app-screenshot-frame-landscape">
+                        <div class="landscape-notch"></div>
+                        <div class="app-screen-mock-landscape">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-ticket mock-ui-icon"></i>
+                                <div class="mock-ui-input">PROMO: WINNER100</div>
+                                <div class="mock-ui-btn">Apply Coupon</div>
+                            </div>
                         </div>
                     </div>
                     <h3>Apply Promo Code</h3>
                     <p>At the checkout box, tap <strong>"Have a Promo Code?"</strong>, paste your unique email coupon code, and click <strong>Apply</strong>.</p>
                 </div>
 
-                <div class="step-card">
+                <div class="step-card reveal reveal-delay-4">
                     <div class="step-badge">4</div>
-                    <div class="app-screenshot-frame">
-                        <div class="app-screen-mock">
-                            <i class="fa-solid fa-circle-check mock-ui-icon" style="color:var(--neon-green);"></i>
-                            <div class="mock-screen-title" style="color:var(--neon-green);">₹0 Checkout</div>
-                            <div class="mock-ui-btn">Unlocked Free!</div>
+                    <div class="app-screenshot-frame-landscape">
+                        <div class="landscape-notch"></div>
+                        <div class="app-screen-mock-landscape">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-circle-check mock-ui-icon" style="color:var(--neon-green);"></i>
+                                <div class="mock-screen-title" style="color:var(--neon-green);">₹0 Checkout</div>
+                                <div class="mock-ui-btn">Unlocked Free!</div>
+                            </div>
                         </div>
                     </div>
                     <h3>Enjoy Pro Features</h3>
@@ -646,7 +567,7 @@
         </div>
     </section>
 
-    <section class="section cta-section">
+    <section class="section cta-section reveal">
         <div class="container">
             <div class="cta-card">
                 <h2>Want to Win in Next Contest?</h2>
@@ -687,60 +608,22 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
     <script>
-        // Archive Data for Past Contests
-        const pastWinnersData = {
-            "draw-2026-july": [
-                { name: "Deepak Verma", handle: "@deepak_raider", platform: "Instagram", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Manoj Tiwari", handle: "@manoj_k_official", platform: "Facebook", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Rohit Rai", handle: "@rohit_kabaddi_buxar", platform: "Instagram", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Karan Johar", handle: "@karan_sports_99", platform: "X (Twitter)", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Sunil Narine", handle: "@sunil_pro_fan", platform: "Instagram", prize: "KabaddiOne Pro 1 Year" }
-            ],
-            "draw-2026-june": [
-                { name: "Ranjeet Pandey", handle: "@ranjeet_ramrekha", platform: "Instagram", prize: "Special Launch Pass" },
-                { name: "Aakash Chopra", handle: "@aakash_commentary", platform: "X (Twitter)", prize: "Special Launch Pass" },
-                { name: "Shivam Chaudhary", handle: "@shivam_buxar_01", platform: "Instagram", prize: "Special Launch Pass" },
-                { name: "Vishal Gupta", handle: "@vishal_tackle_king", platform: "Facebook", prize: "Special Launch Pass" },
-                { name: "Alok Kumar", handle: "@alok_kabaddione", platform: "Instagram", prize: "Special Launch Pass" }
-            ],
-            "draw-2026-may": [
-                { name: "Sanjay Mishra", handle: "@sanjay_score_keeper", platform: "Facebook", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Gaurav Singh", handle: "@gaurav_arts_fan", platform: "Instagram", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Pankaj Tripathi", handle: "@pankaj_pro_kabaddi", platform: "Instagram", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Nitish Kumar", handle: "@nitish_bihar_sports", platform: "X (Twitter)", prize: "KabaddiOne Pro 1 Year" },
-                { name: "Tushar Deshpande", handle: "@tushar_super_raid", platform: "Instagram", prize: "KabaddiOne Pro 1 Year" }
-            ],
-            "draw-2026-april": [
-                { name: "Abhishek Joshi", handle: "@abhishek_cricket_kabaddi", platform: "Instagram", prize: "Early Bird Pro Pass" },
-                { name: "Sameer Khan", handle: "@sameer_kabaddi_champ", platform: "Facebook", prize: "Early Bird Pro Pass" },
-                { name: "Varun Sharma", handle: "@varun_foul_card_master", platform: "Instagram", prize: "Early Bird Pro Pass" },
-                { name: "Hardik Patel", handle: "@hardik_p_sports", platform: "Instagram", prize: "Early Bird Pro Pass" },
-                { name: "Manish Malhotra", handle: "@manish_scoreboard_fan", platform: "X (Twitter)", prize: "Early Bird Pro Pass" }
-            ]
-        };
+        // Archive Data for Past Contests (Empty for now since this is the first contest)
+        const pastWinnersData = {};
 
         function filterPastWinners() {
             const selectBox = document.getElementById("contestSelect");
             const selectedDraw = selectBox.value;
             const gridContainer = document.getElementById("pastWinnersGrid");
-            const winnersList = pastWinnersData[selectedDraw] || [];
-
-            gridContainer.innerHTML = "";
-
-            winnersList.forEach((winner) => {
-                const firstLetter = winner.name.charAt(0);
-                const cardHTML = `
-                    <div class="past-winner-card">
-                        <div class="past-avatar">${firstLetter}</div>
-                        <div class="past-info">
-                            <h4>${winner.name}</h4>
-                            <p>${winner.handle}</p>
-                            <span>${winner.prize} • ${winner.platform}</span>
-                        </div>
-                    </div>
-                `;
-                gridContainer.insertAdjacentHTML("beforeend", cardHTML);
-            });
+            
+            // For now, always show the empty state since it's the first contest
+            gridContainer.innerHTML = `
+                <div class="empty-archive-state">
+                    <i class="fa-solid fa-box-open"></i>
+                    <h3>No Past Winners Yet</h3>
+                    <p>This is our very first giveaway! Past winners will be archived here safely after November 8, 2026.</p>
+                </div>
+            `;
         }
 
         // Initialize with default option on load
@@ -769,6 +652,19 @@
         });
 
         backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Reveal Animations Observer
+        const revealElements = document.querySelectorAll('.reveal');
+        const observerOptions = { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 };
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        revealElements.forEach(el => revealObserver.observe(el));
     </script>
 </body>
 </html>
