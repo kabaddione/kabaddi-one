@@ -461,21 +461,13 @@
             text-transform: uppercase;
         }
 
-        /* ---- Hero Graphics: text on top, images row below (default) ---- */
+        /* ---- Hero Graphics: original layout (left image, text center, right image) ---- */
         .hero-graphics {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 30px;
-        }
-
-        /* Images row: side‑by‑side */
-        .hero-images-row {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
 
@@ -486,7 +478,6 @@
             flex-shrink: 0;
         }
 
-        /* Float animation for both images */
         .float-img {
             animation: float 3s ease-in-out infinite;
         }
@@ -575,6 +566,19 @@
             font-weight: 900;
             line-height: 1.3;
             margin-bottom: 5px;
+        }
+
+        /* ---- Mobile‑only image row (hidden on desktop) ---- */
+        .hero-images-row-mobile {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        .hero-images-row-mobile .promo-img {
+            width: 100px;
         }
 
         /* ---- Join Button (Neon) ---- */
@@ -1243,9 +1247,6 @@
                 border-radius: 18px;
             }
 
-            .hero-images-row {
-                gap: 20px;
-            }
             .promo-img {
                 width: 100px;
             }
@@ -1309,7 +1310,7 @@
         }
 
         /* ============================================================
-           MOBILE (≤480px) – text on top, images side‑by‑side in a row
+           MOBILE ONLY (≤480px) — text on top, images below in a row
            ============================================================ */
         @media (max-width: 480px) {
             .giveaway-hero h1 {
@@ -1319,15 +1320,19 @@
                 font-size: 0.9rem;
             }
 
-            .hero-images-row {
-                flex-direction: row !important;   /* force row */
-                flex-wrap: nowrap !important;
-                gap: 15px;
-                justify-content: center;
+            .hero-graphics {
+                flex-direction: column;
+                gap: 10px;
             }
-            .hero-images-row .promo-img {
-                width: 80px;   /* fit two side by side */
-                flex-shrink: 0;
+
+            /* Hide the left/right images on mobile */
+            .hero-graphics .promo-img {
+                display: none;
+            }
+
+            /* Show the mobile row */
+            .hero-images-row-mobile {
+                display: flex;
             }
 
             .central-text {
@@ -1445,8 +1450,11 @@
                     </div>
                 </div>
 
-                <!-- Hero Graphics: text on top, images row below -->
-                <div class="hero-graphics">
+                <!-- Hero Graphics: original layout (left image, text, right image) for desktop -->
+                <div class="hero-graphics" id="heroGraphics">
+                    <!-- Left image (desktop) -->
+                    <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImgDesktop">
+
                     <!-- Text section -->
                     <div class="central-text" id="centralText">
                         <!-- Old text group -->
@@ -1462,11 +1470,14 @@
                         </div>
                     </div>
 
-                    <!-- Images row: winner left, pro right -->
-                    <div class="hero-images-row">
-                        <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImg">
-                        <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImg">
-                    </div>
+                    <!-- Right image (desktop) -->
+                    <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImgDesktop">
+                </div>
+
+                <!-- Mobile‑only image row (hidden on desktop) -->
+                <div class="hero-images-row-mobile" id="mobileImagesRow">
+                    <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner">
+                    <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access">
                 </div>
 
                 <!-- Rules inside white box -->
