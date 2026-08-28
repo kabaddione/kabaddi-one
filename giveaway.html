@@ -654,6 +654,7 @@
             .winners-desc { font-size: 14px; }
             .new-winners-desc { font-size: 22px; }
             .worth-text { font-size: 18px; }
+
             .timer-box { width: 48px; height: 44px; font-size: 20px; }
             .timer-label { font-size: 11px; }
 
@@ -755,7 +756,7 @@
                                 <text x="50%" y="42" text-anchor="middle" class="new-lucky-text-svg">NEW CONTEST</text>
                             </svg>
                             <div class="new-winners-desc">COMING SOON</div>
-                            <div class="worth-text" id="worthTextNew">Stay Tuned.</div>
+                            <div class="worth-text" id="worthTextNew">Stay Tuned</div>
                         </div>
                     </div>
 
@@ -816,7 +817,7 @@
                     <div class="form-success" id="formSuccess">
                         <i class="fa-solid fa-circle-check"></i>
                         <h3>Entry Confirmed! 🎉</h3>
-                        <p>Keep your Instagram post up until the timer ends. We'll verify your entry and announce winners soon. Good luck!<br><b>The results will be announced on Sunday, November 8, 2026.</b></p>
+                        <p>Keep your Instagram post up until the timer ends. We'll verify your entry and announce winners soon. Good luck!</p>
                     </div>
                 </div>
 
@@ -998,7 +999,7 @@
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ─── 2. FIREBASE CONFIG ──────────────────────────────
+        // ─── 2. FIREBASE CONFIG (REPLACE WITH YOUR OWN) ──────────────
         const firebaseConfig = {
             apiKey: "AIzaSyCoRGEpOh7g3Lz1cD_7Jxwa3GBs4iHScPM",
             authDomain: "giveaway-page-33b24.firebaseapp.com",
@@ -1013,7 +1014,8 @@
         const db = getFirestore(app);
 
         // ─── 3. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
-        const END_TIMESTAMP = 1787863216000; // Oct 31, 2026 23:59:59 GMT real - 1793471399000 test - 1787863216000
+        // Use your actual timestamp here (for testing, set to a future date)
+        const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
 
         // ─── 4. COUNTRY PRICE MAPPING ──────────────────────────────
         const priceMap = {
@@ -1148,6 +1150,7 @@
 
         // ─── 5. FETCH USER COUNTRY WITH FALLBACK ─────────────────────
         async function getCountryWithFallback() {
+            // High-reliability HTTPS API
             try {
                 const response = await fetch('https://get.geojs.io/v1/ip/country.json');
                 if (response.ok) {
@@ -1158,6 +1161,7 @@
                 console.warn('geojs failed, trying fallback...');
             }
 
+            // Fallback HTTPS API
             try {
                 const response = await fetch('https://ipwho.is/');
                 if (response.ok) {
@@ -1176,7 +1180,6 @@
             try {
                 const countryCode = await getCountryWithFallback();
                 const worthOld = document.getElementById('worthTextOld');
-                const worthNew = document.getElementById('worthTextNew');
 
                 let priceText = 'Worth $19.99';
                 if (countryCode && priceMap[countryCode]) {
@@ -1187,12 +1190,10 @@
                     priceText = `Worth ${symbol}${formattedPrice}`;
                 }
                 worthOld.textContent = priceText;
-                worthNew.textContent = priceText;
 
             } catch (error) {
                 const fallback = 'Worth $19.99';
                 document.getElementById('worthTextOld').textContent = fallback;
-                document.getElementById('worthTextNew').textContent = fallback;
             }
         }
 
@@ -1465,7 +1466,8 @@
 
         console.log('%c🏆 KabaddiOne Giveaway Page Ready %c| %cWin Premium Prizes',
             'color:#39FF14;font-weight:bold;font-size:1.1em;', '', 'color:#00FFFF;');
+        console.log('%c🔥 Firebase backend connected. Maximum Security rules applied.',
+            'color:#b0b0c8;');
     </script>
-
 </body>
 </html>
