@@ -1796,8 +1796,8 @@
         const END_TIMESTAMP = 1787863216000; // Oct 31, 2026 23:59:59 GMT test- 1787863216000 real - 1793471399000
 
         // ─── 4. COUNTRY PRICE MAPPING ──────────────────────────────
-        // (Full map included – we'll update both worth texts)
         const priceMap = {
+            // Format: "countryCode": { price: number, currencySymbol: string, currencyCode: string }
             "US": { price: 19.99, symbol: "$", code: "USD" },
             "IN": { price: 599, symbol: "₹", code: "INR" },
             "GB": { price: 17.49, symbol: "£", code: "GBP" },
@@ -1985,7 +1985,7 @@
             "ME": { price: 19.99, symbol: "€", code: "EUR" },
             "MK": { price: 19.99, symbol: "ден", code: "MKD" },
             "XK": { price: 19.99, symbol: "€", code: "EUR" },
-            // ... include all countries from your full list ...
+            // Add more as needed
         };
 
         // ─── 5. FETCH USER COUNTRY AND UPDATE BOTH WORTH TEXTS ──────
