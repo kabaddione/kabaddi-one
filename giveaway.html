@@ -461,28 +461,50 @@
             text-transform: uppercase;
         }
 
-        /* ---- Hero Graphics: text on top, images side by side below ---- */
+        /* ---- Hero Graphics: text in center, images on sides (default) ---- */
         .hero-graphics {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
-        /* Text section (centered) */
+        .promo-img {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* Float animation for both images */
+        .float-img {
+            animation: float 3s ease-in-out infinite;
+        }
+        .float-img:last-child {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Text section (centered, with fixed height for carousel) */
         .central-text {
             position: relative;
-            width: 100%;
-            height: 120px; /* fixed height to contain absolute children */
+            width: 280px;
+            height: 120px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
-        /* Both text groups are absolutely positioned */
         .text-group {
             position: absolute;
             top: 0;
@@ -497,19 +519,16 @@
             will-change: transform, opacity;
         }
 
-        /* Old text initially visible */
         .old-text {
             transform: translateY(0);
             opacity: 1;
         }
 
-        /* New text initially hidden (below) */
         .new-text {
             transform: translateY(30px);
             opacity: 0;
         }
 
-        /* When contest ends, we hide the worth text */
         .contest-ended .old-text .worth-text {
             display: none;
         }
@@ -548,36 +567,6 @@
             font-weight: 900;
             line-height: 1.3;
             margin-bottom: 5px;
-        }
-
-        /* Images row: side‑by‑side */
-        .hero-images-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .promo-img {
-            width: 130px;
-            height: auto;
-            object-fit: contain;
-            flex-shrink: 0;
-        }
-
-        /* Float animation for both images */
-        .float-img {
-            animation: float 3s ease-in-out infinite;
-        }
-        .float-img:nth-child(2) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
-            100% { transform: translateY(0px); }
         }
 
         /* ---- Join Button (Neon) ---- */
@@ -1246,9 +1235,6 @@
                 border-radius: 18px;
             }
 
-            .hero-images-row {
-                gap: 20px;
-            }
             .promo-img {
                 width: 100px;
             }
@@ -1272,6 +1258,7 @@
                 font-size: 22px;
             }
             .central-text {
+                width: 220px;
                 height: 110px;
             }
 
@@ -1310,6 +1297,9 @@
             }
         }
 
+        /* ============================================================
+           ONLY AT MAX-WIDTH: 480px — images move below the text
+           ============================================================ */
         @media (max-width: 480px) {
             .giveaway-hero h1 {
                 font-size: 1.6rem;
@@ -1317,6 +1307,25 @@
             .giveaway-hero .hero-desc {
                 font-size: 0.9rem;
             }
+
+            .hero-graphics {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .hero-graphics .central-text {
+                width: 100%;
+                height: 100px;
+                order: 0;
+            }
+            .hero-graphics .promo-img {
+                width: 80px;
+                order: 1;
+            }
+            .hero-graphics .promo-img:last-child {
+                order: 2;
+            }
+
             .timer-box {
                 width: 48px;
                 height: 44px;
@@ -1338,15 +1347,7 @@
             .worth-text {
                 font-size: 18px;
             }
-            .central-text {
-                height: 100px;
-            }
-            .hero-images-row {
-                gap: 14px;
-            }
-            .promo-img {
-                width: 80px;
-            }
+
             .prize-grid {
                 grid-template-columns: 1fr;
             }
@@ -1435,8 +1436,11 @@
                     </div>
                 </div>
 
-                <!-- Hero Graphics: text on top, images side by side below -->
+                <!-- Hero Graphics: text in center, images on sides (default) -->
                 <div class="hero-graphics">
+                    <!-- Left Image -->
+                    <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImg">
+
                     <!-- Text section -->
                     <div class="central-text" id="centralText">
                         <!-- Old text group -->
@@ -1452,11 +1456,8 @@
                         </div>
                     </div>
 
-                    <!-- Images row (side‑by‑side) -->
-                    <div class="hero-images-row">
-                        <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImg">
-                        <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImg">
-                    </div>
+                    <!-- Right Image -->
+                    <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImg">
                 </div>
 
                 <!-- Rules inside white box -->
@@ -1729,11 +1730,9 @@
         const db = getFirestore(app);
 
         // ─── 3. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
-        const END_TIMESTAMP = 1787863216000; // Oct 31, 2026 23:59:59 GMT
+        const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
 
-        // ─── 4. COUNTRY PRICE MAPPING ──────────────────────────────
-        // (Truncated for brevity – include your full map from the Albania file)
-        // We'll keep the core mapping for major countries.
+        // ─── 4. COUNTRY PRICE MAPPING (truncated – include your full map) ──
         const priceMap = {
             "US": { price: 19.99, symbol: "$", code: "USD" },
             "IN": { price: 599, symbol: "₹", code: "INR" },
@@ -1748,7 +1747,7 @@
             "BR": { price: 99.99, symbol: "R$", code: "BRL" },
             "JP": { price: 3490, symbol: "¥", code: "JPY" },
             "KR": { price: 31000, symbol: "₩", code: "KRW" },
-            // Add more as needed – the full list is in the Albania file.
+            // Add the rest from your Albania list...
         };
 
         // ─── 5. FETCH USER COUNTRY AND UPDATE PRICE ────────────────
@@ -1802,14 +1801,12 @@
                 cdMinutes.textContent = '00';
                 cdSeconds.textContent = '00';
 
-                // Hide form, show "Contest Over" button
                 formWrapper.style.display = 'none';
                 endedBtn.style.display = 'block';
                 endedBtn.onclick = () => {
                     window.location.href = 'giveaway-winners.html';
                 };
 
-                // Start the carousel animation (only once)
                 if (!isCarouselRunning) {
                     startCarousel();
                 }
@@ -1829,19 +1826,17 @@
 
         function startCarousel() {
             isCarouselRunning = true;
-            centralText.classList.add('contest-ended'); // hide worth text
+            centralText.classList.add('contest-ended');
 
-            // Set initial states: old visible, new hidden below
+            // Reset states: old visible, new hidden below
             oldTextGroup.style.transition = 'none';
             oldTextGroup.style.transform = 'translateY(0)';
             oldTextGroup.style.opacity = '1';
             newTextGroup.style.transition = 'none';
             newTextGroup.style.transform = 'translateY(30px)';
             newTextGroup.style.opacity = '0';
-            // Force reflow
             void newTextGroup.offsetHeight;
 
-            // Start the cycle after a short delay
             setTimeout(() => {
                 cycleText();
             }, 1000);
@@ -1849,17 +1844,15 @@
 
         function cycleText() {
             const slideDuration = 400; // ms
-            const holdDuration = 3000; // ms
+            const holdDuration = 2000; // 2 seconds (reduced from 3)
 
             if (showingNew) {
-                // We are showing new -> switch to old
-                // First, reset old to bottom
+                // Switch from new → old
                 oldTextGroup.style.transition = 'none';
                 oldTextGroup.style.transform = 'translateY(30px)';
                 oldTextGroup.style.opacity = '0';
                 void oldTextGroup.offsetHeight;
 
-                // Now animate: new slides up and out, old slides in from bottom
                 oldTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
                 newTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
                 newTextGroup.style.transform = 'translateY(-30px)';
@@ -1869,13 +1862,12 @@
 
                 setTimeout(() => {
                     showingNew = false;
-                    // After hold, cycle again
                     carouselTimer = setTimeout(() => {
                         cycleText();
                     }, holdDuration);
                 }, slideDuration);
             } else {
-                // Showing old -> switch to new
+                // Switch from old → new
                 newTextGroup.style.transition = 'none';
                 newTextGroup.style.transform = 'translateY(30px)';
                 newTextGroup.style.opacity = '0';
