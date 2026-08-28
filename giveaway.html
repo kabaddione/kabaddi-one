@@ -491,7 +491,7 @@
             100% { transform: translateY(0px); }
         }
 
-        /* Text section (centered, with fixed height for carousel) */
+        /* ---- Text section with SVG (fixed inner stroke) ---- */
         .central-text {
             position: relative;
             width: 280px;
@@ -532,28 +532,56 @@
             display: none;
         }
 
-        .lucky-text,
-        .new-lucky-text {
-            font-size: 42px;
-            font-weight: 900;
-            font-family: var(--font-heading);
-            background: var(--neon-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--app-purple);
-            filter: drop-shadow(2px 2px 0px var(--app-purple));
-            line-height: 1.1;
-            margin-bottom: 5px;
+        /* ===== SVG TEXT STYLES (FIXES INNER STROKE ON 'k' and 'y') ===== */
+        .lucky-svg-container {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            overflow: visible;
+            filter: drop-shadow(3px 3px 0px var(--app-purple));
         }
 
+        .lucky-text-svg {
+            font-family: var(--font-heading);
+            font-size: 42px;
+            font-weight: 900;
+            fill: url(#lucky-gradient);
+            stroke: var(--app-purple);
+            stroke-width: 3px;
+            stroke-linejoin: round;
+            paint-order: stroke fill;  /* CRITICAL: stroke UNDER fill */
+        }
+
+        /* NEW CONTEST text uses same style but with different text */
+        .new-lucky-svg-container {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            overflow: visible;
+            filter: drop-shadow(3px 3px 0px var(--app-purple));
+        }
+
+        .new-lucky-text-svg {
+            font-family: var(--font-heading);
+            font-size: 42px;
+            font-weight: 900;
+            fill: url(#lucky-gradient);
+            stroke: var(--app-purple);
+            stroke-width: 3px;
+            stroke-linejoin: round;
+            paint-order: stroke fill;
+        }
+
+        /* Keep the description text as plain HTML */
         .winners-desc {
             color: var(--app-dark-purple);
             font-size: 20px;
             font-weight: 800;
             line-height: 1.3;
             margin-bottom: 5px;
+            text-align: center;
         }
+
         .worth-text {
             color: var(--app-dark-purple);
             font-size: 26px;
@@ -566,6 +594,7 @@
             font-weight: 900;
             line-height: 1.3;
             margin-bottom: 5px;
+            text-align: center;
         }
 
         /* ---- Mobile‑only image row (hidden on desktop) ---- */
@@ -1256,8 +1285,8 @@
                 height: 50px;
                 font-size: 24px;
             }
-            .lucky-text,
-            .new-lucky-text {
+            .lucky-text-svg,
+            .new-lucky-text-svg {
                 font-size: 32px;
             }
             .winners-desc {
@@ -1325,12 +1354,10 @@
                 gap: 10px;
             }
 
-            /* Hide the left/right images on mobile */
             .hero-graphics .promo-img {
                 display: none;
             }
 
-            /* Show the mobile row */
             .hero-images-row-mobile {
                 display: flex;
             }
@@ -1340,16 +1367,8 @@
                 height: 100px;
             }
 
-            .timer-box {
-                width: 48px;
-                height: 44px;
-                font-size: 20px;
-            }
-            .timer-label {
-                font-size: 11px;
-            }
-            .lucky-text,
-            .new-lucky-text {
+            .lucky-text-svg,
+            .new-lucky-text-svg {
                 font-size: 26px;
             }
             .winners-desc {
@@ -1360,6 +1379,15 @@
             }
             .worth-text {
                 font-size: 18px;
+            }
+
+            .timer-box {
+                width: 48px;
+                height: 44px;
+                font-size: 20px;
+            }
+            .timer-label {
+                font-size: 11px;
             }
 
             .prize-grid {
@@ -1455,17 +1483,36 @@
                     <!-- Left image (desktop) -->
                     <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImgDesktop">
 
-                    <!-- Text section -->
+                    <!-- Text section with SVG (fixed inner stroke) -->
                     <div class="central-text" id="centralText">
                         <!-- Old text group -->
                         <div class="text-group old-text" id="oldTextGroup">
-                            <div class="lucky-text" id="luckyText">5 Lucky</div>
+                            <!-- SVG for "5 Lucky" -->
+                            <svg class="lucky-svg-container" viewBox="0 0 260 55" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="lucky-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#39FF14" />
+                                        <stop offset="100%" stop-color="#00FFFF" />
+                                    </linearGradient>
+                                </defs>
+                                <text x="50%" y="42" text-anchor="middle" class="lucky-text-svg">5 Lucky</text>
+                            </svg>
                             <div class="winners-desc" id="winnersDesc">Winners Will Win A<br>KabaddiOne Pro Subscription</div>
                             <div class="worth-text" id="worthText">Worth ₹599</div>
                         </div>
-                        <!-- New text group (hidden initially) -->
+
+                        <!-- New text group -->
                         <div class="text-group new-text" id="newTextGroup">
-                            <div class="new-lucky-text">NEW CONTEST</div>
+                            <!-- SVG for "NEW CONTEST" -->
+                            <svg class="new-lucky-svg-container" viewBox="0 0 280 55" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="new-lucky-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#39FF14" />
+                                        <stop offset="100%" stop-color="#00FFFF" />
+                                    </linearGradient>
+                                </defs>
+                                <text x="50%" y="42" text-anchor="middle" class="new-lucky-text-svg">NEW CONTEST</text>
+                            </svg>
                             <div class="new-winners-desc">COMING SOON</div>
                         </div>
                     </div>
@@ -1492,15 +1539,15 @@
                         Follow KabaddiOne Scoreboard On Social Media.
                     </div>
                     <div class="step-item">
-                        <div class="step-num">2</div>
-                        Take screenshort of your match scorecard and post it to your Instagram/Facebook/X.com.
-                    </div>
-                    <div class="step-item">
                         <div class="step-num">3</div>
-                        Tag @KabaddiOneApp in the post.
+                        Take screenshot of your match scorecard and post it to your Instagram/Facebook/X.com.
                     </div>
                     <div class="step-item">
                         <div class="step-num">4</div>
+                        Tag @KabaddiOneApp in the post.
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">5</div>
                         Submit your Instagram/Facebook/X.com Handle &amp; Post URL below to verify your entry!
                     </div>
                 </div>
@@ -1563,7 +1610,7 @@
                 <div class="prize-card reveal reveal-delay-2">
                     <div class="prize-icon"><i class="fa-solid fa-9"></i></div>
                     <h3>Jersey Number</h3>
-                    <p>Give every player thier real jersey number</p>
+                    <p>Give every player their real jersey number</p>
                     <span class="prize-value">Pro Feature</span>
                 </div>
                 <div class="prize-card reveal reveal-delay-3">
@@ -1575,7 +1622,7 @@
                 <div class="prize-card reveal reveal-delay-4">
                     <div class="prize-icon"><i class="fa-solid fa-ban"></i></div>
                     <h3>No Ads</h3>
-                    <p>Parmanetly removes all ads</p>
+                    <p>Permanently removes all ads</p>
                     <span class="prize-value">Pro Feature</span>
                 </div>
             </div>
@@ -1583,13 +1630,13 @@
                 <div class="prize-card reveal reveal-delay-1">
                     <div class="prize-icon"><i class="fa-solid fa-users-gear"></i></div>
                     <h3>Starting 7</h3>
-                    <p>Setup both team's starting 7 complitly</p>
+                    <p>Setup both team's starting 7 completely</p>
                     <span class="prize-value">Pro Feature</span>
                 </div>
                 <div class="prize-card reveal reveal-delay-2">
                     <div class="prize-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
                     <h3>Performance Tracker</h3>
-                    <p>Track every player's detailed performance automaticly</p>
+                    <p>Track every player's detailed performance automatically</p>
                     <span class="prize-value">Pro Feature</span>
                 </div>
                 <div class="prize-card reveal reveal-delay-3">
@@ -1757,16 +1804,190 @@
             "US": { price: 19.99, symbol: "$", code: "USD" },
             "IN": { price: 599, symbol: "₹", code: "INR" },
             "GB": { price: 17.49, symbol: "£", code: "GBP" },
-            "EU": { price: 20.99, symbol: "€", code: "EUR" },
+            "EU": { price: 20.99, symbol: "€", code: "EUR" }, // fallback for EU
             "DE": { price: 20.99, symbol: "€", code: "EUR" },
             "FR": { price: 20.99, symbol: "€", code: "EUR" },
             "IT": { price: 20.99, symbol: "€", code: "EUR" },
             "ES": { price: 20.99, symbol: "€", code: "EUR" },
+            "NL": { price: 20.99, symbol: "€", code: "EUR" },
+            "BE": { price: 20.99, symbol: "€", code: "EUR" },
+            "PT": { price: 20.99, symbol: "€", code: "EUR" },
+            "AT": { price: 20.99, symbol: "€", code: "EUR" },
+            "FI": { price: 21.99, symbol: "€", code: "EUR" },
+            "SE": { price: 239.00, symbol: "kr", code: "SEK" },
+            "NO": { price: 235.00, symbol: "kr", code: "NOK" },
+            "DK": { price: 159.00, symbol: "kr", code: "DKK" },
+            "CH": { price: 16.00, symbol: "CHF", code: "CHF" },
             "AU": { price: 30.99, symbol: "A$", code: "AUD" },
+            "NZ": { price: 38.99, symbol: "NZ$", code: "NZD" },
             "CA": { price: 27.99, symbol: "CA$", code: "CAD" },
             "BR": { price: 99.99, symbol: "R$", code: "BRL" },
+            "MX": { price: 399.00, symbol: "Mex$", code: "MXN" },
             "JP": { price: 3490, symbol: "¥", code: "JPY" },
             "KR": { price: 31000, symbol: "₩", code: "KRW" },
+            "CN": { price: 19.99, symbol: "¥", code: "CNY" }, // approximate
+            "TW": { price: 680.00, symbol: "NT$", code: "TWD" },
+            "HK": { price: 158.00, symbol: "HK$", code: "HKD" },
+            "SG": { price: 27.98, symbol: "S$", code: "SGD" },
+            "MY": { price: 87.99, symbol: "RM", code: "MYR" },
+            "PH": { price: 1350.00, symbol: "₱", code: "PHP" },
+            "VN": { price: 523000, symbol: "₫", code: "VND" },
+            "TH": { price: 700.00, symbol: "฿", code: "THB" },
+            "ID": { price: 359000, symbol: "Rp", code: "IDR" },
+            "PK": { price: 1750, symbol: "Rs", code: "PKR" },
+            "BD": { price: 900.00, symbol: "৳", code: "BDT" },
+            "LK": { price: 2100.00, symbol: "Rs", code: "LKR" },
+            "NP": { price: 7.11, symbol: "Rs", code: "NPR" }, // special rate
+            "SA": { price: 85.99, symbol: "﷼", code: "SAR" },
+            "AE": { price: 23.99, symbol: "د.إ", code: "AED" },
+            "QA": { price: 73.00, symbol: "﷼", code: "QAR" },
+            "KW": { price: 19.99, symbol: "د.ك", code: "KWD" },
+            "OM": { price: 20.99, symbol: "﷼", code: "OMR" },
+            "BH": { price: 21.99, symbol: "د.ب", code: "BHD" },
+            "IL": { price: 60.00, symbol: "₪", code: "ILS" },
+            "TR": { price: 1139.99, symbol: "₺", code: "TRY" },
+            "RU": { price: 1690.00, symbol: "₽", code: "RUB" },
+            "UA": { price: 1099.99, symbol: "₴", code: "UAH" },
+            "PL": { price: 91.99, symbol: "zł", code: "PLN" },
+            "CZ": { price: 499.99, symbol: "Kč", code: "CZK" },
+            "HU": { price: 7999, symbol: "Ft", code: "HUF" },
+            "RO": { price: 109.99, symbol: "lei", code: "RON" },
+            "BG": { price: 20.99, symbol: "лв", code: "BGN" }, // approximate
+            "HR": { price: 21.99, symbol: "€", code: "EUR" },
+            "RS": { price: 2399, symbol: "дин", code: "RSD" },
+            "ZA": { price: 369.99, symbol: "R", code: "ZAR" },
+            "NG": { price: 29500.00, symbol: "₦", code: "NGN" },
+            "EG": { price: 1149.99, symbol: "E£", code: "EGP" },
+            "KE": { price: 3000.00, symbol: "KSh", code: "KES" },
+            "GH": { price: 280.00, symbol: "GH₵", code: "GHS" },
+            "MA": { price: 224.99, symbol: "DH", code: "MAD" },
+            "DZ": { price: 2650.00, symbol: "دج", code: "DZD" },
+            "TN": { price: 19.99, symbol: "د.ت", code: "TND" }, // approximate
+            "LB": { price: 19.99, symbol: "ل.ل", code: "LBP" },
+            "IQ": { price: 8250, symbol: "د.ع", code: "IQD" },
+            "JO": { price: 14.15, symbol: "د.ا", code: "JOD" },
+            "YE": { price: 19.99, symbol: "﷼", code: "YER" },
+            "SY": { price: 19.99, symbol: "£S", code: "SYP" }, // fallback
+            "PS": { price: 19.99, symbol: "₪", code: "ILS" }, // Palestine
+            "KZ": { price: 10990.00, symbol: "₸", code: "KZT" },
+            "UZ": { price: 22.39, symbol: "soʻm", code: "UZS" },
+            "BY": { price: 23.99, symbol: "Br", code: "BYN" },
+            "MD": { price: 23.99, symbol: "lei", code: "MDL" },
+            "GE": { price: 59.00, symbol: "₾", code: "GEL" },
+            "AM": { price: 19.99, symbol: "AMD", code: "AMD" },
+            "AZ": { price: 19.99, symbol: "₼", code: "AZN" },
+            "KG": { price: 19.99, symbol: "сом", code: "KGS" },
+            "TJ": { price: 19.99, symbol: "SM", code: "TJS" },
+            "TM": { price: 19.99, symbol: "m", code: "TMT" },
+            "MN": { price: 71800.00, symbol: "₮", code: "MNT" },
+            "MM": { price: 42000, symbol: "K", code: "MMK" },
+            "KH": { price: 19.99, symbol: "៛", code: "KHR" },
+            "LA": { price: 19.99, symbol: "₭", code: "LAK" },
+            "BT": { price: 19.99, symbol: "Nu.", code: "BTN" }, // Bhutan
+            "MV": { price: 19.99, symbol: "ރ.", code: "MVR" },
+            "FJ": { price: 19.99, symbol: "FJ$", code: "FJD" },
+            "PG": { price: 19.99, symbol: "K", code: "PGK" },
+            "SB": { price: 19.99, symbol: "SI$", code: "SBD" },
+            "VU": { price: 19.99, symbol: "Vt", code: "VUV" },
+            "WS": { price: 19.99, symbol: "WS$", code: "WST" },
+            "TO": { price: 19.99, symbol: "T$", code: "TOP" },
+            "KI": { price: 19.99, symbol: "$", code: "KID" }, // Kiribati
+            "MH": { price: 19.99, symbol: "$", code: "USD" },
+            "PW": { price: 19.99, symbol: "$", code: "USD" },
+            "FM": { price: 19.99, symbol: "$", code: "USD" },
+            "NR": { price: 19.99, symbol: "$", code: "AUD" }, // Nauru
+            "TV": { price: 19.99, symbol: "$", code: "AUD" }, // Tuvalu
+            "WF": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "PF": { price: 19.99, symbol: "CFP", code: "XPF" }, // French Polynesia
+            "NC": { price: 19.99, symbol: "CFP", code: "XPF" }, // New Caledonia
+            "GL": { price: 19.99, symbol: "kr", code: "DKK" }, // Greenland
+            "FO": { price: 19.99, symbol: "kr", code: "DKK" }, // Faroe Islands
+            "AX": { price: 19.99, symbol: "€", code: "EUR" }, // Åland
+            "JE": { price: 19.99, symbol: "£", code: "GBP" }, // Jersey
+            "GG": { price: 19.99, symbol: "£", code: "GBP" }, // Guernsey
+            "IM": { price: 19.99, symbol: "£", code: "GBP" }, // Isle of Man
+            "GI": { price: 14.99, symbol: "£", code: "GBP" }, // Gibraltar
+            "MC": { price: 20.99, symbol: "€", code: "EUR" },
+            "VA": { price: 16.99, symbol: "€", code: "EUR" }, // Vatican
+            "SM": { price: 16.99, symbol: "€", code: "EUR" }, // San Marino
+            "LI": { price: 17.00, symbol: "CHF", code: "CHF" },
+            "AD": { price: 19.99, symbol: "€", code: "EUR" }, // Andorra
+            "MT": { price: 20.41, symbol: "€", code: "EUR" },
+            "CY": { price: 20.99, symbol: "€", code: "EUR" },
+            "LV": { price: 20.99, symbol: "€", code: "EUR" },
+            "LT": { price: 20.99, symbol: "€", code: "EUR" },
+            "EE": { price: 20.99, symbol: "€", code: "EUR" },
+            "SK": { price: 20.99, symbol: "€", code: "EUR" },
+            "SI": { price: 20.99, symbol: "€", code: "EUR" },
+            "GR": { price: 20.99, symbol: "€", code: "EUR" },
+            "LU": { price: 19.99, symbol: "€", code: "EUR" },
+            "IE": { price: 20.99, symbol: "€", code: "EUR" },
+            "IS": { price: 21.45, symbol: "kr", code: "ISK" },
+            "AL": { price: 23.99, symbol: "Lek", code: "ALL" }, // Albania
+            "BA": { price: 19.99, symbol: "KM", code: "BAM" }, // Bosnia
+            "ME": { price: 19.99, symbol: "€", code: "EUR" }, // Montenegro
+            "MK": { price: 19.99, symbol: "ден", code: "MKD" }, // North Macedonia
+            "XK": { price: 19.99, symbol: "€", code: "EUR" }, // Kosovo
+            "BY": { price: 23.99, symbol: "Br", code: "BYN" },
+            "UA": { price: 1099.99, symbol: "₴", code: "UAH" },
+            "MD": { price: 23.99, symbol: "lei", code: "MDL" },
+            "GE": { price: 59.00, symbol: "₾", code: "GEL" },
+            "AM": { price: 19.99, symbol: "AMD", code: "AMD" },
+            "AZ": { price: 19.99, symbol: "₼", code: "AZN" },
+            "KZ": { price: 10990.00, symbol: "₸", code: "KZT" },
+            "UZ": { price: 22.39, symbol: "soʻm", code: "UZS" },
+            "TM": { price: 19.99, symbol: "m", code: "TMT" },
+            "KG": { price: 19.99, symbol: "сом", code: "KGS" },
+            "TJ": { price: 19.99, symbol: "SM", code: "TJS" },
+            "MN": { price: 71800.00, symbol: "₮", code: "MNT" },
+            "MM": { price: 42000, symbol: "K", code: "MMK" },
+            "KH": { price: 19.99, symbol: "៛", code: "KHR" },
+            "LA": { price: 19.99, symbol: "₭", code: "LAK" },
+            "BT": { price: 19.99, symbol: "Nu.", code: "BTN" },
+            "MV": { price: 19.99, symbol: "ރ.", code: "MVR" },
+            "FJ": { price: 19.99, symbol: "FJ$", code: "FJD" },
+            "PG": { price: 19.99, symbol: "K", code: "PGK" },
+            "SB": { price: 19.99, symbol: "SI$", code: "SBD" },
+            "VU": { price: 19.99, symbol: "Vt", code: "VUV" },
+            "WS": { price: 19.99, symbol: "WS$", code: "WST" },
+            "TO": { price: 19.99, symbol: "T$", code: "TOP" },
+            "KI": { price: 19.99, symbol: "$", code: "KID" },
+            "MH": { price: 19.99, symbol: "$", code: "USD" },
+            "PW": { price: 19.99, symbol: "$", code: "USD" },
+            "FM": { price: 19.99, symbol: "$", code: "USD" },
+            "NR": { price: 19.99, symbol: "$", code: "AUD" },
+            "TV": { price: 19.99, symbol: "$", code: "AUD" },
+            "WF": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "PF": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "NC": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "GL": { price: 19.99, symbol: "kr", code: "DKK" },
+            "FO": { price: 19.99, symbol: "kr", code: "DKK" },
+            "AX": { price: 19.99, symbol: "€", code: "EUR" },
+            "JE": { price: 19.99, symbol: "£", code: "GBP" },
+            "GG": { price: 19.99, symbol: "£", code: "GBP" },
+            "IM": { price: 19.99, symbol: "£", code: "GBP" },
+            "GI": { price: 14.99, symbol: "£", code: "GBP" },
+            "MC": { price: 20.99, symbol: "€", code: "EUR" },
+            "VA": { price: 16.99, symbol: "€", code: "EUR" },
+            "SM": { price: 16.99, symbol: "€", code: "EUR" },
+            "LI": { price: 17.00, symbol: "CHF", code: "CHF" },
+            "AD": { price: 19.99, symbol: "€", code: "EUR" },
+            "MT": { price: 20.41, symbol: "€", code: "EUR" },
+            "CY": { price: 20.99, symbol: "€", code: "EUR" },
+            "LV": { price: 20.99, symbol: "€", code: "EUR" },
+            "LT": { price: 20.99, symbol: "€", code: "EUR" },
+            "EE": { price: 20.99, symbol: "€", code: "EUR" },
+            "SK": { price: 20.99, symbol: "€", code: "EUR" },
+            "SI": { price: 20.99, symbol: "€", code: "EUR" },
+            "GR": { price: 20.99, symbol: "€", code: "EUR" },
+            "LU": { price: 19.99, symbol: "€", code: "EUR" },
+            "IE": { price: 20.99, symbol: "€", code: "EUR" },
+            "IS": { price: 21.45, symbol: "kr", code: "ISK" },
+            "AL": { price: 23.99, symbol: "Lek", code: "ALL" },
+            "BA": { price: 19.99, symbol: "KM", code: "BAM" },
+            "ME": { price: 19.99, symbol: "€", code: "EUR" },
+            "MK": { price: 19.99, symbol: "ден", code: "MKD" },
+            "XK": { price: 19.99, symbol: "€", code: "EUR" },
             // Add the rest from your Albania list...
         };
 
