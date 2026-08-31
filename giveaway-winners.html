@@ -286,7 +286,7 @@
            ============================================================ */
         .promo-guide-section { position: relative; z-index: 1; }
         .steps-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 28px; margin-top: 40px;
         }
         .step-card {
@@ -305,7 +305,7 @@
 
         /* App Screenshot Mockup Frame (LANDSCAPE MODE) */
         .app-screenshot-frame-landscape {
-            width: 100%; max-width: 450px; aspect-ratio: 19.5/9; background: #000;
+            width: 100%; max-width: 340px; aspect-ratio: 19.5/9; background: #000;
             border: 4px solid #2a2a40; border-radius: 20px; margin: 16px auto;
             position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             display: flex; align-items: center; justify-content: center;
@@ -320,7 +320,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .app-screen-mock-landscape img {
-            width: 100%; height: 100%; object-fit: cover; /* Dimmed slightly so overlay text is readable if no image */
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.6; /* Dimmed slightly so overlay text is readable if no image */
         }
         
         /* Fallback UI overlay if no real image is provided yet */
@@ -492,7 +492,7 @@
             <div class="section-header reveal">
                 <span class="section-tag">🎁 Coupon Redemption</span>
                 <h2>How to Get <span class="highlight">KabaddiOne Pro Free</span></h2>
-                <p>Got a winning promo code? Follow this simple 4-step guide to unlock all Pro features inside the app at ₹0 checkout!</p>
+                <p>Got a winning promo code? Follow this simple 4-step guide to unlock all Pro features inside the app at <span id="dynamicPriceDesc">₹0</span> checkout!</p>
             </div>
 
             <div class="steps-container">
@@ -501,11 +501,16 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="images/giveaway-screen1.png" alt="App Screen Placeholder">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-bars mock-ui-icon"></i>
+                                <div class="mock-screen-title">Open App Menu</div>
+                            </div>
                         </div>
                     </div>
-                    <h3>Click Green Dimond Button</h3>
-                    <p>Open the KabaddiOne app on your phone and tap on the green dimond icon to view purchase options.</p>
+                    <h3>Open KabaddiOne Menu</h3>
+                    <p>Open the KabaddiOne app on your phone and tap on the top menu icon to view options.</p>
                 </div>
 
                 <div class="step-card reveal reveal-delay-2">
@@ -513,11 +518,17 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="images/giveaway-screen2.png" alt="App Screen Placeholder">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-crown mock-ui-icon" style="color:var(--gold);"></i>
+                                <div class="mock-screen-title">Pro Subscription</div>
+                                <div class="mock-ui-btn" style="background:var(--accent); color:#fff;">Select Pro Plan</div>
+                            </div>
                         </div>
                     </div>
-                    <h3>Click The Buy Now Button</h3>
-                    <p>Select the buy now button to proceed to the secure checkout screen.</p>
+                    <h3>Choose Pro Plan</h3>
+                    <p>Select the <strong>KabaddiOne Pro 1-Year Pass</strong> option to proceed to the secure checkout screen.</p>
                 </div>
 
                 <div class="step-card reveal reveal-delay-3">
@@ -525,11 +536,17 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="images/giveaway-screen3.png" alt="App Screen Placeholder">
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-ticket mock-ui-icon"></i>
+                                <div class="mock-ui-input">PROMO: WINNER100</div>
+                                <div class="mock-ui-btn">Apply Coupon</div>
+                            </div>
                         </div>
                     </div>
                     <h3>Apply Promo Code</h3>
-                    <p>At the checkout box, tap <strong>"Redeeme Code"</strong>, paste your unique email coupon code, and click <strong>Apply</strong>.</p>
+                    <p>At the checkout box, tap <strong>"Have a Promo Code?"</strong>, paste your unique email coupon code, and click <strong>Apply</strong>.</p>
                 </div>
 
                 <div class="step-card reveal reveal-delay-4">
@@ -537,11 +554,17 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="images/giveaway-screen4.png" alt="App Screen Placeholder">
-                             </div>
+                            <img src="" alt="App Screen Placeholder">
+                            
+                            <div class="mock-overlay">
+                                <i class="fa-solid fa-circle-check mock-ui-icon" style="color:var(--neon-green);"></i>
+                                <div class="mock-screen-title" style="color:var(--neon-green);"><span id="dynamicPriceOverlay">₹0</span> Checkout</div>
+                                <div class="mock-ui-btn">Unlocked Free!</div>
+                            </div>
+                        </div>
                     </div>
                     <h3>Enjoy Pro Features</h3>
-                    <p>Your total price becomes <strong>₹0 / Free</strong>! Tap confirm to instantly enjoy No Ads, Starting 7, and Player Profiling!</p>
+                    <p>Your total price becomes <strong><span id="dynamicPriceCheckout">₹0</span> / Free</strong>! Tap confirm to instantly enjoy No Ads, Starting 7, and Player Profiling!</p>
                 </div>
             </div>
         </div>
@@ -591,12 +614,154 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
     <script>
-        // Archive Data for Past Contests (Empty for now since this is the first contest)
-        const pastWinnersData = {};
+        // ─── DYNAMIC PRICING SCRIPT ──────────────────────────────
+        const priceMap = {
+            "US": { symbol: "$" },
+            "IN": { symbol: "₹" },
+            "GB": { symbol: "£" },
+            "EU": { symbol: "€" },
+            "DE": { symbol: "€" },
+            "FR": { symbol: "€" },
+            "IT": { symbol: "€" },
+            "ES": { symbol: "€" },
+            "NL": { symbol: "€" },
+            "BE": { symbol: "€" },
+            "PT": { symbol: "€" },
+            "AT": { symbol: "€" },
+            "FI": { symbol: "€" },
+            "SE": { symbol: "kr" },
+            "NO": { symbol: "kr" },
+            "DK": { symbol: "kr" },
+            "CH": { symbol: "CHF" },
+            "AU": { symbol: "A$" },
+            "NZ": { symbol: "NZ$" },
+            "CA": { symbol: "CA$" },
+            "BR": { symbol: "R$" },
+            "MX": { symbol: "Mex$" },
+            "JP": { symbol: "¥" },
+            "KR": { symbol: "₩" },
+            "CN": { symbol: "¥" },
+            "TW": { symbol: "NT$" },
+            "HK": { symbol: "HK$" },
+            "SG": { symbol: "S$" },
+            "MY": { symbol: "RM" },
+            "PH": { symbol: "₱" },
+            "VN": { symbol: "₫" },
+            "TH": { symbol: "฿" },
+            "ID": { symbol: "Rp" },
+            "PK": { symbol: "Rs" },
+            "BD": { symbol: "৳" },
+            "LK": { symbol: "Rs" },
+            "NP": { symbol: "Rs" },
+            "SA": { symbol: "﷼" },
+            "AE": { symbol: "د.إ" },
+            "QA": { symbol: "﷼" },
+            "KW": { symbol: "د.ك" },
+            "OM": { symbol: "﷼" },
+            "BH": { symbol: "د.ب" },
+            "IL": { symbol: "₪" },
+            "TR": { symbol: "₺" },
+            "RU": { symbol: "₽" },
+            "UA": { symbol: "₴" },
+            "PL": { symbol: "zł" },
+            "CZ": { symbol: "Kč" },
+            "HU": { symbol: "Ft" },
+            "RO": { symbol: "lei" },
+            "BG": { symbol: "лв" },
+            "HR": { symbol: "€" },
+            "RS": { symbol: "дин" },
+            "ZA": { symbol: "R" },
+            "NG": { symbol: "₦" },
+            "EG": { symbol: "E£" },
+            "KE": { symbol: "KSh" },
+            "GH": { symbol: "GH₵" },
+            "MA": { symbol: "DH" },
+            "DZ": { symbol: "دج" },
+            "TN": { symbol: "د.ت" },
+            "LB": { symbol: "ل.ل" },
+            "IQ": { symbol: "د.ع" },
+            "JO": { symbol: "د.ا" },
+            "YE": { symbol: "﷼" },
+            "SY": { symbol: "£S" },
+            "PS": { symbol: "₪" },
+            "KZ": { symbol: "₸" },
+            "UZ": { symbol: "soʻm" },
+            "BY": { symbol: "Br" },
+            "MD": { symbol: "lei" },
+            "GE": { symbol: "₾" },
+            "AM": { symbol: "AMD" },
+            "AZ": { symbol: "₼" },
+            "KG": { symbol: "сом" },
+            "TJ": { symbol: "SM" },
+            "TM": { symbol: "m" },
+            "MN": { symbol: "₮" },
+            "MM": { symbol: "K" },
+            "KH": { symbol: "៛" },
+            "LA": { symbol: "₭" },
+            "BT": { symbol: "Nu." },
+            "MV": { symbol: "ރ." },
+            "FJ": { symbol: "FJ$" },
+            "PG": { symbol: "K" },
+            "SB": { symbol: "SI$" },
+            "VUV": { symbol: "Vt" },
+            "WS": { symbol: "WS$" }
+        };
 
+        async function getCountryWithFallback() {
+            try {
+                const response = await fetch('https://get.geojs.io/v1/ip/country.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.country) return data.country;
+                }
+            } catch (e) {
+                console.warn('geojs failed, trying fallback...');
+            }
+
+            try {
+                const response = await fetch('https://ipwho.is/');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.country_code) return data.country_code;
+                }
+            } catch (e) {
+                console.warn('ipwho.is failed, using default US');
+            }
+
+            return 'US';
+        }
+
+        async function updatePriceBasedOnCountry() {
+            try {
+                const countryCode = await getCountryWithFallback();
+                const dynamicPriceDesc = document.getElementById('dynamicPriceDesc');
+                const dynamicPriceCheckout = document.getElementById('dynamicPriceCheckout');
+                const dynamicPriceOverlay = document.getElementById('dynamicPriceOverlay');
+
+                let symbol = '$'; // Fallback
+                if (countryCode && priceMap[countryCode]) {
+                    symbol = priceMap[countryCode].symbol;
+                }
+
+                if(dynamicPriceDesc) dynamicPriceDesc.textContent = symbol + '0';
+                if(dynamicPriceCheckout) dynamicPriceCheckout.textContent = symbol + '0';
+                if(dynamicPriceOverlay) dynamicPriceOverlay.textContent = symbol + '0';
+
+            } catch (error) {
+                const dynamicPriceDesc = document.getElementById('dynamicPriceDesc');
+                const dynamicPriceCheckout = document.getElementById('dynamicPriceCheckout');
+                const dynamicPriceOverlay = document.getElementById('dynamicPriceOverlay');
+                if(dynamicPriceDesc) dynamicPriceDesc.textContent = '$0';
+                if(dynamicPriceCheckout) dynamicPriceCheckout.textContent = '$0';
+                if(dynamicPriceOverlay) dynamicPriceOverlay.textContent = '$0';
+            }
+        }
+
+        // Initialize Pricing Script
+        updatePriceBasedOnCountry();
+
+        // ─── ARCHIVE FILTER LOGIC ──────────────────────────────
         function filterPastWinners() {
-            const selectBox = document.getElementById("contestSelect");
-            const selectedDraw = selectBox.value;
             const gridContainer = document.getElementById("pastWinnersGrid");
             
             // For now, always show the empty state since it's the first contest
@@ -609,12 +774,11 @@
             `;
         }
 
-        // Initialize with default option on load
         window.addEventListener("DOMContentLoaded", () => {
             filterPastWinners();
         });
 
-        // Navigation Menu Toggle & Scroll Logic
+        // ─── NAVIGATION SCROLL & TOGGLE ──────────────────────────────
         const navbar = document.getElementById('navbar');
         const hamburger = document.getElementById('hamburger');
         const navLinks = document.getElementById('navLinks');
@@ -636,7 +800,7 @@
 
         backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-        // Reveal Animations Observer
+        // ─── REVEAL ANIMATIONS ──────────────────────────────
         const revealElements = document.querySelectorAll('.reveal');
         const observerOptions = { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 };
         const revealObserver = new IntersectionObserver((entries) => {
