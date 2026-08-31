@@ -286,7 +286,7 @@
            ============================================================ */
         .promo-guide-section { position: relative; z-index: 1; }
         .steps-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 28px; margin-top: 40px;
         }
         .step-card {
@@ -305,7 +305,7 @@
 
         /* App Screenshot Mockup Frame (LANDSCAPE MODE) */
         .app-screenshot-frame-landscape {
-            width: 100%; max-width: 340px; aspect-ratio: 19.5/9; background: #000;
+            width: 100%; max-width: 450px; aspect-ratio: 19.5/9; background: #000;
             border: 4px solid #2a2a40; border-radius: 20px; margin: 16px auto;
             position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             display: flex; align-items: center; justify-content: center;
@@ -320,7 +320,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .app-screen-mock-landscape img {
-            width: 100%; height: 100%; object-fit: cover; opacity: 0.6; /* Dimmed slightly so overlay text is readable if no image */
+            width: 100%; height: 100%; object-fit: cover; /* Dimmed slightly so overlay text is readable if no image */
         }
         
         /* Fallback UI overlay if no real image is provided yet */
@@ -501,16 +501,11 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="" alt="App Screen Placeholder">
-                            
-                            <div class="mock-overlay">
-                                <i class="fa-solid fa-bars mock-ui-icon"></i>
-                                <div class="mock-screen-title">Open App Menu</div>
-                            </div>
+                            <img src="images/giveaway-screen1.png" alt="App Screen Placeholder">
                         </div>
                     </div>
-                    <h3>Open KabaddiOne Menu</h3>
-                    <p>Open the KabaddiOne app on your phone and tap on the top menu icon to view options.</p>
+                    <h3>Click Green Dimond Button</h3>
+                    <p>Open the KabaddiOne app on your phone and tap on the green dimond icon to view purchase options.</p>
                 </div>
 
                 <div class="step-card reveal reveal-delay-2">
@@ -518,17 +513,11 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="" alt="App Screen Placeholder">
-                            
-                            <div class="mock-overlay">
-                                <i class="fa-solid fa-crown mock-ui-icon" style="color:var(--gold);"></i>
-                                <div class="mock-screen-title">Pro Subscription</div>
-                                <div class="mock-ui-btn" style="background:var(--accent); color:#fff;">Select Pro Plan</div>
-                            </div>
+                            <img src="images/giveaway-screen2.png" alt="App Screen Placeholder">
                         </div>
                     </div>
-                    <h3>Choose Pro Plan</h3>
-                    <p>Select the <strong>KabaddiOne Pro 1-Year Pass</strong> option to proceed to the secure checkout screen.</p>
+                    <h3>Click The Buy Now Button</h3>
+                    <p>Select the buy now button to proceed to the secure checkout screen.</p>
                 </div>
 
                 <div class="step-card reveal reveal-delay-3">
@@ -536,17 +525,11 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="" alt="App Screen Placeholder">
-                            
-                            <div class="mock-overlay">
-                                <i class="fa-solid fa-ticket mock-ui-icon"></i>
-                                <div class="mock-ui-input">PROMO: WINNER100</div>
-                                <div class="mock-ui-btn">Apply Coupon</div>
-                            </div>
+                            <img src="images/giveaway-screen3.png" alt="App Screen Placeholder">
                         </div>
                     </div>
                     <h3>Apply Promo Code</h3>
-                    <p>At the checkout box, tap <strong>"Have a Promo Code?"</strong>, paste your unique email coupon code, and click <strong>Apply</strong>.</p>
+                    <p>At the checkout box, tap <strong>"Redeeme Code"</strong>, paste your unique email coupon code, and click <strong>Apply</strong>.</p>
                 </div>
 
                 <div class="step-card reveal reveal-delay-4">
@@ -554,17 +537,11 @@
                     <div class="app-screenshot-frame-landscape">
                         <div class="landscape-notch"></div>
                         <div class="app-screen-mock-landscape">
-                            <img src="" alt="App Screen Placeholder">
-                            
-                            <div class="mock-overlay">
-                                <i class="fa-solid fa-circle-check mock-ui-icon" style="color:var(--neon-green);"></i>
-                                <div class="mock-screen-title" style="color:var(--neon-green);"><span id="dynamicPriceOverlay">₹0</span> Checkout</div>
-                                <div class="mock-ui-btn">Unlocked Free!</div>
-                            </div>
-                        </div>
+                            <img src="images/giveaway-screen4.png" alt="App Screen Placeholder">
+                             </div>
                     </div>
                     <h3>Enjoy Pro Features</h3>
-                    <p>Your total price becomes <strong><span id="dynamicPriceCheckout">₹0</span> / Free</strong>! Tap confirm to instantly enjoy No Ads, Starting 7, and Player Profiling!</p>
+                    <p>Your total price becomes <strong><span id="dynamicPriceCheckout">₹0</span> / Free</strong>! Tap confirm to instantly enjoy Ads free, Starting 7, Player Profiling and much more!</p>
                 </div>
             </div>
         </div>
@@ -736,7 +713,6 @@
                 const countryCode = await getCountryWithFallback();
                 const dynamicPriceDesc = document.getElementById('dynamicPriceDesc');
                 const dynamicPriceCheckout = document.getElementById('dynamicPriceCheckout');
-                const dynamicPriceOverlay = document.getElementById('dynamicPriceOverlay');
 
                 let symbol = '$'; // Fallback
                 if (countryCode && priceMap[countryCode]) {
@@ -745,23 +721,24 @@
 
                 if(dynamicPriceDesc) dynamicPriceDesc.textContent = symbol + '0';
                 if(dynamicPriceCheckout) dynamicPriceCheckout.textContent = symbol + '0';
-                if(dynamicPriceOverlay) dynamicPriceOverlay.textContent = symbol + '0';
 
             } catch (error) {
                 const dynamicPriceDesc = document.getElementById('dynamicPriceDesc');
                 const dynamicPriceCheckout = document.getElementById('dynamicPriceCheckout');
-                const dynamicPriceOverlay = document.getElementById('dynamicPriceOverlay');
                 if(dynamicPriceDesc) dynamicPriceDesc.textContent = '$0';
                 if(dynamicPriceCheckout) dynamicPriceCheckout.textContent = '$0';
-                if(dynamicPriceOverlay) dynamicPriceOverlay.textContent = '$0';
             }
         }
 
         // Initialize Pricing Script
         updatePriceBasedOnCountry();
 
-        // ─── ARCHIVE FILTER LOGIC ──────────────────────────────
+        // Archive Data for Past Contests (Empty for now since this is the first contest)
+        const pastWinnersData = {};
+
         function filterPastWinners() {
+            const selectBox = document.getElementById("contestSelect");
+            const selectedDraw = selectBox.value;
             const gridContainer = document.getElementById("pastWinnersGrid");
             
             // For now, always show the empty state since it's the first contest
@@ -774,11 +751,12 @@
             `;
         }
 
+        // Initialize with default option on load
         window.addEventListener("DOMContentLoaded", () => {
             filterPastWinners();
         });
 
-        // ─── NAVIGATION SCROLL & TOGGLE ──────────────────────────────
+        // Navigation Menu Toggle & Scroll Logic
         const navbar = document.getElementById('navbar');
         const hamburger = document.getElementById('hamburger');
         const navLinks = document.getElementById('navLinks');
@@ -800,7 +778,7 @@
 
         backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-        // ─── REVEAL ANIMATIONS ──────────────────────────────
+        // Reveal Animations Observer
         const revealElements = document.querySelectorAll('.reveal');
         const observerOptions = { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 };
         const revealObserver = new IntersectionObserver((entries) => {
