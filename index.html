@@ -61,6 +61,13 @@
             --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
             --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             --max-width: 1200px; --nav-height: 72px;
+
+            /* Giveaway colours – pulled from the giveaway page */
+            --app-purple: #4A0E4E;
+            --app-dark-purple: #3A004A;
+            --neon-green: #39FF14;
+            --neon-cyan: #00FFFF;
+            --neon-gradient: linear-gradient(to right, #39FF14, #00FFFF);
         }
 
         *,
@@ -75,7 +82,6 @@
         .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .bg-orb { 
             position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; 
-            /* Safari Color Rendering Fix */
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
             -webkit-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0);
             will-change: transform;
@@ -205,6 +211,176 @@
         .section-header h2 { font-family: var(--font-heading); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900; letter-spacing: -1px; line-height: 1.2; margin-bottom: 12px; }
         .section-header h2 .highlight { background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .section-header p { color: var(--text-secondary); max-width: 550px; margin: 0 auto; font-size: 1rem; }
+
+        /* ============ GIVEAWAY BANNER (new) ============ */
+        .giveaway-hero {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            background: var(--bg-primary);
+        }
+        .premium-white-box {
+            max-width: 820px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 48px 40px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            position: relative;
+            text-align: center;
+        }
+        .giveaway-badge-img {
+            position: absolute;
+            top: -75px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: auto;
+            z-index: 10;
+            filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.3));
+        }
+        .timer-grid {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .timer-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .timer-box {
+            width: 75px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: #FFFFFF;
+            font-family: var(--font-heading);
+            position: relative;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background-image: 
+                linear-gradient(var(--app-purple), var(--app-purple)), 
+                linear-gradient(to right, rgb(57, 255, 20), rgb(0, 255, 255));
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+        .timer-box::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: var(--neon-gradient);
+            border-radius: 14px;
+            z-index: -1;
+        }
+        .timer-label {
+            color: var(--app-purple);
+            font-size: 13px;
+            font-weight: 800;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+        .hero-graphics {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .promo-img { width: 130px; height: auto; object-fit: contain; flex-shrink: 0; }
+        .float-img { animation: float 3s ease-in-out infinite; }
+        .float-img:last-child { animation-delay: 0.4s; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+        .central-text {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            height: 170px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .text-group {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            will-change: transform, opacity;
+            pointer-events: none;
+        }
+        .old-text { transform: translateY(0); opacity: 1; }
+        .new-text { transform: translateY(30px); opacity: 0; }
+        .lucky-svg-container { width: 100%; max-width: 280px; height: auto; overflow: visible; filter: drop-shadow(3px 3px 0px var(--app-purple)); }
+        .lucky-text-svg { font-family: var(--font-heading); font-size: 42px; font-weight: 900; fill: url(#lucky-gradient); stroke: var(--app-purple); stroke-width: 2px; stroke-linejoin: round; paint-order: stroke fill; }
+        .new-lucky-svg-container { width: 100%; max-width: 280px; height: auto; overflow: visible; filter: drop-shadow(3px 3px 0px var(--app-purple)); }
+        .new-lucky-text-svg { font-family: var(--font-heading); font-size: 42px; font-weight: 900; fill: url(#lucky-gradient); stroke: var(--app-purple); stroke-width: 2px; stroke-linejoin: round; paint-order: stroke fill; }
+        .winners-desc { color: var(--app-dark-purple); font-size: 20px; font-weight: 800; line-height: 1.3; margin-bottom: 2px; text-align: center; }
+        .worth-text { color: var(--app-dark-purple); font-size: 26px; font-weight: 900; text-align: center; }
+        .new-winners-desc { color: var(--app-dark-purple); font-size: 32px; font-weight: 900; line-height: 1.3; margin-bottom: 2px; text-align: center; }
+        .hero-images-row-mobile { display: none; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; width: 100%; }
+        .hero-images-row-mobile .promo-img { width: 100px; }
+        .join-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--neon-gradient);
+            color: var(--app-dark-purple);
+            font-size: 22px;
+            font-weight: 900;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--app-dark-purple);
+            text-decoration: none;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(57, 255, 20, 0.3);
+        }
+        .join-btn:hover { transform: scale(1.02); box-shadow: 0 8px 32px rgba(57, 255, 20, 0.5); }
+        .join-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .join-btn.disabled { background: linear-gradient(to right, rgba(57, 255, 20, 0.5), rgba(0, 255, 255, 0.5)); border-color: rgba(58, 0, 74, 0.5); color: rgba(58, 0, 74, 0.8); font-size: 18px; }
+
+        /* Responsive for giveaway banner */
+        @media (max-width: 768px) {
+            .giveaway-hero { padding-top: 30px; padding-bottom: 30px; }
+            .premium-white-box { padding: 40px 20px 24px; border-radius: 18px; }
+            .promo-img { width: 100px; }
+            .timer-box { width: 55px; height: 50px; font-size: 24px; }
+            .lucky-text-svg, .new-lucky-text-svg { font-size: 32px; }
+            .winners-desc { font-size: 16px; }
+            .new-winners-desc { font-size: 26px; }
+            .worth-text { font-size: 22px; }
+            .central-text { width: 220px; height: 140px; }
+        }
+        @media (max-width: 480px) {
+            .hero-graphics .promo-img { display: none; }
+            .hero-images-row-mobile { display: flex; }
+            .central-text { width: 100%; height: 150px; }
+            .lucky-text-svg, .new-lucky-text-svg { font-size: 26px; }
+            .winners-desc { font-size: 14px; }
+            .new-winners-desc { font-size: 22px; }
+            .worth-text { font-size: 18px; }
+            .timer-box { width: 48px; height: 44px; font-size: 20px; }
+            .timer-label { font-size: 11px; }
+            .join-btn { font-size: 18px; padding: 14px 16px; }
+        }
 
         /* ============ FEATURES GRID ============ */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -452,7 +628,6 @@ z-index: 5 }
             background: radial-gradient(ellipse, rgba(42, 19, 156, 0.8) 0%, rgba(10,10,26,0) 70%);
             filter: blur(50px);
             z-index: -1;
-            /* Safari blur color bug fix */
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
             will-change: transform;
         }
@@ -778,6 +953,80 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ GIVEAWAY BANNER (Inserted here) ============ -->
+    <section class="giveaway-hero" aria-labelledby="giveaway-heading">
+        <div class="container">
+            <div class="premium-white-box" id="premiumBox">
+                <img src="images/giveaway.png" alt="Giveaway Contest" class="giveaway-badge-img" id="badgeImg">
+
+                <div class="timer-grid" id="timerGrid">
+                    <div class="timer-unit">
+                        <div class="timer-box" id="cdDays">00</div>
+                        <div class="timer-label">Days</div>
+                    </div>
+                    <div class="timer-unit">
+                        <div class="timer-box" id="cdHours">00</div>
+                        <div class="timer-label">Hours</div>
+                    </div>
+                    <div class="timer-unit">
+                        <div class="timer-box" id="cdMinutes">00</div>
+                        <div class="timer-label">Minutes</div>
+                    </div>
+                    <div class="timer-unit">
+                        <div class="timer-box" id="cdSeconds">00</div>
+                        <div class="timer-label">Seconds</div>
+                    </div>
+                </div>
+
+                <div class="hero-graphics" id="heroGraphics">
+                    <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner" id="winnerImgDesktop">
+
+                    <div class="central-text" id="centralText">
+                        <div class="text-group old-text" id="oldTextGroup">
+                            <svg class="lucky-svg-container" viewBox="0 0 260 55" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="lucky-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#39FF14" />
+                                        <stop offset="100%" stop-color="#00FFFF" />
+                                    </linearGradient>
+                                </defs>
+                                <text x="50%" y="42" text-anchor="middle" class="lucky-text-svg">5 Lucky</text>
+                            </svg>
+                            <div class="winners-desc" id="winnersDesc">Winners Will Win A<br>KabaddiOne Pro Subscription</div>
+                            <div class="worth-text" id="worthTextOld">Worth ₹599</div>
+                        </div>
+
+                        <div class="text-group new-text" id="newTextGroup">
+                            <svg class="new-lucky-svg-container" viewBox="0 0 280 55" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="new-lucky-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#39FF14" />
+                                        <stop offset="100%" stop-color="#00FFFF" />
+                                    </linearGradient>
+                                </defs>
+                                <text x="50%" y="42" text-anchor="middle" class="new-lucky-text-svg">NEW CONTEST</text>
+                            </svg>
+                            <div class="new-winners-desc">COMING SOON</div>
+                            <div class="worth-text" id="worthTextNew">Stay Tuned</div>
+                        </div>
+                    </div>
+
+                    <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access" id="proImgDesktop">
+                </div>
+
+                <div class="hero-images-row-mobile" id="mobileImagesRow">
+                    <img src="images/giveaway_winner.png" class="promo-img float-img" alt="Winner">
+                    <img src="images/giveaway_pro.png" class="promo-img float-img" alt="Pro Access">
+                </div>
+
+                <a href="/giveaway.html" class="join-btn" id="joinBtn">
+                    <i class="fa-solid fa-gift" style="margin-right:8px;"></i> Join Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ FEATURES SECTION ============ -->
     <section class="section" id="features" aria-labelledby="features-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -786,6 +1035,8 @@ z-index: 5 }
                 <p>KabaddiOne is packed with automated tools and trackers that make scoring effortless and accurate.</p>
             </div>
             <div class="features-grid">
+                <!-- ... rest of features ... -->
+                <!-- (keep your existing feature cards) -->
                 <div class="feature-card reveal reveal-delay-1">
                     <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
                     <h3>Auto Team Swap</h3>
@@ -838,6 +1089,7 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ REMAINING SECTIONS (keep unchanged) ============ -->
     <section class="auto-feature-section super-style" id="auto-super-tackle" aria-labelledby="st-heading">
         <div class="super-card">
             <div class="super-stars"></div>
@@ -1201,6 +1453,7 @@ z-index: 5 }
 
     <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
+    <!-- ============ EXISTING SCRIPT (navigation, reveal, etc.) ============ -->
     <script>
         (function() {
             const navbar = document.getElementById('navbar');
@@ -1287,6 +1540,183 @@ z-index: 5 }
             console.log('%c🏆 KabaddiOne Landing Page Ready %c| %cPremium Kabaddi Scoreboard App',
                 'color:#FF5E3A;font-weight:bold;font-size:1.1em;', '', 'color:#b0b0c8;');
         })();
+    </script>
+
+    <!-- ============ GIVEAWAY COUNTDOWN & CAROUSEL SCRIPT ============ -->
+    <script type="module">
+        // ─── 1. IMPORT FIREBASE v10 SDK ──────────────────────────────
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        // We only need Firestore for the price mapping (optional – can remove if not needed)
+        // For the banner we only need the countdown and carousel, so we can skip firestore entirely.
+        // But we keep the price detection logic using a simple API call without Firebase.
+        // We'll use a simpler approach – detect country via ipapi and update the worth text.
+
+        // ─── 2. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
+        // Use your actual timestamp here (for testing, set to a future date)
+        const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
+
+        // ─── 3. COUNTRY PRICE MAPPING (same as before) ──────────────
+        const priceMap = {
+            "US": { price: 19.99, symbol: "$", code: "USD" },
+            "IN": { price: 599, symbol: "₹", code: "INR" },
+            "GB": { price: 17.49, symbol: "£", code: "GBP" },
+            // ... (include all countries you have)
+            // Keep it shorter for brevity, you can extend from your full list.
+        };
+
+        // ─── 4. FETCH USER COUNTRY WITH FALLBACK ─────────────────────
+        async function getCountryWithFallback() {
+            try {
+                const response = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.country_code) return data.country_code;
+                }
+            } catch (e) {
+                console.warn('ipapi.co failed, trying ip-api.com...');
+            }
+            try {
+                const response = await fetch('https://ip-api.com/json/', { signal: AbortSignal.timeout(5000) });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.countryCode) return data.countryCode;
+                }
+            } catch (e) {}
+            return 'US'; // fallback
+        }
+
+        // ─── 5. UPDATE PRICE BASED ON COUNTRY ──────────────────────
+        async function updatePriceBasedOnCountry() {
+            try {
+                const countryCode = await getCountryWithFallback();
+                const worthOld = document.getElementById('worthTextOld');
+                let priceText = 'Worth $19.99';
+                if (countryCode && priceMap[countryCode]) {
+                    const info = priceMap[countryCode];
+                    const price = info.price;
+                    const symbol = info.symbol;
+                    const formattedPrice = (price % 1 === 0) ? price : price.toFixed(2);
+                    priceText = `Worth ${symbol}${formattedPrice}`;
+                }
+                worthOld.textContent = priceText;
+            } catch (error) {
+                const fallback = 'Worth $19.99';
+                document.getElementById('worthTextOld').textContent = fallback;
+            }
+        }
+
+        // ─── 6. COUNTDOWN & CAROUSEL LOGIC ───────────────────────────
+        const cdDays = document.getElementById('cdDays');
+        const cdHours = document.getElementById('cdHours');
+        const cdMinutes = document.getElementById('cdMinutes');
+        const cdSeconds = document.getElementById('cdSeconds');
+        const oldTextGroup = document.getElementById('oldTextGroup');
+        const newTextGroup = document.getElementById('newTextGroup');
+
+        let countdownInterval;
+        let carouselTimer = null;
+        let showingNew = false;
+        let isCarouselRunning = false;
+
+        function updateTimer() {
+            const now = Date.now();
+            const distance = END_TIMESTAMP - now;
+
+            if (distance <= 0) {
+                clearInterval(countdownInterval);
+                cdDays.textContent = '00';
+                cdHours.textContent = '00';
+                cdMinutes.textContent = '00';
+                cdSeconds.textContent = '00';
+
+                if (!isCarouselRunning) {
+                    startCarousel();
+                }
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            cdDays.textContent = String(days).padStart(2, '0');
+            cdHours.textContent = String(hours).padStart(2, '0');
+            cdMinutes.textContent = String(minutes).padStart(2, '0');
+            cdSeconds.textContent = String(seconds).padStart(2, '0');
+        }
+
+        function startCarousel() {
+            isCarouselRunning = true;
+            // Reset states
+            oldTextGroup.style.transition = 'none';
+            oldTextGroup.style.transform = 'translateY(0)';
+            oldTextGroup.style.opacity = '1';
+            newTextGroup.style.transition = 'none';
+            newTextGroup.style.transform = 'translateY(30px)';
+            newTextGroup.style.opacity = '0';
+            void newTextGroup.offsetHeight;
+
+            setTimeout(() => {
+                cycleText();
+            }, 1000);
+        }
+
+        function cycleText() {
+            const slideDuration = 400;
+            const holdDuration = 2000;
+
+            if (showingNew) {
+                // new → old
+                oldTextGroup.style.transition = 'none';
+                oldTextGroup.style.transform = 'translateY(30px)';
+                oldTextGroup.style.opacity = '0';
+                void oldTextGroup.offsetHeight;
+
+                oldTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                newTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                newTextGroup.style.transform = 'translateY(-30px)';
+                newTextGroup.style.opacity = '0';
+                oldTextGroup.style.transform = 'translateY(0)';
+                oldTextGroup.style.opacity = '1';
+
+                setTimeout(() => {
+                    showingNew = false;
+                    carouselTimer = setTimeout(() => {
+                        cycleText();
+                    }, holdDuration);
+                }, slideDuration);
+            } else {
+                // old → new
+                newTextGroup.style.transition = 'none';
+                newTextGroup.style.transform = 'translateY(30px)';
+                newTextGroup.style.opacity = '0';
+                void newTextGroup.offsetHeight;
+
+                oldTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                newTextGroup.style.transition = `transform ${slideDuration}ms ease, opacity ${slideDuration}ms ease`;
+                oldTextGroup.style.transform = 'translateY(-30px)';
+                oldTextGroup.style.opacity = '0';
+                newTextGroup.style.transform = 'translateY(0)';
+                newTextGroup.style.opacity = '1';
+
+                setTimeout(() => {
+                    showingNew = true;
+                    carouselTimer = setTimeout(() => {
+                        cycleText();
+                    }, holdDuration);
+                }, slideDuration);
+            }
+        }
+
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
+
+        // ─── 7. INIT ──────────────────────────────────────────────────
+        updatePriceBasedOnCountry();
+
+        console.log('%c🎁 Giveaway banner loaded with live countdown.',
+            'color:#39FF14;font-weight:bold;');
     </script>
 </body>
 </html>
