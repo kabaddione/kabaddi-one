@@ -62,7 +62,7 @@
             --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             --max-width: 1200px; --nav-height: 72px;
 
-            /* Giveaway colours – pulled from the giveaway page */
+            /* Giveaway colours */
             --app-purple: #4A0E4E;
             --app-dark-purple: #3A004A;
             --neon-green: #39FF14;
@@ -125,9 +125,8 @@
             padding-top: var(--nav-height);
             position: relative;
             z-index: 1;
-            overflow: hidden; /* important for video containment */
+            overflow: hidden;
         }
-        /* Video background overlay */
         .hero-video-bg {
             position: absolute;
             top: 0;
@@ -142,7 +141,6 @@
             object-fit: cover;
             object-position: center;
         }
-        /* Semi‑transparent overlay for text readability */
         .hero-video-bg::after {
             content: '';
             position: absolute;
@@ -150,7 +148,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgb(10 10 26 / 0%); /* dark tint */
+            background: rgb(10 10 26 / 0%);
         }
         .hero .container {
             display: grid;
@@ -167,7 +165,6 @@
         .hero-badge .badge-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: badgePulse 2s ease-in-out infinite; }
         @keyframes badgePulse { 0%,100% { opacity: 1; box-shadow: 0 0 6px var(--accent); } 50% { opacity: 0.4; box-shadow: 0 0 16px var(--accent); } }
         .hero h1 { font-family: var(--font-heading); font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; animation: fadeInUp 0.8s ease-out 0.1s both; }
-        
         .hero h1 .gradient-text { 
             background: linear-gradient(135deg, var(--accent), var(--accent-secondary), #FF6B4A);
             -webkit-background-clip: text;
@@ -175,7 +172,6 @@
             color: transparent;                 
             -webkit-text-fill-color: transparent; 
         }
-        
         .hero-desc { font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 32px; max-width: 460px; animation: fadeInUp 0.8s ease-out 0.2s both; line-height: 1.7; }
         .hero-buttons { display: flex; flex-wrap: wrap; gap: 14px; animation: fadeInUp 0.8s ease-out 0.3s both; }
         .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--accent), #FF3D10); color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); box-shadow: 0 6px 24px rgba(255, 94, 58, 0.4); border: none; cursor: pointer; letter-spacing: 0.3px; }
@@ -187,7 +183,6 @@
         .hero-stat .stat-num { font-size: 2rem; font-weight: 900; color: var(--accent); font-family: var(--font-heading); }
         .hero-stat .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
-        /* Phone Mockup (floating image) */
         .phone-mockup-wrapper {
             display: flex;
             justify-content: center;
@@ -212,7 +207,7 @@
         .section-header h2 .highlight { background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .section-header p { color: var(--text-secondary); max-width: 550px; margin: 0 auto; font-size: 1rem; }
 
-        /* ============ GIVEAWAY BANNER (new) ============ */
+        /* ============ GIVEAWAY BANNER (main) ============ */
         .giveaway-hero {
             padding-top: 40px;
             padding-bottom: 40px;
@@ -240,6 +235,10 @@
             height: auto;
             z-index: 10;
             filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.3));
+        }
+        /* For the pro section, we remove the shadow */
+        .giveaway-badge-img.no-shadow {
+            filter: none;
         }
         .timer-grid {
             display: flex;
@@ -382,6 +381,75 @@
             .join-btn { font-size: 18px; padding: 14px 16px; }
         }
 
+        /* ============ PRO PACKAGE SECTION (new) ============ */
+        .pro-package .premium-white-box {
+            padding-top: 30px;
+        }
+        .pro-package .giveaway-badge-img {
+            top: -60px;
+            width: 160px;
+        }
+        .pro-headline {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 900;
+            color: var(--app-dark-purple);
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+        .pro-subheadline {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--app-dark-purple);
+            margin-bottom: 20px;
+        }
+        .pro-features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 30px;
+            margin: 24px 0 30px;
+            text-align: left;
+        }
+        .pro-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--app-dark-purple);
+            padding: 6px 0;
+        }
+        .pro-feature-item i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: var(--neon-green);
+            flex-shrink: 0;
+        }
+        /* No hero-graphics and no timer grid in pro section */
+        .pro-package .hero-graphics {
+            display: none;
+        }
+        .pro-package .timer-grid {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .pro-features-grid {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            .pro-package .giveaway-badge-img {
+                width: 120px;
+                top: -50px;
+            }
+            .pro-headline {
+                font-size: 1.6rem;
+            }
+            .pro-subheadline {
+                font-size: 1rem;
+            }
+        }
+
         /* ============ FEATURES GRID ============ */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .feature-card { background-color: #1a1a1a; background-image: url('https://github.com/kabaddione/kabaddi-one/blob/main/images/feature-background-round.png?raw=true'); background-position: 150px 150px; background-repeat: no-repeat; background-size: 250px auto;
@@ -417,7 +485,6 @@
         .auto-feature-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
         .auto-feature-list li .check-icon { width: 20px; height: 20px; border-radius: 50%; color: #d486ff; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; border: 1px solid;}
 
-        /* Landscape Phone Mockup */
         .landscape-mockup-wrapper { display: flex; justify-content: center; align-items: center; position: relative; }
         .landscape-mockup { width: 100%; max-width: 520px; aspect-ratio: 16/9; background: #1a1a2e; border-radius: 24px; border: 3px solid #2a2a40; box-shadow: 0 25px 70px rgba(0,0,0,0.55), 0 0 50px rgba(255,94,58,0.1), inset 0 0 0 1px rgba(255,255,255,0.04); position: relative; overflow: hidden; min-height: 260px; }
         .landscape-mockup .lm-notch { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 18px; height: 80px; background: #0a0a1a; border-radius: 0 12px 12px 0; z-index: 2; }
@@ -461,7 +528,7 @@
             z-index: 1;
             padding: 60px 24px;
             background: var(--bg-primary);
-            display: none; /* hidden by default, show on desktop */
+            display: none;
         }
         @media (min-width: 769px) {
             .qr-section {
@@ -553,7 +620,6 @@ z-index: 5 }
             padding: 60px;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px rgba(0,0,0,0.5);
         }
-        /* Thin gradient border simulation */
         .super-card::before {
             content: "";
             position: absolute;
@@ -603,7 +669,7 @@ z-index: 5 }
             -webkit-text-fill-color: transparent;
             background: radial-gradient(rgb(227, 143, 255), rgb(51, 34, 252)) padding-box text;
             background-clip: text;
-            display: inline-block; /* Safari text clip fix */
+            display: inline-block;
         }
         .super-style .auto-feature-text p {
             color: rgba(255,255,255,0.7);
@@ -616,7 +682,6 @@ z-index: 5 }
             color: rgba(255,255,255,0.8);
         }
 
-        /* 3D Landscape Mockup */
         .super-style .landscape-mockup-wrapper {
             perspective: 1200px;
         }
@@ -643,7 +708,7 @@ z-index: 5 }
             background: #000;
             border: none;
             border-radius: 28px;
-            overflow: visible; /* to allow buttons out */
+            overflow: visible;
         }
         .super-3d-mockup:hover {
             transform: rotateX(8deg) rotateY(-10deg) rotateZ(2deg) translateY(-10px);
@@ -660,7 +725,6 @@ z-index: 5 }
             transform: rotateX(8deg) rotateY(10deg) rotateZ(-2deg) translateY(-10px);
         }
         
-        /* Hardware buttons */
         .super-3d-mockup::before {
             content: ''; position: absolute; left: 100px; top: -3px;
             width: 40px; height: 3px; background: #444; border-radius: 4px 4px 0 0;
@@ -699,7 +763,7 @@ z-index: 5 }
             top: 8px; left: 8px; right: 8px; bottom: 8px;
             border-radius: 20px;
             background: #000;
-            overflow: hidden; /* to contain video */
+            overflow: hidden;
         }
 
         /* ============ FOOTER ============ */
@@ -747,9 +811,7 @@ z-index: 5 }
         }
         
         @media (max-width: 768px) {
-            /* PERFECT MOBILE HERO FIX */
             .hero { min-height: 100vh; padding-top: 130px; padding-bottom: 60px; }
-            
             .hero-video-bg { 
                 background-color: var(--bg-primary); 
                 display: flow;
@@ -758,32 +820,26 @@ z-index: 5 }
             }
             .hero-video-bg video {
                 width: 100% !important;
-                height: 150vw !important; /* Shortens container so blob perfectly scales down */
+                height: 150vw !important;
                 object-fit: cover !important;
                 -webkit-transform: none !important;
                 transform: none !important;
-                /* Feather top/bottom edges to vanish perfectly into the background color */
                 -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
                 mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
             }
             .hero-video-bg::after {
                 background: rgb(10 10 26 / 0%) !important;
             }
-
             .phone-mockup-wrapper {
                 scale: .7;
                 margin-top: -50px;
-             
             }
-
             .hero-content {
                 margin-top: -120px;
             }
-
             .feature-card {
                 background-position: 200px 100px;
             }
-
             .nav-links { position: fixed; top: 0; right: -100%; width: 75%; max-width: 320px; height: 100vh; background: rgba(15,15,36,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); flex-direction: column; justify-content: center; gap: 28px; transition: var(--transition-smooth); padding: 40px; border-left: 1px solid var(--border-subtle); }
             .nav-links.active { right: 0; }
             .nav-links a { font-size: 1.1rem; }
@@ -801,8 +857,6 @@ z-index: 5 }
             .footer-links { justify-content: center; }
             .social-links { justify-content: center; }
             .qr-section { display: none; } 
-
-            /* Fixes the background image extreme zooming on mobile */
             .super-card { 
                 padding: 40px 20px;
                 background-size: 160% auto !important;
@@ -816,7 +870,6 @@ z-index: 5 }
             .super-blob { width: 150%; height: 150%; }
             .super-3d-mockup .lm-notch { width: 14px; height: 60px; }
             .super-3d-mockup .lm-screen video { width: 100%; height: 100%; position: relative; }
-            
         }
         
         @media (max-width: 480px) {
@@ -846,7 +899,6 @@ z-index: 5 }
             .auto-feature-grid.reverse .super-3d-mockup { transform: rotateX(15deg) rotateY(15deg) rotateZ(-5deg); }
         }
         @media (max-width: 768px) {
-            /* Fixes the background image extreme zooming on mobile */
             .super-card { 
                 padding: 30px 20px;
                 background-size: 100% auto;
@@ -953,7 +1005,7 @@ z-index: 5 }
         </div>
     </section>
 
-    <!-- ============ GIVEAWAY BANNER (Inserted here) ============ -->
+    <!-- ============ GIVEAWAY BANNER (Main) ============ -->
     <section class="giveaway-hero" aria-labelledby="giveaway-heading">
         <div class="container">
             <div class="premium-white-box" id="premiumBox">
@@ -1035,8 +1087,6 @@ z-index: 5 }
                 <p>KabaddiOne is packed with automated tools and trackers that make scoring effortless and accurate.</p>
             </div>
             <div class="features-grid">
-                <!-- ... rest of features ... -->
-                <!-- (keep your existing feature cards) -->
                 <div class="feature-card reveal reveal-delay-1">
                     <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
                     <h3>Auto Team Swap</h3>
@@ -1089,14 +1139,14 @@ z-index: 5 }
         </div>
     </section>
 
-    <!-- ============ REMAINING SECTIONS (keep unchanged) ============ -->
+    <!-- ============ AUTO FEATURE SECTIONS (unchanged) ============ -->
     <section class="auto-feature-section super-style" id="auto-super-tackle" aria-labelledby="st-heading">
         <div class="super-card">
             <div class="super-stars"></div>
             <div class="auto-feature-grid">
                 <div class="auto-feature-text reveal">
                     <div class="feature-number">01 · Auto Detection</div>
-                    <h2 id="st-heading">Auto <span class="highlight">Super Tackle</span>  Detection</h2>
+                    <h2 id="st-heading">Auto <span class="highlight">Super Tackle</span> Detection</h2>
                     <p>When a defender brings down the raider with 3 or fewer defenders on the mat, KabaddiOne instantly detects the Super Tackle — flashing the screen, playing the roar sound, and awarding <strong>+2 bonus points</strong> automatically. No second-guessing, no manual toggles.</p>
                     <ul class="auto-feature-list">
                         <li><span class="check-icon">✓</span> Automatic +2 bonus point calculation</li>
@@ -1230,6 +1280,7 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ SOUNDS SECTION ============ -->
     <section class="section sound-section" id="sounds" aria-labelledby="sounds-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -1257,6 +1308,7 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ LANGUAGES SECTION ============ -->
     <section class="languages-section" id="languages" aria-labelledby="languages-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -1367,6 +1419,38 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ PRO PACKAGE SECTION (new) ============ -->
+    <section class="giveaway-hero pro-package" aria-labelledby="pro-heading">
+        <div class="container">
+            <div class="premium-white-box">
+                <img src="images/kabaddione-pro.png" alt="KabaddiOne Pro" class="giveaway-badge-img no-shadow" id="proBadgeImg">
+
+                <div class="pro-headline">Upgrade To Pro.</div>
+                <div class="pro-subheadline">Unlock Amazing Features.</div>
+
+                <div style="font-weight:700; font-size:1.1rem; color:var(--app-dark-purple); margin-bottom:4px;">Pro Subscription Includes.</div>
+
+                <div class="pro-features-grid">
+                    <!-- Left column -->
+                    <div class="pro-feature-item"><i class="fas fa-user"></i> Player Name and Profile</div>
+                    <div class="pro-feature-item"><i class="fas fa-hashtag"></i> Jersey Number</div>
+                    <div class="pro-feature-item"><i class="fas fa-highlighter"></i> Raider Highlighter</div>
+                    <div class="pro-feature-item"><i class="fas fa-ban"></i> No Ads</div>
+                    <!-- Right column -->
+                    <div class="pro-feature-item"><i class="fas fa-users"></i> Starting 7</div>
+                    <div class="pro-feature-item"><i class="fas fa-chart-line"></i> Performance Tracker</div>
+                    <div class="pro-feature-item"><i class="fas fa-arrows-rotate"></i> Live Substitution</div>
+                    <div class="pro-feature-item"><i class="fas fa-square"></i> Foul Cards</div>
+                </div>
+
+                <a href="#" class="join-btn" id="buyNowBtn">
+                    <i class="fa-solid fa-cart-shopping" style="margin-right:8px;"></i> Lifetime: <span id="proPriceDisplay">₹599</span> – Buy Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
     <section class="section" id="how-it-works" aria-labelledby="how-heading">
         <div class="container">
             <div class="section-header reveal">
@@ -1394,6 +1478,7 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ CTA SECTION ============ -->
     <section class="section cta-section" id="download" aria-labelledby="cta-heading">
         <div class="container">
             <div class="cta-card reveal">
@@ -1409,6 +1494,7 @@ z-index: 5 }
         </div>
     </section>
 
+    <!-- ============ QR CODE SECTION ============ -->
     <section class="qr-section" id="qr-download" aria-labelledby="qr-heading">
         <div class="container">
             <div class="qr-card reveal">
@@ -1542,29 +1628,143 @@ z-index: 5 }
         })();
     </script>
 
-    <!-- ============ GIVEAWAY COUNTDOWN & CAROUSEL SCRIPT ============ -->
+    <!-- ============ GIVEAWAY COUNTDOWN & CAROUSEL + PRO PRICE SCRIPT ============ -->
     <script type="module">
-        // ─── 1. IMPORT FIREBASE v10 SDK ──────────────────────────────
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // We only need Firestore for the price mapping (optional – can remove if not needed)
-        // For the banner we only need the countdown and carousel, so we can skip firestore entirely.
-        // But we keep the price detection logic using a simple API call without Firebase.
-        // We'll use a simpler approach – detect country via ipapi and update the worth text.
-
-        // ─── 2. CONTEST END TIMESTAMP (Unix ms) ──────────────────────
-        // Use your actual timestamp here (for testing, set to a future date)
+        // ─── 1. CONTEST END TIMESTAMP ──────────────────────
         const END_TIMESTAMP = 1793471399000; // Oct 31, 2026 23:59:59 GMT
 
-        // ─── 3. COUNTRY PRICE MAPPING (same as before) ──────────────
+        // ─── 2. COUNTRY PRICE MAPPING (full list) ──────────
         const priceMap = {
             "US": { price: 19.99, symbol: "$", code: "USD" },
             "IN": { price: 599, symbol: "₹", code: "INR" },
             "GB": { price: 17.49, symbol: "£", code: "GBP" },
-            // ... (include all countries you have)
-            // Keep it shorter for brevity, you can extend from your full list.
+            "EU": { price: 20.99, symbol: "€", code: "EUR" },
+            "DE": { price: 20.99, symbol: "€", code: "EUR" },
+            "FR": { price: 20.99, symbol: "€", code: "EUR" },
+            "IT": { price: 20.99, symbol: "€", code: "EUR" },
+            "ES": { price: 20.99, symbol: "€", code: "EUR" },
+            "NL": { price: 20.99, symbol: "€", code: "EUR" },
+            "BE": { price: 20.99, symbol: "€", code: "EUR" },
+            "PT": { price: 20.99, symbol: "€", code: "EUR" },
+            "AT": { price: 20.99, symbol: "€", code: "EUR" },
+            "FI": { price: 21.99, symbol: "€", code: "EUR" },
+            "SE": { price: 239.00, symbol: "kr", code: "SEK" },
+            "NO": { price: 235.00, symbol: "kr", code: "NOK" },
+            "DK": { price: 159.00, symbol: "kr", code: "DKK" },
+            "CH": { price: 16.00, symbol: "CHF", code: "CHF" },
+            "AU": { price: 30.99, symbol: "A$", code: "AUD" },
+            "NZ": { price: 38.99, symbol: "NZ$", code: "NZD" },
+            "CA": { price: 27.99, symbol: "CA$", code: "CAD" },
+            "BR": { price: 99.99, symbol: "R$", code: "BRL" },
+            "MX": { price: 399.00, symbol: "Mex$", code: "MXN" },
+            "JP": { price: 3490, symbol: "¥", code: "JPY" },
+            "KR": { price: 31000, symbol: "₩", code: "KRW" },
+            "CN": { price: 19.99, symbol: "¥", code: "CNY" },
+            "TW": { price: 680.00, symbol: "NT$", code: "TWD" },
+            "HK": { price: 158.00, symbol: "HK$", code: "HKD" },
+            "SG": { price: 27.98, symbol: "S$", code: "SGD" },
+            "MY": { price: 87.99, symbol: "RM", code: "MYR" },
+            "PH": { price: 1350.00, symbol: "₱", code: "PHP" },
+            "VN": { price: 523000, symbol: "₫", code: "VND" },
+            "TH": { price: 700.00, symbol: "฿", code: "THB" },
+            "ID": { price: 359000, symbol: "Rp", code: "IDR" },
+            "PK": { price: 1750, symbol: "Rs", code: "PKR" },
+            "BD": { price: 900.00, symbol: "৳", code: "BDT" },
+            "LK": { price: 2100.00, symbol: "Rs", code: "LKR" },
+            "NP": { price: 7.11, symbol: "Rs", code: "NPR" },
+            "SA": { price: 85.99, symbol: "﷼", code: "SAR" },
+            "AE": { price: 23.99, symbol: "د.إ", code: "AED" },
+            "QA": { price: 73.00, symbol: "﷼", code: "QAR" },
+            "KW": { price: 19.99, symbol: "د.ك", code: "KWD" },
+            "OM": { price: 20.99, symbol: "﷼", code: "OMR" },
+            "BH": { price: 21.99, symbol: "د.ب", code: "BHD" },
+            "IL": { price: 60.00, symbol: "₪", code: "ILS" },
+            "TR": { price: 1139.99, symbol: "₺", code: "TRY" },
+            "RU": { price: 1690.00, symbol: "₽", code: "RUB" },
+            "UA": { price: 1099.99, symbol: "₴", code: "UAH" },
+            "PL": { price: 91.99, symbol: "zł", code: "PLN" },
+            "CZ": { price: 499.99, symbol: "Kč", code: "CZK" },
+            "HU": { price: 7999, symbol: "Ft", code: "HUF" },
+            "RO": { price: 109.99, symbol: "lei", code: "RON" },
+            "BG": { price: 20.99, symbol: "лв", code: "BGN" },
+            "HR": { price: 21.99, symbol: "€", code: "EUR" },
+            "RS": { price: 2399, symbol: "дин", code: "RSD" },
+            "ZA": { price: 369.99, symbol: "R", code: "ZAR" },
+            "NG": { price: 29500.00, symbol: "₦", code: "NGN" },
+            "EG": { price: 1149.99, symbol: "E£", code: "EGP" },
+            "KE": { price: 3000.00, symbol: "KSh", code: "KES" },
+            "GH": { price: 280.00, symbol: "GH₵", code: "GHS" },
+            "MA": { price: 224.99, symbol: "DH", code: "MAD" },
+            "DZ": { price: 2650.00, symbol: "دج", code: "DZD" },
+            "TN": { price: 19.99, symbol: "د.ت", code: "TND" },
+            "LB": { price: 19.99, symbol: "ل.ل", code: "LBP" },
+            "IQ": { price: 8250, symbol: "د.ع", code: "IQD" },
+            "JO": { price: 14.15, symbol: "د.ا", code: "JOD" },
+            "YE": { price: 19.99, symbol: "﷼", code: "YER" },
+            "SY": { price: 19.99, symbol: "£S", code: "SYP" },
+            "PS": { price: 19.99, symbol: "₪", code: "ILS" },
+            "KZ": { price: 10990.00, symbol: "₸", code: "KZT" },
+            "UZ": { price: 22.39, symbol: "soʻm", code: "UZS" },
+            "BY": { price: 23.99, symbol: "Br", code: "BYN" },
+            "MD": { price: 23.99, symbol: "lei", code: "MDL" },
+            "GE": { price: 59.00, symbol: "₾", code: "GEL" },
+            "AM": { price: 19.99, symbol: "AMD", code: "AMD" },
+            "AZ": { price: 19.99, symbol: "₼", code: "AZN" },
+            "KG": { price: 19.99, symbol: "сом", code: "KGS" },
+            "TJ": { price: 19.99, symbol: "SM", code: "TJS" },
+            "TM": { price: 19.99, symbol: "m", code: "TMT" },
+            "MN": { price: 71800.00, symbol: "₮", code: "MNT" },
+            "MM": { price: 42000, symbol: "K", code: "MMK" },
+            "KH": { price: 19.99, symbol: "៛", code: "KHR" },
+            "LA": { price: 19.99, symbol: "₭", code: "LAK" },
+            "BT": { price: 19.99, symbol: "Nu.", code: "BTN" },
+            "MV": { price: 19.99, symbol: "ރ.", code: "MVR" },
+            "FJ": { price: 19.99, symbol: "FJ$", code: "FJD" },
+            "PG": { price: 19.99, symbol: "K", code: "PGK" },
+            "SB": { price: 19.99, symbol: "SI$", code: "SBD" },
+            "VU": { price: 19.99, symbol: "Vt", code: "VUV" },
+            "WS": { price: 19.99, symbol: "WS$", code: "WST" },
+            "TO": { price: 19.99, symbol: "T$", code: "TOP" },
+            "KI": { price: 19.99, symbol: "$", code: "KID" },
+            "MH": { price: 19.99, symbol: "$", code: "USD" },
+            "PW": { price: 19.99, symbol: "$", code: "USD" },
+            "FM": { price: 19.99, symbol: "$", code: "USD" },
+            "NR": { price: 19.99, symbol: "$", code: "AUD" },
+            "TV": { price: 19.99, symbol: "$", code: "AUD" },
+            "WF": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "PF": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "NC": { price: 19.99, symbol: "CFP", code: "XPF" },
+            "GL": { price: 19.99, symbol: "kr", code: "DKK" },
+            "FO": { price: 19.99, symbol: "kr", code: "DKK" },
+            "AX": { price: 19.99, symbol: "€", code: "EUR" },
+            "JE": { price: 19.99, symbol: "£", code: "GBP" },
+            "GG": { price: 19.99, symbol: "£", code: "GBP" },
+            "IM": { price: 19.99, symbol: "£", code: "GBP" },
+            "GI": { price: 14.99, symbol: "£", code: "GBP" },
+            "MC": { price: 20.99, symbol: "€", code: "EUR" },
+            "VA": { price: 16.99, symbol: "€", code: "EUR" },
+            "SM": { price: 16.99, symbol: "€", code: "EUR" },
+            "LI": { price: 17.00, symbol: "CHF", code: "CHF" },
+            "AD": { price: 19.99, symbol: "€", code: "EUR" },
+            "MT": { price: 20.41, symbol: "€", code: "EUR" },
+            "CY": { price: 20.99, symbol: "€", code: "EUR" },
+            "LV": { price: 20.99, symbol: "€", code: "EUR" },
+            "LT": { price: 20.99, symbol: "€", code: "EUR" },
+            "EE": { price: 20.99, symbol: "€", code: "EUR" },
+            "SK": { price: 20.99, symbol: "€", code: "EUR" },
+            "SI": { price: 20.99, symbol: "€", code: "EUR" },
+            "GR": { price: 20.99, symbol: "€", code: "EUR" },
+            "LU": { price: 19.99, symbol: "€", code: "EUR" },
+            "IE": { price: 20.99, symbol: "€", code: "EUR" },
+            "IS": { price: 21.45, symbol: "kr", code: "ISK" },
+            "AL": { price: 23.99, symbol: "Lek", code: "ALL" },
+            "BA": { price: 19.99, symbol: "KM", code: "BAM" },
+            "ME": { price: 19.99, symbol: "€", code: "EUR" },
+            "MK": { price: 19.99, symbol: "ден", code: "MKD" },
+            "XK": { price: 19.99, symbol: "€", code: "EUR" }
         };
 
-        // ─── 4. FETCH USER COUNTRY WITH FALLBACK ─────────────────────
+        // ─── 3. FETCH USER COUNTRY ──────────────────────
         async function getCountryWithFallback() {
             try {
                 const response = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
@@ -1582,30 +1782,45 @@ z-index: 5 }
                     if (data.countryCode) return data.countryCode;
                 }
             } catch (e) {}
-            return 'US'; // fallback
+            return 'US';
         }
 
-        // ─── 5. UPDATE PRICE BASED ON COUNTRY ──────────────────────
-        async function updatePriceBasedOnCountry() {
+        // ─── 4. UPDATE PRICE IN BOTH PLACES ──────────────
+        async function updatePrices() {
             try {
                 const countryCode = await getCountryWithFallback();
-                const worthOld = document.getElementById('worthTextOld');
-                let priceText = 'Worth $19.99';
+                let priceText = '₹599';
+                let priceValue = 599;
+                let symbol = '₹';
                 if (countryCode && priceMap[countryCode]) {
                     const info = priceMap[countryCode];
-                    const price = info.price;
-                    const symbol = info.symbol;
-                    const formattedPrice = (price % 1 === 0) ? price : price.toFixed(2);
-                    priceText = `Worth ${symbol}${formattedPrice}`;
+                    priceValue = info.price;
+                    symbol = info.symbol;
+                    const formattedPrice = (priceValue % 1 === 0) ? priceValue : priceValue.toFixed(2);
+                    priceText = `${symbol}${formattedPrice}`;
                 }
-                worthOld.textContent = priceText;
+                // Update main giveaway worth text
+                const worthOld = document.getElementById('worthTextOld');
+                if (worthOld) worthOld.textContent = `Worth ${priceText}`;
+                // Update pro button price
+                const proPriceSpan = document.getElementById('proPriceDisplay');
+                if (proPriceSpan) proPriceSpan.textContent = priceText;
+                // Update buy now button text if needed
+                const buyBtn = document.getElementById('buyNowBtn');
+                if (buyBtn) {
+                    // Keep the text as is, but we already updated the span inside
+                }
             } catch (error) {
-                const fallback = 'Worth $19.99';
-                document.getElementById('worthTextOld').textContent = fallback;
+                console.warn('Price update failed, using defaults.');
+                const fallback = '₹599';
+                const worthOld = document.getElementById('worthTextOld');
+                if (worthOld) worthOld.textContent = `Worth ${fallback}`;
+                const proPriceSpan = document.getElementById('proPriceDisplay');
+                if (proPriceSpan) proPriceSpan.textContent = fallback;
             }
         }
 
-        // ─── 6. COUNTDOWN & CAROUSEL LOGIC ───────────────────────────
+        // ─── 5. COUNTDOWN & CAROUSEL ──────────────────────
         const cdDays = document.getElementById('cdDays');
         const cdHours = document.getElementById('cdHours');
         const cdMinutes = document.getElementById('cdMinutes');
@@ -1648,7 +1863,6 @@ z-index: 5 }
 
         function startCarousel() {
             isCarouselRunning = true;
-            // Reset states
             oldTextGroup.style.transition = 'none';
             oldTextGroup.style.transform = 'translateY(0)';
             oldTextGroup.style.opacity = '1';
@@ -1667,7 +1881,6 @@ z-index: 5 }
             const holdDuration = 2000;
 
             if (showingNew) {
-                // new → old
                 oldTextGroup.style.transition = 'none';
                 oldTextGroup.style.transform = 'translateY(30px)';
                 oldTextGroup.style.opacity = '0';
@@ -1687,7 +1900,6 @@ z-index: 5 }
                     }, holdDuration);
                 }, slideDuration);
             } else {
-                // old → new
                 newTextGroup.style.transition = 'none';
                 newTextGroup.style.transform = 'translateY(30px)';
                 newTextGroup.style.opacity = '0';
@@ -1712,10 +1924,10 @@ z-index: 5 }
         updateTimer();
         countdownInterval = setInterval(updateTimer, 1000);
 
-        // ─── 7. INIT ──────────────────────────────────────────────────
-        updatePriceBasedOnCountry();
+        // ─── 6. INIT ──────────────────────────────────────
+        updatePrices();
 
-        console.log('%c🎁 Giveaway banner loaded with live countdown.',
+        console.log('%c🎁 Giveaway banner & Pro section loaded.',
             'color:#39FF14;font-weight:bold;');
     </script>
 </body>
