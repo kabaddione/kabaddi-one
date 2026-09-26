@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        // If the URL contains /match/id/, redirect to our master template and pass the ID!
+        if (window.location.pathname.includes('/match/id/')) {
+            // Extracts "A1B2C3" from "/match/id/A1B2C3"
+            var matchId = window.location.pathname.split('/').pop().replace('.html', '');
+            window.location.replace('/match/id/index.html?match=' + matchId);
+        } else {
+            window.location.replace('/'); // Normal 404 fallback
+        }
+    </script>
+</head>
+<body>Redirecting to Live Match...</body>
+</html>
