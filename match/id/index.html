@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KabaddiOne - Live Match Broadcast</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: white; text-align: center; padding: 20px; }
+        .scoreboard { background: #1a1a2e; border-radius: 16px; padding: 30px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .teams { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .team { flex: 1; }
+        .score { font-size: 64px; font-weight: 900; margin: 10px 0; }
+        .clocks { font-size: 24px; color: #FF5E3A; font-weight: bold; margin-bottom: 20px; }
+        .status { color: #b0b0c8; font-size: 14px; }
+        .timeline-box { background: #0f0f24; border-radius: 12px; padding: 15px; margin-top: 20px; text-align: left; max-height: 200px; overflow-y: auto; }
+    </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="scoreboard">
+        <div class="clocks">
+            <span id="mainClock">--:--</span> | Raid: <span id="raidClock">--</span>
+        </div>
 
+        <div class="teams">
+            <div class="team">
+                <h2>Left Team</h2>
+                <div class="score" id="leftScore">0</div>
+            </div>
+            <div class="team" style="font-size: 24px; font-weight: bold; color: gray;">VS</div>
+            <div class="team">
+                <h2>Right Team</h2>
+                <div class="score" id="rightScore">0</div>
+            </div>
+        </div>
+
+        <div class="status" id="matchStatus">Connecting to live feed...</div>
+
+        <h3 style="margin-top:30px; text-align:left;">Match Logs</h3>
+        <div class="timeline-box" id="timelineLogs">
+            Waiting for events...
+        </div>
+    </div>
+
+    <script>
+        // 1. Initialize Firebase (Replace with your EXACT details from Firebase Console -> Project Settings)
+        const firebaseConfig = {
+            apiKey: "AIzaSyYourApiKeyHere...",
+            authDomain: "kabaddi-scoreboard.firebaseapp.com",
+            databaseURL: "https://kabaddi-scoreboard-xxxx-default-rtdb.firebaseio.com",
+            projectId: "kabaddi-scoreboard-xxxx"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 2. Get Match ID from URL (e.g. ?match=A1B2C3)
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('match');
+
+        if (!matchId) {
+            document.getElementById('matchStatus').innerText = "Invalid Match ID.";
+        } else {
+            document.getElementById('matchStatus').innerText = "Live tracking Match ID: " + matchId;
+
+            // 3. LISTEN TO CLOCKS (Fast updates)
+            db.ref('live_matches/' + matchId).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if(data.main_clock) document.getElementById('mainClock').innerText = data.main_clock;
+                    if(data.raid_clock) document.getElementById('raidClock').innerText = data.raid_clock;
+
+                    // 4. DECODE JSON SNAPSHOT (Scores & Logs)
+                    if(data.state_json) {
+                        const state = JSON.parse(data.state_json);
+                        document.getElementById('leftScore').innerText = state.leftScore;
+                        document.getElementById('rightScore').innerText = state.rightScore;
+
+                        // Optional: Decode logs
+                        if (state.logsJson) {
+                            const logs = JSON.parse(state.logsJson);
+                            let logHtml = "";
+                            // Loop backwards to show newest first
+                            for(let i = logs.length - 1; i >= 0; i--) {
+                                logHtml += `<div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">
+                                     <strong>${logs[i].timeStr}</strong>: ${logs[i].title}<br>
+                                     <span style="color:gray; font-size:12px;">${logs[i].desc}</span>
+                                </div>`;
+                            }
+                            document.getElementById('timelineLogs').innerHTML = logHtml;
+                        }
+                    }
+                } else {
+                    document.getElementById('matchStatus').innerText = "Match not found or has not started yet.";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
