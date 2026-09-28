@@ -3,127 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <title>KabaddiOne - Live Match Broadcast</title>
-    <style>
-        :root {
-            --bg-dark: #0a0a1a;
-            --card-bg: #1a1a2e;
-            --text-light: #ffffff;
-            --text-muted: #b0b0c8;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-dark); color: var(--text-light); -webkit-font-smoothing: antialiased; }
-        
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        
-        /* Top Header */
-        .header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
-        .match-id-badge { display: inline-block; background: rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 15px; color: #FF5E3A; border: 1px solid rgba(255,94,58,0.3); }
-        
-        /* The Clocks */
-        .clock-panel { background: var(--card-bg); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
-        .main-clock { font-size: 48px; font-weight: 900; letter-spacing: 2px; }
-        .raid-clock { font-size: 24px; color: #F0C040; font-weight: bold; margin-top: 5px; }
-        .half-indicator { display: inline-block; background: #6A1B9A; padding: 4px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; margin-bottom: 10px; }
-        
-        /* Main Scoreboard */
-        .scoreboard { display: flex; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
-        .team-panel { flex: 1; padding: 40px 20px; text-align: center; position: relative; transition: background 0.3s ease; }
-        .team-name { font-size: 28px; font-weight: 800; margin-bottom: 15px; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .score { font-size: 96px; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        
-        .vs-divider { width: 60px; background: #111; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; color: #555; z-index: 10; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        
-        /* Detailed Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .stats-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .stats-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; }
-        .stats-row:last-child { margin-bottom: 0; }
-        .stat-label { color: var(--text-muted); font-weight: 600; }
-        .stat-val { font-weight: bold; }
-        
-        /* Match Logs */
-        .logs-container { background: var(--card-bg); border-radius: 16px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); }
-        .logs-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .log-list { max-height: 400px; overflow-y: auto; padding-right: 10px; }
-        .log-item { display: flex; gap: 15px; margin-bottom: 20px; }
-        .log-time { flex-shrink: 0; font-weight: bold; color: var(--text-muted); font-size: 14px; width: 85px; }
-        .log-content { flex: 1; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 12px; border-left: 4px solid #555; }
-        .log-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
-        .log-desc { color: var(--text-muted); font-size: 14px; line-height: 1.4; }
-        .log-score { display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-top: 8px; font-weight: bold; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-
-        @media (max-width: 600px) {
-            .score { font-size: 64px; }
-            .team-name { font-size: 20px; }
-            .team-panel { padding: 30px 10px; }
-            .vs-divider { width: 40px; font-size: 18px; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .log-item { flex-direction: column; gap: 5px; }
-            .log-time { width: auto; }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <style>
+        /* ============ INHERITED WEBSITE STYLES ============ */
+        :root {
+            --bg-primary: #0a0a1a; --bg-secondary: #0f0f24;
+            --accent: #FF5E3A; --accent-glow: #FF3D10; --accent-secondary: #FFB830;
+            --text-primary: #ffffff; --text-secondary: #b0b0c8;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --nav-height: 72px; --max-width: 1200px;
+            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px;
+            --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-body); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+        a { text-decoration: none; }
+
+        /* Background Orbs */
+        .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; }
+        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
+        .bg-orb:nth-child(2) { width: 450px; height: 450px; background: #6C3CE0; top: 50%; right: -12%; animation-delay: -6s; animation-duration: 20s; }
+        @keyframes orbFloat { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(-30px,50px,0) scale(0.9); } }
+
+        /* Navbar (Retained from main site) */
+        .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); background: rgba(10, 10, 26, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); }
+        .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 100%; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; letter-spacing: -0.5px; }
+        .logo-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); overflow: hidden; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .nav-cta-btn { background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #fff; padding: 10px 22px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .nav-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255, 94, 58, 0.5); }
+
+        /* Footer (Retained from main site) */
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; margin-top: auto; }
+        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; }
+        .footer-copy { color: var(--text-muted); font-size: 0.8rem; text-align: center; width: 100%; margin-top: 16px; }
+
+        /* ============ PREMIUM LIVE SCORE UI ============ */
+        .live-wrapper { padding: calc(var(--nav-height) + 40px) 20px 60px; max-width: 600px; margin: 0 auto; width: 100%; }
+        
+        /* Main Scoreboard Card */
+        .score-card { background: #1E213A; border-radius: 24px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; margin-bottom: 12px; }
+        .score-card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background: url('https://kabaddione.com/images/feature-background-round.png') center/cover opacity(0.05); pointer-events: none; }
+        
+        /* Top Badges */
+        .top-badges { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 2; }
+        .badge-id { background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #b0b0c8; font-weight: 600; }
+        .badge-live { background: rgba(255,255,255,0.9); color: #1E213A; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .badge-live::before { content:''; width: 6px; height: 6px; background: #FF3B30; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        /* Match Details */
+        .match-details { text-align: center; color: #8C8E9F; font-size: 11px; margin-bottom: 16px; position: relative; z-index: 2; }
+        
+        /* Center Clocks */
+        .clocks-container { text-align: center; position: relative; z-index: 2; margin-bottom: 15px; }
+        .half-badge { display: inline-block; background: #E65100; color: white; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .main-timer { font-size: 42px; font-weight: 900; letter-spacing: 1px; color: white; line-height: 1; }
+        
+        /* The Scores */
+        .scores-row { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; margin-top: -45px; margin-bottom: 15px;}
+        .team-score-box { text-align: center; width: 120px; }
+        .team-score { font-size: 72px; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .team-name { font-size: 16px; font-weight: bold; color: white; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        /* Raid Timer Badge */
+        .raid-timer-badge { width: 44px; height: 44px; border-radius: 50%; background: white; color: #1E213A; font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: -10px auto 10px; position: relative; z-index: 2; border: 3px solid #FBC02D; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        /* Active Raider & Mat Status */
+        .active-raider { text-align: center; color: white; font-size: 13px; font-weight: 600; margin-bottom: 10px; position: relative; z-index: 2; }
+        .mat-status-title { text-align: center; color: #8C8E9F; font-size: 11px; margin-bottom: 6px; position: relative; z-index: 2; }
+        .mat-dots { display: flex; justify-content: center; align-items: center; gap: 4px; position: relative; z-index: 2; }
+        .mat-divider { width: 24px; height: 16px; border: 1px solid #4A4D67; border-top: none; border-bottom: none; margin: 0 10px; opacity: 0.5; }
+        .dot { font-size: 14px; }
+        .dot.out { opacity: 0.3; }
+        
+        /* Sub-Stats Bar (Fouls, Subs, Timeouts) */
+        .sub-stats-bar { display: flex; border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .stat-team-half { flex: 1; display: flex; justify-content: space-around; padding: 12px 10px; align-items: center; }
+        .stat-item { display: flex; align-items: center; gap: 6px; color: white; font-size: 14px; font-weight: bold; }
+        .stat-item i { font-size: 12px; opacity: 0.9; }
+        .card-icon { width: 10px; height: 14px; border-radius: 2px; background: #FFEB3B; }
+        
+        /* Tabs */
+        .tabs { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; background: #2A2D47; color: #b0b0c8; text-align: center; padding: 10px 0; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .tab.active { background: #FF5E3A; color: white; }
+        
+        /* Commentary Timeline */
+        .timeline-card { background: #1E213A; border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .timeline-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
+        .log-item { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; }
+        .log-item:last-child { border-bottom: none; padding-bottom: 0; }
+        
+        .log-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+        .log-content { flex: 1; }
+        .log-title { color: white; font-weight: bold; font-size: 14px; margin-bottom: 2px; }
+        .log-desc { color: #8C8E9F; font-size: 12px; }
+        
+        .log-meta { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .log-badge { background: #2A2D47; color: #4DA8DA; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; }
+        .log-time { color: #8C8E9F; font-size: 11px; }
+        .log-score-str { color: white; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; margin-top:2px;}
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        @media (max-width: 400px) {
+            .team-score { font-size: 56px; }
+            .team-name { font-size: 14px; }
+            .main-timer { font-size: 36px; }
+            .log-item { gap: 10px; }
+        }
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <div class="match-id-badge" id="matchStatus">Connecting to LIVE feed... 🔴</div>
-        </div>
-
-        <div class="clock-panel">
-            <div class="half-indicator" id="halfIndicator">1st Half</div>
-            <div class="main-clock" id="mainClock">--:--</div>
-            <div class="raid-clock">Raid: <span id="raidClock">--</span></div>
-        </div>
-
-        <div class="scoreboard">
-            <div class="team-panel" id="leftPanel" style="background: #228B22;">
-                <div class="team-name" id="leftName">Left Team</div>
-                <div class="score" id="leftScore">0</div>
-            </div>
-            <div class="vs-divider">VS</div>
-            <div class="team-panel" id="rightPanel" style="background: #1976D2;">
-                <div class="team-name" id="rightName">Right Team</div>
-                <div class="score" id="rightScore">0</div>
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stats-card">
-                <h3 style="margin-bottom: 15px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px;">Left Team Stats</h3>
-                <div class="stats-row"><span class="stat-label">Raid Points</span> <span class="stat-val" id="lRaid">0</span></div>
-                <div class="stats-row"><span class="stat-label">Tackle Points</span> <span class="stat-val" id="lTackle">0</span></div>
-                <div class="stats-row"><span class="stat-label">All Out Points</span> <span class="stat-val" id="lAllOut">0</span></div>
-                <div class="stats-row"><span class="stat-label">Extra Points</span> <span class="stat-val" id="lExtra">0</span></div>
-            </div>
-            <div class="stats-card">
-                <h3 style="margin-bottom: 15px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px;">Right Team Stats</h3>
-                <div class="stats-row"><span class="stat-label">Raid Points</span> <span class="stat-val" id="rRaid">0</span></div>
-                <div class="stats-row"><span class="stat-label">Tackle Points</span> <span class="stat-val" id="rTackle">0</span></div>
-                <div class="stats-row"><span class="stat-label">All Out Points</span> <span class="stat-val" id="rAllOut">0</span></div>
-                <div class="stats-row"><span class="stat-label">Extra Points</span> <span class="stat-val" id="rExtra">0</span></div>
-            </div>
-        </div>
-
-        <div class="logs-container">
-            <div class="logs-title">Match Timeline</div>
-            <div class="log-list" id="timelineLogs">
-                Waiting for match events...
-            </div>
-        </div>
+    <!-- Animated Background -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
     </div>
 
+    <!-- Top Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <div class="logo-icon"><img src="/images/kabaddione_logo.png" alt="Logo"></div>
+                <span>KabaddiOne</span>
+            </a>
+            <a href="/download.html" class="nav-cta-btn">Get App</a>
+        </div>
+    </nav>
+
+    <!-- LIVE SCOREBOARD WRAPPER -->
+    <div class="live-wrapper">
+        
+        <!-- Main Score Card -->
+        <div class="score-card">
+            <div class="top-badges">
+                <div class="badge-id" id="uiMatchId">Match Id: ------</div>
+                <div class="badge-live">Live</div>
+            </div>
+            
+            <div class="match-details" id="uiMatchDate">Fetching live stream connection...</div>
+            
+            <div class="clocks-container">
+                <div class="half-badge" id="uiHalf">1st Half</div>
+                <div class="main-timer" id="uiMainClock">--:--</div>
+            </div>
+            
+            <div class="scores-row">
+                <div class="team-score-box">
+                    <div class="team-score" id="uiLeftScore" style="color: #4CAF50;">0</div>
+                    <div class="team-name" id="uiLeftName">Left Team</div>
+                </div>
+                <div class="team-score-box">
+                    <div class="team-score" id="uiRightScore" style="color: #2196F3;">0</div>
+                    <div class="team-name" id="uiRightName">Right Team</div>
+                </div>
+            </div>
+            
+            <div class="raid-timer-badge" id="uiRaidClock">30</div>
+            
+            <div class="active-raider" id="uiActiveRaider">▶ Waiting for raid...</div>
+            
+            <div class="mat-status-title">On The Mat</div>
+            <div class="mat-dots" id="uiMatDots">
+                <!-- Dots generated by JS -->
+            </div>
+        </div>
+
+        <!-- Sub Stats Bar -->
+        <div class="sub-stats-bar">
+            <!-- Left Side -->
+            <div class="stat-team-half" id="uiLeftSubBg" style="background: #1B5E20;">
+                <div class="stat-item"><i class="fa-solid fa-hand-paper"></i> <span id="uiLeftFouls">0</span></div>
+                <div class="stat-item"><i class="fa-solid fa-t"></i> <span id="uiLeftTimeouts">0</span></div>
+                <div class="stat-item"><i class="fa-solid fa-right-left"></i> <span id="uiLeftSubs">0</span></div>
+                <div class="stat-item"><div class="card-icon"></div> <span id="uiLeftCards">0</span></div>
+            </div>
+            <!-- Right Side -->
+            <div class="stat-team-half" id="uiRightSubBg" style="background: #0D47A1;">
+                <div class="stat-item"><span id="uiRightCards">0</span> <div class="card-icon"></div></div>
+                <div class="stat-item"><span id="uiRightSubs">0</span> <i class="fa-solid fa-right-left"></i></div>
+                <div class="stat-item"><span id="uiRightTimeouts">0</span> <i class="fa-solid fa-t"></i></div>
+                <div class="stat-item"><span id="uiRightFouls">0</span> <i class="fa-solid fa-hand-paper"></i></div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active">Commentary</div>
+            <div class="tab">Stats</div>
+            <div class="tab">Lineup</div>
+            <div class="tab">Graph</div>
+            <div class="tab">Details</div>
+        </div>
+
+        <!-- Commentary Timeline -->
+        <div class="timeline-card">
+            <div class="timeline-list" id="uiTimelineLogs">
+                <div style="text-align:center; color:#8C8E9F; padding: 20px;">Waiting for match events...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="nav-logo">
+                <div class="logo-icon"><img src="/images/kabaddione_logo.png" alt="Logo"></div>
+                <span style="font-size: 1.2rem;">KabaddiOne</span>
+            </div>
+            <p class="footer-copy">© 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.</p>
+        </div>
+    </footer>
+
     <script>
-        // 1. Initialize Firebase
+        // 1. Initialize Firebase (Ensure URL points to asia-southeast1)
         const firebaseConfig = {
             apiKey: "AIzaSyBciKNutpVo_zYXCLuVOIUb4VmoPaE7zHM",
             authDomain: "kabaddi-scoreboard.firebaseapp.com",
@@ -138,49 +248,88 @@
         const matchId = urlParams.get('match');
 
         if (!matchId) {
-            document.getElementById('matchStatus').innerText = "Invalid Match ID";
-            document.getElementById('matchStatus').style.borderColor = "red";
-            document.getElementById('matchStatus').style.color = "red";
+            document.getElementById('uiMatchDate').innerText = "Invalid Match ID. Please check your link.";
+            document.getElementById('uiMatchDate').style.color = "#FF3B30";
         } else {
-            document.getElementById('matchStatus').innerText = "LIVE ID: " + matchId + " 🔴";
+            document.getElementById('uiMatchId').innerText = "Match Id: " + matchId.toUpperCase();
+            
+            // Generate a fake but realistic date string for the UI header
+            const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('uiMatchDate').innerText = dateStr + ", Live Kabaddi Arena";
 
             // 3. LISTEN TO FIREBASE REALTIME UPDATES
             db.ref('live_matches/' + matchId).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    // Update Clocks
-                    if(data.main_clock) document.getElementById('mainClock').innerText = data.main_clock;
-                    if(data.raid_clock) document.getElementById('raidClock').innerText = data.raid_clock;
+                    // Update Clocks & Top UI
+                    if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
+                    if(data.raid_clock) {
+                        const rc = document.getElementById('uiRaidClock');
+                        rc.innerText = data.raid_clock;
+                        // Flash red if 10 seconds or less
+                        if(parseInt(data.raid_clock) <= 10) rc.style.borderColor = "#FF3B30";
+                        else rc.style.borderColor = "#FBC02D";
+                    }
+                    if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
                     
-                    // Update Top-Level UI Config
-                    if(data.half_status) document.getElementById('halfIndicator').innerText = data.half_status;
+                    if(data.left_name) document.getElementById('uiLeftName').innerText = data.left_name;
+                    if(data.right_name) document.getElementById('uiRightName').innerText = data.right_name;
                     
-                    if(data.left_name) document.getElementById('leftName').innerText = data.left_name;
-                    if(data.right_name) document.getElementById('rightName').innerText = data.right_name;
-                    if(data.left_score !== undefined) document.getElementById('leftScore').innerText = data.left_score;
-                    if(data.right_score !== undefined) document.getElementById('rightScore').innerText = data.right_score;
+                    if(data.left_score !== undefined) document.getElementById('uiLeftScore').innerText = data.left_score;
+                    if(data.right_score !== undefined) document.getElementById('uiRightScore').innerText = data.right_score;
 
-                    // Dynamically apply Android Team Colors to Web Backgrounds!
-                    if(data.left_color) document.getElementById('leftPanel').style.background = data.left_color;
-                    if(data.right_color) document.getElementById('rightPanel').style.background = data.right_color;
+                    // Apply Android Team Colors to Web UI
+                    const leftColor = data.left_color || "#4CAF50";
+                    const rightColor = data.right_color || "#2196F3";
+                    
+                    document.getElementById('uiLeftScore').style.color = leftColor;
+                    document.getElementById('uiRightScore').style.color = rightColor;
+                    
+                    // Darken the colors slightly for the sub-stats background
+                    document.getElementById('uiLeftSubBg').style.background = leftColor;
+                    document.getElementById('uiRightSubBg').style.background = rightColor;
+                    document.getElementById('uiLeftSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
+                    document.getElementById('uiRightSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
 
-                    // 4. DECODE JSON SNAPSHOT for Deep Stats & Logs
+                    // 4. DECODE JSON SNAPSHOT for Deep Stats, Dots & Logs
                     if(data.state_json) {
                         try {
                             const state = JSON.parse(data.state_json);
                             
-                            // Map deep stats using the non-minified keys established by @Keep
-                            document.getElementById('lRaid').innerText = state.leftRaidPoints || 0;
-                            document.getElementById('lTackle').innerText = state.leftTacklePoints || 0;
-                            document.getElementById('lAllOut').innerText = state.leftAllOutPoints || 0;
-                            document.getElementById('lExtra').innerText = state.leftExtraPoints || 0;
+                            // Sub Stats
+                            document.getElementById('uiLeftFouls').innerText = state.leftFouls || 0;
+                            document.getElementById('uiRightFouls').innerText = state.rightFouls || 0;
+                            document.getElementById('uiLeftTimeouts').innerText = state.leftTimeouts || 0;
+                            document.getElementById('uiRightTimeouts').innerText = state.rightTimeouts || 0;
+                            document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
+                            document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
+                            
+                            // Active Raider Text
+                            if (state.currentRaidTeamIsLeft) {
+                                document.getElementById('uiActiveRaider').innerHTML = `▶ ${data.left_name} is on raid`;
+                            } else {
+                                document.getElementById('uiActiveRaider').innerHTML = `◀ ${data.right_name} is on raid`;
+                            }
 
-                            document.getElementById('rRaid').innerText = state.rightRaidPoints || 0;
-                            document.getElementById('rTackle').innerText = state.rightTacklePoints || 0;
-                            document.getElementById('rAllOut').innerText = state.rightAllOutPoints || 0;
-                            document.getElementById('rExtra').innerText = state.rightExtraPoints || 0;
+                            // Render Mat Dots (7 per side)
+                            let dotsHtml = "";
+                            const drawDots = (statesArray, color) => {
+                                let html = "";
+                                if(statesArray && statesArray.length > 0) {
+                                    for(let i=0; i<7; i++) {
+                                        const isAlive = statesArray[i] === true;
+                                        const opClass = isAlive ? "" : "out";
+                                        html += `<i class="fa-solid fa-user dot ${opClass}" style="color: ${color};"></i>`;
+                                    }
+                                }
+                                return html;
+                            };
+                            dotsHtml += drawDots(state.leftDotStates, leftColor);
+                            dotsHtml += `<div class="mat-divider"></div>`;
+                            dotsHtml += drawDots(state.rightDotStates, rightColor);
+                            document.getElementById('uiMatDots').innerHTML = dotsHtml;
 
-                            // Decode and Render Timeline Logs
+                            // Decode and Render Timeline Logs (Commentary)
                             if (state.logsJson) {
                                 const logs = JSON.parse(state.logsJson);
                                 let logHtml = "";
@@ -189,31 +338,56 @@
                                 for(let i = logs.length - 1; i >= 0; i--) {
                                     const log = logs[i];
                                     
-                                    // Determine border color based on team
-                                    let borderColor = "#555"; 
-                                    if (log.isLeftTeam === true) borderColor = data.left_color || "#228B22";
-                                    else if (log.isLeftTeam === false) borderColor = data.right_color || "#1976D2";
+                                    // Determine Icon & Colors based on event type/team
+                                    let iconBg = "#4A4D67";
+                                    let iconHtml = '<i class="fa-solid fa-bolt"></i>';
+                                    let badgeColor = "#4A4D67";
+                                    let badgeText = "";
+                                    
+                                    if (log.isLeftTeam === true) { iconBg = leftColor; badgeColor = leftColor; }
+                                    else if (log.isLeftTeam === false) { iconBg = rightColor; badgeColor = rightColor; }
 
-                                    let scoreBadge = log.scoreStr ? `<div class="log-score">${log.scoreStr}</div>` : "";
+                                    const t = log.title || "";
+                                    if(t.includes("Bonus")) { iconHtml = '<i class="fa-solid fa-b"></i>'; badgeText = "+1"; }
+                                    else if(t.includes("Touch")) { iconHtml = '<i class="fa-solid fa-hand-sparkles"></i>'; badgeText = `+${log.points}`; }
+                                    else if(t.includes("Tackle")) { iconHtml = '<i class="fa-solid fa-hand-back-fist"></i>'; badgeText = `+${log.points}`; }
+                                    else if(t.includes("Super Tackle")) { iconHtml = '<i class="fa-solid fa-shield-halved"></i>'; badgeText = "+2"; }
+                                    else if(t.includes("ALL OUT")) { iconHtml = '<i class="fa-solid fa-skull"></i>'; badgeText = "+2"; }
+                                    else if(t.includes("Toss")) { iconHtml = '<i class="fa-solid fa-coins"></i>'; iconBg = "#4CAF50"; }
+                                    else if(t.includes("Starting 7")) { iconHtml = '<i class="fa-solid fa-users"></i>'; }
+                                    else if(t.includes("Half") || t.includes("Match Started") || t.includes("Full Time")) { iconHtml = '<i class="fa-solid fa-whistle"></i>'; iconBg = "#FBC02D"; }
+                                    
+                                    // Build the Badge (if points exist)
+                                    let badgeHtml = "";
+                                    if(badgeText) {
+                                        badgeHtml = `<div class="log-badge" style="background: ${badgeColor}33; color: ${badgeColor};">${badgeText}</div>`;
+                                    }
+
+                                    // Build Score Tracker
+                                    let scoreHtml = log.scoreStr ? `<div class="log-score-str">Score: ${log.scoreStr.replace("Score: ", "")}</div>` : "";
 
                                     logHtml += `
                                     <div class="log-item">
-                                        <div class="log-time">${log.timeStr}</div>
-                                        <div class="log-content" style="border-left-color: ${borderColor};">
+                                        <div class="log-icon" style="background: ${iconBg};">${iconHtml}</div>
+                                        <div class="log-content">
                                             <div class="log-title">${log.title}</div>
                                             <div class="log-desc">${log.desc}</div>
-                                            ${scoreBadge}
+                                        </div>
+                                        <div class="log-meta">
+                                            ${badgeHtml}
+                                            <div class="log-time">${log.timeStr}</div>
+                                            ${scoreHtml}
                                         </div>
                                     </div>`;
                                 }
-                                document.getElementById('timelineLogs').innerHTML = logHtml || "No events recorded yet.";
+                                document.getElementById('uiTimelineLogs').innerHTML = logHtml || "<div style='text-align:center; color:#8C8E9F; padding: 20px;'>No events recorded yet.</div>";
                             }
                         } catch(e) {
                             console.error("Failed to parse JSON state", e);
                         }
                     }
                 } else {
-                    document.getElementById('matchStatus').innerText = "Match Offline or Ended";
+                    document.getElementById('uiMatchDate').innerText = "Match Offline or Ended.";
                 }
             });
         }
