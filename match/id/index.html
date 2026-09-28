@@ -4,8 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/favicon.png">
-    <title>KabaddiOne - Live Match Broadcast</title>
+    <link rel="apple-touch-icon" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.png" type="image/png">
+    <meta name="title" content="KabaddiOne Live Match Broadcast">
+    <meta name="description" content="Watch live kabaddi matches on KabaddiOne - real-time scores, commentary, player stats, lineup, and match analytics.">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>Live Match | KabaddiOne</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YRYC0NEP1H');
+    </script>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -15,12 +30,14 @@
         :root {
             --bg-primary: #0a0a1a; --bg-secondary: #0f0f24;
             --accent: #FF5E3A; --accent-glow: #FF3D10; --accent-secondary: #FFB830;
-            --text-primary: #ffffff; --text-secondary: #b0b0c8;
-            --border-subtle: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff; --text-secondary: #b0b0c8; --text-muted: #7a7a95;
+            --border-subtle: rgba(255, 255, 255, 0.08); --border-glow: rgba(255, 94, 58, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.04); --glass-border: rgba(255, 255, 255, 0.1);
             --nav-height: 72px; --max-width: 1200px;
             --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px;
             --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
             --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             
             /* Dynamic Team Colors */
             --left-team-color: #4CAF50;
@@ -28,31 +45,76 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         body { font-family: var(--font-body); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
         a { text-decoration: none; }
 
-        .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
-        .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; }
-        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
+        /* ============ ANIMATED BACKGROUND ORBS ============ */
+        .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; -webkit-backface-visibility: hidden; backface-visibility: hidden; will-change: transform; }
+        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; animation-delay: 0s; }
         .bg-orb:nth-child(2) { width: 450px; height: 450px; background: #6C3CE0; top: 50%; right: -12%; animation-delay: -6s; animation-duration: 20s; }
-        @keyframes orbFloat { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(-30px,50px,0) scale(0.9); } }
+        .bg-orb:nth-child(3) { width: 350px; height: 350px; background: var(--accent-secondary); bottom: -10%; left: 20%; animation-delay: -12s; animation-duration: 16s; }
+        @keyframes orbFloat { 0%,100% { transform: translate3d(0,0,0) scale(1); } 25% { transform: translate3d(60px,-40px,0) scale(1.15); } 50% { transform: translate3d(-30px,50px,0) scale(0.9); } 75% { transform: translate3d(-50px,-30px,0) scale(1.1); } }
 
-        .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); background: rgba(10, 10, 26, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); }
-        .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 100%; }
-        .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; letter-spacing: -0.5px; }
-        .logo-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); overflow: hidden; }
-        .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .nav-cta-btn { background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #fff; padding: 10px 22px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        /* ============ NAVIGATION (from main site) ============ */
+        .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); transition: var(--transition-smooth); background: rgba(10, 10, 26, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); }
+        .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; height: 100%; gap: 12px; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; letter-spacing: -0.5px; z-index: 1001; flex-shrink: 0; }
+        .nav-logo .logo-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 20px rgba(255, 94, 58, 0.35); animation: logoPulse 3s ease-in-out infinite; }
+        .nav-logo .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+        @keyframes logoPulse { 0%,100% { box-shadow: 0 0 20px rgba(255, 94, 58, 0.35); } 50% { box-shadow: 0 0 40px rgba(255, 94, 58, 0.65); } }
+        .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; margin-left: auto; }
+        .nav-links a { color: #ffffff; font-weight: 500; font-size: 0.9rem; transition: 0.2s; position: relative; white-space: nowrap; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 0; height: 2px; background: var(--accent); border-radius: 2px; transition: var(--transition-smooth); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-cta-btn { background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #fff !important; padding: 10px 22px; border-radius: 50px; font-weight: 600 !important; font-size: 0.9rem !important; transition: 0.3s !important; box-shadow: 0 4px 18px rgba(255, 94, 58, 0.35); }
+        .nav-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255, 94, 58, 0.5); }
+        .nav-cta-btn::after { display: none !important; }
 
-        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; margin-top: auto; }
-        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; }
+        /* Mobile Get App button (visible only on mobile) */
+        .mobile-get-app-btn { display: none; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #fff; border-radius: 50px; font-weight: 600; font-size: 0.8rem; box-shadow: 0 4px 18px rgba(255, 94, 58, 0.35); margin-left: auto; z-index: 1001; white-space: nowrap; }
+
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1001; background: none; border: none; padding: 8px; margin-left: 8px; }
+        .hamburger span { width: 26px; height: 2.5px; background: #fff; border-radius: 2px; transition: var(--transition-smooth); display: block; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        @media (max-width: 768px) {
+            .nav-links { position: fixed; top: 0; right: -100%; width: 75%; max-width: 320px; height: 100vh; background: rgba(15,15,36,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); flex-direction: column; justify-content: center; gap: 28px; transition: var(--transition-smooth); padding: 40px; border-left: 1px solid var(--border-subtle); margin-left: 0; }
+            .nav-links.active { right: 0; }
+            .nav-links a { font-size: 1.1rem; }
+            .nav-links a::after { display: none; }
+            .mobile-get-app-btn { display: inline-flex; }
+            .hamburger { display: flex; }
+        }
+
+        /* ============ FOOTER (from main site) ============ */
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; position: relative; z-index: 1; margin-top: auto; }
+        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; }
+        .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: #fff; font-family: var(--font-heading); }
+        .footer-logo .logo-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 20px rgba(255, 94, 58, 0.35); animation: logoPulse 3s ease-in-out infinite; }
+        .footer-logo .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+        .footer-links a { color: var(--text-muted); font-size: 0.85rem; transition: 0.2s; }
+        .footer-links a:hover { color: #fff; }
+        .social-links { display: flex; gap: 16px; align-items: center; }
+        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: 0.2s; }
+        .social-links a:hover { color: var(--accent); }
         .footer-copy { color: var(--text-muted); font-size: 0.8rem; text-align: center; width: 100%; margin-top: 16px; }
+        @media (max-width: 768px) { .footer-inner { flex-direction: column; align-items: center; text-align: center; } .footer-links { justify-content: center; } .social-links { justify-content: center; } }
+
+        /* ============ BACK TO TOP ============ */
+        .back-to-top { position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 46px; height: 46px; border-radius: 50%; background: var(--accent); color: #fff; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition-smooth); box-shadow: 0 6px 20px rgba(255,94,58,0.4); }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; }
+        .back-to-top:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(255,94,58,0.55); }
 
         /* ============ PREMIUM LIVE SCORE UI ============ */
-        .live-wrapper { padding: calc(var(--nav-height) + 40px) 20px 60px; max-width: 600px; margin: 0 auto; width: 100%; }
+        .live-wrapper { padding: calc(var(--nav-height) + 40px) 20px 60px; max-width: 600px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
         
         .score-card { background: #1E213A; border-radius: 24px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; margin-bottom: 12px; }
-        .score-card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background: url('https://kabaddione.com/images/feature-background-round.png') center/cover opacity(0.05); pointer-events: none; }
+        .score-card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background: url('https://kabaddione.com/images/feature-background-round.png') center/cover; opacity:0.05; pointer-events: none; }
         
         .top-badges { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 2; }
         .badge-id { background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #b0b0c8; font-weight: 600; }
@@ -71,12 +133,11 @@
         .team-score { font-size: 72px; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .team-name { font-size: 16px; font-weight: bold; color: white; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;}
         
-        /* Empty Raids Indicator */
         .empty-raids { display: flex; gap: 4px; margin-top: 4px; }
         .empty-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A2D47; border: 1px solid rgba(255,255,255,0.2); }
         .empty-dot.filled { background: #FF9800; border-color: #FF9800; box-shadow: 0 0 5px rgba(255,152,0,0.5); }
         
-        .raid-timer-container { width: 56px; height: 56px; margin: -10px auto 10px; position: relative; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(#FBC02D var(--raid-deg, 360deg), #2A2D47 0deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .raid-timer-container { width: 56px; height: 56px; margin: -10px auto 10px; position: relative; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .raid-timer-inner { width: 48px; height: 48px; background: #1E213A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: white; }
         
         .active-raider { text-align: center; color: white; font-size: 14px; font-weight: bold; margin-bottom: 10px; position: relative; z-index: 2; }
@@ -90,15 +151,13 @@
         .dot { font-size: 14px; }
         .dot.out { opacity: 0.2; }
         
-        /* Sub-Stats Bar */
         .sub-stats-bar { display: flex; border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .stat-team-half { flex: 1; display: flex; justify-content: space-around; padding: 12px 10px; align-items: center; }
         .stat-item { display: flex; align-items: center; gap: 6px; color: white; font-size: 14px; font-weight: bold; }
         .stat-item i { font-size: 12px; opacity: 0.9; }
         
-        /* Tabs */
-        .tabs { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; background: #2A2D47; color: #b0b0c8; text-align: center; padding: 10px 0; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .tabs { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 20px; }
+        .tab { flex: 1; background: #2A2D47; color: #b0b0c8; text-align: center; padding: 10px 4px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab.active { background: #FF5E3A; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -139,8 +198,8 @@
         .donut-wrapper { position: relative; width: 100px; height: 100px; }
         .donut-chart { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .donut-inner { width: 70px; height: 70px; background: #1E213A; border-radius: 50%; }
-        .donut-left { background: conic-gradient(var(--left-team-color) var(--left-strike-deg), white 0deg); }
-        .donut-right { background: conic-gradient(var(--right-team-color) var(--right-strike-deg), white 0deg); }
+        .donut-left { background: conic-gradient(var(--left-team-color) var(--left-strike-deg, 0deg), #2A2D47 0deg); }
+        .donut-right { background: conic-gradient(var(--right-team-color) var(--right-strike-deg, 0deg), #2A2D47 0deg); }
         .strike-val-left { font-size: 24px; font-weight: 900; color: var(--left-team-color); }
         .strike-val-right { font-size: 24px; font-weight: 900; color: var(--right-team-color); }
         .strike-label-center { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: 12px; color: white; font-weight: bold;}
@@ -148,11 +207,8 @@
         /* ============ LINEUP TAB ============ */
         .lineup-team-toggle { display: flex; background: #151726; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
         .team-tog { flex: 1; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; color: #8C8E9F; cursor: pointer; border-radius: 8px; transition: 0.3s; }
-        .team-tog.active-left { background: var(--left-team-color); color: white; }
-        .team-tog.active-right { background: var(--right-team-color); color: white; }
 
         .lineup-card { background: #151726; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .lineup-header { display: flex; justify-content: space-between; font-size: 11px; color: #8C8E9F; margin-bottom: 10px; padding: 0 10px; font-weight: bold;}
         .lineup-grid { display: flex; flex-direction: column; gap: 10px; }
         
         .player-bar-container { border-radius: 8px; overflow: hidden; background: #1E213A; transition: 0.3s; cursor: pointer; border: 1px solid transparent; }
@@ -187,10 +243,10 @@
         .ana-donut { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .ana-donut-inner { width: 44px; height: 44px; background: #1A1C30; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; color: white;}
         .ana-donut-title { font-size: 10px; color: #8C8E9F; text-align: center; max-width: 70px; line-height: 1.2;}
-        .donut-raid-succ { background: conic-gradient(#F9A825 var(--deg), #2A2D47 0deg); }
-        .donut-raid-unsucc { background: conic-gradient(#8E24AA var(--deg), #2A2D47 0deg); }
-        .donut-tack-succ { background: conic-gradient(#E53935 var(--deg), #2A2D47 0deg); }
-        .donut-tack-unsucc { background: conic-gradient(#3949AB var(--deg), #2A2D47 0deg); }
+        .donut-raid-succ { background: conic-gradient(#F9A825 var(--deg, 0deg), #2A2D47 0deg); }
+        .donut-raid-unsucc { background: conic-gradient(#8E24AA var(--deg, 0deg), #2A2D47 0deg); }
+        .donut-tack-succ { background: conic-gradient(#E53935 var(--deg, 0deg), #2A2D47 0deg); }
+        .donut-tack-unsucc { background: conic-gradient(#3949AB var(--deg, 0deg), #2A2D47 0deg); }
 
         /* ============ GRAPH TAB ============ */
         .graph-card { background: #1A1C29; border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
@@ -222,26 +278,51 @@
             .strike-val-left, .strike-val-right { font-size: 20px; }
             .graph-container { height: 250px; }
             .details-grid { grid-template-columns: 1fr; }
+            .tab { font-size: 11px; padding: 8px 2px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ============ BACKGROUND ORBS ============ -->
     <div class="bg-orbs" aria-hidden="true">
+        <div class="bg-orb"></div>
         <div class="bg-orb"></div>
         <div class="bg-orb"></div>
     </div>
 
-    <nav class="nav">
+    <!-- ============ NAVIGATION (from main site + Get App for mobile) ============ -->
+    <nav class="nav" id="navbar" aria-label="Main navigation">
         <div class="nav-inner">
-            <a href="/" class="nav-logo">
-                <div class="logo-icon"><img src="/images/kabaddione_logo.png" alt="Logo"></div>
+            <a href="/" class="nav-logo" aria-label="KabaddiOne Home">
+                <div class="logo-icon">
+                    <img src="/images/kabaddione_logo.png" alt="KabaddiOne Logo">
+                </div>
                 <span>KabaddiOne</span>
             </a>
-            <a href="/download.html" class="nav-cta-btn">Get App</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/#auto-super-tackle">Smart Auto</a></li>
+                <li><a href="/#sounds">Sounds</a></li>
+                <li><a href="/#languages">Languages</a></li>
+                <li><a href="/#how-it-works">How It Works</a></li>
+                <li><a href="/giveaway.html">Giveaway</a></li>
+                <li><a href="/giveaway-winners.html">Winners</a></li>
+                <li><a href="/download.html" class="nav-cta-btn">Download</a></li>
+            </ul>
+            <!-- Get App button visible only on mobile, before the hamburger -->
+            <a href="/download.html" class="mobile-get-app-btn" aria-label="Get App">
+                <i class="fa-brands fa-google-play"></i> Get App
+            </a>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
+    <!-- ============ LIVE SCORE WRAPPER ============ -->
     <div class="live-wrapper">
         
         <!-- Main Score Card -->
@@ -313,10 +394,12 @@
             <div class="tab" onclick="switchTab('details', this)">Details</div>
         </div>
 
+        <!-- ============ COMMENTARY TAB ============ -->
         <div class="timeline-card tab-content active" id="tab-commentary">
             <div class="timeline-list" id="uiTimelineLogs"></div>
         </div>
         
+        <!-- ============ STATS TAB ============ -->
         <div class="tab-content" id="tab-stats">
             <!-- Points Breakdown Card -->
             <div class="stats-card">
@@ -370,7 +453,7 @@
                         <div class="stat-val-left" id="stLeftAllOut">0</div>
                         <div class="stat-val-right" id="stRightAllOut">0</div>
                     </div>
-                    <div class="stat-label-center">All out Points</div>
+                    <div class="stat-label-center">All Out Points</div>
                     <div class="progress-container">
                         <div class="progress-left" id="pbLeftAllOut" style="width: 50%;"></div>
                         <div class="progress-right" id="pbRightAllOut" style="width: 50%;"></div>
@@ -437,9 +520,8 @@
 
         <!-- ============ LINEUP TAB ============ -->
         <div class="tab-content" id="tab-lineup">
-            
             <div class="lineup-team-toggle">
-                <div class="team-tog active-left" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div>
+                <div class="team-tog" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div>
                 <div class="team-tog" id="togRight" onclick="switchLineupTeam('right')">Right Team</div>
             </div>
 
@@ -562,19 +644,81 @@
 
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <!-- ============ FOOTER (from main site) ============ -->
+    <footer class="footer" role="contentinfo">
         <div class="footer-inner">
-            <div class="nav-logo">
-                <div class="logo-icon"><img src="/images/kabaddione_logo.png" alt="Logo"></div>
-                <span style="font-size: 1.2rem;">KabaddiOne</span>
+            <div class="footer-logo">
+                <div class="logo-icon">
+                    <img src="/images/kabaddione_logo.png" alt="KabaddiOne">
+                </div>
+                <span>KabaddiOne</span>
+            </div>
+            <div class="footer-links">
+                <a href="/#features">Features</a>
+                <a href="/#auto-super-tackle">Smart Auto</a>
+                <a href="/#sounds">Sounds</a>
+                <a href="/#languages">Languages</a>
+                <a href="/download.html">Download</a>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms & Conditions</a>
+                <a href="/sitemap.xml">Sitemap</a>
+                <a href="/contact.html">Contact Us</a>
+            </div>
+            <div class="social-links">
+                <a href="https://facebook.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://instagram.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com/@kabaddioneapp" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
             </div>
             <p class="footer-copy">© 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.</p>
         </div>
     </footer>
 
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top"><i class="fa-solid fa-up-long"></i></button>
+
     <script>
-        // --- 🚨 BUG 2 FIX: PREVENT DOM COLLAPSE ---
+        // ============ NAVIGATION ============
+        (function() {
+            const navbar = document.getElementById('navbar');
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const backToTop = document.getElementById('backToTop');
+            const allNavLinks = navLinks.querySelectorAll('a');
+
+            hamburger.addEventListener('click', function() {
+                const isActive = navLinks.classList.toggle('active');
+                hamburger.classList.toggle('active');
+                hamburger.setAttribute('aria-expanded', isActive);
+                document.body.style.overflow = isActive ? 'hidden' : '';
+            });
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            function updateNavbar() {
+                if (window.scrollY > 50) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            }
+            window.addEventListener('scroll', updateNavbar, { passive: true });
+            updateNavbar();
+
+            function updateBackToTop() {
+                if (window.scrollY > 600) backToTop.classList.add('visible');
+                else backToTop.classList.remove('visible');
+            }
+            window.addEventListener('scroll', updateBackToTop, { passive: true });
+            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            updateBackToTop();
+        })();
+    </script>
+
+    <script>
+        // ============ UI HELPERS ============
         window.expandedPlayerIds = new Set();
         
         function togglePlayerExpand(element, playerId) {
@@ -597,7 +741,6 @@
             if(tabId === 'graph') setTimeout(drawGraph, 50);
         }
 
-        // --- 🚨 BUG 1 FIX: LINEUP TEAM SWITCHER ---
         let currentLineupTeam = 'left';
         let latestGlobalState = null; 
         
@@ -605,6 +748,18 @@
             currentLineupTeam = side;
             document.getElementById('togLeft').className = `team-tog ${side === 'left' ? 'active-left' : ''}`;
             document.getElementById('togRight').className = `team-tog ${side === 'right' ? 'active-right' : ''}`;
+            // Apply active background dynamically
+            if (side === 'left') {
+                document.getElementById('togLeft').style.background = 'var(--left-team-color)';
+                document.getElementById('togLeft').style.color = '#fff';
+                document.getElementById('togRight').style.background = 'transparent';
+                document.getElementById('togRight').style.color = '#8C8E9F';
+            } else {
+                document.getElementById('togRight').style.background = 'var(--right-team-color)';
+                document.getElementById('togRight').style.color = '#fff';
+                document.getElementById('togLeft').style.background = 'transparent';
+                document.getElementById('togLeft').style.color = '#8C8E9F';
+            }
             if(latestGlobalState) renderLineups(latestGlobalState);
         }
 
@@ -622,7 +777,7 @@
             return { left: ((l / total) * 100) + "%", right: ((r / total) * 100) + "%" };
         }
 
-        // --- 🚨 BUG 5 FIX: DYNAMIC GRAPH ENGINE ---
+        // ============ GRAPH ENGINE ============
         let matchLogsForGraph = [];
         let leftTeamColorForGraph = "#4CAF50";
         let rightTeamColorForGraph = "#2196F3";
@@ -645,81 +800,81 @@
             const graphW = w - padLeft - padRight;
             const graphH = h - padTop - padBottom;
             
-            const dataPoints = [{ min: 0, lScore: 0, rScore: 0 }];
-            const intervalStep = totalMatchMinutes <= 20 ? 2 : 5; 
-            for(let i = intervalStep; i <= totalMatchMinutes; i += intervalStep) {
-                dataPoints.push({ min: i, lScore: null, rScore: null }); 
+            // Build data points based on logs
+            const dataPoints = [];
+            const step = totalMatchMinutes <= 20 ? 2 : 5;
+            for(let i = 0; i <= totalMatchMinutes; i += step) {
+                dataPoints.push({ min: i, lScore: null, rScore: null });
             }
             
-            let currentL = 0; let currentR = 0;
-            let currentHalf = 1;
+            let currentL = 0, currentR = 0, currentHalf = 1;
+            // logs are newest first - reverse to chronological
             const sortedLogs = [...matchLogsForGraph].reverse();
             
             for(let log of sortedLogs) {
-                if(log.title.includes("Half Time") || log.title.includes("Second Half") || log.timeStr.includes("2nd")) currentHalf = 2;
+                if(log.title && (log.title.includes("Half Time") || log.title.includes("Second Half")) || (log.timeStr && log.timeStr.includes("2nd"))) currentHalf = 2;
                 
                 let currentMinuteInHalf = 0;
-                const timeMatch = log.timeStr.match(/(\d+)'/);
+                const timeMatch = log.timeStr ? log.timeStr.match(/(\d+)'/) : null;
                 if(timeMatch) currentMinuteInHalf = parseInt(timeMatch[1]);
                 
                 const halfDuration = totalMatchMinutes / 2;
                 let absoluteMinute = (currentHalf === 1) ? currentMinuteInHalf : (halfDuration + currentMinuteInHalf);
                 
-                if(absoluteMinute > currentAbsoluteMatchMinute) currentAbsoluteMatchMinute = absoluteMinute;
-
                 if(log.scoreStr) {
                     const scores = log.scoreStr.replace("Score: ", "").split(" - ");
                     if(scores.length === 2) {
-                        currentL = parseInt(scores[0]);
-                        currentR = parseInt(scores[1]);
+                        currentL = parseInt(scores[0]) || 0;
+                        currentR = parseInt(scores[1]) || 0;
                     }
                 }
                 
+                // Fill in data points up to this minute
                 for(let pt of dataPoints) {
-                    if(absoluteMinute <= pt.min && pt.min <= currentAbsoluteMatchMinute) {
+                    if(absoluteMinute >= pt.min) {
                         pt.lScore = currentL;
                         pt.rScore = currentR;
                     }
                 }
             }
             
-            let highestL = 0; let highestR = 0;
+            // Fill forward - carry last known score
+            let lastL = 0, lastR = 0;
             for(let pt of dataPoints) {
-                if (pt.min <= currentAbsoluteMatchMinute) {
-                    if(pt.lScore === null) pt.lScore = highestL; else highestL = pt.lScore;
-                    if(pt.rScore === null) pt.rScore = highestR; else highestR = pt.rScore;
-                }
+                if (pt.min > currentAbsoluteMatchMinute) break; // Stop at current time
+                if(pt.lScore === null) pt.lScore = lastL; else lastL = pt.lScore;
+                if(pt.rScore === null) pt.rScore = lastR; else lastR = pt.rScore;
             }
 
-            const maxScore = Math.max(10, highestL, highestR);
+            const maxScore = Math.max(10, currentL, currentR);
             const yMax = Math.ceil(maxScore / 5) * 5;
             
+            // Grid lines
             ctx.lineWidth = 1; ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
             ctx.font = "12px sans-serif"; ctx.fillStyle = "#8C8E9F";
             ctx.textAlign = "right"; ctx.textBaseline = "middle";
             
-            for(let i = 0; i <= yMax; i += 5) {
+            for(let i = 0; i <= yMax; i += Math.max(1, Math.ceil(yMax/5))) {
                 const y = padTop + graphH - ((i / yMax) * graphH);
                 ctx.beginPath(); ctx.moveTo(padLeft, y); ctx.lineTo(padLeft + graphW, y); ctx.stroke();
                 ctx.fillText(i.toString(), padLeft - 10, y);
             }
             
+            // X axis labels
             ctx.textAlign = "center"; ctx.textBaseline = "top";
-            for(let i = 0; i <= totalMatchMinutes; i += intervalStep) {
+            for(let i = 0; i <= totalMatchMinutes; i += step) {
                 const x = padLeft + ((i / totalMatchMinutes) * graphW);
                 ctx.beginPath(); ctx.moveTo(x, padTop); ctx.lineTo(x, padTop + graphH); ctx.stroke();
-                if(i !== 0 || totalMatchMinutes <= 20) {
-                     ctx.fillText(i === 0 ? "1" : i.toString(), x, padTop + graphH + 10);
-                }
+                ctx.fillText(i.toString(), x, padTop + graphH + 10);
             }
             ctx.fillText("Minutes", padLeft + (graphW / 2), padTop + graphH + 25);
             
-            // 🚨 THE FIX: Draw only up to current match time
+            // Draw team lines
             const drawTeamLine = (isLeftTeam, color) => {
                 ctx.lineWidth = 3; ctx.strokeStyle = color; ctx.fillStyle = color;
                 ctx.beginPath();
                 let started = false;
-                dataPoints.forEach((pt, index) => {
+                dataPoints.forEach((pt) => {
                     if (pt.lScore === null || pt.rScore === null) return; 
                     const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
                     const score = isLeftTeam ? pt.lScore : pt.rScore;
@@ -730,6 +885,7 @@
                 });
                 ctx.stroke();
                 
+                // Data points
                 dataPoints.forEach((pt) => {
                     if (pt.lScore === null || pt.rScore === null) return;
                     const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
@@ -739,8 +895,8 @@
                 });
             };
             
-            // Draw loser line first so winner line paints over it
-            if (currentL > currentR) {
+            // Draw first (leading) team line on top
+            if (currentL >= currentR) {
                 drawTeamLine(false, rightTeamColorForGraph); 
                 drawTeamLine(true, leftTeamColorForGraph); 
             } else {
@@ -750,11 +906,17 @@
         }
         window.addEventListener('resize', () => { if(document.getElementById('tab-graph').classList.contains('active')) drawGraph(); });
 
-        // --- LINEUP RENDERER ---
+        // ============ LINEUP RENDERER ============
         function renderLineups(state) {
             if (!state.leftRosterJson || !state.rightRosterJson) return;
-            const lRoster = JSON.parse(state.leftRosterJson);
-            const rRoster = JSON.parse(state.rightRosterJson);
+            let lRoster, rRoster;
+            try {
+                lRoster = JSON.parse(state.leftRosterJson);
+                rRoster = JSON.parse(state.rightRosterJson);
+            } catch(e) {
+                console.error("Roster parse error", e);
+                return;
+            }
             
             const activeRoster = currentLineupTeam === 'left' ? lRoster : rRoster;
             const isLeftTeam = currentLineupTeam === 'left';
@@ -766,12 +928,10 @@
             const createPlayerHtml = (player) => {
                 const role = player.positionOnMat || "Substitute";
                 const totalPts = (player.raidPoints || 0) + (player.tacklePoints || 0);
-                
-                // 🚨 BUG 8 FIX: Safely bind the correct Jersey Number without breaking alignment
                 const nameDisplay = player.jerseyNumber ? `${player.name} (${player.jerseyNumber})` : player.name;
                 
                 const tRaid = player.totalRaids || 0;
-                const succRaid = (player.raidPoints > 0) ? player.raidPoints : 0; 
+                const succRaid = player.raidPoints > 0 ? player.raidPoints : 0; 
                 const unsRaid = Math.max(0, tRaid - succRaid);
                 const tTack = player.totalTackles || 0;
                 const succTack = player.tacklePoints || 0; 
@@ -835,11 +995,11 @@
                 else subsHtml += createPlayerHtml(player);
             });
 
-            document.getElementById('uiStarting7Grid').innerHTML = startersHtml;
-            document.getElementById('uiSubstitutesGrid').innerHTML = subsHtml;
+            document.getElementById('uiStarting7Grid').innerHTML = startersHtml || '<div style="text-align:center; padding: 20px; color:#8C8E9F;">No starting 7 set.</div>';
+            document.getElementById('uiSubstitutesGrid').innerHTML = subsHtml || '<div style="text-align:center; padding: 20px; color:#8C8E9F;">No substitutes.</div>';
         }
 
-        // --- FIREBASE INIT ---
+        // ============ FIREBASE INIT ============
         const firebaseConfig = {
             apiKey: "AIzaSyBciKNutpVo_zYXCLuVOIUb4VmoPaE7zHM",
             authDomain: "kabaddi-scoreboard.firebaseapp.com",
@@ -881,19 +1041,17 @@
 
                     if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
                     
-                    // 🚨 BUG 3 FIX: Raid Clock Pie Chart CSS Math
+                    // RAID CLOCK - FIXED conic gradient
                     if(data.raid_clock) {
                         const rc = document.getElementById('uiRaidClock');
                         const rContainer = document.getElementById('uiRaidTimerContainer');
                         rc.innerText = data.raid_clock;
                         
-                        const timeInt = parseInt(data.raid_clock);
+                        const timeInt = parseInt(data.raid_clock) || 30;
                         const deg = (timeInt / 30) * 360;
-                        rContainer.style.setProperty('--raid-deg', deg + 'deg');
                         
-                        // Counter-clockwise fill: 0deg is top. We fill transparent from `deg` to 360.
-                        if(timeInt <= 10) rContainer.style.background = `conic-gradient(transparent ${deg}deg, #FF3B30 0deg)`;
-                        else rContainer.style.background = `conic-gradient(transparent ${deg}deg, #FBC02D 0deg)`;
+                        let arcColor = timeInt <= 10 ? "#FF3B30" : "#FBC02D";
+                        rContainer.style.background = `conic-gradient(from 0deg, ${arcColor} 0deg ${deg}deg, #2A2D47 ${deg}deg 360deg)`;
                     }
 
                     if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
@@ -946,7 +1104,6 @@
                         document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
                         totalMatchMinutes = data.match_duration_mins * 2; 
                         
-                        // Parse clock to get precise absolute minute
                         let halfMins = data.match_duration_mins;
                         let currentHalfNum = (data.half_status && data.half_status.includes("1st")) ? 1 : 2;
                         if(data.half_status && data.half_status.includes("Match Over")) currentHalfNum = 2;
@@ -972,9 +1129,10 @@
                             const state = JSON.parse(data.state_json);
                             latestGlobalState = state; 
                             
-                            // 🚨 BUG 4 FIX: Empty Raids Sub-stats
                             document.getElementById('uiLeftEmptyRaids').innerText = state.leftEmptyRaids || 0;
                             document.getElementById('uiRightEmptyRaids').innerText = state.rightEmptyRaids || 0;
+                            document.getElementById('uiLeftEmptyRaidCount').innerText = state.leftEmptyRaids || 0;
+                            document.getElementById('uiRightEmptyRaidCount').innerText = state.rightEmptyRaids || 0;
 
                             document.getElementById('uiLeftFouls').innerText = state.leftFouls || 0;
                             document.getElementById('uiRightFouls').innerText = state.rightFouls || 0;
@@ -983,7 +1141,6 @@
                             document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                             document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
                             
-                            // 🚨 BUG 6 FIX: Active Raider Name
                             if (data.active_raider_name && data.active_raider_name !== "") {
                                 if (data.active_raider_team === "left") {
                                     document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${leftColor}; font-size:16px;">▶</span> ${data.active_raider_name} is on raid`;
@@ -994,8 +1151,7 @@
                                 document.getElementById('uiActiveRaider').innerHTML = "Waiting for raid...";
                             }
 
-                            // 🚨 BUG 7 FIX: Mat Dots properly aligned from center
-                            let lDotsHtml = ""; let rDotsHtml = "";
+                            // Mat dots
                             const fillDots = (arr, color) => {
                                 let html = "";
                                 if(arr) {
@@ -1007,13 +1163,11 @@
                                 }
                                 return html;
                             };
-                            lDotsHtml = fillDots(state.leftDotStates, leftColor);
-                            rDotsHtml = fillDots(state.rightDotStates, rightColor);
                             
                             document.getElementById('uiMatDots').innerHTML = `
-                                <div class="team-dots left">${lDotsHtml}</div>
+                                <div class="team-dots left">${fillDots(state.leftDotStates, leftColor)}</div>
                                 <div class="mat-divider"></div>
-                                <div class="team-dots right">${rDotsHtml}</div>
+                                <div class="team-dots right">${fillDots(state.rightDotStates, rightColor)}</div>
                             `;
                             
                             const lRaid = state.leftRaidPoints || 0; const rRaid = state.rightRaidPoints || 0;
@@ -1090,12 +1244,12 @@
                                     else if(t.includes("ALL OUT")) { iconHtml = '<i class="fa-solid fa-skull"></i>'; badgeText = "+2"; }
                                     else if(t.includes("Toss")) { iconHtml = '<i class="fa-solid fa-coins"></i>'; iconBg = "#4CAF50"; }
                                     else if(t.includes("Starting 7") || t.includes("Substitution")) { iconHtml = '<i class="fa-solid fa-users"></i>'; }
-                                    else if(t.includes("Half") || t.includes("Match Started") || t.includes("Full Time")) { iconHtml = '<i class="fa-solid fa-whistle"></i>'; iconBg = "#FBC02D"; }
+                                    else if(t.includes("Half") || t.includes("Match Started") || t.includes("Full Time")) { iconHtml = '<i class="fa-solid fa-flag-checkered"></i>'; iconBg = "#FBC02D"; }
                                     else if(t.includes("Card")) { iconHtml = '<i class="fa-solid fa-square"></i>'; iconBg = "#FFEB3B"; }
                                     else if(t.includes("Time-Out") || t.includes("Timeout")) { iconHtml = '<i class="fa-solid fa-stopwatch"></i>'; iconBg = "#FF5E3A"; }
 
                                     let badgeHtml = badgeText ? `<div class="log-badge" style="background: ${badgeColor}33; color: ${badgeColor};">${badgeText}</div>` : "";
-                                    let scoreHtml = log.scoreStr ? `<div class="log-score-str">Score: ${log.scoreStr.replace("Score: ", "")}</div>` : "";
+                                    let scoreHtml = log.scoreStr ? `<div class="log-score-str">${log.scoreStr.replace("Score: ", "S: ")}</div>` : "";
 
                                     logHtml += `
                                     <div class="log-item">
@@ -1110,7 +1264,6 @@
                                 document.getElementById('uiTimelineLogs').innerHTML = logHtml || "<div style='text-align:center; color:#8C8E9F; padding: 20px;'>No events recorded yet.</div>";
                             }
 
-                            // 🚨 BUG 1 FIX: Safely route to renderLineups which now handles the Team Toggles properly
                             renderLineups(state);
 
                         } catch(e) {
@@ -1122,6 +1275,11 @@
                 }
             });
         }
+
+        // Initialize lineup toggle on load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchLineupTeam('left');
+        });
     </script>
 </body>
 </html>
