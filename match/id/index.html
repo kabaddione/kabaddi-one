@@ -21,6 +21,10 @@
             --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px;
             --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
             --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            
+            /* Dynamic Team Colors (Updated by JS) */
+            --left-team-color: #4CAF50;
+            --right-team-color: #2196F3;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -99,6 +103,10 @@
         .tab { flex: 1; background: #2A2D47; color: #b0b0c8; text-align: center; padding: 10px 0; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab.active { background: #FF5E3A; color: white; }
         
+        /* Container Sections */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
         /* Commentary Timeline */
         .timeline-card { background: #1E213A; border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .timeline-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
@@ -119,12 +127,53 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        
+        /* ============ STATS SECTION UI ============ */
+        .stats-card { background: #1E213A; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 20px; }
+        .stats-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
+        .stats-team-info { display: flex; align-items: center; gap: 10px; width: 120px;}
+        .stats-team-info.right { justify-content: flex-end; text-align: right; }
+        .stats-team-name { font-size: 14px; font-weight: bold; line-height: 1.2;}
+        .stats-team-logo { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; flex-shrink: 0;}
+        .stats-title-center { font-size: 14px; color: #8C8E9F; font-weight: 600; text-align: center; flex: 1;}
+        
+        .stat-row { margin-bottom: 24px; position: relative;}
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-values { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px; position: relative; z-index: 2;}
+        .stat-val-left { font-size: 24px; font-weight: 900; color: var(--left-team-color); line-height: 1;}
+        .stat-val-right { font-size: 24px; font-weight: 900; color: var(--right-team-color); line-height: 1;}
+        .stat-label-center { font-size: 12px; color: white; text-align: center; position: absolute; left: 0; right: 0; bottom: 4px; z-index: 1;}
+        
+        /* Progress Bar (Matches the design) */
+        .progress-container { width: 100%; height: 6px; background: #2A2D47; border-radius: 3px; display: flex; overflow: hidden; }
+        .progress-left { height: 100%; background: var(--left-team-color); border-radius: 3px 0 0 3px; transition: width 0.5s ease;}
+        .progress-right { height: 100%; background: var(--right-team-color); border-radius: 0 3px 3px 0; margin-left: auto; transition: width 0.5s ease;}
+        
+        /* Strike Rates Donuts */
+        .strike-rates-container { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; position: relative; padding-bottom: 20px;}
+        .donut-wrapper { position: relative; width: 100px; height: 100px; }
+        .donut-chart { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .donut-inner { width: 70px; height: 70px; background: #1E213A; border-radius: 50%; }
+        /* The CSS trick for the partial donut stroke */
+        .donut-left { background: conic-gradient(var(--left-team-color) var(--left-strike-deg), white 0deg); }
+        .donut-right { background: conic-gradient(var(--right-team-color) var(--right-strike-deg), white 0deg); }
+        
+        /* Strike Rate Text (Outside the donuts) */
+        .strike-val-left { font-size: 24px; font-weight: 900; color: var(--left-team-color); }
+        .strike-val-right { font-size: 24px; font-weight: 900; color: var(--right-team-color); }
+        .strike-label-center { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: 12px; color: white; font-weight: bold;}
+        
+        /* Longest Streak section */
+        .streak-section { margin-top: 20px; }
 
         @media (max-width: 400px) {
             .team-score { font-size: 56px; }
             .team-name { font-size: 14px; }
             .main-timer { font-size: 36px; }
             .log-item { gap: 10px; }
+            .donut-wrapper { width: 80px; height: 80px; }
+            .donut-inner { width: 56px; height: 56px; }
+            .strike-val-left, .strike-val-right { font-size: 20px; }
         }
     </style>
 </head>
@@ -166,11 +215,11 @@
             
             <div class="scores-row">
                 <div class="team-score-box">
-                    <div class="team-score" id="uiLeftScore" style="color: #4CAF50;">0</div>
+                    <div class="team-score" id="uiLeftScore" style="color: var(--left-team-color);">0</div>
                     <div class="team-name" id="uiLeftName">Left Team</div>
                 </div>
                 <div class="team-score-box">
-                    <div class="team-score" id="uiRightScore" style="color: #2196F3;">0</div>
+                    <div class="team-score" id="uiRightScore" style="color: var(--right-team-color);">0</div>
                     <div class="team-name" id="uiRightName">Right Team</div>
                 </div>
             </div>
@@ -188,14 +237,14 @@
         <!-- Sub Stats Bar -->
         <div class="sub-stats-bar">
             <!-- Left Side -->
-            <div class="stat-team-half" id="uiLeftSubBg" style="background: #1B5E20;">
+            <div class="stat-team-half" id="uiLeftSubBg" style="background: var(--left-team-color);">
                 <div class="stat-item"><i class="fa-solid fa-hand-paper"></i> <span id="uiLeftFouls">0</span></div>
                 <div class="stat-item"><i class="fa-solid fa-t"></i> <span id="uiLeftTimeouts">0</span></div>
                 <div class="stat-item"><i class="fa-solid fa-right-left"></i> <span id="uiLeftSubs">0</span></div>
                 <div class="stat-item"><div class="card-icon"></div> <span id="uiLeftCards">0</span></div>
             </div>
             <!-- Right Side -->
-            <div class="stat-team-half" id="uiRightSubBg" style="background: #0D47A1;">
+            <div class="stat-team-half" id="uiRightSubBg" style="background: var(--right-team-color);">
                 <div class="stat-item"><span id="uiRightCards">0</span> <div class="card-icon"></div></div>
                 <div class="stat-item"><span id="uiRightSubs">0</span> <i class="fa-solid fa-right-left"></i></div>
                 <div class="stat-item"><span id="uiRightTimeouts">0</span> <i class="fa-solid fa-t"></i></div>
@@ -205,18 +254,157 @@
 
         <!-- Tabs -->
         <div class="tabs">
-            <div class="tab active">Commentary</div>
-            <div class="tab">Stats</div>
-            <div class="tab">Lineup</div>
-            <div class="tab">Graph</div>
-            <div class="tab">Details</div>
+            <div class="tab active" onclick="switchTab('commentary', this)">Commentary</div>
+            <div class="tab" onclick="switchTab('stats', this)">Stats</div>
+            <div class="tab" style="opacity: 0.5;">Lineup</div>
+            <div class="tab" style="opacity: 0.5;">Graph</div>
+            <div class="tab" style="opacity: 0.5;">Details</div>
         </div>
 
-        <!-- Commentary Timeline -->
-        <div class="timeline-card">
+        <!-- Commentary Timeline Tab -->
+        <div class="timeline-card tab-content active" id="tab-commentary">
             <div class="timeline-list" id="uiTimelineLogs">
                 <div style="text-align:center; color:#8C8E9F; padding: 20px;">Waiting for match events...</div>
             </div>
+        </div>
+        
+        <!-- Stats Tab -->
+        <div class="tab-content" id="tab-stats">
+            
+            <!-- Points Breakdown Card -->
+            <div class="stats-card">
+                <div class="stats-header-row">
+                    <div class="stats-team-info">
+                        <div class="stats-team-name" id="stLeftName">Left Team</div>
+                        <div class="stats-team-logo" id="stLeftLogo" style="background: var(--left-team-color);">LT</div>
+                    </div>
+                    <div class="stats-title-center">Half Wise Comparison</div>
+                    <div class="stats-team-info right">
+                        <div class="stats-team-logo" id="stRightLogo" style="background: var(--right-team-color);">RT</div>
+                        <div class="stats-team-name" id="stRightName">Right Team</div>
+                    </div>
+                </div>
+                
+                <!-- Total Points -->
+                <div class="stat-row">
+                    <div class="stat-values">
+                        <div class="stat-val-left" id="stLeftTotal">0</div>
+                        <div class="stat-val-right" id="stRightTotal">0</div>
+                    </div>
+                    <div class="stat-label-center">Total Points</div>
+                    <div class="progress-container">
+                        <div class="progress-left" id="pbLeftTotal" style="width: 50%;"></div>
+                        <div class="progress-right" id="pbRightTotal" style="width: 50%;"></div>
+                    </div>
+                </div>
+                
+                <!-- Raid Points -->
+                <div class="stat-row">
+                    <div class="stat-values">
+                        <div class="stat-val-left" id="stLeftRaid">0</div>
+                        <div class="stat-val-right" id="stRightRaid">0</div>
+                    </div>
+                    <div class="stat-label-center">Raid Points</div>
+                    <div class="progress-container">
+                        <div class="progress-left" id="pbLeftRaid" style="width: 50%;"></div>
+                        <div class="progress-right" id="pbRightRaid" style="width: 50%;"></div>
+                    </div>
+                </div>
+                
+                <!-- Tackle Points -->
+                <div class="stat-row">
+                    <div class="stat-values">
+                        <div class="stat-val-left" id="stLeftTackle">0</div>
+                        <div class="stat-val-right" id="stRightTackle">0</div>
+                    </div>
+                    <div class="stat-label-center">Tackle Points</div>
+                    <div class="progress-container">
+                        <div class="progress-left" id="pbLeftTackle" style="width: 50%;"></div>
+                        <div class="progress-right" id="pbRightTackle" style="width: 50%;"></div>
+                    </div>
+                </div>
+                
+                <!-- All out Points -->
+                <div class="stat-row">
+                    <div class="stat-values">
+                        <div class="stat-val-left" id="stLeftAllOut">0</div>
+                        <div class="stat-val-right" id="stRightAllOut">0</div>
+                    </div>
+                    <div class="stat-label-center">All out Points</div>
+                    <div class="progress-container">
+                        <div class="progress-left" id="pbLeftAllOut" style="width: 50%;"></div>
+                        <div class="progress-right" id="pbRightAllOut" style="width: 50%;"></div>
+                    </div>
+                </div>
+                
+                <!-- Extra Points -->
+                <div class="stat-row">
+                    <div class="stat-values">
+                        <div class="stat-val-left" id="stLeftExtra">0</div>
+                        <div class="stat-val-right" id="stRightExtra">0</div>
+                    </div>
+                    <div class="stat-label-center">Extra Points</div>
+                    <div class="progress-container">
+                        <div class="progress-left" id="pbLeftExtra" style="width: 50%;"></div>
+                        <div class="progress-right" id="pbRightExtra" style="width: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Stats Card -->
+            <div class="stats-card">
+                <div class="stats-header-row">
+                    <div class="stats-team-info">
+                        <div class="stats-team-name" id="stPerfLeftName">Left Team</div>
+                        <div class="stats-team-logo" id="stPerfLeftLogo" style="background: var(--left-team-color);">LT</div>
+                    </div>
+                    <div class="stats-title-center">Points Break Down</div>
+                    <div class="stats-team-info right">
+                        <div class="stats-team-logo" id="stPerfRightLogo" style="background: var(--right-team-color);">RT</div>
+                        <div class="stats-team-name" id="stPerfRightName">Right Team</div>
+                    </div>
+                </div>
+                
+                <!-- Total Raids/Tackles -->
+                <div class="stat-row" style="margin-bottom: 10px;">
+                    <div class="stat-values" style="justify-content: center; gap: 60px;">
+                        <div class="stat-val-left" id="stLeftTotalPerf">0</div>
+                        <div class="stat-label-center" style="position: static; font-weight: bold;">Total Raids</div>
+                        <div class="stat-val-right" id="stRightTotalPerf">0</div>
+                    </div>
+                </div>
+                
+                <!-- Successful Raids/Tackles -->
+                <div class="stat-row" style="margin-bottom: 20px;">
+                    <div class="stat-values" style="justify-content: center; gap: 60px;">
+                        <div class="stat-val-left" id="stLeftSuccPerf" style="color: white;">0</div>
+                        <div class="stat-label-center" style="position: static; background: #2A2D47; padding: 4px 10px; border-radius: 4px; font-weight: bold;">Successful Raids</div>
+                        <div class="stat-val-right" id="stRightSuccPerf" style="color: white;">0</div>
+                    </div>
+                </div>
+                
+                <!-- Strike Rates Section -->
+                <div class="strike-rates-container">
+                    <div class="strike-val-left" id="stLeftStrikeVal">0%</div>
+                    
+                    <div class="donut-wrapper">
+                        <div class="donut-chart donut-left" id="pbLeftStrikeChart" style="--left-strike-deg: 0deg;">
+                            <div class="donut-inner"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="strike-label-center">Raid Strike Rate</div>
+                    
+                    <div class="donut-wrapper">
+                        <div class="donut-chart donut-right" id="pbRightStrikeChart" style="--right-strike-deg: 0deg;">
+                            <div class="donut-inner"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="strike-val-right" id="stRightStrikeVal">0%</div>
+                </div>
+            </div>
+            
         </div>
 
     </div>
@@ -233,6 +421,37 @@
     </footer>
 
     <script>
+        // --- TAB SWITCHER LOGIC ---
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            element.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+        
+        // Helper to extract initials for team logo
+        function getInitials(name) {
+            if (!name) return "T";
+            const words = name.trim().split(" ");
+            if (words.length > 1) {
+                return (words[0][0] + words[1][0]).toUpperCase();
+            }
+            return name.substring(0, 2).toUpperCase();
+        }
+        
+        // Helper to calculate widths for progress bars
+        function calculateWidths(leftVal, rightVal) {
+            const l = parseInt(leftVal) || 0;
+            const r = parseInt(rightVal) || 0;
+            const total = l + r;
+            if (total === 0) return { left: "50%", right: "50%" };
+            return {
+                left: ((l / total) * 100) + "%",
+                right: ((r / total) * 100) + "%"
+            };
+        }
+
         // 1. Initialize Firebase (Ensure URL points to asia-southeast1)
         const firebaseConfig = {
             apiKey: "AIzaSyBciKNutpVo_zYXCLuVOIUb4VmoPaE7zHM",
@@ -272,22 +491,39 @@
                     }
                     if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
                     
-                    if(data.left_name) document.getElementById('uiLeftName').innerText = data.left_name;
-                    if(data.right_name) document.getElementById('uiRightName').innerText = data.right_name;
+                    if(data.left_name) {
+                        document.getElementById('uiLeftName').innerText = data.left_name;
+                        document.getElementById('stLeftName').innerText = data.left_name;
+                        document.getElementById('stPerfLeftName').innerText = data.left_name;
+                        document.getElementById('stLeftLogo').innerText = getInitials(data.left_name);
+                        document.getElementById('stPerfLeftLogo').innerText = getInitials(data.left_name);
+                    }
+                    if(data.right_name) {
+                        document.getElementById('uiRightName').innerText = data.right_name;
+                        document.getElementById('stRightName').innerText = data.right_name;
+                        document.getElementById('stPerfRightName').innerText = data.right_name;
+                        document.getElementById('stRightLogo').innerText = getInitials(data.right_name);
+                        document.getElementById('stPerfRightLogo').innerText = getInitials(data.right_name);
+                    }
                     
-                    if(data.left_score !== undefined) document.getElementById('uiLeftScore').innerText = data.left_score;
-                    if(data.right_score !== undefined) document.getElementById('uiRightScore').innerText = data.right_score;
+                    if(data.left_score !== undefined) {
+                        document.getElementById('uiLeftScore').innerText = data.left_score;
+                        document.getElementById('stLeftTotal').innerText = data.left_score;
+                    }
+                    if(data.right_score !== undefined) {
+                        document.getElementById('uiRightScore').innerText = data.right_score;
+                        document.getElementById('stRightTotal').innerText = data.right_score;
+                    }
 
                     // Apply Android Team Colors to Web UI
                     const leftColor = data.left_color || "#4CAF50";
                     const rightColor = data.right_color || "#2196F3";
                     
-                    document.getElementById('uiLeftScore').style.color = leftColor;
-                    document.getElementById('uiRightScore').style.color = rightColor;
+                    // Update CSS variables for progress bars and donuts
+                    document.documentElement.style.setProperty('--left-team-color', leftColor);
+                    document.documentElement.style.setProperty('--right-team-color', rightColor);
                     
                     // Darken the colors slightly for the sub-stats background
-                    document.getElementById('uiLeftSubBg').style.background = leftColor;
-                    document.getElementById('uiRightSubBg').style.background = rightColor;
                     document.getElementById('uiLeftSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
                     document.getElementById('uiRightSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
 
@@ -296,7 +532,7 @@
                         try {
                             const state = JSON.parse(data.state_json);
                             
-                            // Sub Stats
+                            // Sub Stats (Top Bar)
                             document.getElementById('uiLeftFouls').innerText = state.leftFouls || 0;
                             document.getElementById('uiRightFouls').innerText = state.rightFouls || 0;
                             document.getElementById('uiLeftTimeouts').innerText = state.leftTimeouts || 0;
@@ -328,8 +564,76 @@
                             dotsHtml += `<div class="mat-divider"></div>`;
                             dotsHtml += drawDots(state.rightDotStates, rightColor);
                             document.getElementById('uiMatDots').innerHTML = dotsHtml;
+                            
+                            // ==========================================
+                            // POPULATE STATS TAB
+                            // ==========================================
+                            
+                            // Raid Points
+                            const lRaid = state.leftRaidPoints || 0; const rRaid = state.rightRaidPoints || 0;
+                            document.getElementById('stLeftRaid').innerText = lRaid;
+                            document.getElementById('stRightRaid').innerText = rRaid;
+                            const wRaid = calculateWidths(lRaid, rRaid);
+                            document.getElementById('pbLeftRaid').style.width = wRaid.left;
+                            document.getElementById('pbRightRaid').style.width = wRaid.right;
+                            
+                            // Tackle Points
+                            const lTackle = state.leftTacklePoints || 0; const rTackle = state.rightTacklePoints || 0;
+                            document.getElementById('stLeftTackle').innerText = lTackle;
+                            document.getElementById('stRightTackle').innerText = rTackle;
+                            const wTackle = calculateWidths(lTackle, rTackle);
+                            document.getElementById('pbLeftTackle').style.width = wTackle.left;
+                            document.getElementById('pbRightTackle').style.width = wTackle.right;
+                            
+                            // All Out Points
+                            const lAll = state.leftAllOutPoints || 0; const rAll = state.rightAllOutPoints || 0;
+                            document.getElementById('stLeftAllOut').innerText = lAll;
+                            document.getElementById('stRightAllOut').innerText = rAll;
+                            const wAll = calculateWidths(lAll, rAll);
+                            document.getElementById('pbLeftAllOut').style.width = wAll.left;
+                            document.getElementById('pbRightAllOut').style.width = wAll.right;
+                            
+                            // Extra Points
+                            const lExtra = state.leftExtraPoints || 0; const rExtra = state.rightExtraPoints || 0;
+                            document.getElementById('stLeftExtra').innerText = lExtra;
+                            document.getElementById('stRightExtra').innerText = rExtra;
+                            const wExtra = calculateWidths(lExtra, rExtra);
+                            document.getElementById('pbLeftExtra').style.width = wExtra.left;
+                            document.getElementById('pbRightExtra').style.width = wExtra.right;
+                            
+                            // Total Progress Bar
+                            const lTotal = data.left_score || 0; const rTotal = data.right_score || 0;
+                            const wTotal = calculateWidths(lTotal, rTotal);
+                            document.getElementById('pbLeftTotal').style.width = wTotal.left;
+                            document.getElementById('pbRightTotal').style.width = wTotal.right;
+                            
+                            // Performance Breakdown
+                            const lTotRaids = state.leftTotalRaids || 0;
+                            const rTotRaids = state.rightTotalRaids || 0;
+                            document.getElementById('stLeftTotalPerf').innerText = lTotRaids;
+                            document.getElementById('stRightTotalPerf').innerText = rTotRaids;
+                            
+                            const lSuccRaids = state.leftSuccessfulRaids || 0;
+                            const rSuccRaids = state.rightSuccessfulRaids || 0;
+                            document.getElementById('stLeftSuccPerf').innerText = lSuccRaids;
+                            document.getElementById('stRightSuccPerf').innerText = rSuccRaids;
+                            
+                            // Strike Rate Math
+                            const lStrike = lTotRaids > 0 ? ((lSuccRaids / lTotRaids) * 100).toFixed(1) : 0;
+                            const rStrike = rTotRaids > 0 ? ((rSuccRaids / rTotRaids) * 100).toFixed(1) : 0;
+                            
+                            document.getElementById('stLeftStrikeVal').innerText = lStrike + "%";
+                            document.getElementById('stRightStrikeVal').innerText = rStrike + "%";
+                            
+                            // Update Donut Charts (360deg logic)
+                            const lDeg = (lStrike / 100) * 360;
+                            const rDeg = (rStrike / 100) * 360;
+                            document.getElementById('pbLeftStrikeChart').style.setProperty('--left-strike-deg', lDeg + 'deg');
+                            document.getElementById('pbRightStrikeChart').style.setProperty('--right-strike-deg', rDeg + 'deg');
 
-                            // Decode and Render Timeline Logs (Commentary)
+                            // ==========================================
+                            // DECODE TIMELINE LOGS (Commentary)
+                            // ==========================================
                             if (state.logsJson) {
                                 const logs = JSON.parse(state.logsJson);
                                 let logHtml = "";
