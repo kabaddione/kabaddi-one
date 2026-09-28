@@ -789,6 +789,26 @@
             db.ref('live_matches/' + matchId).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
+                    
+                    // 🚨 DYNAMIC TIMEOUT / HALF-TIME CLOCK OVERLAY
+                    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
+                    
+                    if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
+                        // Override the top detail bar with a glowing yellow timeout status
+                        document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
+                        document.getElementById('uiMatchDate').style.color = "#FBC02D";
+                        document.getElementById('uiMatchDate').style.fontWeight = "bold";
+                        document.getElementById('uiMatchDate').style.fontSize = "13px";
+                    } else {
+                        // Restore standard match details
+                        document.getElementById('uiMatchDate').innerText = dateStr + ", Live Kabaddi Arena";
+                        document.getElementById('uiMatchDate').style.color = "#8C8E9F";
+                        document.getElementById('uiMatchDate').style.fontWeight = "normal";
+                        document.getElementById('uiMatchDate').style.fontSize = "11px";
+                    }
+
                     if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
                     if(data.raid_clock) {
                         const rc = document.getElementById('uiRaidClock');
@@ -842,10 +862,9 @@
                     document.getElementById('uiLeftSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
                     document.getElementById('uiRightSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
 
-                    // NEW: Update Match Settings from Firebase
                     if(data.match_duration_mins) {
                         document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
-                        totalMatchMinutes = data.match_duration_mins * 2; // Graph needs total match time
+                        totalMatchMinutes = data.match_duration_mins * 2; 
                     }
                     if(data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
                     if(data.players_per_side) document.getElementById('dtPlayers').innerText = data.players_per_side + " Players";
@@ -857,7 +876,6 @@
                         try {
                             const state = JSON.parse(data.state_json);
                             
-                            // A. SUB STATS
                             document.getElementById('uiLeftFouls').innerText = state.leftFouls || 0;
                             document.getElementById('uiRightFouls').innerText = state.rightFouls || 0;
                             document.getElementById('uiLeftTimeouts').innerText = state.leftTimeouts || 0;
@@ -865,13 +883,13 @@
                             document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                             document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
                             
+                            // 🚨 ACTIVE RAIDER WITH CUSTOM COLOR BOLDING
                             if (state.currentRaidTeamIsLeft) {
-                                document.getElementById('uiActiveRaider').innerHTML = `▶ ${data.left_name} is on raid`;
+                                document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${leftColor}; font-size:16px;">▶</span> ${data.left_name} is on raid`;
                             } else {
-                                document.getElementById('uiActiveRaider').innerHTML = `◀ ${data.right_name} is on raid`;
+                                document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${rightColor}; font-size:16px;">◀</span> ${data.right_name} is on raid`;
                             }
 
-                            // B. MAT DOTS
                             let dotsHtml = "";
                             const drawDots = (statesArray, color) => {
                                 let html = "";
@@ -889,7 +907,6 @@
                             dotsHtml += drawDots(state.rightDotStates, rightColor);
                             document.getElementById('uiMatDots').innerHTML = dotsHtml;
                             
-                            // C. STATS TAB
                             const lRaid = state.leftRaidPoints || 0; const rRaid = state.rightRaidPoints || 0;
                             document.getElementById('stLeftRaid').innerText = lRaid;
                             document.getElementById('stRightRaid').innerText = rRaid;
@@ -941,7 +958,6 @@
                             document.getElementById('pbLeftStrikeChart').style.setProperty('--left-strike-deg', lDeg + 'deg');
                             document.getElementById('pbRightStrikeChart').style.setProperty('--right-strike-deg', rDeg + 'deg');
 
-                            // D. TIMELINE LOGS & GRAPH DATA
                             if (state.logsJson) {
                                 const logs = JSON.parse(state.logsJson);
                                 matchLogsForGraph = logs; 
@@ -966,9 +982,11 @@
                                     else if(t.includes("Super Tackle")) { iconHtml = '<i class="fa-solid fa-shield-halved"></i>'; badgeText = "+2"; }
                                     else if(t.includes("ALL OUT")) { iconHtml = '<i class="fa-solid fa-skull"></i>'; badgeText = "+2"; }
                                     else if(t.includes("Toss")) { iconHtml = '<i class="fa-solid fa-coins"></i>'; iconBg = "#4CAF50"; }
-                                    else if(t.includes("Starting 7")) { iconHtml = '<i class="fa-solid fa-users"></i>'; }
+                                    else if(t.includes("Starting 7") || t.includes("Substitution")) { iconHtml = '<i class="fa-solid fa-users"></i>'; }
                                     else if(t.includes("Half") || t.includes("Match Started") || t.includes("Full Time")) { iconHtml = '<i class="fa-solid fa-whistle"></i>'; iconBg = "#FBC02D"; }
-                                    
+                                    else if(t.includes("Card")) { iconHtml = '<i class="fa-solid fa-square"></i>'; iconBg = "#FFEB3B"; }
+                                    else if(t.includes("Time-Out") || t.includes("Timeout")) { iconHtml = '<i class="fa-solid fa-stopwatch"></i>'; iconBg = "#FF5E3A"; }
+
                                     let badgeHtml = badgeText ? `<div class="log-badge" style="background: ${badgeColor}33; color: ${badgeColor};">${badgeText}</div>` : "";
                                     let scoreHtml = log.scoreStr ? `<div class="log-score-str">Score: ${log.scoreStr.replace("Score: ", "")}</div>` : "";
 
@@ -985,7 +1003,6 @@
                                 document.getElementById('uiTimelineLogs').innerHTML = logHtml || "<div style='text-align:center; color:#8C8E9F; padding: 20px;'>No events recorded yet.</div>";
                             }
 
-                            // E. LINEUP TAB
                             if (state.leftRosterJson && state.rightRosterJson) {
                                 const lRoster = JSON.parse(state.leftRosterJson);
                                 const rRoster = JSON.parse(state.rightRosterJson);
@@ -1009,14 +1026,18 @@
 
                                     const raidSuccDeg = tRaid > 0 ? (succRaid / tRaid) * 360 : 0;
                                     const raidUnsDeg = tRaid > 0 ? (unsRaid / tRaid) * 360 : 0;
-                                    
                                     const tackSuccDeg = tTack > 0 ? (succTack / tTack) * 360 : 0;
                                     const tackUnsDeg = tTack > 0 ? (unsTack / tTack) * 360 : 0;
+
+                                    // 🚨 BASE64 IMAGE DECODER
+                                    const imgContent = (player.imageUri && player.imageUri.startsWith("data:image")) 
+                                        ? `<img src="${player.imageUri}" alt="Profile">` 
+                                        : `<i class="fa-solid fa-user"></i>`;
 
                                     return `
                                     <div class="player-bar-container" onclick="togglePlayerExpand(this)">
                                         <div class="player-bar ${teamClass}">
-                                            <div class="player-img-wrapper"><i class="fa-solid fa-user"></i></div>
+                                            <div class="player-img-wrapper">${imgContent}</div>
                                             <div class="player-info">
                                                 <div class="player-name">${nameDisplay}</div>
                                                 <div class="player-role">${role}</div>
