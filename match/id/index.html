@@ -842,6 +842,17 @@
                     document.getElementById('uiLeftSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
                     document.getElementById('uiRightSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
 
+                    // NEW: Update Match Settings from Firebase
+                    if(data.match_duration_mins) {
+                        document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
+                        totalMatchMinutes = data.match_duration_mins * 2; // Graph needs total match time
+                    }
+                    if(data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
+                    if(data.players_per_side) document.getElementById('dtPlayers').innerText = data.players_per_side + " Players";
+                    if(data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs + " Seconds";
+                    if(data.max_subs) document.getElementById('dtSubs').innerText = data.max_subs;
+                    if(data.max_timeouts) document.getElementById('dtTimeouts').innerText = data.max_timeouts;
+
                     if(data.state_json) {
                         try {
                             const state = JSON.parse(data.state_json);
@@ -935,21 +946,6 @@
                                 const logs = JSON.parse(state.logsJson);
                                 matchLogsForGraph = logs; 
                                 
-                                let highestMin = 20; 
-                                logs.forEach(l => {
-                                    const mMatch = l.timeStr.match(/(\d+)'/);
-                                    if(mMatch) {
-                                        const m = parseInt(mMatch[1]);
-                                        if(l.title.includes("Second Half") || l.timeStr.includes("2nd")) {
-                                            if(m > highestMin) highestMin = m;
-                                        }
-                                    }
-                                });
-                                totalMatchMinutes = highestMin > 0 ? highestMin * 2 : 40;
-                                
-                                // Update Match Duration Detail dynamically
-                                document.getElementById('dtDuration').innerText = `${totalMatchMinutes / 2} Minutes`;
-
                                 if(document.getElementById('tab-graph').classList.contains('active')) {
                                     drawGraph();
                                 }
