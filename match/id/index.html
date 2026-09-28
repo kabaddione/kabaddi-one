@@ -50,7 +50,6 @@
         .bg-orb:nth-child(3) { width: 350px; height: 350px; background: var(--accent-secondary); bottom: -10%; left: 20%; animation-delay: -12s; }
         @keyframes orbFloat { 0%,100% { transform: translate3d(0,0,0) scale(1); } 25% { transform: translate3d(60px,-40px,0) scale(1.15); } 50% { transform: translate3d(-30px,50px,0) scale(0.9); } 75% { transform: translate3d(-50px,-30px,0) scale(1.1); } }
 
-        /* NAVIGATION */
         .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); transition: var(--transition-smooth); background: rgba(10, 10, 26, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); }
         .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; height: 100%; gap: 12px; }
         .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; letter-spacing: -0.5px; z-index: 1001; flex-shrink: 0; }
@@ -79,7 +78,6 @@
             .hamburger { display: flex; }
         }
 
-        /* FOOTER */
         .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; position: relative; z-index: 1; margin-top: auto; }
         .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; }
         .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: #fff; font-family: var(--font-heading); }
@@ -98,7 +96,6 @@
         .back-to-top.visible { opacity: 1; pointer-events: auto; }
         .back-to-top:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(255,94,58,0.55); }
 
-        /* LIVE SCORE UI */
         .live-wrapper { padding: calc(var(--nav-height) + 40px) 20px 60px; max-width: 600px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
         .score-card { background: #1E213A; border-radius: 24px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; margin-bottom: 12px; }
         .score-card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background: url('https://kabaddione.com/images/feature-background-round.png') center/cover; opacity:0.05; pointer-events: none; }
@@ -253,7 +250,6 @@
         <div class="bg-orb"></div>
     </div>
 
-    <!-- NAVIGATION -->
     <nav class="nav" id="navbar" aria-label="Main navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo" aria-label="KabaddiOne Home">
@@ -283,7 +279,6 @@
         </div>
     </nav>
 
-    <!-- LIVE SCORE WRAPPER -->
     <div class="live-wrapper">
         
         <div class="score-card">
@@ -595,7 +590,6 @@
 
     </div>
 
-    <!-- FOOTER -->
     <footer class="footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-logo">
@@ -628,7 +622,6 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
     <script>
-        // ============ NAVIGATION ============
         (function() {
             const navbar = document.getElementById('navbar');
             const hamburger = document.getElementById('hamburger');
@@ -728,19 +721,141 @@
             return { left: ((l / total) * 100) + "%", right: ((r / total) * 100) + "%" };
         }
 
-        // ============ COMPLETELY REWRITTEN GRAPH ENGINE ============
+        // ============================================================
+        // ============ TOTALLY REWRITTEN GRAPH ENGINE ================
+        // ============================================================
         let matchLogsForGraph = [];
         let leftTeamColorForGraph = "#4CAF50";
         let rightTeamColorForGraph = "#2196F3";
         let totalMatchMinutes = 40;
         let currentAbsoluteMatchMinute = 0;
 
+        /**
+         * Builds a strictly-monotonic timeline of { min, l, r } score snapshots.
+         * 
+         * Key fixes:
+         *  1. "Second half begins" log has timeStr "2nd Half: 15'" but actually
+         *     represents minute = halfDuration (start of 2nd half). We detect and
+         *     clamp this.
+         *  2. Enforces monotonic non-decreasing minute values across all entries.
+         *  3. Sorts logs chronologically by numeric id (timestamp).
+         */
+        function buildScoreTimeline() {
+            const sortedLogs = [...matchLogsForGraph].sort((a, b) => {
+                return (parseInt(a.id) || 0) - (parseInt(b.id) || 0);
+            });
+            
+            const halfDuration = totalMatchMinutes / 2;
+            const timeline = [{ min: 0, l: 0, r: 0 }];
+            
+            let runningL = 0;
+            let runningR = 0;
+            let lastMinute = 0;
+            
+            for (let log of sortedLogs) {
+                const title = (log.title || '').toLowerCase();
+                const desc = (log.desc || '').toLowerCase();
+                const timeStr = log.timeStr || '';
+                
+                // Detect half and half-start markers
+                const is2ndHalf = timeStr.includes('2nd Half') || timeStr.includes('2nd half');
+                const isHalfStart = title.includes('half time') || 
+                                    desc.includes('second half begins') || 
+                                    desc.includes('first half begins');
+                
+                // Parse minute number from "X'" 
+                let minuteInHalf = 0;
+                const m = timeStr.match(/(\d+)\s*'/);
+                if (m) minuteInHalf = parseInt(m[1]) || 0;
+                
+                // Compute absolute minute
+                let absMinute;
+                if (is2ndHalf) {
+                    // Special case: the "Second half begins" log always shows "15'"
+                    // but is actually the START of 2nd half → absolute = halfDuration
+                    if (isHalfStart) {
+                        absMinute = halfDuration;
+                    } else {
+                        absMinute = halfDuration + minuteInHalf;
+                    }
+                } else {
+                    absMinute = minuteInHalf;
+                }
+                
+                // Clamp to valid range
+                if (absMinute > totalMatchMinutes) absMinute = totalMatchMinutes;
+                if (absMinute < 0) absMinute = 0;
+                
+                // Enforce monotonic non-decreasing
+                if (absMinute < lastMinute) absMinute = lastMinute;
+                lastMinute = absMinute;
+                
+                // Update running scores from scoreStr
+                if (log.scoreStr) {
+                    const clean = log.scoreStr.replace(/Score:\s*/i, '').trim();
+                    const parts = clean.split('-').map(s => parseInt(s.trim()) || 0);
+                    if (parts.length === 2) {
+                        runningL = parts[0];
+                        runningR = parts[1];
+                    }
+                }
+                
+                timeline.push({ min: absMinute, l: runningL, r: runningR });
+            }
+            
+            return timeline;
+        }
+
+        /**
+         * Samples the timeline at a fixed interval (default 30 seconds = 0.5 min).
+         * Returns array of { min, l, r } from minute 0 up to currentAbsoluteMatchMinute.
+         */
+        function sampleTimeline(timeline, resolutionMinutes, upToMinute) {
+            const samples = [];
+            const maxM = Math.min(upToMinute, totalMatchMinutes);
+            
+            // Generate sample times
+            for (let m = 0; m <= maxM + 0.001; m += resolutionMinutes) {
+                const rounded = Math.round(m * 1000) / 1000;
+                let scoreL = 0, scoreR = 0;
+                
+                // Find last entry with min <= rounded
+                for (let i = 0; i < timeline.length; i++) {
+                    if (timeline[i].min <= rounded + 0.0001) {
+                        scoreL = timeline[i].l;
+                        scoreR = timeline[i].r;
+                    } else {
+                        break; // timeline is monotonic
+                    }
+                }
+                
+                samples.push({ min: rounded, l: scoreL, r: scoreR });
+            }
+            
+            // Ensure the last sample is exactly at maxM
+            if (samples.length > 0) {
+                const lastSample = samples[samples.length - 1];
+                if (Math.abs(lastSample.min - maxM) > 0.001) {
+                    let scoreL = 0, scoreR = 0;
+                    for (let i = 0; i < timeline.length; i++) {
+                        if (timeline[i].min <= maxM + 0.0001) {
+                            scoreL = timeline[i].l;
+                            scoreR = timeline[i].r;
+                        } else break;
+                    }
+                    samples.push({ min: maxM, l: scoreL, r: scoreR });
+                }
+            }
+            
+            return samples;
+        }
+
         function drawGraph() {
             const canvas = document.getElementById('matchGraphCanvas');
-            if(!canvas) return;
+            if (!canvas) return;
+            
             const rect = canvas.parentElement.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) {
-                // Tab not yet visible, retry
                 setTimeout(drawGraph, 100);
                 return;
             }
@@ -761,232 +876,186 @@
             const padLeft = 42;
             const padRight = 45;
             const padTop = 15;
-            const padBottom = 35;
+            const padBottom = 38;
             const graphW = w - padLeft - padRight;
             const graphH = h - padTop - padBottom;
             
-            // ================== BUILD SCORE TIMELINE ==================
-            // Sort logs chronologically by id (numeric ascending)
-            const sortedLogs = [...matchLogsForGraph].sort((a, b) => {
-                const idA = parseInt(a.id) || 0;
-                const idB = parseInt(b.id) || 0;
-                return idA - idB;
-            });
+            // ================== BUILD DATA ==================
+            const timeline = buildScoreTimeline();
             
-            let runningL = 0;
-            let runningR = 0;
-            let runningHalf = 1;
-            const scoreTimeline = []; // Sorted list of {min, l, r}
+            // Resolution: 30 seconds = 0.5 min
+            const resolution = 0.5;
+            const dataPoints = sampleTimeline(timeline, resolution, currentAbsoluteMatchMinute);
             
-            // Initial point
-            scoreTimeline.push({ min: 0, l: 0, r: 0 });
-            
-            for (let log of sortedLogs) {
-                // Detect half transition
-                const title = (log.title || '').toLowerCase();
-                const timeStr = (log.timeStr || '');
-                
-                if (title.includes('second half') || title.includes('half time') || timeStr.includes('2nd Half')) {
-                    runningHalf = 2;
-                }
-                
-                // Parse minute in current half
-                let minuteInHalf = 0;
-                const match = timeStr.match(/(\d+)\s*'/);
-                if (match) minuteInHalf = parseInt(match[1]) || 0;
-                
-                const halfDuration = totalMatchMinutes / 2;
-                const absMinute = (runningHalf === 1) 
-                    ? minuteInHalf 
-                    : (halfDuration + minuteInHalf);
-                
-                // Update score from scoreStr
-                if (log.scoreStr) {
-                    const clean = log.scoreStr.replace(/Score:\s*/i, '').trim();
-                    const parts = clean.split('-').map(s => parseInt(s.trim()) || 0);
-                    if (parts.length === 2) {
-                        runningL = parts[0];
-                        runningR = parts[1];
-                    }
-                }
-                
-                // Push timeline entry
-                scoreTimeline.push({ min: absMinute, l: runningL, r: runningR });
+            if (dataPoints.length === 0) {
+                dataPoints.push({ min: 0, l: 0, r: 0 });
             }
             
-            // Final known score
-            const finalL = runningL;
-            const finalR = runningR;
-            
-            // ================== BUILD DATA POINTS ==================
-            // Choose grid step based on total duration
-            let step;
-            if (totalMatchMinutes <= 20) step = 2;
-            else if (totalMatchMinutes <= 40) step = 5;
-            else step = 5;
-            
-            const dataPoints = [];
-            for (let m = 0; m <= totalMatchMinutes; m += step) {
-                // Find the score as of minute m (last entry with min <= m)
-                let scoreAtM = { l: 0, r: 0 };
-                for (let entry of scoreTimeline) {
-                    if (entry.min <= m) scoreAtM = entry;
-                    else break;
-                }
-                dataPoints.push({ min: m, l: scoreAtM.l, r: scoreAtM.r });
+            // Find true max score across all points AND timeline
+            let maxL = 0, maxR = 0;
+            for (let pt of dataPoints) {
+                if (pt.l > maxL) maxL = pt.l;
+                if (pt.r > maxR) maxR = pt.r;
             }
+            const finalL = dataPoints[dataPoints.length - 1].l;
+            const finalR = dataPoints[dataPoints.length - 1].r;
             
-            // Add current time data point (if not aligned with grid)
-            if (currentAbsoluteMatchMinute > 0 && currentAbsoluteMatchMinute <= totalMatchMinutes) {
-                let scoreAtNow = { l: 0, r: 0 };
-                for (let entry of scoreTimeline) {
-                    if (entry.min <= currentAbsoluteMatchMinute) scoreAtNow = entry;
-                    else break;
-                }
-                dataPoints.push({ min: currentAbsoluteMatchMinute, l: scoreAtNow.l, r: scoreAtNow.r });
-                dataPoints.sort((a, b) => a.min - b.min);
-            }
-            
-            // Filter out data points beyond current match time
-            const visiblePoints = dataPoints.filter(p => p.min <= currentAbsoluteMatchMinute + 0.01);
-            
-            // ================== Y-AXIS RANGE ==================
-            const maxScore = Math.max(5, finalL, finalR);
+            // Y-axis range (use both current and max observed scores)
+            let maxScore = Math.max(5, maxL, maxR);
             const yMax = Math.max(5, Math.ceil(maxScore / 5) * 5);
             
-            // ================== DRAW Y-AXIS GRID & LABELS ==================
+            // ================== DRAW Y-AXIS ==================
             const yStep = yMax <= 10 ? 2 : (yMax <= 30 ? 5 : 10);
             
             ctx.font = "600 11px Inter, sans-serif";
             ctx.textAlign = "right";
             ctx.textBaseline = "middle";
             
-            for (let i = 0; i <= yMax; i += yStep) {
+            for (let i = 0; i <= yMax + 0.001; i += yStep) {
                 const y = padTop + graphH - ((i / yMax) * graphH);
                 
-                // Grid line
-                if (i === 0) {
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-                    ctx.lineWidth = 1;
-                } else {
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
-                    ctx.lineWidth = 1;
-                }
+                ctx.strokeStyle = i === 0 ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.05)";
+                ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.moveTo(padLeft, y);
                 ctx.lineTo(padLeft + graphW, y);
                 ctx.stroke();
                 
-                // Y-axis label
                 ctx.fillStyle = "#B0B0C8";
-                ctx.fillText(String(i), padLeft - 8, y);
+                ctx.fillText(String(Math.round(i)), padLeft - 8, y);
             }
             
-            // ================== DRAW X-AXIS GRID & LABELS ==================
+            // ================== DRAW X-AXIS ==================
+            // Grid every 0.5 min (very faint), labels every 2/5 min
+            const labelStep = totalMatchMinutes <= 20 ? 2 : (totalMatchMinutes <= 40 ? 5 : 5);
+            
+            // Faint 30-second grid
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+            for (let m = 0; m <= totalMatchMinutes + 0.001; m += resolution) {
+                const x = padLeft + ((m / totalMatchMinutes) * graphW);
+                ctx.beginPath();
+                ctx.moveTo(x, padTop);
+                ctx.lineTo(x, padTop + graphH);
+                ctx.stroke();
+            }
+            
+            // Label grid
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
-            
-            for (let m = 0; m <= totalMatchMinutes; m += step) {
+            for (let m = 0; m <= totalMatchMinutes + 0.001; m += labelStep) {
                 const x = padLeft + ((m / totalMatchMinutes) * graphW);
                 
-                // Vertical grid line
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
                 ctx.beginPath();
                 ctx.moveTo(x, padTop);
                 ctx.lineTo(x, padTop + graphH);
                 ctx.stroke();
                 
-                // X-axis label
                 ctx.fillStyle = "#B0B0C8";
+                ctx.font = "600 11px Inter, sans-serif";
                 ctx.fillText(m + "'", x, padTop + graphH + 8);
             }
             
-            // "Minutes" axis label
+            // Axis caption
             ctx.fillStyle = "#7A7A95";
-            ctx.font = "600 10px Inter, sans-serif";
-            ctx.fillText("MINUTES", padLeft + graphW / 2, padTop + graphH + 24);
+            ctx.font = "700 10px Inter, sans-serif";
+            ctx.fillText("MINUTES", padLeft + graphW / 2, padTop + graphH + 26);
             
             // ================== DRAW TEAM LINES ==================
-            const drawTeamLine = (isLeftTeam, color) => {
+            const drawLine = (isLeftTeam, color) => {
+                if (dataPoints.length === 0) return;
+                
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = color;
                 ctx.fillStyle = color;
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
                 
-                // Draw line
+                // Main polyline
                 ctx.beginPath();
-                visiblePoints.forEach((pt, idx) => {
+                dataPoints.forEach((pt, idx) => {
                     const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
                     const score = isLeftTeam ? pt.l : pt.r;
                     const y = padTop + graphH - ((score / yMax) * graphH);
-                    
                     if (idx === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 });
                 ctx.stroke();
                 
-                // Draw data points
-                visiblePoints.forEach((pt) => {
-                    const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
-                    const score = isLeftTeam ? pt.l : pt.r;
-                    const y = padTop + graphH - ((score / yMax) * graphH);
+                // Markers ONLY on score changes (and the final point)
+                let prevL = null, prevR = null;
+                dataPoints.forEach((pt, idx) => {
+                    const isLast = idx === dataPoints.length - 1;
+                    const scoreChanged = (isLeftTeam ? pt.l !== prevL : pt.r !== prevR);
                     
-                    // Outer colored dot
-                    ctx.beginPath();
-                    ctx.arc(x, y, 5, 0, 2 * Math.PI);
-                    ctx.fillStyle = color;
-                    ctx.fill();
+                    if (scoreChanged || isLast) {
+                        const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
+                        const score = isLeftTeam ? pt.l : pt.r;
+                        const y = padTop + graphH - ((score / yMax) * graphH);
+                        
+                        // Outer ring
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.fillStyle = color;
+                        ctx.fill();
+                        // Inner dark
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+                        ctx.fillStyle = "#1A1C29";
+                        ctx.fill();
+                    }
                     
-                    // Inner dark dot
-                    ctx.beginPath();
-                    ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
-                    ctx.fillStyle = "#1A1C29";
-                    ctx.fill();
+                    prevL = pt.l;
+                    prevR = pt.r;
                 });
                 
-                // Score label at end of line
-                if (visiblePoints.length > 0) {
-                    const lastPt = visiblePoints[visiblePoints.length - 1];
-                    const x = padLeft + ((lastPt.min / totalMatchMinutes) * graphW);
-                    const score = isLeftTeam ? lastPt.l : lastPt.r;
-                    const y = padTop + graphH - ((score / yMax) * graphH);
-                    
-                    ctx.font = "700 14px Inter, sans-serif";
-                    ctx.fillStyle = color;
-                    ctx.textBaseline = "middle";
-                    
-                    if (isLeftTeam) {
-                        ctx.textAlign = "right";
-                        ctx.fillText(score, x - 12, y);
-                    } else {
-                        ctx.textAlign = "left";
-                        ctx.fillText(score, x + 12, y);
-                    }
+                // End-of-line score badge
+                const lastPt = dataPoints[dataPoints.length - 1];
+                const x = padLeft + ((lastPt.min / totalMatchMinutes) * graphW);
+                const score = isLeftTeam ? lastPt.l : lastPt.r;
+                const y = padTop + graphH - ((score / yMax) * graphH);
+                
+                ctx.font = "700 15px Inter, sans-serif";
+                ctx.fillStyle = color;
+                ctx.textBaseline = "middle";
+                
+                if (isLeftTeam) {
+                    ctx.textAlign = "right";
+                    ctx.fillText(score, x - 14, y);
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(score, x + 14, y);
                 }
             };
             
-            // Draw the losing team first so the leading team's line appears on top
+            // Draw the trailing team first so the leading team's line renders on top
             if (finalL >= finalR) {
-                drawTeamLine(false, rightTeamColorForGraph);
-                drawTeamLine(true, leftTeamColorForGraph);
+                drawLine(false, rightTeamColorForGraph);
+                drawLine(true, leftTeamColorForGraph);
             } else {
-                drawTeamLine(true, leftTeamColorForGraph);
-                drawTeamLine(false, rightTeamColorForGraph);
+                drawLine(true, leftTeamColorForGraph);
+                drawLine(false, rightTeamColorForGraph);
             }
             
-            // ================== CURRENT TIME MARKER ==================
+            // ================== LIVE TIME MARKER ==================
             if (currentAbsoluteMatchMinute > 0.5 && currentAbsoluteMatchMinute < totalMatchMinutes - 0.5) {
                 const x = padLeft + ((currentAbsoluteMatchMinute / totalMatchMinutes) * graphW);
                 
                 ctx.setLineDash([4, 4]);
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.moveTo(x, padTop);
                 ctx.lineTo(x, padTop + graphH);
                 ctx.stroke();
                 ctx.setLineDash([]);
+                
+                // "LIVE" label
+                ctx.font = "700 9px Inter, sans-serif";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+                ctx.fillText("LIVE", x, padTop - 2);
             }
         }
         
@@ -1119,7 +1188,6 @@
                 const dateStr = new Date(data.last_updated || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                 const timeStr = new Date(data.last_updated || Date.now()).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                 
-                // Handle break clock display
                 if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
                     document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
                     document.getElementById('uiMatchDate').style.color = "#FBC02D";
@@ -1134,10 +1202,8 @@
                 
                 document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
 
-                // Main clock
                 if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
                 
-                // Raid clock with conic gradient
                 if(data.raid_clock) {
                     const rc = document.getElementById('uiRaidClock');
                     const rContainer = document.getElementById('uiRaidTimerContainer');
@@ -1145,14 +1211,12 @@
                     
                     const timeInt = parseInt(data.raid_clock) || 30;
                     const deg = (timeInt / 30) * 360;
-                    
                     let arcColor = timeInt <= 10 ? "#FF3B30" : "#FBC02D";
                     rContainer.style.background = `conic-gradient(from 0deg, ${arcColor} 0deg ${deg}deg, #2A2D47 ${deg}deg 360deg)`;
                 }
 
                 if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
                 
-                // Team names & colors
                 if(data.left_name && data.right_name) {
                     document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
                     document.getElementById('togLeft').innerText = data.left_name;
@@ -1178,7 +1242,6 @@
                     document.getElementById('grRightLogo').innerText = getInitials(data.right_name);
                 }
                 
-                // Scores
                 if(data.left_score !== undefined) {
                     document.getElementById('uiLeftScore').innerText = data.left_score;
                     document.getElementById('stLeftTotal').innerText = data.left_score;
@@ -1188,7 +1251,6 @@
                     document.getElementById('stRightTotal').innerText = data.right_score;
                 }
 
-                // Team colors
                 const leftColor = data.left_color || "#4CAF50";
                 const rightColor = data.right_color || "#2196F3";
                 leftTeamColorForGraph = leftColor;
@@ -1199,7 +1261,6 @@
                 document.getElementById('uiLeftSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
                 document.getElementById('uiRightSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
 
-                // Compute current match absolute minute
                 if(data.match_duration_mins) {
                     document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
                     totalMatchMinutes = data.match_duration_mins * 2;
@@ -1218,6 +1279,7 @@
                         ? elapsedHalfMins 
                         : (halfMins + elapsedHalfMins);
                     if(currentAbsoluteMatchMinute > totalMatchMinutes) currentAbsoluteMatchMinute = totalMatchMinutes;
+                    if(currentAbsoluteMatchMinute < 0) currentAbsoluteMatchMinute = 0;
                 }
                 
                 if(data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
@@ -1226,7 +1288,6 @@
                 if(data.max_subs) document.getElementById('dtSubs').innerText = data.max_subs;
                 if(data.max_timeouts) document.getElementById('dtTimeouts').innerText = data.max_timeouts;
 
-                // Process state_json
                 if(data.state_json) {
                     try {
                         const state = JSON.parse(data.state_json);
@@ -1244,7 +1305,6 @@
                         document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                         document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
                         
-                        // Active raider
                         if (data.active_raider_name && data.active_raider_name !== "") {
                             if (data.active_raider_team === "left") {
                                 document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${leftColor}; font-size:16px;">▶</span> ${data.active_raider_name} is on raid`;
@@ -1255,7 +1315,6 @@
                             document.getElementById('uiActiveRaider').innerHTML = "Waiting for raid...";
                         }
 
-                        // Mat dots
                         const fillDots = (arr, color) => {
                             let html = "";
                             if(arr) {
@@ -1274,7 +1333,6 @@
                             <div class="team-dots right">${fillDots(state.rightDotStates, rightColor)}</div>
                         `;
                         
-                        // Stat progress bars
                         const lRaid = state.leftRaidPoints || 0; const rRaid = state.rightRaidPoints || 0;
                         document.getElementById('stLeftRaid').innerText = lRaid;
                         document.getElementById('stRightRaid').innerText = rRaid;
@@ -1326,17 +1384,11 @@
                         document.getElementById('pbLeftStrikeChart').style.setProperty('--left-strike-deg', lDeg + 'deg');
                         document.getElementById('pbRightStrikeChart').style.setProperty('--right-strike-deg', rDeg + 'deg');
 
-                        // Logs & Graph
                         if (state.logsJson) {
                             let logs = [];
-                            try {
-                                logs = JSON.parse(state.logsJson);
-                            } catch(e) {
-                                console.error("Logs parse error", e);
-                            }
+                            try { logs = JSON.parse(state.logsJson); } catch(e) { console.error(e); }
                             matchLogsForGraph = logs;
                             
-                            // Redraw graph if visible
                             if (document.getElementById('tab-graph').classList.contains('active')) {
                                 drawGraph();
                             }
