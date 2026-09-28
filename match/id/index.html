@@ -142,7 +142,7 @@
         .raider-banner i { font-size: 11px; }
         .raider-banner.idle { color: #8C8E9F; font-weight: 500; }
 
-        /* MAT DOTS — increased gap */
+        /* MAT DOTS */
         .mat-section { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .mat-title { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #8C8E9F; }
         .mat-row { display: flex; align-items: flex-start; justify-content: center; gap: 10px; width: 100%; }
@@ -190,8 +190,15 @@
 
         .mat-dot { width: 14px; height: 14px; border-radius: 50%; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; flex-shrink: 0; }
         .mat-dot.alive { background: var(--dot-color, #fff); box-shadow: 0 0 8px var(--dot-color, #fff), inset 0 -2px 3px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.25); }
-        .mat-dot.out { background: transparent; border: 1.5px dashed rgba(255,255,255,0.2); opacity: 0.5; }
         .mat-dot.alive::after { content: ''; position: absolute; top: 2px; left: 2px; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+        /* OUT DOT: visible tinted circle at 70% opacity (never disappears) */
+        .mat-dot.out {
+            background: color-mix(in srgb, var(--dot-color, #888) 25%, transparent);
+            border: 1.5px solid color-mix(in srgb, var(--dot-color, #888) 55%, transparent);
+            opacity: 0.7;
+            box-shadow: none;
+        }
+        .mat-dot.out::after { content: none; }
 
         /* QUICK STATS */
         .quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
@@ -301,7 +308,7 @@
         .player-card:last-child { margin-bottom: 0; }
         .player-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 
-        /* PLAYER HEAD — chevron right after points */
+        /* PLAYER HEAD */
         .player-card-head {
             display: grid;
             grid-template-columns: 44px minmax(0, 1fr) auto auto auto;
@@ -395,34 +402,6 @@
             letter-spacing: 0.5px;
             text-shadow: 0 0 12px rgba(77,168,218,0.4);
         }
-
-        /* Sub indicators inside expanded body */
-        .sub-indicator-wrap { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-        .sub-indicator {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 900;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-        .sub-indicator i { font-size: 16px; }
-        .sub-indicator.sub-in {
-            background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05));
-            border: 1px solid rgba(34,197,94,0.3);
-            color: #22C55E;
-        }
-        .sub-indicator.sub-out {
-            background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05));
-            border: 1px solid rgba(239,68,68,0.3);
-            color: #EF4444;
-        }
-        .sub-indicator .sub-time { font-size: 12px; letter-spacing: 0.3px; }
-        .sub-indicator .sub-label { font-size: 8px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; }
 
         .p-body-pts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
         .p-body-pt { text-align: center; padding: 10px 4px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); }
@@ -1287,10 +1266,13 @@
             }
         });
 
-        // ============ SUBSTITUTION PARSER ============
-        // Uses player ID (like "left_3") from log description for accurate mapping
+        // ============ SUBSTITUTION PARSER (TEAM-SPECIFIC) ============
+        // Returns: { left: { byJersey: {...} }, right: { byJersey: {...} } }
         function parseSubsFromLogs(logs) {
-            const subInfo = {};
+            const result = {
+                left:  { byJersey: {} },
+                right: { byJersey: {} }
+            };
             const sorted = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
 
             for (let log of sorted) {
@@ -1298,20 +1280,27 @@
                 const d = log.desc || '';
                 if (!t.includes('substitution') && !d.toLowerCase().includes('replaced')) continue;
 
-                // Match "Player (X) replaced by Player (Y)"
                 const m = d.match(/Player\s*\((\d+)\)\s+replaced by\s+Player\s*\((\d+)\)/i);
-                if (m) {
-                    const outJersey = String(m[1]);
-                    const inJersey = String(m[2]);
-                    const timeMatch = (log.timeStr || '').match(/(\d+)'/);
-                    const minute = timeMatch ? parseInt(timeMatch[1]) : 0;
-                    if (!subInfo[outJersey]) subInfo[outJersey] = {};
-                    subInfo[outJersey].outMinute = minute;
-                    if (!subInfo[inJersey]) subInfo[inJersey] = {};
-                    subInfo[inJersey].inMinute = minute;
-                }
+                if (!m) continue;
+
+                const outJersey = String(m[1]);
+                const inJersey  = String(m[2]);
+                const timeMatch = (log.timeStr || '').match(/(\d+)'/);
+                const minute = timeMatch ? parseInt(timeMatch[1]) : 0;
+
+                // Filter subs by team using log.isLeftTeam
+                const teamKey = log.isLeftTeam === true ? 'left'
+                              : log.isLeftTeam === false ? 'right'
+                              : null;
+                if (!teamKey) continue;
+
+                const target = result[teamKey].byJersey;
+                if (!target[outJersey]) target[outJersey] = {};
+                target[outJersey].outMinute = minute;
+                if (!target[inJersey]) target[inJersey] = {};
+                target[inJersey].inMinute = minute;
             }
-            return subInfo;
+            return result;
         }
 
         // ============ LINEUP RENDERING ============
@@ -1324,7 +1313,11 @@
             } catch (e) { console.error("Roster parse error", e); return; }
 
             const activeRoster = window.currentLineupTeam === 'left' ? lRoster : rRoster;
-            const subsByJersey = parseSubsFromLogs(window.matchLogsForGraph);
+
+            // Parse team-specific subs
+            const subsByTeam = parseSubsFromLogs(window.matchLogsForGraph);
+            const teamKey = window.currentLineupTeam; // 'left' or 'right'
+            const subsByJersey = subsByTeam[teamKey].byJersey;
 
             let startersHtml = "", subsHtml = "";
 
@@ -1334,10 +1327,13 @@
                 const jersey = String(player.jerseyNumber || '');
                 const onMat = player.onMatSeconds || 0;
 
-                // Sub detection: check if this player's jersey has a sub record
+                // Sub detection: validated against current list position
                 const subInfo = subsByJersey[jersey] || {};
-                const hasSubIn = subInfo.inMinute !== undefined;
-                const hasSubOut = subInfo.outMinute !== undefined;
+                const isCurrentlyStarting = player.isStarting7 === true;
+                // Sub-in mark ONLY if player is now in starting 7 AND has a sub-in record
+                const hasSubIn  = subInfo.inMinute !== undefined && isCurrentlyStarting;
+                // Sub-out mark ONLY if player is now on bench AND has a sub-out record
+                const hasSubOut = subInfo.outMinute !== undefined && !isCurrentlyStarting;
 
                 // Cards
                 const hasGreen = (player.greenCards || 0) > 0;
@@ -1363,7 +1359,7 @@
 
                 const expandedClass = window.expandedPlayerIds.has(player.id) ? "expanded" : "";
 
-                // Build tags row: sub icons + cards (in that order), before points
+                // Tags: sub icons + cards (in that order), before points
                 let tagsHtml = '';
                 if (hasSubIn) {
                     tagsHtml += `<div class="tag-icon tag-sub-in" title="Subbed In"><i class="fa-solid fa-right-left"></i><span class="tag-sub-time">${subInfo.inMinute}'</span></div>`;
@@ -1375,28 +1371,8 @@
                 if (hasYellow) tagsHtml += `<div class="tag-icon tag-card yellow"></div>`;
                 if (hasRed) tagsHtml += `<div class="tag-icon tag-card red"></div>`;
 
-                // Display name with jersey in parens: "Player (1)"
+                // Display name with jersey: "Player (1)"
                 const displayName = jersey ? `${player.name || 'Player'} (${jersey})` : (player.name || 'Player');
-
-                // Expanded body: sub indicators
-                let subIndicatorsHtml = '';
-                if (hasSubIn) {
-                    subIndicatorsHtml += `
-                        <div class="sub-indicator sub-in">
-                            <i class="fa-solid fa-right-left"></i>
-                            <span class="sub-time">${subInfo.inMinute}'</span>
-                            <span class="sub-label">IN</span>
-                        </div>`;
-                }
-                if (hasSubOut) {
-                    subIndicatorsHtml += `
-                        <div class="sub-indicator sub-out">
-                            <i class="fa-solid fa-right-left"></i>
-                            <span class="sub-time">${subInfo.outMinute}'</span>
-                            <span class="sub-label">OUT</span>
-                        </div>`;
-                }
-                const subIndicatorsWrap = subIndicatorsHtml ? `<div class="sub-indicator-wrap">${subIndicatorsHtml}</div>` : '';
 
                 // Raid sequence
                 const raidSeqDots = [];
@@ -1410,6 +1386,7 @@
                     ? `<div class="raid-seq-box"><div class="raid-seq-label">Raid Sequence</div><div class="raid-seq-dots">${raidSeqDots.join('')}</div></div>`
                     : '';
 
+                // NOTE: Sub indicators are NOT shown in expanded body anymore (only in header tags)
                 return `
                 <div class="player-card ${expandedClass}" onclick="togglePlayerExpand(this, '${player.id}')">
                     <div class="player-card-head">
@@ -1430,8 +1407,6 @@
                             <div class="pomb-left"><i class="fa-solid fa-clock"></i> On Mat</div>
                             <div class="pomb-time">${formatOnMatTime(onMat)}</div>
                         </div>
-
-                        ${subIndicatorsWrap}
 
                         <div class="p-body-pts">
                             <div class="p-body-pt"><div class="p-body-pt-label">Total</div><div class="p-body-pt-value">${totalPts}</div></div>
