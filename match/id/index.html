@@ -163,7 +163,7 @@
             text-align: center;
             white-space: nowrap;
         }
-        .mat-dot-cell.is-out .mat-dot-jersey { color: #555; opacity: 0.7; }
+        .mat-dot-cell.is-out .mat-dot-jersey { color: #555; opacity: 0.55; }
 
         .mat-divider-img {
             width: 40px;
@@ -190,7 +190,6 @@
         .mat-dot { width: 14px; height: 14px; border-radius: 50%; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; flex-shrink: 0; }
         .mat-dot.alive { background: var(--dot-color, #fff); box-shadow: 0 0 8px var(--dot-color, #fff), inset 0 -2px 3px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.25); }
         .mat-dot.alive::after { content: ''; position: absolute; top: 2px; left: 2px; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.6); }
-        /* OUT DOT: visible tinted circle at 70% opacity (never disappears) */
         .mat-dot.out {
             background: color-mix(in srgb, var(--dot-color, #888) 25%, transparent);
             border: 1.5px solid color-mix(in srgb, var(--dot-color, #888) 55%, transparent);
@@ -218,9 +217,6 @@
             white-space: nowrap;
             line-height: 1;
         }
-        /* MIRROR right team layout */
-        .quick-stat-team.right-stat .mini-stat { flex-direction: row-reverse; }
-        .quick-stat-team.right-stat .mini-stat-label { text-align: right; }
 
         /* TABS */
         .tabs { display: flex; gap: 6px; margin: 20px 0 16px; padding: 5px; background: var(--surface-1); border-radius: 100px; border: 1px solid var(--glass-border); overflow-x: auto; scrollbar-width: none; }
@@ -574,6 +570,7 @@
         </div>
 
         <div class="quick-stats">
+            <!-- LEFT TEAM: [Fouls, Time-Out] [Subs, Empty] -->
             <div class="quick-stat-team left-stat" id="uiLeftSubBg" style="--team-accent: var(--left-team-color);">
                 <div class="stat-row-inner">
                     <div class="mini-stat">
@@ -584,7 +581,7 @@
                     <div class="mini-stat">
                         <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
                         <span class="mini-stat-value" id="uiLeftTimeouts">0</span>
-                        <span class="mini-stat-label">Timeout</span>
+                        <span class="mini-stat-label">Time-Out</span>
                     </div>
                     <div class="mini-stat">
                         <div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div>
@@ -598,27 +595,29 @@
                     </div>
                 </div>
             </div>
+
+            <!-- RIGHT TEAM (MIRRORED): [Time-Out, Fouls] [Empty, Subs] -->
             <div class="quick-stat-team right-stat" id="uiRightSubBg" style="--team-accent: var(--right-team-color);">
                 <div class="stat-row-inner">
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
+                        <span class="mini-stat-value" id="uiRightTimeouts">0</span>
+                        <span class="mini-stat-label">Time-Out</span>
+                    </div>
                     <div class="mini-stat">
                         <div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div>
                         <span class="mini-stat-value" id="uiRightFouls">0</span>
                         <span class="mini-stat-label">Fouls</span>
                     </div>
                     <div class="mini-stat">
-                        <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
-                        <span class="mini-stat-value" id="uiRightTimeouts">0</span>
-                        <span class="mini-stat-label">Timeout</span>
+                        <div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div>
+                        <span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span>
+                        <span class="mini-stat-label">Empty</span>
                     </div>
                     <div class="mini-stat">
                         <div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div>
                         <span class="mini-stat-value" id="uiRightSubs">0</span>
                         <span class="mini-stat-label">Subs</span>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div>
-                        <span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span>
-                        <span class="mini-stat-label">Empty</span>
                     </div>
                 </div>
             </div>
@@ -1278,7 +1277,7 @@
                     prevL = pt.l; prevR = pt.r;
                 });
 
-                // Score label AFTER the last dot (to the right)
+                // Score label AFTER the last dot (to the right of the dot)
                 const lastPt = dataPoints[dataPoints.length - 1];
                 const x = padLeft + ((lastPt.min / window.totalMatchMinutes) * graphW);
                 const score = isLeftTeam ? lastPt.l : lastPt.r;
@@ -1369,9 +1368,7 @@
 
                 const subInfo = subsByJersey[jersey] || {};
                 const isCurrentlyStarting = player.isStarting7 === true;
-                // Sub-in mark ONLY if player is now in Starting 7 AND has sub-in record
                 const hasSubIn  = subInfo.inMinute !== undefined && isCurrentlyStarting;
-                // Sub-out mark ONLY if player is now on Bench AND has sub-out record
                 const hasSubOut = subInfo.outMinute !== undefined && !isCurrentlyStarting;
 
                 const hasGreen = (player.greenCards || 0) > 0;
@@ -1493,24 +1490,50 @@
             document.getElementById('uiSubstitutesGrid').innerHTML = subsHtml || '<div class="empty-state"><i class="fa-solid fa-user-plus"></i>No substitutes.</div>';
         }
 
-        // ============ MAT DOTS RENDERING ============
+        // ============================================================
+        // ============ MAT DOTS RENDERING (ROBUST, ID-BASED) ========
+        // ============================================================
+        // The app sends:
+        //   - leftDotStates / rightDotStates (unused now — old approach)
+        //   - leftOutIds / rightOutIds (comma-separated player IDs)
+        //
+        // The out-IDs fields may use any team prefix, so we merge both
+        // and match by exact player ID. This eliminates any index-shift
+        // bugs caused by substitutions or roster reordering.
+        // ============================================================
+        function parseOutIdSet(str) {
+            if (!str || typeof str !== 'string') return new Set();
+            return new Set(
+                str.split(',')
+                   .map(s => s.trim())
+                   .filter(Boolean)
+            );
+        }
+
         function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
-            const lStates = state.leftDotStates || [];
-            const rStates = state.rightDotStates || [];
+            // Merge both out-id lists → complete set of OUT player IDs
+            const allOutIds = new Set([
+                ...parseOutIdSet(state.leftOutIds),
+                ...parseOutIdSet(state.rightOutIds)
+            ]);
+
             const lStarters = leftRoster.filter(p => p.isStarting7);
             const rStarters = rightRoster.filter(p => p.isStarting7);
 
-            const buildCells = (states, starters, isLeftTeam, color) => {
-                const len = Math.min(states.length, starters.length);
-                const items = [];
-                for (let i = 0; i < len; i++) {
-                    items.push({
-                        alive: states[i],
-                        jersey: starters[i]?.jerseyNumber || '',
-                    });
+            const buildCells = (starters, isLeftTeam, color) => {
+                // Map each starter → alive/out state using exact ID
+                const items = starters.map(p => ({
+                    alive: !allOutIds.has(p.id),
+                    jersey: p.jerseyNumber || ''
+                }));
+
+                // Left team: alive (left) → out (right, near center)
+                // Right team: out (left, near center) → alive (right)
+                if (isLeftTeam) {
+                    items.sort((a, b) => (b.alive ? 1 : 0) - (a.alive ? 1 : 0));
+                } else {
+                    items.sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0));
                 }
-                if (isLeftTeam) items.sort((a, b) => (b.alive ? 1 : 0) - (a.alive ? 1 : 0));
-                else items.sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0));
 
                 return items.map(item => `
                     <div class="mat-dot-cell ${item.alive ? '' : 'is-out'}">
@@ -1521,9 +1544,9 @@
             };
 
             document.getElementById('uiMatDots').innerHTML = `
-                <div class="team-mat left">${buildCells(lStates, lStarters, true, leftColor)}</div>
+                <div class="team-mat left">${buildCells(lStarters, true, leftColor)}</div>
                 <div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt="" onerror="this.parentElement.classList.add('fallback');"></div>
-                <div class="team-mat right">${buildCells(rStates, rStarters, false, rightColor)}</div>
+                <div class="team-mat right">${buildCells(rStarters, false, rightColor)}</div>
             `;
         }
 
@@ -1680,6 +1703,7 @@
                         try { lRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
                         try { rRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
+                        // Robust mat dots rendering — uses out IDs, not index mapping
                         renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
 
                         if (state.logsJson) {
