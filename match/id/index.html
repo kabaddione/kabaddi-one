@@ -71,19 +71,12 @@
         .team-score { font-size: 72px; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .team-name { font-size: 16px; font-weight: bold; color: white; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;}
         
-        /* Empty Raids Indicator */
-        .empty-raids { display: flex; gap: 4px; margin-top: 4px; }
-        .empty-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A2D47; border: 1px solid rgba(255,255,255,0.2); }
-        .empty-dot.filled { background: #FF9800; border-color: #FF9800; box-shadow: 0 0 5px rgba(255,152,0,0.5); }
-        
-        /* 🚨 BUG 3 FIX: Raid Timer Pie Chart */
         .raid-timer-container { width: 56px; height: 56px; margin: -10px auto 10px; position: relative; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(#FBC02D var(--raid-deg, 360deg), #2A2D47 0deg); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .raid-timer-inner { width: 48px; height: 48px; background: #1E213A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: white; }
         
         .active-raider { text-align: center; color: white; font-size: 14px; font-weight: bold; margin-bottom: 10px; position: relative; z-index: 2; }
         .mat-status-title { text-align: center; color: #8C8E9F; font-size: 11px; margin-bottom: 6px; position: relative; z-index: 2; }
         
-        /* 🚨 BUG 7 FIX: Mat Dots Direction */
         .mat-dots { display: flex; justify-content: center; align-items: center; gap: 0px; position: relative; z-index: 2; }
         .team-dots { display: flex; gap: 4px; width: 120px; }
         .team-dots.left { justify-content: flex-end; padding-right: 10px; }
@@ -97,7 +90,6 @@
         .stat-team-half { flex: 1; display: flex; justify-content: space-around; padding: 12px 10px; align-items: center; }
         .stat-item { display: flex; align-items: center; gap: 6px; color: white; font-size: 14px; font-weight: bold; }
         .stat-item i { font-size: 12px; opacity: 0.9; }
-        .card-icon { width: 10px; height: 14px; border-radius: 2px; background: #FFEB3B; }
         
         /* Tabs */
         .tabs { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
@@ -148,7 +140,7 @@
         .strike-val-right { font-size: 24px; font-weight: 900; color: var(--right-team-color); }
         .strike-label-center { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: 12px; color: white; font-weight: bold;}
 
-        /* ============ LINEUP TAB (NEW) ============ */
+        /* ============ LINEUP TAB ============ */
         .lineup-team-toggle { display: flex; background: #151726; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
         .team-tog { flex: 1; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; color: #8C8E9F; cursor: pointer; border-radius: 8px; transition: 0.3s; }
         .team-tog.active-left { background: var(--left-team-color); color: white; }
@@ -175,7 +167,6 @@
         .player-points { font-size: 18px; font-weight: bold; color: white; margin-right: 15px; }
         .player-expand-icon { color: #8C8E9F; font-size: 12px; transition: transform 0.3s; }
         
-        /* 🚨 BUG 2 FIX: Ensure expansion class reveals the container securely */
         .player-bar-container.expanded .player-expand-icon { transform: rotate(180deg); }
         .player-analytics { display: none; padding: 15px 15px 20px; background: #1A1C30; border-top: 1px solid rgba(255,255,255,0.05); }
         .player-bar-container.expanded .player-analytics { display: block; }
@@ -266,21 +257,14 @@
                 <div class="team-score-box">
                     <div class="team-score" id="uiLeftScore" style="color: var(--left-team-color);">0</div>
                     <div class="team-name" id="uiLeftName">Left Team</div>
-                    <div class="empty-raids left" id="uiLeftEmptyRaids">
-                        <div class="empty-dot"></div><div class="empty-dot"></div>
-                    </div>
                 </div>
                 
                 <div class="team-score-box">
                     <div class="team-score" id="uiRightScore" style="color: var(--right-team-color);">0</div>
                     <div class="team-name" id="uiRightName">Right Team</div>
-                    <div class="empty-raids right" id="uiRightEmptyRaids">
-                        <div class="empty-dot"></div><div class="empty-dot"></div>
-                    </div>
                 </div>
             </div>
             
-            <!-- 🚨 BUG 3 FIX: Raid Timer Pie Chart -->
             <div class="raid-timer-container" id="uiRaidTimerContainer">
                 <div class="raid-timer-inner" id="uiRaidClock">30</div>
             </div>
@@ -300,10 +284,11 @@
                 <div class="stat-item"><i class="fa-solid fa-hand-paper"></i> <span id="uiLeftFouls">0</span></div>
                 <div class="stat-item"><i class="fa-solid fa-t"></i> <span id="uiLeftTimeouts">0</span></div>
                 <div class="stat-item"><i class="fa-solid fa-right-left"></i> <span id="uiLeftSubs">0</span></div>
-                <div class="stat-item"><div class="card-icon"></div> <span id="uiLeftCards">0</span></div>
+                <!-- 🚨 BUG 4 FIX: Empty Raid Indicator -->
+                <div class="stat-item"><i class="fa-regular fa-circle-dot"></i> <span id="uiLeftEmptyRaids">0</span></div>
             </div>
             <div class="stat-team-half" id="uiRightSubBg" style="background: var(--right-team-color);">
-                <div class="stat-item"><span id="uiRightCards">0</span> <div class="card-icon"></div></div>
+                <div class="stat-item"><span id="uiRightEmptyRaids">0</span> <i class="fa-regular fa-circle-dot"></i></div>
                 <div class="stat-item"><span id="uiRightSubs">0</span> <i class="fa-solid fa-right-left"></i></div>
                 <div class="stat-item"><span id="uiRightTimeouts">0</span> <i class="fa-solid fa-t"></i></div>
                 <div class="stat-item"><span id="uiRightFouls">0</span> <i class="fa-solid fa-hand-paper"></i></div>
@@ -443,7 +428,6 @@
         <!-- ============ LINEUP TAB ============ -->
         <div class="tab-content" id="tab-lineup">
             
-            <!-- 🚨 BUG 1 FIX: Team Toggle Bar -->
             <div class="lineup-team-toggle">
                 <div class="team-tog active-left" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div>
                 <div class="team-tog" id="togRight" onclick="switchLineupTeam('right')">Right Team</div>
@@ -581,7 +565,6 @@
 
     <script>
         // --- 🚨 BUG 2 FIX: PREVENT DOM COLLAPSE ---
-        // Store expanded player IDs globally so they stay open during the 1-second refresh cycle
         window.expandedPlayerIds = new Set();
         
         function togglePlayerExpand(element, playerId) {
@@ -589,16 +572,13 @@
                 window.expandedPlayerIds.delete(playerId);
                 element.classList.remove('expanded');
             } else {
-                // Close others if desired, or let multiple stay open
                 document.querySelectorAll('.player-bar-container').forEach(el => el.classList.remove('expanded'));
                 window.expandedPlayerIds.clear();
-                
                 window.expandedPlayerIds.add(playerId);
                 element.classList.add('expanded');
             }
         }
 
-        // --- TAB SWITCHER LOGIC ---
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -609,7 +589,7 @@
 
         // --- 🚨 BUG 1 FIX: LINEUP TEAM SWITCHER ---
         let currentLineupTeam = 'left';
-        let latestGlobalState = null; // Store latest payload to rebuild UI safely
+        let latestGlobalState = null; 
         
         function switchLineupTeam(side) {
             currentLineupTeam = side;
@@ -637,7 +617,7 @@
         let leftTeamColorForGraph = "#4CAF50";
         let rightTeamColorForGraph = "#2196F3";
         let totalMatchMinutes = 40; 
-        let currentAbsoluteMatchMinute = 0; // Tracks the highest current time
+        let currentAbsoluteMatchMinute = 0; 
 
         function drawGraph() {
             const canvas = document.getElementById('matchGraphCanvas');
@@ -655,21 +635,18 @@
             const graphW = w - padLeft - padRight;
             const graphH = h - padTop - padBottom;
             
-            // 🚨 Generate intervals based on match settings
             const dataPoints = [{ min: 0, lScore: 0, rScore: 0 }];
             const intervalStep = totalMatchMinutes <= 20 ? 2 : 5; 
             for(let i = intervalStep; i <= totalMatchMinutes; i += intervalStep) {
-                // Pre-fill with null to prevent "flatlining" to the future
                 dataPoints.push({ min: i, lScore: null, rScore: null }); 
             }
             
             let currentL = 0; let currentR = 0;
             let currentHalf = 1;
-
             const sortedLogs = [...matchLogsForGraph].reverse();
             
             for(let log of sortedLogs) {
-                if(log.title.includes("Half Time") || log.title.includes("Second Half")) currentHalf = 2;
+                if(log.title.includes("Half Time") || log.title.includes("Second Half") || log.timeStr.includes("2nd")) currentHalf = 2;
                 
                 let currentMinuteInHalf = 0;
                 const timeMatch = log.timeStr.match(/(\d+)'/);
@@ -688,7 +665,6 @@
                     }
                 }
                 
-                // Map to the closest point bucket safely
                 for(let pt of dataPoints) {
                     if(absoluteMinute <= pt.min && pt.min <= currentAbsoluteMatchMinute) {
                         pt.lScore = currentL;
@@ -697,7 +673,6 @@
                 }
             }
             
-            // Forward-fill nulls with previous known score UP TO current match minute
             let highestL = 0; let highestR = 0;
             for(let pt of dataPoints) {
                 if (pt.min <= currentAbsoluteMatchMinute) {
@@ -709,7 +684,6 @@
             const maxScore = Math.max(10, highestL, highestR);
             const yMax = Math.ceil(maxScore / 5) * 5;
             
-            // Draw Axes
             ctx.lineWidth = 1; ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
             ctx.font = "12px sans-serif"; ctx.fillStyle = "#8C8E9F";
             ctx.textAlign = "right"; ctx.textBaseline = "middle";
@@ -721,23 +695,23 @@
             }
             
             ctx.textAlign = "center"; ctx.textBaseline = "top";
-            dataPoints.forEach((pt, index) => {
-                const x = padLeft + ((index / (dataPoints.length - 1)) * graphW);
+            for(let i = 0; i <= totalMatchMinutes; i += intervalStep) {
+                const x = padLeft + ((i / totalMatchMinutes) * graphW);
                 ctx.beginPath(); ctx.moveTo(x, padTop); ctx.lineTo(x, padTop + graphH); ctx.stroke();
-                if(pt.min === 0) ctx.fillText("1", x, padTop + graphH + 10);
-                else ctx.fillText(pt.min.toString(), x, padTop + graphH + 10);
-            });
+                if(i !== 0 || totalMatchMinutes <= 20) {
+                     ctx.fillText(i === 0 ? "1" : i.toString(), x, padTop + graphH + 10);
+                }
+            }
             ctx.fillText("Minutes", padLeft + (graphW / 2), padTop + graphH + 25);
             
-            // Draw Line only up to current match time!
+            // 🚨 THE FIX: Draw only up to current match time
             const drawTeamLine = (isLeftTeam, color) => {
                 ctx.lineWidth = 3; ctx.strokeStyle = color; ctx.fillStyle = color;
-                
                 ctx.beginPath();
                 let started = false;
                 dataPoints.forEach((pt, index) => {
-                    if (pt.lScore === null || pt.rScore === null) return; // Ignore future time!
-                    const x = padLeft + ((index / (dataPoints.length - 1)) * graphW);
+                    if (pt.lScore === null || pt.rScore === null) return; 
+                    const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
                     const score = isLeftTeam ? pt.lScore : pt.rScore;
                     const y = padTop + graphH - ((score / yMax) * graphH);
                     
@@ -746,17 +720,23 @@
                 });
                 ctx.stroke();
                 
-                dataPoints.forEach((pt, index) => {
+                dataPoints.forEach((pt) => {
                     if (pt.lScore === null || pt.rScore === null) return;
-                    const x = padLeft + ((index / (dataPoints.length - 1)) * graphW);
+                    const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
                     const score = isLeftTeam ? pt.lScore : pt.rScore;
                     const y = padTop + graphH - ((score / yMax) * graphH);
                     ctx.beginPath(); ctx.arc(x, y, 4, 0, 2 * Math.PI); ctx.fill();
                 });
             };
             
-            drawTeamLine(false, rightTeamColorForGraph); 
-            drawTeamLine(true, leftTeamColorForGraph);   
+            // Draw loser line first so winner line paints over it
+            if (currentL > currentR) {
+                drawTeamLine(false, rightTeamColorForGraph); 
+                drawTeamLine(true, leftTeamColorForGraph); 
+            } else {
+                drawTeamLine(true, leftTeamColorForGraph); 
+                drawTeamLine(false, rightTeamColorForGraph); 
+            }
         }
         window.addEventListener('resize', () => { if(document.getElementById('tab-graph').classList.contains('active')) drawGraph(); });
 
@@ -766,7 +746,6 @@
             const lRoster = JSON.parse(state.leftRosterJson);
             const rRoster = JSON.parse(state.rightRosterJson);
             
-            // 🚨 BUG 1 & 8 FIX: Separate the rosters accurately!
             const activeRoster = currentLineupTeam === 'left' ? lRoster : rRoster;
             const isLeftTeam = currentLineupTeam === 'left';
             const teamClass = isLeftTeam ? "left" : "right";
@@ -796,7 +775,6 @@
                 const imgContent = (player.imageUri && player.imageUri.startsWith("data:image")) 
                     ? `<img src="${player.imageUri}" alt="Profile">` : `<i class="fa-solid fa-user"></i>`;
 
-                // 🚨 BUG 2 FIX: Checks window.expandedPlayerIds to retain open state
                 const expandedClass = window.expandedPlayerIds.has(player.id) ? "expanded" : "";
 
                 return `
@@ -842,7 +820,6 @@
                 </div>`;
             };
 
-            // Process Active Team's Starters vs Subs accurately
             activeRoster.forEach(player => {
                 if (player.isStarting7) startersHtml += createPlayerHtml(player);
                 else subsHtml += createPlayerHtml(player);
@@ -877,7 +854,19 @@
                 if (data) {
                     const dateStr = new Date(data.last_updated || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                     const timeStr = new Date(data.last_updated || Date.now()).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                    document.getElementById('uiMatchDate').innerText = dateStr + ", Live Kabaddi Arena";
+                    
+                    if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
+                        document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
+                        document.getElementById('uiMatchDate').style.color = "#FBC02D";
+                        document.getElementById('uiMatchDate').style.fontWeight = "bold";
+                        document.getElementById('uiMatchDate').style.fontSize = "13px";
+                    } else {
+                        document.getElementById('uiMatchDate').innerText = dateStr + ", Live Kabaddi Arena";
+                        document.getElementById('uiMatchDate').style.color = "#8C8E9F";
+                        document.getElementById('uiMatchDate').style.fontWeight = "normal";
+                        document.getElementById('uiMatchDate').style.fontSize = "11px";
+                    }
+                    
                     document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
 
                     if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
@@ -892,8 +881,9 @@
                         const deg = (timeInt / 30) * 360;
                         rContainer.style.setProperty('--raid-deg', deg + 'deg');
                         
-                        if(timeInt <= 10) rContainer.style.background = `conic-gradient(#FF3B30 ${deg}deg, #2A2D47 0deg)`;
-                        else rContainer.style.background = `conic-gradient(#FBC02D ${deg}deg, #2A2D47 0deg)`;
+                        // Counter-clockwise fill: 0deg is top. We fill transparent from `deg` to 360.
+                        if(timeInt <= 10) rContainer.style.background = `conic-gradient(transparent ${deg}deg, #FF3B30 0deg)`;
+                        else rContainer.style.background = `conic-gradient(transparent ${deg}deg, #FBC02D 0deg)`;
                     }
 
                     if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
@@ -945,7 +935,22 @@
                     if(data.match_duration_mins) {
                         document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
                         totalMatchMinutes = data.match_duration_mins * 2; 
+                        
+                        // Parse clock to get precise absolute minute
+                        let halfMins = data.match_duration_mins;
+                        let currentHalfNum = (data.half_status && data.half_status.includes("1st")) ? 1 : 2;
+                        if(data.half_status && data.half_status.includes("Match Over")) currentHalfNum = 2;
+                        
+                        let minsLeft = halfMins;
+                        if (data.main_clock && data.main_clock.includes(":")) {
+                            let parts = data.main_clock.split(":");
+                            minsLeft = parseInt(parts[0]) + (parseInt(parts[1])/60);
+                        }
+                        let elapsedHalfMins = halfMins - minsLeft;
+                        currentAbsoluteMatchMinute = (currentHalfNum === 1) ? elapsedHalfMins : (halfMins + elapsedHalfMins);
+                        if(currentAbsoluteMatchMinute > totalMatchMinutes) currentAbsoluteMatchMinute = totalMatchMinutes;
                     }
+                    
                     if(data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
                     if(data.players_per_side) document.getElementById('dtPlayers').innerText = data.players_per_side + " Players";
                     if(data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs + " Seconds";
@@ -955,16 +960,11 @@
                     if(data.state_json) {
                         try {
                             const state = JSON.parse(data.state_json);
-                            latestGlobalState = state; // Save for Team Toggle clicks!
+                            latestGlobalState = state; 
                             
-                            // 🚨 BUG 4 FIX: Empty Raid Indicators
-                            const setEmptyDots = (boxId, count) => {
-                                const dots = document.getElementById(boxId).querySelectorAll('.empty-dot');
-                                dots[0].className = count >= 1 ? "empty-dot filled" : "empty-dot";
-                                dots[1].className = count >= 2 ? "empty-dot filled" : "empty-dot";
-                            };
-                            setEmptyDots('uiLeftEmptyRaids', state.leftEmptyRaids || 0);
-                            setEmptyDots('uiRightEmptyRaids', state.rightEmptyRaids || 0);
+                            // 🚨 BUG 4 FIX: Empty Raids Sub-stats
+                            document.getElementById('uiLeftEmptyRaids').innerText = state.leftEmptyRaids || 0;
+                            document.getElementById('uiRightEmptyRaids').innerText = state.rightEmptyRaids || 0;
 
                             document.getElementById('uiLeftFouls').innerText = state.leftFouls || 0;
                             document.getElementById('uiRightFouls').innerText = state.rightFouls || 0;
@@ -973,7 +973,7 @@
                             document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                             document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
                             
-                            // 🚨 BUG 6 FIX: Properly display Active Raider Name
+                            // 🚨 BUG 6 FIX: Active Raider Name
                             if (data.active_raider_name && data.active_raider_name !== "") {
                                 if (data.active_raider_team === "left") {
                                     document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${leftColor}; font-size:16px;">▶</span> ${data.active_raider_name} is on raid`;
