@@ -187,16 +187,22 @@
         .donut-tack-succ { background: conic-gradient(#E53935 var(--deg), #2A2D47 0deg); }
         .donut-tack-unsucc { background: conic-gradient(#3949AB var(--deg), #2A2D47 0deg); }
 
-        /* ============ GRAPH TAB (NEW) ============ */
+        /* ============ GRAPH TAB ============ */
         .graph-card { background: #1A1C29; border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .graph-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: white;}
-        .graph-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px;}
-        
         .graph-container { position: relative; width: 100%; height: 350px; margin-top: 20px; }
         canvas { width: 100%; height: 100%; display: block; }
         
-        /* Tooltip for hover */
-        .graph-tooltip { position: absolute; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; color: white; font-size: 12px; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 10; transform: translate(-50%, -100%); margin-top: -10px;}
+        /* ============ DETAILS TAB (NEW) ============ */
+        .details-card { background: #1E213A; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 20px; }
+        .details-header { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .detail-item { display: flex; align-items: center; gap: 12px; background: #151726; padding: 12px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); }
+        .detail-icon { width: 36px; height: 36px; border-radius: 50%; background: #2A2D47; display: flex; align-items: center; justify-content: center; color: #FF5E3A; font-size: 16px; flex-shrink: 0; }
+        .detail-text { display: flex; flex-direction: column; }
+        .detail-label { font-size: 11px; color: #8C8E9F; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+        .detail-value { font-size: 14px; color: white; font-weight: 600; line-height: 1.2;}
+        .detail-item.full-width { grid-column: 1 / -1; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
@@ -213,6 +219,7 @@
             .donut-inner { width: 56px; height: 56px; }
             .strike-val-left, .strike-val-right { font-size: 20px; }
             .graph-container { height: 250px; }
+            .details-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -275,14 +282,12 @@
 
         <!-- Sub Stats Bar -->
         <div class="sub-stats-bar">
-            <!-- Left Side -->
             <div class="stat-team-half" id="uiLeftSubBg" style="background: var(--left-team-color);">
                 <div class="stat-item"><i class="fa-solid fa-hand-paper"></i> <span id="uiLeftFouls">0</span></div>
                 <div class="stat-item"><i class="fa-solid fa-t"></i> <span id="uiLeftTimeouts">0</span></div>
                 <div class="stat-item"><i class="fa-solid fa-right-left"></i> <span id="uiLeftSubs">0</span></div>
                 <div class="stat-item"><div class="card-icon"></div> <span id="uiLeftCards">0</span></div>
             </div>
-            <!-- Right Side -->
             <div class="stat-team-half" id="uiRightSubBg" style="background: var(--right-team-color);">
                 <div class="stat-item"><span id="uiRightCards">0</span> <div class="card-icon"></div></div>
                 <div class="stat-item"><span id="uiRightSubs">0</span> <i class="fa-solid fa-right-left"></i></div>
@@ -297,7 +302,7 @@
             <div class="tab" onclick="switchTab('stats', this)">Stats</div>
             <div class="tab" onclick="switchTab('lineup', this)">Lineup</div>
             <div class="tab" onclick="switchTab('graph', this)">Graph</div>
-            <div class="tab" style="opacity: 0.5;">Details</div>
+            <div class="tab" onclick="switchTab('details', this)">Details</div>
         </div>
 
         <!-- ============ COMMENTARY TAB ============ -->
@@ -323,7 +328,6 @@
                     </div>
                 </div>
                 
-                <!-- Total Points -->
                 <div class="stat-row">
                     <div class="stat-values">
                         <div class="stat-val-left" id="stLeftTotal">0</div>
@@ -336,7 +340,6 @@
                     </div>
                 </div>
                 
-                <!-- Raid Points -->
                 <div class="stat-row">
                     <div class="stat-values">
                         <div class="stat-val-left" id="stLeftRaid">0</div>
@@ -349,7 +352,6 @@
                     </div>
                 </div>
                 
-                <!-- Tackle Points -->
                 <div class="stat-row">
                     <div class="stat-values">
                         <div class="stat-val-left" id="stLeftTackle">0</div>
@@ -362,7 +364,6 @@
                     </div>
                 </div>
                 
-                <!-- All out Points -->
                 <div class="stat-row">
                     <div class="stat-values">
                         <div class="stat-val-left" id="stLeftAllOut">0</div>
@@ -375,7 +376,6 @@
                     </div>
                 </div>
                 
-                <!-- Extra Points -->
                 <div class="stat-row">
                     <div class="stat-values">
                         <div class="stat-val-left" id="stLeftExtra">0</div>
@@ -403,7 +403,6 @@
                     </div>
                 </div>
                 
-                <!-- Total Raids/Tackles -->
                 <div class="stat-row" style="margin-bottom: 10px;">
                     <div class="stat-values" style="justify-content: center; gap: 60px;">
                         <div class="stat-val-left" id="stLeftTotalPerf">0</div>
@@ -412,7 +411,6 @@
                     </div>
                 </div>
                 
-                <!-- Successful Raids/Tackles -->
                 <div class="stat-row" style="margin-bottom: 20px;">
                     <div class="stat-values" style="justify-content: center; gap: 60px;">
                         <div class="stat-val-left" id="stLeftSuccPerf" style="color: white;">0</div>
@@ -421,24 +419,19 @@
                     </div>
                 </div>
                 
-                <!-- Strike Rates Section -->
                 <div class="strike-rates-container">
                     <div class="strike-val-left" id="stLeftStrikeVal">0%</div>
-                    
                     <div class="donut-wrapper">
                         <div class="donut-chart donut-left" id="pbLeftStrikeChart" style="--left-strike-deg: 0deg;">
                             <div class="donut-inner"></div>
                         </div>
                     </div>
-                    
                     <div class="strike-label-center">Raid Strike Rate</div>
-                    
                     <div class="donut-wrapper">
                         <div class="donut-chart donut-right" id="pbRightStrikeChart" style="--right-strike-deg: 0deg;">
                             <div class="donut-inner"></div>
                         </div>
                     </div>
-                    
                     <div class="strike-val-right" id="stRightStrikeVal">0%</div>
                 </div>
             </div>
@@ -446,7 +439,6 @@
 
         <!-- ============ LINEUP TAB ============ -->
         <div class="tab-content" id="tab-lineup">
-            <!-- Starters -->
             <div class="lineup-card">
                 <div style="border-left: 4px solid #F9A825; padding-left: 10px; margin-bottom: 15px; font-weight: bold; font-size: 16px;">Starting 7</div>
                 <div class="lineup-header">
@@ -458,7 +450,6 @@
                 </div>
             </div>
 
-            <!-- Substitutes -->
             <div class="lineup-card">
                 <div style="border-left: 4px solid #8C8E9F; padding-left: 10px; margin-bottom: 15px; font-weight: bold; font-size: 16px;">Substitutes</div>
                 <div class="lineup-header">
@@ -470,7 +461,7 @@
             </div>
         </div>
 
-        <!-- ============ GRAPH TAB (NEW) ============ -->
+        <!-- ============ GRAPH TAB ============ -->
         <div class="tab-content" id="tab-graph">
             <div class="graph-card">
                 <div class="graph-title">Match Progression</div>
@@ -487,10 +478,93 @@
                     </div>
                 </div>
                 
-                <!-- The Canvas Graph Container -->
                 <div class="graph-container">
                     <canvas id="matchGraphCanvas"></canvas>
-                    <div class="graph-tooltip" id="graphTooltip">0 - 0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DETAILS TAB (NEW) ============ -->
+        <div class="tab-content" id="tab-details">
+            <div class="details-card">
+                <div class="details-header">Match Information</div>
+                <div class="details-grid">
+                    <div class="detail-item full-width">
+                        <div class="detail-icon"><i class="fa-solid fa-people-group"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Teams</span>
+                            <span class="detail-value" id="dtTeams">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-hashtag"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Match ID</span>
+                            <span class="detail-value" id="dtMatchId">------</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Date & Time</span>
+                            <span class="detail-value" id="dtDate">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-icon"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Venue</span>
+                            <span class="detail-value" id="dtVenue">Live Kabaddi Arena</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <div class="details-header">Match Rules & Settings</div>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Half Duration</span>
+                            <span class="detail-value" id="dtDuration">20 Minutes</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Break Duration</span>
+                            <span class="detail-value" id="dtBreak">5 Minutes</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Players / Side</span>
+                            <span class="detail-value" id="dtPlayers">7 Players</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-right-left"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Max Subs / Half</span>
+                            <span class="detail-value" id="dtSubs">5</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-t"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Max Timeouts / Half</span>
+                            <span class="detail-value" id="dtTimeouts">2</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div class="detail-text">
+                            <span class="detail-label">Timeout Duration</span>
+                            <span class="detail-value" id="dtTimeoutDur">60 Seconds</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -523,7 +597,6 @@
             }
         }
 
-        // --- LINEUP ACCORDION TOGGLE ---
         function togglePlayerExpand(element) {
             document.querySelectorAll('.player-bar-container').forEach(el => {
                 if(el !== element) el.classList.remove('expanded');
@@ -531,7 +604,6 @@
             element.classList.toggle('expanded');
         }
         
-        // Helper to extract initials for team logo
         function getInitials(name) {
             if (!name) return "T";
             const words = name.trim().split(" ");
@@ -556,16 +628,13 @@
         let matchLogsForGraph = [];
         let leftTeamColorForGraph = "#4CAF50";
         let rightTeamColorForGraph = "#2196F3";
-        let totalMatchMinutes = 40; // Default: 20 min halves
+        let totalMatchMinutes = 40; 
 
         function drawGraph() {
             const canvas = document.getElementById('matchGraphCanvas');
-            const tooltip = document.getElementById('graphTooltip');
             if(!canvas) return;
             
             const ctx = canvas.getContext('2d');
-            
-            // Handle high DPI displays for crisp rendering
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.parentElement.getBoundingClientRect();
             
@@ -578,50 +647,35 @@
             
             ctx.clearRect(0, 0, w, h);
             
-            // Calculate Graph Bounds
-            const padLeft = 40;
-            const padBottom = 30;
-            const padTop = 20;
-            const padRight = 10;
-            
+            const padLeft = 40; const padBottom = 30; const padTop = 20; const padRight = 10;
             const graphW = w - padLeft - padRight;
             const graphH = h - padTop - padBottom;
             
-            // 1. Process Data into 5-minute intervals based on Match Logs
-            // We start at 0,0
             const dataPoints = [{ min: 0, lScore: 0, rScore: 0 }];
-            
-            // Setup the X-axis intervals dynamically based on match settings
             const intervalStep = totalMatchMinutes <= 20 ? 2 : 5; 
             for(let i = intervalStep; i <= totalMatchMinutes; i += intervalStep) {
-                dataPoints.push({ min: i, lScore: 0, rScore: 0 }); // Placeholders
+                dataPoints.push({ min: i, lScore: 0, rScore: 0 }); 
             }
             
-            // Fill placeholders with actual scores from logs!
             let currentL = 0; let currentR = 0;
             let currentHalf = 1;
             let currentMinuteInHalf = 0;
 
-            // Sort logs chronologically (oldest first)
             const sortedLogs = [...matchLogsForGraph].reverse();
             
             for(let log of sortedLogs) {
-                // Determine half
                 if(log.title.includes("Half Time") || log.title.includes("Second Half")) {
                     currentHalf = 2;
                 }
                 
-                // Extract minute from "1st Half: 5'"
                 const timeMatch = log.timeStr.match(/(\d+)'/);
                 if(timeMatch) {
                     currentMinuteInHalf = parseInt(timeMatch[1]);
                 }
                 
-                // Extract absolute minute (0 to totalMatchMinutes)
                 const halfDuration = totalMatchMinutes / 2;
                 let absoluteMinute = (currentHalf === 1) ? currentMinuteInHalf : (halfDuration + currentMinuteInHalf);
                 
-                // Extract scores
                 if(log.scoreStr) {
                     const scores = log.scoreStr.replace("Score: ", "").split(" - ");
                     if(scores.length === 2) {
@@ -630,7 +684,6 @@
                     }
                 }
                 
-                // Update the nearest data point bucket
                 for(let pt of dataPoints) {
                     if(absoluteMinute <= pt.min) {
                         pt.lScore = currentL;
@@ -639,22 +692,15 @@
                 }
             }
             
-            // Smooth out the data to ensure the line never goes backwards
             let highestL = 0; let highestR = 0;
             for(let pt of dataPoints) {
-                if(pt.lScore < highestL) pt.lScore = highestL;
-                else highestL = pt.lScore;
-                
-                if(pt.rScore < highestR) pt.rScore = highestR;
-                else highestR = pt.rScore;
+                if(pt.lScore < highestL) pt.lScore = highestL; else highestL = pt.lScore;
+                if(pt.rScore < highestR) pt.rScore = highestR; else highestR = pt.rScore;
             }
 
-            // Determine Y-Axis Max
             const maxScore = Math.max(10, highestL, highestR);
-            // Round up to nearest 5
             const yMax = Math.ceil(maxScore / 5) * 5;
             
-            // 2. Draw Grid Lines
             ctx.lineWidth = 1;
             ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
             ctx.font = "12px sans-serif";
@@ -662,43 +708,24 @@
             ctx.textAlign = "right";
             ctx.textBaseline = "middle";
             
-            // Horizontal lines (Y-axis)
             for(let i = 0; i <= yMax; i += 5) {
                 const y = padTop + graphH - ((i / yMax) * graphH);
-                
-                ctx.beginPath();
-                ctx.moveTo(padLeft, y);
-                ctx.lineTo(padLeft + graphW, y);
-                ctx.stroke();
-                
-                // Label
+                ctx.beginPath(); ctx.moveTo(padLeft, y); ctx.lineTo(padLeft + graphW, y); ctx.stroke();
                 ctx.fillText(i.toString(), padLeft - 10, y);
             }
             
-            // Vertical lines (X-axis)
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
             
             dataPoints.forEach((pt, index) => {
                 const x = padLeft + ((index / (dataPoints.length - 1)) * graphW);
-                
-                ctx.beginPath();
-                ctx.moveTo(x, padTop);
-                ctx.lineTo(x, padTop + graphH);
-                ctx.stroke();
-                
-                // Label (Ignore 0, show intervals)
-                if(pt.min === 0) {
-                    ctx.fillText("1", x, padTop + graphH + 10);
-                } else {
-                    ctx.fillText(pt.min.toString(), x, padTop + graphH + 10);
-                }
+                ctx.beginPath(); ctx.moveTo(x, padTop); ctx.lineTo(x, padTop + graphH); ctx.stroke();
+                if(pt.min === 0) ctx.fillText("1", x, padTop + graphH + 10);
+                else ctx.fillText(pt.min.toString(), x, padTop + graphH + 10);
             });
             
-            // Center X-axis title
             ctx.fillText("Minutes", padLeft + (graphW / 2), padTop + graphH + 25);
             
-            // 3. Draw Lines & Points
             const drawTeamLine = (isLeftTeam, color) => {
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = color;
@@ -709,33 +736,24 @@
                     const x = padLeft + ((index / (dataPoints.length - 1)) * graphW);
                     const score = isLeftTeam ? pt.lScore : pt.rScore;
                     const y = padTop + graphH - ((score / yMax) * graphH);
-                    
-                    if(index === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
+                    if(index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                 });
                 ctx.stroke();
                 
-                // Draw dots
                 dataPoints.forEach((pt, index) => {
                     const x = padLeft + ((index / (dataPoints.length - 1)) * graphW);
                     const score = isLeftTeam ? pt.lScore : pt.rScore;
                     const y = padTop + graphH - ((score / yMax) * graphH);
-                    
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(x, y, 4, 0, 2 * Math.PI); ctx.fill();
                 });
             };
             
-            drawTeamLine(false, rightTeamColorForGraph); // Draw Right Team First
-            drawTeamLine(true, leftTeamColorForGraph);   // Draw Left Team on top
+            drawTeamLine(false, rightTeamColorForGraph); 
+            drawTeamLine(true, leftTeamColorForGraph);   
         }
         
-        // Handle window resize for canvas redrawing
         window.addEventListener('resize', () => {
-            if(document.getElementById('tab-graph').classList.contains('active')) {
-                drawGraph();
-            }
+            if(document.getElementById('tab-graph').classList.contains('active')) drawGraph();
         });
 
 
@@ -758,8 +776,14 @@
             document.getElementById('uiMatchDate').style.color = "#FF3B30";
         } else {
             document.getElementById('uiMatchId').innerText = "Match Id: " + matchId.toUpperCase();
+            document.getElementById('dtMatchId').innerText = matchId.toUpperCase();
+            
             const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-            document.getElementById('uiMatchDate').innerText = dateStr + ", Live Kabaddi Arena";
+            const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const fullDateStr = dateStr + ", Live Kabaddi Arena";
+            
+            document.getElementById('uiMatchDate').innerText = fullDateStr;
+            document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
 
             // 3. LISTEN TO FIREBASE REALTIME UPDATES
             db.ref('live_matches/' + matchId).on('value', (snapshot) => {
@@ -774,12 +798,15 @@
                     }
                     if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
                     
+                    if(data.left_name && data.right_name) {
+                        document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
+                    }
+
                     if(data.left_name) {
                         document.getElementById('uiLeftName').innerText = data.left_name;
                         document.getElementById('stLeftName').innerText = data.left_name;
                         document.getElementById('stPerfLeftName').innerText = data.left_name;
                         document.getElementById('grLeftName').innerText = data.left_name;
-                        
                         document.getElementById('stLeftLogo').innerText = getInitials(data.left_name);
                         document.getElementById('stPerfLeftLogo').innerText = getInitials(data.left_name);
                         document.getElementById('grLeftLogo').innerText = getInitials(data.left_name);
@@ -789,7 +816,6 @@
                         document.getElementById('stRightName').innerText = data.right_name;
                         document.getElementById('stPerfRightName').innerText = data.right_name;
                         document.getElementById('grRightName').innerText = data.right_name;
-                        
                         document.getElementById('stRightLogo').innerText = getInitials(data.right_name);
                         document.getElementById('stPerfRightLogo').innerText = getInitials(data.right_name);
                         document.getElementById('grRightLogo').innerText = getInitials(data.right_name);
@@ -907,10 +933,9 @@
                             // D. TIMELINE LOGS & GRAPH DATA
                             if (state.logsJson) {
                                 const logs = JSON.parse(state.logsJson);
-                                matchLogsForGraph = logs; // Save for graph renderer
+                                matchLogsForGraph = logs; 
                                 
-                                // Auto-detect match length from the highest minute recorded
-                                let highestMin = 20; // fallback
+                                let highestMin = 20; 
                                 logs.forEach(l => {
                                     const mMatch = l.timeStr.match(/(\d+)'/);
                                     if(mMatch) {
@@ -920,9 +945,11 @@
                                         }
                                     }
                                 });
-                                // Double the highest minute in the second half to get total duration
                                 totalMatchMinutes = highestMin > 0 ? highestMin * 2 : 40;
                                 
+                                // Update Match Duration Detail dynamically
+                                document.getElementById('dtDuration').innerText = `${totalMatchMinutes / 2} Minutes`;
+
                                 if(document.getElementById('tab-graph').classList.contains('active')) {
                                     drawGraph();
                                 }
