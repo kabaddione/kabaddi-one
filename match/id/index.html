@@ -36,6 +36,17 @@
             --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             --left-team-color: #4CAF50;
             --right-team-color: #2196F3;
+
+            /* NEW: Redesign surface tokens */
+            --surface-1: #131629;
+            --surface-2: #1a1d33;
+            --surface-3: #22263f;
+            --surface-glass: rgba(30, 33, 58, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-highlight: rgba(255, 255, 255, 0.03);
+            --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+            --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,6 +54,7 @@
         body { font-family: var(--font-body); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
         a { text-decoration: none; }
 
+        /* AMBIENT BACKGROUND */
         .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; -webkit-backface-visibility: hidden; backface-visibility: hidden; will-change: transform; }
         .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
@@ -50,6 +62,7 @@
         .bg-orb:nth-child(3) { width: 350px; height: 350px; background: var(--accent-secondary); bottom: -10%; left: 20%; animation-delay: -12s; }
         @keyframes orbFloat { 0%,100% { transform: translate3d(0,0,0) scale(1); } 25% { transform: translate3d(60px,-40px,0) scale(1.15); } 50% { transform: translate3d(-30px,50px,0) scale(0.9); } 75% { transform: translate3d(-50px,-30px,0) scale(1.1); } }
 
+        /* ==================== NAVIGATION (UNCHANGED) ==================== */
         .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); transition: var(--transition-smooth); background: rgba(10, 10, 26, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); }
         .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; height: 100%; gap: 12px; }
         .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: #ffffff; letter-spacing: -0.5px; z-index: 1001; flex-shrink: 0; }
@@ -78,6 +91,7 @@
             .hamburger { display: flex; }
         }
 
+        /* ==================== FOOTER (UNCHANGED) ==================== */
         .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; position: relative; z-index: 1; margin-top: auto; }
         .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; }
         .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: #fff; font-family: var(--font-heading); }
@@ -96,149 +110,1021 @@
         .back-to-top.visible { opacity: 1; pointer-events: auto; }
         .back-to-top:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(255,94,58,0.55); }
 
-        .live-wrapper { padding: calc(var(--nav-height) + 40px) 20px 60px; max-width: 600px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
-        .score-card { background: #1E213A; border-radius: 24px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; margin-bottom: 12px; }
-        .score-card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background: url('https://kabaddione.com/images/feature-background-round.png') center/cover; opacity:0.05; pointer-events: none; }
-        .top-badges { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 2; }
-        .badge-id { background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #b0b0c8; font-weight: 600; }
-        .badge-live { background: rgba(255,255,255,0.9); color: #1E213A; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .badge-live::before { content:''; width: 6px; height: 6px; background: #FF3B30; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .match-details { text-align: center; color: #8C8E9F; font-size: 11px; margin-bottom: 16px; position: relative; z-index: 2; }
-        .clocks-container { text-align: center; position: relative; z-index: 2; margin-bottom: 15px; }
-        .half-badge { display: inline-block; background: #E65100; color: white; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
-        .main-timer { font-size: 42px; font-weight: 900; letter-spacing: 1px; color: white; line-height: 1; }
-        .scores-row { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; margin-top: -45px; margin-bottom: 15px;}
-        .team-score-box { text-align: center; width: 120px; display: flex; flex-direction: column; align-items: center; }
-        .team-score { font-size: 72px; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .team-name { font-size: 16px; font-weight: bold; color: white; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;}
-        .empty-raids { display: flex; gap: 4px; margin-top: 4px; }
-        .empty-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A2D47; border: 1px solid rgba(255,255,255,0.2); }
-        .raid-timer-container { width: 56px; height: 56px; margin: -10px auto 10px; position: relative; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .raid-timer-inner { width: 48px; height: 48px; background: #1E213A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: white; }
-        .active-raider { text-align: center; color: white; font-size: 14px; font-weight: bold; margin-bottom: 10px; position: relative; z-index: 2; }
-        .mat-status-title { text-align: center; color: #8C8E9F; font-size: 11px; margin-bottom: 6px; position: relative; z-index: 2; }
-        .mat-dots { display: flex; justify-content: center; align-items: center; gap: 0px; position: relative; z-index: 2; }
-        .team-dots { display: flex; gap: 4px; width: 120px; }
-        .team-dots.left { justify-content: flex-end; padding-right: 10px; }
-        .team-dots.right { justify-content: flex-start; padding-left: 10px; }
-        .mat-divider { width: 2px; height: 16px; background: #4A4D67; opacity: 0.5; }
-        .dot { font-size: 14px; }
-        .dot.out { opacity: 0.2; }
-        .sub-stats-bar { display: flex; border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .stat-team-half { flex: 1; display: flex; justify-content: space-around; padding: 12px 10px; align-items: center; }
-        .stat-item { display: flex; align-items: center; gap: 6px; color: white; font-size: 14px; font-weight: bold; }
-        .stat-item i { font-size: 12px; opacity: 0.9; }
-        .tabs { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 20px; }
-        .tab { flex: 1; background: #2A2D47; color: #b0b0c8; text-align: center; padding: 10px 4px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .tab.active { background: #FF5E3A; color: white; }
-        .tab-content { display: none; }
+        /* ============================================================
+           ============== REDESIGNED LIVE SCORE UI ====================
+           ============================================================ */
+
+        .live-wrapper { padding: calc(var(--nav-height) + 28px) 16px 60px; max-width: 620px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+
+        /* ---------- MAIN SCOREBOARD ---------- */
+        .score-board {
+            position: relative;
+            border-radius: 28px;
+            padding: 20px 20px 24px;
+            overflow: hidden;
+            background: linear-gradient(165deg, #1c2040 0%, #131629 55%, #0f1122 100%);
+            box-shadow: var(--shadow-lift), var(--shadow-inset);
+            border: 1px solid var(--glass-border);
+            isolation: isolate;
+        }
+        .score-board::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at top left, color-mix(in srgb, var(--left-team-color) 25%, transparent) 0%, transparent 55%),
+                radial-gradient(ellipse at top right, color-mix(in srgb, var(--right-team-color) 25%, transparent) 0%, transparent 55%);
+            opacity: 0.6;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .score-board::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            pointer-events: none;
+        }
+
+        .board-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .badge-id {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.35);
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            color: #b0b0c8;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .badge-id i { font-size: 10px; opacity: 0.7; }
+        .badge-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #FF3B30, #D32F2F);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
+        }
+        .badge-live::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
+
+        .board-meta {
+            text-align: center;
+            color: #8C8E9F;
+            font-size: 11px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .board-meta i { color: var(--accent-secondary); }
+
+        /* Half badge + main clock */
+        .board-clock {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .half-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(255,94,58,0.15), rgba(255,184,48,0.15));
+            color: #FFB830;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            border: 1px solid rgba(255,184,48,0.2);
+        }
+        .main-timer {
+            font-size: 46px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            background: linear-gradient(180deg, #ffffff 0%, #d0d0e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* SCORES ROW */
+        .scores-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .team-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+        .team-score {
+            font-size: 68px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -3px;
+            font-variant-numeric: tabular-nums;
+            transition: all 0.3s ease;
+        }
+        .team-score.left-color { color: var(--left-team-color); text-shadow: 0 0 30px color-mix(in srgb, var(--left-team-color) 50%, transparent); }
+        .team-score.right-color { color: var(--right-team-color); text-shadow: 0 0 30px color-mix(in srgb, var(--right-team-color) 50%, transparent); }
+        .team-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 4px;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
+        }
+
+        /* CENTER COLUMN with raid timer */
+        .center-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 70px;
+        }
+        .raid-timer-ring {
+            position: relative;
+            width: 62px; height: 62px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+        }
+        .raid-timer-inner {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1a1d33, #131629);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* Active raider banner */
+        .raider-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 100px;
+            margin: 0 auto 16px;
+            max-width: max-content;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .raider-banner i { font-size: 11px; }
+        .raider-banner.idle { color: #8C8E9F; font-weight: 500; }
+
+        /* MAT DOTS section */
+        .mat-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .mat-title {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8C8E9F;
+        }
+        .mat-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .team-mat { display: flex; gap: 5px; align-items: center; }
+        .team-mat.left { justify-content: flex-end; }
+        .team-mat.right { justify-content: flex-start; }
+
+        .mat-divider {
+            width: 1px;
+            height: 20px;
+            background: linear-gradient(180deg, transparent, rgba(255,255,255,0.15), transparent);
+            flex-shrink: 0;
+        }
+
+        .mat-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .mat-dot.alive {
+            background: var(--dot-color, #fff);
+            box-shadow: 0 0 8px var(--dot-color, #fff), inset 0 -2px 3px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(255,255,255,0.25);
+        }
+        .mat-dot.out {
+            background: transparent;
+            border: 1.5px dashed rgba(255,255,255,0.2);
+            opacity: 0.5;
+        }
+        .mat-dot.alive::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+        }
+
+        /* ---------- QUICK STATS BAR ---------- */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .quick-stat-team {
+            position: relative;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .quick-stat-team::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: var(--team-accent, #fff);
+            z-index: 1;
+        }
+        .quick-stat-team.left-stat::before { background: var(--left-team-color); }
+        .quick-stat-team.right-stat::before { background: var(--right-team-color); }
+        .quick-stat-team::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, color-mix(in srgb, var(--team-accent, transparent) 10%, transparent), transparent);
+            pointer-events: none;
+        }
+
+        .stat-row-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 14px;
+            position: relative;
+            z-index: 2;
+        }
+        .mini-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .mini-stat i {
+            font-size: 11px;
+            color: #8C8E9F;
+            width: 14px;
+            text-align: center;
+        }
+        .mini-stat .stat-icon-wrap {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.06);
+            color: var(--team-accent, #fff);
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+        .mini-stat-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---------- TABS ---------- */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin: 20px 0 16px;
+            padding: 5px;
+            background: var(--surface-1);
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            flex: 1;
+            min-width: 62px;
+            text-align: center;
+            padding: 10px 8px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #8C8E9F;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            user-select: none;
+            letter-spacing: 0.2px;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(255,94,58,0.4);
+            transform: translateZ(0);
+        }
+        .tab:hover:not(.active) { color: #d0d0e0; }
+        .tab-content { display: none; animation: tabFadeIn 0.3s ease; }
         .tab-content.active { display: block; }
+        @keyframes tabFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .timeline-card { background: #1E213A; border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .timeline-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
-        .log-item { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; }
-        .log-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .log-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
-        .log-content { flex: 1; }
-        .log-title { color: white; font-weight: bold; font-size: 14px; margin-bottom: 2px; }
-        .log-desc { color: #8C8E9F; font-size: 12px; }
-        .log-meta { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .log-badge { background: #2A2D47; color: #4DA8DA; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; }
-        .log-time { color: #8C8E9F; font-size: 11px; }
-        .log-score-str { color: white; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; margin-top:2px;}
+        /* ---------- TAB: COMMENTARY ---------- */
+        .commentary-panel {
+            background: linear-gradient(165deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 6px 4px 6px 6px;
+            box-shadow: var(--shadow-soft);
+        }
+        .log-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 560px;
+            overflow-y: auto;
+            padding: 10px 8px 10px 10px;
+        }
+        .log-stream::-webkit-scrollbar { width: 4px; }
+        .log-stream::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-        .stats-card { background: #1E213A; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 20px; }
-        .stats-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
-        .stats-team-info { display: flex; align-items: center; gap: 10px; width: 120px;}
-        .stats-team-info.right { justify-content: flex-end; text-align: right; }
-        .stats-team-name { font-size: 14px; font-weight: bold; line-height: 1.2;}
-        .stats-team-logo { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; flex-shrink: 0;}
-        .stats-title-center { font-size: 14px; color: #8C8E9F; font-weight: 600; text-align: center; flex: 1;}
-        .stat-row { margin-bottom: 24px; position: relative;}
-        .stat-row:last-child { margin-bottom: 0; }
-        .stat-values { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px; position: relative; z-index: 2;}
-        .stat-val-left { font-size: 24px; font-weight: 900; color: var(--left-team-color); line-height: 1;}
-        .stat-val-right { font-size: 24px; font-weight: 900; color: var(--right-team-color); line-height: 1;}
-        .stat-label-center { font-size: 12px; color: white; text-align: center; position: absolute; left: 0; right: 0; bottom: 4px; z-index: 1;}
-        .progress-container { width: 100%; height: 6px; background: #2A2D47; border-radius: 3px; display: flex; overflow: hidden; }
-        .progress-left { height: 100%; background: var(--left-team-color); border-radius: 3px 0 0 3px; transition: width 0.5s ease;}
-        .progress-right { height: 100%; background: var(--right-team-color); border-radius: 0 3px 3px 0; margin-left: auto; transition: width 0.5s ease;}
-        .strike-rates-container { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; position: relative; padding-bottom: 20px;}
-        .donut-wrapper { position: relative; width: 100px; height: 100px; }
-        .donut-chart { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .donut-inner { width: 70px; height: 70px; background: #1E213A; border-radius: 50%; }
-        .donut-left { background: conic-gradient(var(--left-team-color) var(--left-strike-deg, 0deg), #2A2D47 0deg); }
-        .donut-right { background: conic-gradient(var(--right-team-color) var(--right-strike-deg, 0deg), #2A2D47 0deg); }
-        .strike-val-left { font-size: 24px; font-weight: 900; color: var(--left-team-color); }
-        .strike-val-right { font-size: 24px; font-weight: 900; color: var(--right-team-color); }
-        .strike-label-center { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: 12px; color: white; font-weight: bold;}
+        .log-row {
+            display: grid;
+            grid-template-columns: 38px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 10px;
+            border-radius: 14px;
+            transition: background 0.2s ease;
+            position: relative;
+        }
+        .log-row:hover { background: rgba(255,255,255,0.03); }
+        .log-row + .log-row::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 58px;
+            right: 14px;
+            height: 1px;
+            background: rgba(255,255,255,0.04);
+        }
 
-        .lineup-team-toggle { display: flex; background: #151726; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
-        .team-tog { flex: 1; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; color: #8C8E9F; cursor: pointer; border-radius: 8px; transition: 0.3s; }
-        .lineup-card { background: #151726; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .lineup-grid { display: flex; flex-direction: column; gap: 10px; }
-        .player-bar-container { border-radius: 8px; overflow: hidden; background: #1E213A; transition: 0.3s; cursor: pointer; border: 1px solid transparent; }
-        .player-bar-container:hover { border-color: rgba(255,255,255,0.1); }
-        .player-bar { display: flex; align-items: center; padding: 10px; position: relative; }
-        .player-bar::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .player-bar.left::before { background: var(--left-team-color); }
-        .player-bar.right::before { background: var(--right-team-color); }
-        .player-img-wrapper { width: 40px; height: 40px; border-radius: 4px; overflow: hidden; background: #2A2D47; margin-right: 12px; display: flex; align-items: center; justify-content: center; }
-        .player-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-        .player-img-wrapper i { color: #555; font-size: 20px; }
-        .player-info { flex: 1; }
-        .player-name { font-weight: bold; font-size: 14px; color: #d6d6eb; margin-bottom: 2px; }
-        .player-role { font-size: 11px; color: #8C8E9F; }
-        .player-points { font-size: 18px; font-weight: bold; color: white; margin-right: 15px; }
-        .player-expand-icon { color: #8C8E9F; font-size: 12px; transition: transform 0.3s; }
-        .player-bar-container.expanded .player-expand-icon { transform: rotate(180deg); }
-        .player-analytics { display: none; padding: 15px 15px 20px; background: #1A1C30; border-top: 1px solid rgba(255,255,255,0.05); }
-        .player-bar-container.expanded .player-analytics { display: block; }
-        .ana-pts-row { display: flex; justify-content: space-between; margin-bottom: 20px; text-align: center; }
-        .ana-pt-col { flex: 1; }
-        .ana-pt-title { font-size: 10px; color: #8C8E9F; margin-bottom: 4px; }
-        .ana-pt-val { font-size: 18px; font-weight: bold; color: white; }
-        .ana-donut-row { display: flex; justify-content: space-around; }
-        .ana-donut-col { display: flex; flex-direction: column; align-items: center; }
-        .ana-donut-wrapper { position: relative; width: 60px; height: 60px; margin-bottom: 8px; }
-        .ana-donut { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .ana-donut-inner { width: 44px; height: 44px; background: #1A1C30; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; color: white;}
-        .ana-donut-title { font-size: 10px; color: #8C8E9F; text-align: center; max-width: 70px; line-height: 1.2;}
-        .donut-raid-succ { background: conic-gradient(#F9A825 var(--deg, 0deg), #2A2D47 0deg); }
-        .donut-raid-unsucc { background: conic-gradient(#8E24AA var(--deg, 0deg), #2A2D47 0deg); }
-        .donut-tack-succ { background: conic-gradient(#E53935 var(--deg, 0deg), #2A2D47 0deg); }
-        .donut-tack-unsucc { background: conic-gradient(#3949AB var(--deg, 0deg), #2A2D47 0deg); }
+        .log-icon-circle {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
 
-        .graph-card { background: #1A1C29; border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .graph-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: white;}
-        .graph-container { position: relative; width: 100%; height: 350px; margin-top: 20px; }
-        canvas { width: 100%; height: 100%; display: block; }
+        .log-body { min-width: 0; }
+        .log-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px;
+            letter-spacing: -0.1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .log-desc {
+            font-size: 11.5px;
+            color: #8C8E9F;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
-        .details-card { background: #1E213A; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 20px; }
-        .details-header { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .detail-item { display: flex; align-items: center; gap: 12px; background: #151726; padding: 12px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .detail-icon { width: 36px; height: 36px; border-radius: 50%; background: #2A2D47; display: flex; align-items: center; justify-content: center; color: #FF5E3A; font-size: 16px; flex-shrink: 0; }
-        .detail-text { display: flex; flex-direction: column; }
-        .detail-label { font-size: 11px; color: #8C8E9F; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
-        .detail-value { font-size: 14px; color: white; font-weight: 600; line-height: 1.2;}
-        .detail-item.full-width { grid-column: 1 / -1; }
+        .log-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .log-time-tag {
+            font-size: 10px;
+            font-weight: 700;
+            color: #8C8E9F;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.04);
+            white-space: nowrap;
+        }
+        .log-points-badge {
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            white-space: nowrap;
+        }
+        .log-score-tag {
+            font-size: 10px;
+            font-weight: 700;
+            color: #b0b0c8;
+            font-variant-numeric: tabular-nums;
+        }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        /* ---------- TAB: STATS ---------- */
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .stat-panel {
+            background: linear-gradient(165deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+        .panel-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .panel-team { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .panel-team.right { justify-content: flex-end; flex-direction: row-reverse; }
+        .panel-team-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .panel-team-badge {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .panel-team-badge.left { background: var(--left-team-color); }
+        .panel-team-badge.right { background: var(--right-team-color); }
+        .panel-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
+        }
 
-        @media (max-width: 600px) {
-            .team-score { font-size: 56px; }
-            .team-name { font-size: 14px; }
-            .main-timer { font-size: 36px; }
-            .donut-wrapper { width: 80px; height: 80px; }
-            .donut-inner { width: 56px; height: 56px; }
-            .strike-val-left, .strike-val-right { font-size: 20px; }
-            .graph-container { height: 280px; }
-            .details-grid { grid-template-columns: 1fr; }
-            .tab { font-size: 11px; padding: 8px 2px; }
+        /* Comparison row */
+        .cmp-row { margin-bottom: 18px; }
+        .cmp-row:last-child { margin-bottom: 0; }
+        .cmp-labels {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .cmp-value {
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .cmp-value.left { color: var(--left-team-color); }
+        .cmp-value.right { color: var(--right-team-color); }
+        .cmp-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #8C8E9F;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            flex: 1;
+            text-align: center;
+        }
+        .cmp-bar {
+            height: 8px;
+            border-radius: 100px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+        .cmp-bar-fill {
+            height: 100%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 100px;
+        }
+        .cmp-bar-fill.left { background: linear-gradient(90deg, var(--left-team-color), color-mix(in srgb, var(--left-team-color) 60%, white)); }
+        .cmp-bar-fill.right { background: linear-gradient(90deg, color-mix(in srgb, var(--right-team-color) 60%, white), var(--right-team-color)); margin-left: auto; }
+
+        /* Donut charts */
+        .strike-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .strike-side {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .donut-shell {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+        .donut-ring {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: background 0.6s ease;
+        }
+        .donut-ring.left { background: conic-gradient(var(--left-team-color) var(--deg, 0deg), rgba(255,255,255,0.06) 0deg); }
+        .donut-ring.right { background: conic-gradient(var(--right-team-color) var(--deg, 0deg), rgba(255,255,255,0.06) 0deg); }
+        .donut-hole {
+            width: 68px; height: 68px;
+            border-radius: 50%;
+            background: var(--surface-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .donut-pct {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .donut-label {
+            font-size: 8px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .strike-team-name {
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ---------- TAB: LINEUP ---------- */
+        .lineup-panel { display: flex; flex-direction: column; gap: 14px; }
+
+        .team-toggle {
+            display: flex;
+            gap: 6px;
+            padding: 5px;
+            background: var(--surface-1);
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+        }
+        .team-toggle-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #8C8E9F;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .team-toggle-btn.active-left {
+            background: var(--left-team-color);
+            color: #fff;
+            box-shadow: 0 4px 14px color-mix(in srgb, var(--left-team-color) 50%, transparent);
+        }
+        .team-toggle-btn.active-right {
+            background: var(--right-team-color);
+            color: #fff;
+            box-shadow: 0 4px 14px color-mix(in srgb, var(--right-team-color) 50%, transparent);
+        }
+
+        .roster-group {
+            background: linear-gradient(165deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: var(--shadow-soft);
+        }
+        .roster-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .roster-title-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #F9A825;
+            box-shadow: 0 0 8px #F9A825;
+        }
+        .roster-title-dot.sub { background: #8C8E9F; box-shadow: none; }
+
+        .player-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 14px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .player-card:last-child { margin-bottom: 0; }
+        .player-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+
+        .player-card-head {
+            display: grid;
+            grid-template-columns: 44px 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+        .player-avatar-wrap {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .player-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .player-avatar-wrap i { color: #555; font-size: 20px; }
+
+        .player-main { min-width: 0; }
+        .player-main-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-main-role {
+            font-size: 10px;
+            font-weight: 700;
+            color: #8C8E9F;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-pts {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            padding: 0 4px;
+        }
+        .player-chevron {
+            color: #8C8E9F;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+            width: 16px;
+            text-align: center;
+        }
+        .player-card.expanded .player-chevron { transform: rotate(180deg); }
+
+        .player-card-body { display: none; padding: 14px 12px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.04); }
+        .player-card.expanded .player-card-body { display: block; }
+
+        .p-body-pts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .p-body-pt {
+            text-align: center;
+            padding: 10px 6px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .p-body-pt-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .p-body-pt-value {
+            font-size: 16px;
+            font-weight: 900;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .p-body-section-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .p-body-donuts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .p-body-donuts:last-child { margin-bottom: 0; }
+        .p-body-donut { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .p-body-donut-shell {
+            position: relative;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .p-body-donut-shell.raid-succ { background: conic-gradient(#F9A825 var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
+        .p-body-donut-shell.raid-unsucc { background: conic-gradient(#8E24AA var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
+        .p-body-donut-shell.tack-succ { background: conic-gradient(#E53935 var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
+        .p-body-donut-shell.tack-unsucc { background: conic-gradient(#3949AB var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
+        .p-body-donut-hole {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #131629;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 900;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .p-body-donut-caption {
+            font-size: 9px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 0.5px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        /* ---------- TAB: GRAPH ---------- */
+        .graph-panel {
+            background: linear-gradient(165deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+        .graph-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .graph-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.2px;
+        }
+        .graph-legend { display: flex; gap: 12px; align-items: center; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; color: #b0b0c8; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .legend-dot.left { background: var(--left-team-color); }
+        .legend-dot.right { background: var(--right-team-color); }
+
+        .graph-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 14px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .graph-team-tag { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .graph-team-tag.right { flex-direction: row-reverse; }
+        .graph-team-tag-name {
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .graph-team-pill {
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 100px;
+            color: #fff;
+        }
+        .graph-team-pill.left { background: var(--left-team-color); }
+        .graph-team-pill.right { background: var(--right-team-color); }
+
+        .graph-canvas-wrap { position: relative; width: 100%; height: 300px; }
+        .graph-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+
+        /* ---------- TAB: DETAILS ---------- */
+        .details-panel { display: flex; flex-direction: column; gap: 14px; }
+        .info-card {
+            background: linear-gradient(165deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .info-card-title i { color: var(--accent); font-size: 14px; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+        }
+        .info-item.full { grid-column: 1 / -1; }
+        .info-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,94,58,0.12);
+            color: var(--accent);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .info-text { min-width: 0; }
+        .info-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .info-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ---------- EMPTY STATE ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8C8E9F;
+            font-size: 13px;
+        }
+        .empty-state i { font-size: 32px; opacity: 0.3; margin-bottom: 12px; display: block; }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 480px) {
+            .live-wrapper { padding-left: 12px; padding-right: 12px; }
+            .team-score { font-size: 54px; }
+            .team-name { font-size: 12px; }
+            .main-timer { font-size: 38px; }
+            .raid-timer-ring { width: 56px; height: 56px; }
+            .raid-timer-inner { width: 46px; height: 46px; font-size: 20px; }
+            .info-grid { grid-template-columns: 1fr; }
+            .tab { font-size: 11px; padding: 9px 6px; }
+            .stat-row-inner { grid-template-columns: 1fr; }
+            .graph-canvas-wrap { height: 260px; }
+            .log-row { grid-template-columns: 34px 1fr auto; gap: 10px; padding: 10px 8px; }
+            .log-icon-circle { width: 34px; height: 34px; font-size: 12px; }
         }
     </style>
 </head>
@@ -250,6 +1136,7 @@
         <div class="bg-orb"></div>
     </div>
 
+    <!-- NAVIGATION (unchanged) -->
     <nav class="nav" id="navbar" aria-label="Main navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo" aria-label="KabaddiOne Home">
@@ -281,315 +1168,387 @@
 
     <div class="live-wrapper">
         
-        <div class="score-card">
-            <div class="top-badges">
-                <div class="badge-id" id="uiMatchId">Match Id: ------</div>
+        <!-- ============= MAIN SCOREBOARD ============= -->
+        <div class="score-board">
+            <div class="board-top">
+                <div class="badge-id" id="uiMatchId"><i class="fa-solid fa-hashtag"></i> ------</div>
                 <div class="badge-live">Live</div>
             </div>
-            
-            <div class="match-details" id="uiMatchDate">Fetching live stream connection...</div>
-            
-            <div class="clocks-container">
-                <div class="half-badge" id="uiHalf">1st Half</div>
+
+            <div class="board-meta" id="uiMatchDate">
+                <i class="fa-solid fa-location-dot"></i> Fetching live stream connection...
+            </div>
+
+            <div class="board-clock">
+                <div class="half-badge" id="uiHalf"><i class="fa-solid fa-clock"></i> 1st Half</div>
                 <div class="main-timer" id="uiMainClock">--:--</div>
             </div>
-            
+
             <div class="scores-row">
-                <div class="team-score-box">
-                    <div class="team-score" id="uiLeftScore" style="color: var(--left-team-color);">0</div>
+                <div class="team-col">
+                    <div class="team-score left-color" id="uiLeftScore">0</div>
                     <div class="team-name" id="uiLeftName">Left Team</div>
-                    <div class="empty-raids left" id="uiLeftEmptyRaids">
-                        <div class="empty-dot"></div><div class="empty-dot"></div>
+                </div>
+                <div class="center-col">
+                    <div class="raid-timer-ring" id="uiRaidTimerContainer">
+                        <div class="raid-timer-inner" id="uiRaidClock">30</div>
                     </div>
                 </div>
-                
-                <div class="team-score-box">
-                    <div class="team-score" id="uiRightScore" style="color: var(--right-team-color);">0</div>
+                <div class="team-col">
+                    <div class="team-score right-color" id="uiRightScore">0</div>
                     <div class="team-name" id="uiRightName">Right Team</div>
-                    <div class="empty-raids right" id="uiRightEmptyRaids">
-                        <div class="empty-dot"></div><div class="empty-dot"></div>
+                </div>
+            </div>
+
+            <div class="raider-banner idle" id="uiActiveRaider">
+                <i class="fa-solid fa-person-running"></i> Waiting for raid...
+            </div>
+
+            <div class="mat-section">
+                <div class="mat-title">On The Mat</div>
+                <div class="mat-row" id="uiMatDots">
+                    <div class="team-mat left"></div>
+                    <div class="mat-divider"></div>
+                    <div class="team-mat right"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============= QUICK STATS ============= -->
+        <div class="quick-stats">
+            <div class="quick-stat-team left-stat" id="uiLeftSubBg" style="--team-accent: var(--left-team-color);">
+                <div class="stat-row-inner">
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div>
+                        <span class="mini-stat-value" id="uiLeftFouls">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
+                        <span class="mini-stat-value" id="uiLeftTimeouts">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div>
+                        <span class="mini-stat-value" id="uiLeftSubs">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div>
+                        <span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="raid-timer-container" id="uiRaidTimerContainer">
-                <div class="raid-timer-inner" id="uiRaidClock">30</div>
-            </div>
-            
-            <div class="active-raider" id="uiActiveRaider">▶ Waiting for raid...</div>
-            
-            <div class="mat-status-title">On The Mat</div>
-            <div class="mat-dots" id="uiMatDots">
-                <div class="team-dots left"></div>
-                <div class="mat-divider"></div>
-                <div class="team-dots right"></div>
-            </div>
-        </div>
-
-        <div class="sub-stats-bar">
-            <div class="stat-team-half" id="uiLeftSubBg" style="background: var(--left-team-color);">
-                <div class="stat-item"><i class="fa-solid fa-hand-paper"></i> <span id="uiLeftFouls">0</span></div>
-                <div class="stat-item"><i class="fa-solid fa-t"></i> <span id="uiLeftTimeouts">0</span></div>
-                <div class="stat-item"><i class="fa-solid fa-right-left"></i> <span id="uiLeftSubs">0</span></div>
-                <div class="stat-item"><i class="fa-regular fa-circle-dot"></i> <span id="uiLeftEmptyRaidCount">0</span></div>
-            </div>
-            <div class="stat-team-half" id="uiRightSubBg" style="background: var(--right-team-color);">
-                <div class="stat-item"><span id="uiRightEmptyRaidCount">0</span> <i class="fa-regular fa-circle-dot"></i></div>
-                <div class="stat-item"><span id="uiRightSubs">0</span> <i class="fa-solid fa-right-left"></i></div>
-                <div class="stat-item"><span id="uiRightTimeouts">0</span> <i class="fa-solid fa-t"></i></div>
-                <div class="stat-item"><span id="uiRightFouls">0</span> <i class="fa-solid fa-hand-paper"></i></div>
+            <div class="quick-stat-team right-stat" id="uiRightSubBg" style="--team-accent: var(--right-team-color);">
+                <div class="stat-row-inner">
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div>
+                        <span class="mini-stat-value" id="uiRightFouls">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
+                        <span class="mini-stat-value" id="uiRightTimeouts">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div>
+                        <span class="mini-stat-value" id="uiRightSubs">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div>
+                        <span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- ============= TABS ============= -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('commentary', this)">Commentary</div>
+            <div class="tab active" onclick="switchTab('commentary', this)">Live</div>
             <div class="tab" onclick="switchTab('stats', this)">Stats</div>
             <div class="tab" onclick="switchTab('lineup', this)">Lineup</div>
             <div class="tab" onclick="switchTab('graph', this)">Graph</div>
-            <div class="tab" onclick="switchTab('details', this)">Details</div>
+            <div class="tab" onclick="switchTab('details', this)">Info</div>
         </div>
 
-        <div class="timeline-card tab-content active" id="tab-commentary">
-            <div class="timeline-list" id="uiTimelineLogs"></div>
+        <!-- ============= COMMENTARY TAB ============= -->
+        <div class="tab-content active" id="tab-commentary">
+            <div class="commentary-panel">
+                <div class="log-stream" id="uiTimelineLogs"></div>
+            </div>
         </div>
-        
+
+        <!-- ============= STATS TAB ============= -->
         <div class="tab-content" id="tab-stats">
-            <div class="stats-card">
-                <div class="stats-header-row">
-                    <div class="stats-team-info">
-                        <div class="stats-team-name" id="stLeftName">Left Team</div>
-                        <div class="stats-team-logo" id="stLeftLogo" style="background: var(--left-team-color);">LT</div>
-                    </div>
-                    <div class="stats-title-center">Half Wise Comparison</div>
-                    <div class="stats-team-info right">
-                        <div class="stats-team-logo" id="stRightLogo" style="background: var(--right-team-color);">RT</div>
-                        <div class="stats-team-name" id="stRightName">Right Team</div>
-                    </div>
-                </div>
-                
-                <div class="stat-row">
-                    <div class="stat-values">
-                        <div class="stat-val-left" id="stLeftTotal">0</div>
-                        <div class="stat-val-right" id="stRightTotal">0</div>
-                    </div>
-                    <div class="stat-label-center">Total Points</div>
-                    <div class="progress-container">
-                        <div class="progress-left" id="pbLeftTotal" style="width: 50%;"></div>
-                        <div class="progress-right" id="pbRightTotal" style="width: 50%;"></div>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-values">
-                        <div class="stat-val-left" id="stLeftRaid">0</div>
-                        <div class="stat-val-right" id="stRightRaid">0</div>
-                    </div>
-                    <div class="stat-label-center">Raid Points</div>
-                    <div class="progress-container">
-                        <div class="progress-left" id="pbLeftRaid" style="width: 50%;"></div>
-                        <div class="progress-right" id="pbRightRaid" style="width: 50%;"></div>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-values">
-                        <div class="stat-val-left" id="stLeftTackle">0</div>
-                        <div class="stat-val-right" id="stRightTackle">0</div>
-                    </div>
-                    <div class="stat-label-center">Tackle Points</div>
-                    <div class="progress-container">
-                        <div class="progress-left" id="pbLeftTackle" style="width: 50%;"></div>
-                        <div class="progress-right" id="pbRightTackle" style="width: 50%;"></div>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-values">
-                        <div class="stat-val-left" id="stLeftAllOut">0</div>
-                        <div class="stat-val-right" id="stRightAllOut">0</div>
-                    </div>
-                    <div class="stat-label-center">All Out Points</div>
-                    <div class="progress-container">
-                        <div class="progress-left" id="pbLeftAllOut" style="width: 50%;"></div>
-                        <div class="progress-right" id="pbRightAllOut" style="width: 50%;"></div>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-values">
-                        <div class="stat-val-left" id="stLeftExtra">0</div>
-                        <div class="stat-val-right" id="stRightExtra">0</div>
-                    </div>
-                    <div class="stat-label-center">Extra Points</div>
-                    <div class="progress-container">
-                        <div class="progress-left" id="pbLeftExtra" style="width: 50%;"></div>
-                        <div class="progress-right" id="pbRightExtra" style="width: 50%;"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stats-card">
-                <div class="stats-header-row">
-                    <div class="stats-team-info">
-                        <div class="stats-team-name" id="stPerfLeftName">Left Team</div>
-                        <div class="stats-team-logo" id="stPerfLeftLogo" style="background: var(--left-team-color);">LT</div>
-                    </div>
-                    <div class="stats-title-center">Raid Performance</div>
-                    <div class="stats-team-info right">
-                        <div class="stats-team-logo" id="stPerfRightLogo" style="background: var(--right-team-color);">RT</div>
-                        <div class="stats-team-name" id="stPerfRightName">Right Team</div>
-                    </div>
-                </div>
-                
-                <div class="stat-row" style="margin-bottom: 10px;">
-                    <div class="stat-values" style="justify-content: center; gap: 60px;">
-                        <div class="stat-val-left" id="stLeftTotalPerf">0</div>
-                        <div class="stat-label-center" style="position: static; font-weight: bold;">Total Raids</div>
-                        <div class="stat-val-right" id="stRightTotalPerf">0</div>
-                    </div>
-                </div>
-                <div class="stat-row" style="margin-bottom: 20px;">
-                    <div class="stat-values" style="justify-content: center; gap: 60px;">
-                        <div class="stat-val-left" id="stLeftSuccPerf" style="color: white;">0</div>
-                        <div class="stat-label-center" style="position: static; background: #2A2D47; padding: 4px 10px; border-radius: 4px; font-weight: bold;">Successful Raids</div>
-                        <div class="stat-val-right" id="stRightSuccPerf" style="color: white;">0</div>
-                    </div>
-                </div>
-                <div class="strike-rates-container">
-                    <div class="strike-val-left" id="stLeftStrikeVal">0%</div>
-                    <div class="donut-wrapper">
-                        <div class="donut-chart donut-left" id="pbLeftStrikeChart">
-                            <div class="donut-inner"></div>
+            <div class="stats-section">
+
+                <!-- Points Breakdown -->
+                <div class="stat-panel">
+                    <div class="panel-header">
+                        <div class="panel-team">
+                            <div class="panel-team-badge left" id="stLeftLogo">LT</div>
+                            <div class="panel-team-name" id="stLeftName">Left Team</div>
+                        </div>
+                        <div class="panel-title">Points</div>
+                        <div class="panel-team right">
+                            <div class="panel-team-badge right" id="stRightLogo">RT</div>
+                            <div class="panel-team-name" id="stRightName">Right Team</div>
                         </div>
                     </div>
-                    <div class="strike-label-center">Raid Strike Rate</div>
-                    <div class="donut-wrapper">
-                        <div class="donut-chart donut-right" id="pbRightStrikeChart">
-                            <div class="donut-inner"></div>
+
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftTotal">0</div>
+                            <div class="cmp-name">Total</div>
+                            <div class="cmp-value right" id="stRightTotal">0</div>
+                        </div>
+                        <div class="cmp-bar">
+                            <div class="cmp-bar-fill left" id="pbLeftTotal" style="width:50%"></div>
+                            <div class="cmp-bar-fill right" id="pbRightTotal" style="width:50%"></div>
                         </div>
                     </div>
-                    <div class="strike-val-right" id="stRightStrikeVal">0%</div>
+
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftRaid">0</div>
+                            <div class="cmp-name">Raid Pts</div>
+                            <div class="cmp-value right" id="stRightRaid">0</div>
+                        </div>
+                        <div class="cmp-bar">
+                            <div class="cmp-bar-fill left" id="pbLeftRaid" style="width:50%"></div>
+                            <div class="cmp-bar-fill right" id="pbRightRaid" style="width:50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftTackle">0</div>
+                            <div class="cmp-name">Tackle Pts</div>
+                            <div class="cmp-value right" id="stRightTackle">0</div>
+                        </div>
+                        <div class="cmp-bar">
+                            <div class="cmp-bar-fill left" id="pbLeftTackle" style="width:50%"></div>
+                            <div class="cmp-bar-fill right" id="pbRightTackle" style="width:50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftAllOut">0</div>
+                            <div class="cmp-name">All Out</div>
+                            <div class="cmp-value right" id="stRightAllOut">0</div>
+                        </div>
+                        <div class="cmp-bar">
+                            <div class="cmp-bar-fill left" id="pbLeftAllOut" style="width:50%"></div>
+                            <div class="cmp-bar-fill right" id="pbRightAllOut" style="width:50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftExtra">0</div>
+                            <div class="cmp-name">Extra Pts</div>
+                            <div class="cmp-value right" id="stRightExtra">0</div>
+                        </div>
+                        <div class="cmp-bar">
+                            <div class="cmp-bar-fill left" id="pbLeftExtra" style="width:50%"></div>
+                            <div class="cmp-bar-fill right" id="pbRightExtra" style="width:50%"></div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Raid Strike Rate -->
+                <div class="stat-panel">
+                    <div class="panel-header">
+                        <div class="panel-team">
+                            <div class="panel-team-badge left" id="stPerfLeftLogo">LT</div>
+                            <div class="panel-team-name" id="stPerfLeftName">Left Team</div>
+                        </div>
+                        <div class="panel-title">Raid Strike</div>
+                        <div class="panel-team right">
+                            <div class="panel-team-badge right" id="stPerfRightLogo">RT</div>
+                            <div class="panel-team-name" id="stPerfRightName">Right Team</div>
+                        </div>
+                    </div>
+
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftTotalPerf">0</div>
+                            <div class="cmp-name">Total Raids</div>
+                            <div class="cmp-value right" id="stRightTotalPerf">0</div>
+                        </div>
+                    </div>
+                    <div class="cmp-row">
+                        <div class="cmp-labels">
+                            <div class="cmp-value left" id="stLeftSuccPerf">0</div>
+                            <div class="cmp-name">Successful</div>
+                            <div class="cmp-value right" id="stRightSuccPerf">0</div>
+                        </div>
+                    </div>
+
+                    <div class="strike-block">
+                        <div class="strike-side">
+                            <div class="donut-shell">
+                                <div class="donut-ring left" id="pbLeftStrikeChart">
+                                    <div class="donut-hole">
+                                        <div class="donut-pct" id="stLeftStrikeVal">0%</div>
+                                        <div class="donut-label">LEFT</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="strike-team-name" id="stLeftStrikeTeam">Left Team</div>
+                        </div>
+                        <div class="strike-side">
+                            <div class="donut-shell">
+                                <div class="donut-ring right" id="pbRightStrikeChart">
+                                    <div class="donut-hole">
+                                        <div class="donut-pct" id="stRightStrikeVal">0%</div>
+                                        <div class="donut-label">RIGHT</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="strike-team-name" id="stRightStrikeTeam">Right Team</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
+        <!-- ============= LINEUP TAB ============= -->
         <div class="tab-content" id="tab-lineup">
-            <div class="lineup-team-toggle">
-                <div class="team-tog" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div>
-                <div class="team-tog" id="togRight" onclick="switchLineupTeam('right')">Right Team</div>
-            </div>
-            <div class="lineup-card">
-                <div style="border-left: 4px solid #F9A825; padding-left: 10px; margin-bottom: 15px; font-weight: bold; font-size: 16px;">Starting 7</div>
-                <div class="lineup-grid" id="uiStarting7Grid"></div>
-            </div>
-            <div class="lineup-card">
-                <div style="border-left: 4px solid #8C8E9F; padding-left: 10px; margin-bottom: 15px; font-weight: bold; font-size: 16px;">Substitutes</div>
-                <div class="lineup-grid" id="uiSubstitutesGrid"></div>
+            <div class="lineup-panel">
+                <div class="team-toggle">
+                    <div class="team-toggle-btn" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div>
+                    <div class="team-toggle-btn" id="togRight" onclick="switchLineupTeam('right')">Right Team</div>
+                </div>
+
+                <div class="roster-group">
+                    <div class="roster-title"><span class="roster-title-dot"></span> Starting 7</div>
+                    <div class="lineup-grid" id="uiStarting7Grid"></div>
+                </div>
+
+                <div class="roster-group">
+                    <div class="roster-title"><span class="roster-title-dot sub"></span> Substitutes</div>
+                    <div class="lineup-grid" id="uiSubstitutesGrid"></div>
+                </div>
             </div>
         </div>
 
+        <!-- ============= GRAPH TAB ============= -->
         <div class="tab-content" id="tab-graph">
-            <div class="graph-card">
-                <div class="graph-title">Match Progression</div>
-                <div class="stats-header-row" style="margin-bottom: 0;">
-                    <div class="stats-team-info">
-                        <div class="stats-team-name" id="grLeftName">Left Team</div>
-                        <div class="stats-team-logo" id="grLeftLogo" style="background: var(--left-team-color);">LT</div>
-                    </div>
-                    <div class="stats-title-center">Score Flow</div>
-                    <div class="stats-team-info right">
-                        <div class="stats-team-logo" id="grRightLogo" style="background: var(--right-team-color);">RT</div>
-                        <div class="stats-team-name" id="grRightName">Right Team</div>
+            <div class="graph-panel">
+                <div class="graph-title-row">
+                    <div class="graph-title">Match Progression</div>
+                    <div class="graph-legend">
+                        <div class="legend-item"><div class="legend-dot left"></div> Left</div>
+                        <div class="legend-item"><div class="legend-dot right"></div> Right</div>
                     </div>
                 </div>
-                <div class="graph-container">
+                <div class="graph-teams">
+                    <div class="graph-team-tag">
+                        <div class="graph-team-pill left" id="grLeftLogo">LT</div>
+                        <div class="graph-team-tag-name" id="grLeftName">Left Team</div>
+                    </div>
+                    <div class="graph-team-tag right">
+                        <div class="graph-team-pill right" id="grRightLogo">RT</div>
+                        <div class="graph-team-tag-name" id="grRightName">Right Team</div>
+                    </div>
+                </div>
+                <div class="graph-canvas-wrap">
                     <canvas id="matchGraphCanvas"></canvas>
                 </div>
             </div>
         </div>
 
+        <!-- ============= DETAILS TAB ============= -->
         <div class="tab-content" id="tab-details">
-            <div class="details-card">
-                <div class="details-header">Match Information</div>
-                <div class="details-grid">
-                    <div class="detail-item full-width">
-                        <div class="detail-icon"><i class="fa-solid fa-people-group"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Teams</span>
-                            <span class="detail-value" id="dtTeams">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-hashtag"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Match ID</span>
-                            <span class="detail-value" id="dtMatchId">------</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-calendar-day"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Date & Time</span>
-                            <span class="detail-value" id="dtDate">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="detail-item full-width">
-                        <div class="detail-icon"><i class="fa-solid fa-location-dot"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Venue</span>
-                            <span class="detail-value" id="dtVenue">Live Kabaddi Arena</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="details-panel">
 
-            <div class="details-card">
-                <div class="details-header">Match Rules & Settings</div>
-                <div class="details-grid">
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-stopwatch"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Half Duration</span>
-                            <span class="detail-value" id="dtDuration">20 Minutes</span>
+                <div class="info-card">
+                    <div class="info-card-title"><i class="fa-solid fa-circle-info"></i> Match Information</div>
+                    <div class="info-grid">
+                        <div class="info-item full">
+                            <div class="info-icon"><i class="fa-solid fa-people-group"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Teams</div>
+                                <div class="info-value" id="dtTeams">Loading...</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-mug-hot"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Break Duration</span>
-                            <span class="detail-value" id="dtBreak">5 Minutes</span>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-hashtag"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Match ID</div>
+                                <div class="info-value" id="dtMatchId">------</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-users"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Players / Side</span>
-                            <span class="detail-value" id="dtPlayers">7 Players</span>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Date</div>
+                                <div class="info-value" id="dtDate">Loading...</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-right-left"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Max Subs / Half</span>
-                            <span class="detail-value" id="dtSubs">5</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-t"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Max Timeouts / Half</span>
-                            <span class="detail-value" id="dtTimeouts">2</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon"><i class="fa-solid fa-clock"></i></div>
-                        <div class="detail-text">
-                            <span class="detail-label">Timeout Duration</span>
-                            <span class="detail-value" id="dtTimeoutDur">60 Seconds</span>
+                        <div class="info-item full">
+                            <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Venue</div>
+                                <div class="info-value" id="dtVenue">Live Kabaddi Arena</div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="info-card">
+                    <div class="info-card-title"><i class="fa-solid fa-sliders"></i> Match Settings</div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Half Duration</div>
+                                <div class="info-value" id="dtDuration">20 Minutes</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Break Duration</div>
+                                <div class="info-value" id="dtBreak">5 Minutes</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-users"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Players/Side</div>
+                                <div class="info-value" id="dtPlayers">7 Players</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-right-left"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Max Subs</div>
+                                <div class="info-value" id="dtSubs">5</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Max Timeouts</div>
+                                <div class="info-value" id="dtTimeouts">2</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div class="info-text">
+                                <div class="info-label">Timeout Duration</div>
+                                <div class="info-value" id="dtTimeoutDur">60 Seconds</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
     </div>
 
+    <!-- FOOTER (unchanged) -->
     <footer class="footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-logo">
@@ -664,13 +1623,13 @@
     <script>
         // ============ UI HELPERS ============
         window.expandedPlayerIds = new Set();
-        
+
         function togglePlayerExpand(element, playerId) {
-            if(window.expandedPlayerIds.has(playerId)) {
+            if (window.expandedPlayerIds.has(playerId)) {
                 window.expandedPlayerIds.delete(playerId);
                 element.classList.remove('expanded');
             } else {
-                document.querySelectorAll('.player-bar-container').forEach(el => el.classList.remove('expanded'));
+                document.querySelectorAll('.player-card').forEach(el => el.classList.remove('expanded'));
                 window.expandedPlayerIds.clear();
                 window.expandedPlayerIds.add(playerId);
                 element.classList.add('expanded');
@@ -682,29 +1641,19 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
             document.getElementById('tab-' + tabId).classList.add('active');
-            if(tabId === 'graph') requestAnimationFrame(() => setTimeout(drawGraph, 30));
+            if (tabId === 'graph') requestAnimationFrame(() => setTimeout(drawGraph, 30));
         }
 
         let currentLineupTeam = 'left';
-        let latestGlobalState = null; 
-        
+        let latestGlobalState = null;
+
         function switchLineupTeam(side) {
             currentLineupTeam = side;
             const togL = document.getElementById('togLeft');
             const togR = document.getElementById('togRight');
-            
-            if (side === 'left') {
-                togL.style.background = 'var(--left-team-color)';
-                togL.style.color = '#fff';
-                togR.style.background = 'transparent';
-                togR.style.color = '#8C8E9F';
-            } else {
-                togR.style.background = 'var(--right-team-color)';
-                togR.style.color = '#fff';
-                togL.style.background = 'transparent';
-                togL.style.color = '#8C8E9F';
-            }
-            if(latestGlobalState) renderLineups(latestGlobalState);
+            togL.className = 'team-toggle-btn' + (side === 'left' ? ' active-left' : '');
+            togR.className = 'team-toggle-btn' + (side === 'right' ? ' active-right' : '');
+            if (latestGlobalState) renderLineups(latestGlobalState);
         }
 
         function getInitials(name) {
@@ -713,153 +1662,127 @@
             if (words.length > 1) return (words[0][0] + words[1][0]).toUpperCase();
             return name.substring(0, 2).toUpperCase();
         }
-        
+
         function calculateWidths(leftVal, rightVal) {
-            const l = parseInt(leftVal) || 0; const r = parseInt(rightVal) || 0;
+            const l = parseInt(leftVal) || 0;
+            const r = parseInt(rightVal) || 0;
             const total = l + r;
             if (total === 0) return { left: "50%", right: "50%" };
             return { left: ((l / total) * 100) + "%", right: ((r / total) * 100) + "%" };
         }
 
-        // ============================================================
-        // ============ TOTALLY REWRITTEN GRAPH ENGINE ================
-        // ============================================================
+        // ============ LOG ICON MAPPER ============
+        function getLogIcon(title, logType, isLeftTeam, leftColor, rightColor) {
+            const t = (title || '').toLowerCase();
+            const teamColor = isLeftTeam === true ? leftColor : (isLeftTeam === false ? rightColor : '#546E7A');
+
+            // Priority: Manual & Period events
+            if (t.includes('manual')) return { icon: 'fa-sliders', bg: '#546E7A' };
+            if (t.includes('starting 7')) return { icon: 'fa-users', bg: '#3F51B5' };
+            if (t.includes('match started')) return { icon: 'fa-flag-checkered', bg: '#4CAF50' };
+            if (t.includes('half time') || t.includes('second half')) return { icon: 'fa-hourglass-half', bg: '#FF9800' };
+            if (t.includes('full time') || t.includes('match over')) return { icon: 'fa-trophy', bg: '#FFD700' };
+            if (t.includes('toss')) return { icon: 'fa-coins', bg: '#FFC107' };
+
+            // Game events
+            if (t.includes('super raid')) return { icon: 'fa-bolt', bg: '#FF5722' };
+            if (t.includes('super tackle')) return { icon: 'fa-shield-halved', bg: '#E91E63' };
+            if (t.includes('all out')) return { icon: 'fa-skull', bg: '#D32F2F' };
+            if (t.includes('do-or-die') || t.includes('do or die')) return { icon: 'fa-fire', bg: '#F44336' };
+            if (t.includes('self out')) return { icon: 'fa-person-falling', bg: '#795548' };
+            if (t.includes('empty raid') || (t.includes('empty') && !t.includes('empty raids'))) return { icon: 'fa-circle-xmark', bg: '#607D8B' };
+
+            // Card & admin
+            if (t.includes('time-out') || t.includes('timeout')) return { icon: 'fa-stopwatch', bg: '#009688' };
+            if (t.includes('card')) return { icon: 'fa-square', bg: '#FFEB3B' };
+            if (t.includes('substitution')) return { icon: 'fa-right-left', bg: '#00BCD4' };
+            if (t.includes('technical')) return { icon: 'fa-screwdriver-wrench', bg: '#9C27B0' };
+
+            // Standard points
+            if (t.includes('bonus')) return { icon: 'fa-star', bg: '#FFA726' };
+            if (t.includes('touch')) return { icon: 'fa-hand', bg: teamColor };
+            if (t.includes('tackle')) return { icon: 'fa-hand-fist', bg: teamColor };
+            if (t.includes('raid')) return { icon: 'fa-person-running', bg: teamColor };
+
+            return { icon: 'fa-circle-info', bg: '#546E7A' };
+        }
+
+        // ============ GRAPH ENGINE (kept robust) ============
         let matchLogsForGraph = [];
         let leftTeamColorForGraph = "#4CAF50";
         let rightTeamColorForGraph = "#2196F3";
         let totalMatchMinutes = 40;
         let currentAbsoluteMatchMinute = 0;
 
-        /**
-         * Builds a strictly-monotonic timeline of { min, l, r } score snapshots.
-         * 
-         * Key fixes:
-         *  1. "Second half begins" log has timeStr "2nd Half: 15'" but actually
-         *     represents minute = halfDuration (start of 2nd half). We detect and
-         *     clamp this.
-         *  2. Enforces monotonic non-decreasing minute values across all entries.
-         *  3. Sorts logs chronologically by numeric id (timestamp).
-         */
         function buildScoreTimeline() {
             const sortedLogs = [...matchLogsForGraph].sort((a, b) => {
                 return (parseInt(a.id) || 0) - (parseInt(b.id) || 0);
             });
-            
             const halfDuration = totalMatchMinutes / 2;
             const timeline = [{ min: 0, l: 0, r: 0 }];
-            
-            let runningL = 0;
-            let runningR = 0;
-            let lastMinute = 0;
-            
+            let runningL = 0, runningR = 0, lastMinute = 0;
+
             for (let log of sortedLogs) {
                 const title = (log.title || '').toLowerCase();
                 const desc = (log.desc || '').toLowerCase();
                 const timeStr = log.timeStr || '';
-                
-                // Detect half and half-start markers
                 const is2ndHalf = timeStr.includes('2nd Half') || timeStr.includes('2nd half');
-                const isHalfStart = title.includes('half time') || 
-                                    desc.includes('second half begins') || 
-                                    desc.includes('first half begins');
-                
-                // Parse minute number from "X'" 
+                const isHalfStart = title.includes('half time') || desc.includes('second half begins') || desc.includes('first half begins');
+
                 let minuteInHalf = 0;
                 const m = timeStr.match(/(\d+)\s*'/);
                 if (m) minuteInHalf = parseInt(m[1]) || 0;
-                
-                // Compute absolute minute
+
                 let absMinute;
                 if (is2ndHalf) {
-                    // Special case: the "Second half begins" log always shows "15'"
-                    // but is actually the START of 2nd half → absolute = halfDuration
-                    if (isHalfStart) {
-                        absMinute = halfDuration;
-                    } else {
-                        absMinute = halfDuration + minuteInHalf;
-                    }
+                    absMinute = isHalfStart ? halfDuration : (halfDuration + minuteInHalf);
                 } else {
                     absMinute = minuteInHalf;
                 }
-                
-                // Clamp to valid range
                 if (absMinute > totalMatchMinutes) absMinute = totalMatchMinutes;
                 if (absMinute < 0) absMinute = 0;
-                
-                // Enforce monotonic non-decreasing
                 if (absMinute < lastMinute) absMinute = lastMinute;
                 lastMinute = absMinute;
-                
-                // Update running scores from scoreStr
+
                 if (log.scoreStr) {
                     const clean = log.scoreStr.replace(/Score:\s*/i, '').trim();
                     const parts = clean.split('-').map(s => parseInt(s.trim()) || 0);
-                    if (parts.length === 2) {
-                        runningL = parts[0];
-                        runningR = parts[1];
-                    }
+                    if (parts.length === 2) { runningL = parts[0]; runningR = parts[1]; }
                 }
-                
                 timeline.push({ min: absMinute, l: runningL, r: runningR });
             }
-            
             return timeline;
         }
 
-        /**
-         * Samples the timeline at a fixed interval (default 30 seconds = 0.5 min).
-         * Returns array of { min, l, r } from minute 0 up to currentAbsoluteMatchMinute.
-         */
-        function sampleTimeline(timeline, resolutionMinutes, upToMinute) {
+        function sampleTimeline(timeline, resolution, upToMinute) {
             const samples = [];
             const maxM = Math.min(upToMinute, totalMatchMinutes);
-            
-            // Generate sample times
-            for (let m = 0; m <= maxM + 0.001; m += resolutionMinutes) {
+            for (let m = 0; m <= maxM + 0.001; m += resolution) {
                 const rounded = Math.round(m * 1000) / 1000;
-                let scoreL = 0, scoreR = 0;
-                
-                // Find last entry with min <= rounded
+                let sL = 0, sR = 0;
                 for (let i = 0; i < timeline.length; i++) {
-                    if (timeline[i].min <= rounded + 0.0001) {
-                        scoreL = timeline[i].l;
-                        scoreR = timeline[i].r;
-                    } else {
-                        break; // timeline is monotonic
-                    }
+                    if (timeline[i].min <= rounded + 0.0001) { sL = timeline[i].l; sR = timeline[i].r; }
+                    else break;
                 }
-                
-                samples.push({ min: rounded, l: scoreL, r: scoreR });
+                samples.push({ min: rounded, l: sL, r: sR });
             }
-            
-            // Ensure the last sample is exactly at maxM
-            if (samples.length > 0) {
-                const lastSample = samples[samples.length - 1];
-                if (Math.abs(lastSample.min - maxM) > 0.001) {
-                    let scoreL = 0, scoreR = 0;
-                    for (let i = 0; i < timeline.length; i++) {
-                        if (timeline[i].min <= maxM + 0.0001) {
-                            scoreL = timeline[i].l;
-                            scoreR = timeline[i].r;
-                        } else break;
-                    }
-                    samples.push({ min: maxM, l: scoreL, r: scoreR });
+            if (samples.length > 0 && Math.abs(samples[samples.length - 1].min - maxM) > 0.001) {
+                let sL = 0, sR = 0;
+                for (let i = 0; i < timeline.length; i++) {
+                    if (timeline[i].min <= maxM + 0.0001) { sL = timeline[i].l; sR = timeline[i].r; }
+                    else break;
                 }
+                samples.push({ min: maxM, l: sL, r: sR });
             }
-            
             return samples;
         }
 
         function drawGraph() {
             const canvas = document.getElementById('matchGraphCanvas');
             if (!canvas) return;
-            
             const rect = canvas.parentElement.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) {
-                setTimeout(drawGraph, 100);
-                return;
-            }
-            
+            if (rect.width === 0 || rect.height === 0) { setTimeout(drawGraph, 100); return; }
+
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
             canvas.width = rect.width * dpr;
@@ -868,167 +1791,113 @@
             canvas.style.height = rect.height + 'px';
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(dpr, dpr);
-            
-            const w = rect.width;
-            const h = rect.height;
+
+            const w = rect.width, h = rect.height;
             ctx.clearRect(0, 0, w, h);
-            
-            const padLeft = 42;
-            const padRight = 45;
-            const padTop = 15;
-            const padBottom = 38;
+
+            const padLeft = 42, padRight = 48, padTop = 20, padBottom = 40;
             const graphW = w - padLeft - padRight;
             const graphH = h - padTop - padBottom;
-            
-            // ================== BUILD DATA ==================
+
             const timeline = buildScoreTimeline();
-            
-            // Resolution: 30 seconds = 0.5 min
             const resolution = 0.5;
             const dataPoints = sampleTimeline(timeline, resolution, currentAbsoluteMatchMinute);
-            
-            if (dataPoints.length === 0) {
-                dataPoints.push({ min: 0, l: 0, r: 0 });
-            }
-            
-            // Find true max score across all points AND timeline
+            if (dataPoints.length === 0) dataPoints.push({ min: 0, l: 0, r: 0 });
+
             let maxL = 0, maxR = 0;
-            for (let pt of dataPoints) {
-                if (pt.l > maxL) maxL = pt.l;
-                if (pt.r > maxR) maxR = pt.r;
-            }
+            for (let pt of dataPoints) { if (pt.l > maxL) maxL = pt.l; if (pt.r > maxR) maxR = pt.r; }
             const finalL = dataPoints[dataPoints.length - 1].l;
             const finalR = dataPoints[dataPoints.length - 1].r;
-            
-            // Y-axis range (use both current and max observed scores)
-            let maxScore = Math.max(5, maxL, maxR);
+            const maxScore = Math.max(5, maxL, maxR);
             const yMax = Math.max(5, Math.ceil(maxScore / 5) * 5);
-            
-            // ================== DRAW Y-AXIS ==================
             const yStep = yMax <= 10 ? 2 : (yMax <= 30 ? 5 : 10);
-            
-            ctx.font = "600 11px Inter, sans-serif";
-            ctx.textAlign = "right";
-            ctx.textBaseline = "middle";
-            
+
+            // Y-axis
+            ctx.font = "700 10px Inter, sans-serif";
+            ctx.textAlign = "right"; ctx.textBaseline = "middle";
             for (let i = 0; i <= yMax + 0.001; i += yStep) {
                 const y = padTop + graphH - ((i / yMax) * graphH);
-                
-                ctx.strokeStyle = i === 0 ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.05)";
+                ctx.strokeStyle = i === 0 ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.04)";
                 ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(padLeft, y);
-                ctx.lineTo(padLeft + graphW, y);
-                ctx.stroke();
-                
-                ctx.fillStyle = "#B0B0C8";
+                ctx.beginPath(); ctx.moveTo(padLeft, y); ctx.lineTo(padLeft + graphW, y); ctx.stroke();
+                ctx.fillStyle = "#8C8E9F";
                 ctx.fillText(String(Math.round(i)), padLeft - 8, y);
             }
-            
-            // ================== DRAW X-AXIS ==================
-            // Grid every 0.5 min (very faint), labels every 2/5 min
-            const labelStep = totalMatchMinutes <= 20 ? 2 : (totalMatchMinutes <= 40 ? 5 : 5);
-            
-            // Faint 30-second grid
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+
+            // X-axis
+            const labelStep = totalMatchMinutes <= 20 ? 2 : 5;
+            ctx.strokeStyle = "rgba(255,255,255,0.02)";
             for (let m = 0; m <= totalMatchMinutes + 0.001; m += resolution) {
                 const x = padLeft + ((m / totalMatchMinutes) * graphW);
-                ctx.beginPath();
-                ctx.moveTo(x, padTop);
-                ctx.lineTo(x, padTop + graphH);
-                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(x, padTop); ctx.lineTo(x, padTop + graphH); ctx.stroke();
             }
-            
-            // Label grid
-            ctx.textAlign = "center";
-            ctx.textBaseline = "top";
+            ctx.textAlign = "center"; ctx.textBaseline = "top";
             for (let m = 0; m <= totalMatchMinutes + 0.001; m += labelStep) {
                 const x = padLeft + ((m / totalMatchMinutes) * graphW);
-                
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-                ctx.beginPath();
-                ctx.moveTo(x, padTop);
-                ctx.lineTo(x, padTop + graphH);
-                ctx.stroke();
-                
-                ctx.fillStyle = "#B0B0C8";
-                ctx.font = "600 11px Inter, sans-serif";
+                ctx.strokeStyle = "rgba(255,255,255,0.06)";
+                ctx.beginPath(); ctx.moveTo(x, padTop); ctx.lineTo(x, padTop + graphH); ctx.stroke();
+                ctx.fillStyle = "#8C8E9F";
+                ctx.font = "700 10px Inter, sans-serif";
                 ctx.fillText(m + "'", x, padTop + graphH + 8);
             }
-            
-            // Axis caption
             ctx.fillStyle = "#7A7A95";
-            ctx.font = "700 10px Inter, sans-serif";
+            ctx.font = "800 9px Inter, sans-serif";
             ctx.fillText("MINUTES", padLeft + graphW / 2, padTop + graphH + 26);
-            
-            // ================== DRAW TEAM LINES ==================
+
+            // Draw line for team
             const drawLine = (isLeftTeam, color) => {
                 if (dataPoints.length === 0) return;
-                
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = color;
                 ctx.fillStyle = color;
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
-                
-                // Main polyline
+
+                // Shadow under line
+                ctx.save();
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 10;
+
                 ctx.beginPath();
                 dataPoints.forEach((pt, idx) => {
                     const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
                     const score = isLeftTeam ? pt.l : pt.r;
                     const y = padTop + graphH - ((score / yMax) * graphH);
-                    if (idx === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
+                    if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                 });
                 ctx.stroke();
-                
-                // Markers ONLY on score changes (and the final point)
+                ctx.restore();
+
+                // Markers on score changes
                 let prevL = null, prevR = null;
                 dataPoints.forEach((pt, idx) => {
                     const isLast = idx === dataPoints.length - 1;
-                    const scoreChanged = (isLeftTeam ? pt.l !== prevL : pt.r !== prevR);
-                    
-                    if (scoreChanged || isLast) {
+                    const changed = isLeftTeam ? pt.l !== prevL : pt.r !== prevR;
+                    if (changed || isLast) {
                         const x = padLeft + ((pt.min / totalMatchMinutes) * graphW);
                         const score = isLeftTeam ? pt.l : pt.r;
                         const y = padTop + graphH - ((score / yMax) * graphH);
-                        
-                        // Outer ring
-                        ctx.beginPath();
-                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
-                        ctx.fillStyle = color;
-                        ctx.fill();
-                        // Inner dark
-                        ctx.beginPath();
-                        ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
-                        ctx.fillStyle = "#1A1C29";
-                        ctx.fill();
+                        ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.fillStyle = color; ctx.fill();
+                        ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+                        ctx.fillStyle = "#131629"; ctx.fill();
                     }
-                    
-                    prevL = pt.l;
-                    prevR = pt.r;
+                    prevL = pt.l; prevR = pt.r;
                 });
-                
-                // End-of-line score badge
+
+                // End label
                 const lastPt = dataPoints[dataPoints.length - 1];
                 const x = padLeft + ((lastPt.min / totalMatchMinutes) * graphW);
                 const score = isLeftTeam ? lastPt.l : lastPt.r;
                 const y = padTop + graphH - ((score / yMax) * graphH);
-                
-                ctx.font = "700 15px Inter, sans-serif";
+
+                ctx.font = "900 15px Inter, sans-serif";
                 ctx.fillStyle = color;
                 ctx.textBaseline = "middle";
-                
-                if (isLeftTeam) {
-                    ctx.textAlign = "right";
-                    ctx.fillText(score, x - 14, y);
-                } else {
-                    ctx.textAlign = "left";
-                    ctx.fillText(score, x + 14, y);
-                }
+                ctx.textAlign = isLeftTeam ? "right" : "left";
+                ctx.fillText(score, isLeftTeam ? x - 14 : x + 14, y);
             };
-            
-            // Draw the trailing team first so the leading team's line renders on top
+
             if (finalL >= finalR) {
                 drawLine(false, rightTeamColorForGraph);
                 drawLine(true, leftTeamColorForGraph);
@@ -1036,29 +1905,21 @@
                 drawLine(true, leftTeamColorForGraph);
                 drawLine(false, rightTeamColorForGraph);
             }
-            
-            // ================== LIVE TIME MARKER ==================
+
+            // Live marker
             if (currentAbsoluteMatchMinute > 0.5 && currentAbsoluteMatchMinute < totalMatchMinutes - 0.5) {
                 const x = padLeft + ((currentAbsoluteMatchMinute / totalMatchMinutes) * graphW);
-                
                 ctx.setLineDash([4, 4]);
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+                ctx.strokeStyle = "rgba(255,255,255,0.35)";
                 ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(x, padTop);
-                ctx.lineTo(x, padTop + graphH);
-                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(x, padTop); ctx.lineTo(x, padTop + graphH); ctx.stroke();
                 ctx.setLineDash([]);
-                
-                // "LIVE" label
-                ctx.font = "700 9px Inter, sans-serif";
-                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "bottom";
-                ctx.fillText("LIVE", x, padTop - 2);
+                ctx.font = "900 9px Inter, sans-serif";
+                ctx.fillStyle = "rgba(255,255,255,0.55)";
+                ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+                ctx.fillText("LIVE", x, padTop - 3);
             }
         }
-        
         window.addEventListener('resize', () => {
             if (document.getElementById('tab-graph').classList.contains('active')) {
                 requestAnimationFrame(() => drawGraph());
@@ -1072,23 +1933,19 @@
             try {
                 lRoster = JSON.parse(state.leftRosterJson);
                 rRoster = JSON.parse(state.rightRosterJson);
-            } catch(e) {
-                console.error("Roster parse error", e);
-                return;
-            }
-            
+            } catch (e) { console.error("Roster parse error", e); return; }
+
             const activeRoster = currentLineupTeam === 'left' ? lRoster : rRoster;
             const isLeftTeam = currentLineupTeam === 'left';
             const teamClass = isLeftTeam ? "left" : "right";
-            
-            let startersHtml = "";
-            let subsHtml = "";
+
+            let startersHtml = "", subsHtml = "";
 
             const createPlayerHtml = (player) => {
                 const role = player.positionOnMat || "Substitute";
                 const totalPts = (player.raidPoints || 0) + (player.tacklePoints || 0);
-                const nameDisplay = player.jerseyNumber ? `${player.name} (${player.jerseyNumber})` : player.name;
-                
+                const nameDisplay = player.jerseyNumber ? `${player.name} · #${player.jerseyNumber}` : player.name;
+
                 const tRaid = player.totalRaids || 0;
                 const succRaid = player.raidPoints > 0 ? player.raidPoints : 0;
                 const unsRaid = Math.max(0, tRaid - succRaid);
@@ -1101,48 +1958,58 @@
                 const tackSuccDeg = tTack > 0 ? (succTack / tTack) * 360 : 0;
                 const tackUnsDeg = tTack > 0 ? (unsTack / tTack) * 360 : 0;
 
-                const imgContent = (player.imageUri && player.imageUri.startsWith("data:image")) 
-                    ? `<img src="${player.imageUri}" alt="Profile">` : `<i class="fa-solid fa-user"></i>`;
+                const imgContent = (player.imageUri && player.imageUri.startsWith("data:image"))
+                    ? `<img src="${player.imageUri}" alt="">` : `<i class="fa-solid fa-user"></i>`;
 
                 const expandedClass = window.expandedPlayerIds.has(player.id) ? "expanded" : "";
 
                 return `
-                <div class="player-bar-container ${expandedClass}" onclick="togglePlayerExpand(this, '${player.id}')">
-                    <div class="player-bar ${teamClass}">
-                        <div class="player-img-wrapper">${imgContent}</div>
-                        <div class="player-info">
-                            <div class="player-name">${nameDisplay}</div>
-                            <div class="player-role">${role}</div>
+                <div class="player-card ${expandedClass}" onclick="togglePlayerExpand(this, '${player.id}')">
+                    <div class="player-card-head">
+                        <div class="player-avatar-wrap">${imgContent}</div>
+                        <div class="player-main">
+                            <div class="player-main-name">${nameDisplay}</div>
+                            <div class="player-main-role">${role}</div>
                         </div>
-                        <div class="player-points">${totalPts}</div>
-                        <i class="fa-solid fa-chevron-down player-expand-icon"></i>
+                        <div class="player-pts">${totalPts}</div>
+                        <div class="player-chevron"><i class="fa-solid fa-chevron-down"></i></div>
                     </div>
-                    <div class="player-analytics">
-                        <div class="ana-pts-row">
-                            <div class="ana-pt-col"><div class="ana-pt-title">Total Pts</div><div class="ana-pt-val">${totalPts}</div></div>
-                            <div class="ana-pt-col"><div class="ana-pt-title">Raid Pts</div><div class="ana-pt-val">${player.raidPoints || 0}</div></div>
-                            <div class="ana-pt-col"><div class="ana-pt-title">Tackle Pts</div><div class="ana-pt-val">${player.tacklePoints || 0}</div></div>
+                    <div class="player-card-body">
+                        <div class="p-body-pts">
+                            <div class="p-body-pt"><div class="p-body-pt-label">Total</div><div class="p-body-pt-value">${totalPts}</div></div>
+                            <div class="p-body-pt"><div class="p-body-pt-label">Raid</div><div class="p-body-pt-value">${player.raidPoints || 0}</div></div>
+                            <div class="p-body-pt"><div class="p-body-pt-label">Tackle</div><div class="p-body-pt-value">${player.tacklePoints || 0}</div></div>
                         </div>
-                        <div style="text-align:center; font-size:12px; font-weight:bold; color:white; margin-bottom:10px;">Total Raids: ${tRaid}</div>
-                        <div class="ana-donut-row" style="margin-bottom: 20px;">
-                            <div class="ana-donut-col">
-                                <div class="ana-donut-wrapper"><div class="ana-donut donut-raid-succ" style="--deg: ${raidSuccDeg}deg;"><div class="ana-donut-inner">${succRaid}</div></div></div>
-                                <div class="ana-donut-title">Successful Raids</div>
+
+                        <div class="p-body-section-label">Total Raids: ${tRaid}</div>
+                        <div class="p-body-donuts">
+                            <div class="p-body-donut">
+                                <div class="p-body-donut-shell raid-succ" style="--deg:${raidSuccDeg}deg;">
+                                    <div class="p-body-donut-hole">${succRaid}</div>
+                                </div>
+                                <div class="p-body-donut-caption">Successful</div>
                             </div>
-                            <div class="ana-donut-col">
-                                <div class="ana-donut-wrapper"><div class="ana-donut donut-raid-unsucc" style="--deg: ${raidUnsDeg}deg;"><div class="ana-donut-inner">${unsRaid}</div></div></div>
-                                <div class="ana-donut-title">Unsuccessful Raids</div>
+                            <div class="p-body-donut">
+                                <div class="p-body-donut-shell raid-unsucc" style="--deg:${raidUnsDeg}deg;">
+                                    <div class="p-body-donut-hole">${unsRaid}</div>
+                                </div>
+                                <div class="p-body-donut-caption">Unsuccessful</div>
                             </div>
                         </div>
-                        <div style="text-align:center; font-size:12px; font-weight:bold; color:white; margin-bottom:10px;">Total Tackles: ${tTack}</div>
-                        <div class="ana-donut-row">
-                            <div class="ana-donut-col">
-                                <div class="ana-donut-wrapper"><div class="ana-donut donut-tack-succ" style="--deg: ${tackSuccDeg}deg;"><div class="ana-donut-inner">${succTack}</div></div></div>
-                                <div class="ana-donut-title">Successful Tackles</div>
+
+                        <div class="p-body-section-label" style="margin-top:14px;">Total Tackles: ${tTack}</div>
+                        <div class="p-body-donuts" style="margin-bottom:0;">
+                            <div class="p-body-donut">
+                                <div class="p-body-donut-shell tack-succ" style="--deg:${tackSuccDeg}deg;">
+                                    <div class="p-body-donut-hole">${succTack}</div>
+                                </div>
+                                <div class="p-body-donut-caption">Successful</div>
                             </div>
-                            <div class="ana-donut-col">
-                                <div class="ana-donut-wrapper"><div class="ana-donut donut-tack-unsucc" style="--deg: ${tackUnsDeg}deg;"><div class="ana-donut-inner">${unsTack}</div></div></div>
-                                <div class="ana-donut-title">Unsuccessful Tackles</div>
+                            <div class="p-body-donut">
+                                <div class="p-body-donut-shell tack-unsucc" style="--deg:${tackUnsDeg}deg;">
+                                    <div class="p-body-donut-hole">${unsTack}</div>
+                                </div>
+                                <div class="p-body-donut-caption">Unsuccessful</div>
                             </div>
                         </div>
                     </div>
@@ -1154,8 +2021,8 @@
                 else subsHtml += createPlayerHtml(player);
             });
 
-            document.getElementById('uiStarting7Grid').innerHTML = startersHtml || '<div style="text-align:center; padding: 20px; color:#8C8E9F;">No starting 7 set.</div>';
-            document.getElementById('uiSubstitutesGrid').innerHTML = subsHtml || '<div style="text-align:center; padding: 20px; color:#8C8E9F;">No substitutes.</div>';
+            document.getElementById('uiStarting7Grid').innerHTML = startersHtml || '<div class="empty-state"><i class="fa-solid fa-users"></i>No starting 7 set.</div>';
+            document.getElementById('uiSubstitutesGrid').innerHTML = subsHtml || '<div class="empty-state"><i class="fa-solid fa-user-plus"></i>No substitutes.</div>';
         }
 
         // ============ FIREBASE INIT ============
@@ -1172,81 +2039,80 @@
         const matchId = urlParams.get('match');
 
         if (!matchId) {
-            document.getElementById('uiMatchDate').innerText = "Invalid Match ID. Please check your link.";
+            document.getElementById('uiMatchDate').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
             document.getElementById('uiMatchDate').style.color = "#FF3B30";
         } else {
-            document.getElementById('uiMatchId').innerText = "Match Id: " + matchId.toUpperCase();
+            document.getElementById('uiMatchId').innerHTML = '<i class="fa-solid fa-hashtag"></i> ' + matchId.toUpperCase();
             document.getElementById('dtMatchId').innerText = matchId.toUpperCase();
-            
+
             db.ref('live_matches/' + matchId).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
                     document.getElementById('uiMatchDate').innerText = "Match Offline or Ended.";
                     return;
                 }
-                
+
                 const dateStr = new Date(data.last_updated || Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                 const timeStr = new Date(data.last_updated || Date.now()).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                
+
                 if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
-                    document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
+                    document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch" style="color:#FBC02D;"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
                     document.getElementById('uiMatchDate').style.color = "#FBC02D";
-                    document.getElementById('uiMatchDate').style.fontWeight = "bold";
-                    document.getElementById('uiMatchDate').style.fontSize = "13px";
                 } else {
-                    document.getElementById('uiMatchDate').innerText = dateStr + ", Live Kabaddi Arena";
+                    document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${dateStr} · Live Kabaddi Arena`;
                     document.getElementById('uiMatchDate').style.color = "#8C8E9F";
-                    document.getElementById('uiMatchDate').style.fontWeight = "normal";
-                    document.getElementById('uiMatchDate').style.fontSize = "11px";
                 }
-                
                 document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
 
-                if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
-                
-                if(data.raid_clock) {
+                if (data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
+
+                // RAID CLOCK - modern ring
+                if (data.raid_clock) {
                     const rc = document.getElementById('uiRaidClock');
-                    const rContainer = document.getElementById('uiRaidTimerContainer');
+                    const rCont = document.getElementById('uiRaidTimerContainer');
                     rc.innerText = data.raid_clock;
-                    
                     const timeInt = parseInt(data.raid_clock) || 30;
                     const deg = (timeInt / 30) * 360;
-                    let arcColor = timeInt <= 10 ? "#FF3B30" : "#FBC02D";
-                    rContainer.style.background = `conic-gradient(from 0deg, ${arcColor} 0deg ${deg}deg, #2A2D47 ${deg}deg 360deg)`;
+                    const color = timeInt <= 10 ? "#FF3B30" : "#FBC02D";
+                    rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
                 }
 
-                if(data.half_status) document.getElementById('uiHalf').innerText = data.half_status;
-                
-                if(data.left_name && data.right_name) {
+                if (data.half_status) {
+                    document.getElementById('uiHalf').innerHTML = `<i class="fa-solid fa-clock"></i> ${data.half_status}`;
+                }
+
+                if (data.left_name && data.right_name) {
                     document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
                     document.getElementById('togLeft').innerText = data.left_name;
                     document.getElementById('togRight').innerText = data.right_name;
                 }
 
-                if(data.left_name) {
+                if (data.left_name) {
                     document.getElementById('uiLeftName').innerText = data.left_name;
                     document.getElementById('stLeftName').innerText = data.left_name;
                     document.getElementById('stPerfLeftName').innerText = data.left_name;
                     document.getElementById('grLeftName').innerText = data.left_name;
+                    document.getElementById('stLeftStrikeTeam').innerText = data.left_name;
                     document.getElementById('stLeftLogo').innerText = getInitials(data.left_name);
                     document.getElementById('stPerfLeftLogo').innerText = getInitials(data.left_name);
                     document.getElementById('grLeftLogo').innerText = getInitials(data.left_name);
                 }
-                if(data.right_name) {
+                if (data.right_name) {
                     document.getElementById('uiRightName').innerText = data.right_name;
                     document.getElementById('stRightName').innerText = data.right_name;
                     document.getElementById('stPerfRightName').innerText = data.right_name;
                     document.getElementById('grRightName').innerText = data.right_name;
+                    document.getElementById('stRightStrikeTeam').innerText = data.right_name;
                     document.getElementById('stRightLogo').innerText = getInitials(data.right_name);
                     document.getElementById('stPerfRightLogo').innerText = getInitials(data.right_name);
                     document.getElementById('grRightLogo').innerText = getInitials(data.right_name);
                 }
-                
-                if(data.left_score !== undefined) {
+
+                if (data.left_score !== undefined) {
                     document.getElementById('uiLeftScore').innerText = data.left_score;
                     document.getElementById('stLeftTotal').innerText = data.left_score;
                 }
-                if(data.right_score !== undefined) {
+                if (data.right_score !== undefined) {
                     document.getElementById('uiRightScore').innerText = data.right_score;
                     document.getElementById('stRightTotal').innerText = data.right_score;
                 }
@@ -1257,44 +2123,35 @@
                 rightTeamColorForGraph = rightColor;
                 document.documentElement.style.setProperty('--left-team-color', leftColor);
                 document.documentElement.style.setProperty('--right-team-color', rightColor);
-                
-                document.getElementById('uiLeftSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
-                document.getElementById('uiRightSubBg').style.boxShadow = `inset 0 0 0 1000px rgba(0,0,0,0.4)`;
 
-                if(data.match_duration_mins) {
+                if (data.match_duration_mins) {
                     document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
                     totalMatchMinutes = data.match_duration_mins * 2;
-                    
                     let halfMins = data.match_duration_mins;
                     let currentHalfNum = (data.half_status && data.half_status.includes("1st")) ? 1 : 2;
-                    if(data.half_status && data.half_status.includes("Match Over")) currentHalfNum = 2;
-                    
+                    if (data.half_status && data.half_status.includes("Match Over")) currentHalfNum = 2;
                     let minsLeft = halfMins;
                     if (data.main_clock && data.main_clock.includes(":")) {
                         let parts = data.main_clock.split(":");
                         minsLeft = parseInt(parts[0]) + (parseInt(parts[1]) / 60);
                     }
                     let elapsedHalfMins = halfMins - minsLeft;
-                    currentAbsoluteMatchMinute = (currentHalfNum === 1) 
-                        ? elapsedHalfMins 
-                        : (halfMins + elapsedHalfMins);
-                    if(currentAbsoluteMatchMinute > totalMatchMinutes) currentAbsoluteMatchMinute = totalMatchMinutes;
-                    if(currentAbsoluteMatchMinute < 0) currentAbsoluteMatchMinute = 0;
+                    currentAbsoluteMatchMinute = (currentHalfNum === 1) ? elapsedHalfMins : (halfMins + elapsedHalfMins);
+                    if (currentAbsoluteMatchMinute > totalMatchMinutes) currentAbsoluteMatchMinute = totalMatchMinutes;
+                    if (currentAbsoluteMatchMinute < 0) currentAbsoluteMatchMinute = 0;
                 }
-                
-                if(data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
-                if(data.players_per_side) document.getElementById('dtPlayers').innerText = data.players_per_side + " Players";
-                if(data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs + " Seconds";
-                if(data.max_subs) document.getElementById('dtSubs').innerText = data.max_subs;
-                if(data.max_timeouts) document.getElementById('dtTimeouts').innerText = data.max_timeouts;
 
-                if(data.state_json) {
+                if (data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
+                if (data.players_per_side) document.getElementById('dtPlayers').innerText = data.players_per_side + " Players";
+                if (data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs + " Seconds";
+                if (data.max_subs) document.getElementById('dtSubs').innerText = data.max_subs;
+                if (data.max_timeouts) document.getElementById('dtTimeouts').innerText = data.max_timeouts;
+
+                if (data.state_json) {
                     try {
                         const state = JSON.parse(data.state_json);
                         latestGlobalState = state;
-                        
-                        document.getElementById('uiLeftEmptyRaids').innerText = state.leftEmptyRaids || 0;
-                        document.getElementById('uiRightEmptyRaids').innerText = state.rightEmptyRaids || 0;
+
                         document.getElementById('uiLeftEmptyRaidCount').innerText = state.leftEmptyRaids || 0;
                         document.getElementById('uiRightEmptyRaidCount').innerText = state.rightEmptyRaids || 0;
 
@@ -1304,135 +2161,142 @@
                         document.getElementById('uiRightTimeouts').innerText = state.rightTimeouts || 0;
                         document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                         document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
-                        
+
+                        // Active raider banner
+                        const banner = document.getElementById('uiActiveRaider');
                         if (data.active_raider_name && data.active_raider_name !== "") {
-                            if (data.active_raider_team === "left") {
-                                document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${leftColor}; font-size:16px;">▶</span> ${data.active_raider_name} is on raid`;
-                            } else {
-                                document.getElementById('uiActiveRaider').innerHTML = `<span style="color:${rightColor}; font-size:16px;">◀</span> ${data.active_raider_name} is on raid`;
-                            }
+                            const isLeftRaid = data.active_raider_team === "left";
+                            const color = isLeftRaid ? leftColor : rightColor;
+                            banner.classList.remove('idle');
+                            banner.innerHTML = `<i class="fa-solid fa-person-running" style="color:${color};"></i> <span style="color:${color};">${data.active_raider_name}</span> is on raid`;
                         } else {
-                            document.getElementById('uiActiveRaider').innerHTML = "Waiting for raid...";
+                            banner.classList.add('idle');
+                            banner.innerHTML = '<i class="fa-solid fa-person-running"></i> Waiting for raid...';
                         }
 
-                        const fillDots = (arr, color) => {
-                            let html = "";
-                            if(arr) {
-                                for(let i = 0; i < arr.length; i++) {
-                                    const isAlive = arr[i] === true;
-                                    const opClass = isAlive ? "" : "out";
-                                    html += `<i class="fa-solid fa-user dot ${opClass}" style="color: ${color};"></i>`;
-                                }
+                        // ================== MAT DOTS (FIXED ORDER) ==================
+                        // LEFT TEAM: alive first (left), out last (right, near center)
+                        // RIGHT TEAM: out first (left, near center), alive last (right)
+                        const renderTeamDots = (states, isLeftTeam, color) => {
+                            if (!states || states.length === 0) return '';
+                            let arr = [...states];
+
+                            if (isLeftTeam) {
+                                // Alive first (left), out at high indices (right, near center)
+                                arr.sort((a, b) => (b === true ? 1 : 0) - (a === true ? 1 : 0));
+                            } else {
+                                // Out first (left, near center), alive at high indices (right)
+                                arr.sort((a, b) => (a === true ? 1 : 0) - (b === true ? 1 : 0));
                             }
-                            return html;
+
+                            return arr.map(alive => {
+                                if (alive) {
+                                    return `<div class="mat-dot alive" style="--dot-color: ${color};"></div>`;
+                                } else {
+                                    return `<div class="mat-dot out"></div>`;
+                                }
+                            }).join('');
                         };
-                        
+
                         document.getElementById('uiMatDots').innerHTML = `
-                            <div class="team-dots left">${fillDots(state.leftDotStates, leftColor)}</div>
+                            <div class="team-mat left">${renderTeamDots(state.leftDotStates, true, leftColor)}</div>
                             <div class="mat-divider"></div>
-                            <div class="team-dots right">${fillDots(state.rightDotStates, rightColor)}</div>
+                            <div class="team-mat right">${renderTeamDots(state.rightDotStates, false, rightColor)}</div>
                         `;
-                        
+
+                        // STATS
                         const lRaid = state.leftRaidPoints || 0; const rRaid = state.rightRaidPoints || 0;
                         document.getElementById('stLeftRaid').innerText = lRaid;
                         document.getElementById('stRightRaid').innerText = rRaid;
                         const wRaid = calculateWidths(lRaid, rRaid);
                         document.getElementById('pbLeftRaid').style.width = wRaid.left;
                         document.getElementById('pbRightRaid').style.width = wRaid.right;
-                        
+
                         const lTackle = state.leftTacklePoints || 0; const rTackle = state.rightTacklePoints || 0;
                         document.getElementById('stLeftTackle').innerText = lTackle;
                         document.getElementById('stRightTackle').innerText = rTackle;
                         const wTackle = calculateWidths(lTackle, rTackle);
                         document.getElementById('pbLeftTackle').style.width = wTackle.left;
                         document.getElementById('pbRightTackle').style.width = wTackle.right;
-                        
+
                         const lAll = state.leftAllOutPoints || 0; const rAll = state.rightAllOutPoints || 0;
                         document.getElementById('stLeftAllOut').innerText = lAll;
                         document.getElementById('stRightAllOut').innerText = rAll;
                         const wAll = calculateWidths(lAll, rAll);
                         document.getElementById('pbLeftAllOut').style.width = wAll.left;
                         document.getElementById('pbRightAllOut').style.width = wAll.right;
-                        
+
                         const lExtra = state.leftExtraPoints || 0; const rExtra = state.rightExtraPoints || 0;
                         document.getElementById('stLeftExtra').innerText = lExtra;
                         document.getElementById('stRightExtra').innerText = rExtra;
                         const wExtra = calculateWidths(lExtra, rExtra);
                         document.getElementById('pbLeftExtra').style.width = wExtra.left;
                         document.getElementById('pbRightExtra').style.width = wExtra.right;
-                        
+
                         const lTotal = data.left_score || 0; const rTotal = data.right_score || 0;
                         const wTotal = calculateWidths(lTotal, rTotal);
                         document.getElementById('pbLeftTotal').style.width = wTotal.left;
                         document.getElementById('pbRightTotal').style.width = wTotal.right;
-                        
+
                         const lTotRaids = state.leftTotalRaids || 0; const rTotRaids = state.rightTotalRaids || 0;
                         document.getElementById('stLeftTotalPerf').innerText = lTotRaids;
                         document.getElementById('stRightTotalPerf').innerText = rTotRaids;
-                        
+
                         const lSuccRaids = state.leftSuccessfulRaids || 0; const rSuccRaids = state.rightSuccessfulRaids || 0;
                         document.getElementById('stLeftSuccPerf').innerText = lSuccRaids;
                         document.getElementById('stRightSuccPerf').innerText = rSuccRaids;
-                        
-                        const lStrike = lTotRaids > 0 ? ((lSuccRaids / lTotRaids) * 100).toFixed(1) : 0;
-                        const rStrike = rTotRaids > 0 ? ((rSuccRaids / rTotRaids) * 100).toFixed(1) : 0;
-                        
+
+                        const lStrike = lTotRaids > 0 ? ((lSuccRaids / lTotRaids) * 100).toFixed(0) : 0;
+                        const rStrike = rTotRaids > 0 ? ((rSuccRaids / rTotRaids) * 100).toFixed(0) : 0;
                         document.getElementById('stLeftStrikeVal').innerText = lStrike + "%";
                         document.getElementById('stRightStrikeVal').innerText = rStrike + "%";
-                        
-                        const lDeg = (lStrike / 100) * 360; const rDeg = (rStrike / 100) * 360;
-                        document.getElementById('pbLeftStrikeChart').style.setProperty('--left-strike-deg', lDeg + 'deg');
-                        document.getElementById('pbRightStrikeChart').style.setProperty('--right-strike-deg', rDeg + 'deg');
 
+                        const lDeg = (lStrike / 100) * 360; const rDeg = (rStrike / 100) * 360;
+                        document.getElementById('pbLeftStrikeChart').style.setProperty('--deg', lDeg + 'deg');
+                        document.getElementById('pbRightStrikeChart').style.setProperty('--deg', rDeg + 'deg');
+
+                        // LOGS
                         if (state.logsJson) {
                             let logs = [];
-                            try { logs = JSON.parse(state.logsJson); } catch(e) { console.error(e); }
+                            try { logs = JSON.parse(state.logsJson); } catch (e) { console.error(e); }
                             matchLogsForGraph = logs;
-                            
-                            if (document.getElementById('tab-graph').classList.contains('active')) {
-                                drawGraph();
-                            }
-                            
+
+                            if (document.getElementById('tab-graph').classList.contains('active')) drawGraph();
+
                             let logHtml = "";
-                            for(let i = logs.length - 1; i >= 0; i--) {
+                            for (let i = logs.length - 1; i >= 0; i--) {
                                 const log = logs[i];
-                                let iconBg = "#4A4D67"; let iconHtml = '<i class="fa-solid fa-bolt"></i>';
-                                let badgeColor = "#4A4D67"; let badgeText = "";
-                                
-                                if (log.isLeftTeam === true) { iconBg = leftColor; badgeColor = leftColor; }
-                                else if (log.isLeftTeam === false) { iconBg = rightColor; badgeColor = rightColor; }
+                                const iconInfo = getLogIcon(log.title, log.type, log.isLeftTeam, leftColor, rightColor);
 
-                                const t = log.title || "";
-                                if(t.includes("Bonus")) { iconHtml = '<i class="fa-solid fa-b"></i>'; badgeText = "+1"; }
-                                else if(t.includes("Touch")) { iconHtml = '<i class="fa-solid fa-hand-sparkles"></i>'; badgeText = `+${log.points}`; }
-                                else if(t.includes("Tackle")) { iconHtml = '<i class="fa-solid fa-hand-back-fist"></i>'; badgeText = `+${log.points}`; }
-                                else if(t.includes("Super Tackle")) { iconHtml = '<i class="fa-solid fa-shield-halved"></i>'; badgeText = "+2"; }
-                                else if(t.includes("ALL OUT")) { iconHtml = '<i class="fa-solid fa-skull"></i>'; badgeText = "+2"; }
-                                else if(t.includes("Toss")) { iconHtml = '<i class="fa-solid fa-coins"></i>'; iconBg = "#4CAF50"; }
-                                else if(t.includes("Starting 7") || t.includes("Substitution")) { iconHtml = '<i class="fa-solid fa-users"></i>'; }
-                                else if(t.includes("Half") || t.includes("Match Started") || t.includes("Full Time")) { iconHtml = '<i class="fa-solid fa-flag-checkered"></i>'; iconBg = "#FBC02D"; }
-                                else if(t.includes("Card")) { iconHtml = '<i class="fa-solid fa-square"></i>'; iconBg = "#FFEB3B"; }
-                                else if(t.includes("Time-Out") || t.includes("Timeout")) { iconHtml = '<i class="fa-solid fa-stopwatch"></i>'; iconBg = "#FF5E3A"; }
+                                let badgeHtml = '';
+                                if (log.points && log.points > 0) {
+                                    badgeHtml = `<div class="log-points-badge" style="background:${iconInfo.bg}33; color:${iconInfo.bg};">+${log.points}</div>`;
+                                }
 
-                                let badgeHtml = badgeText ? `<div class="log-badge" style="background: ${badgeColor}33; color: ${badgeColor};">${badgeText}</div>` : "";
-                                let scoreHtml = log.scoreStr ? `<div class="log-score-str">${log.scoreStr.replace("Score: ", "S: ")}</div>` : "";
+                                const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i, '') : '';
 
                                 logHtml += `
-                                <div class="log-item">
-                                    <div class="log-icon" style="background: ${iconBg};">${iconHtml}</div>
-                                    <div class="log-content">
-                                        <div class="log-title">${log.title}</div>
-                                        <div class="log-desc">${log.desc}</div>
+                                <div class="log-row">
+                                    <div class="log-icon-circle" style="background:${iconInfo.bg};">
+                                        <i class="fa-solid ${iconInfo.icon}"></i>
                                     </div>
-                                    <div class="log-meta">${badgeHtml}<div class="log-time">${log.timeStr}</div>${scoreHtml}</div>
+                                    <div class="log-body">
+                                        <div class="log-title">${log.title || 'Event'}</div>
+                                        <div class="log-desc">${log.desc || ''}</div>
+                                    </div>
+                                    <div class="log-side">
+                                        <div class="log-time-tag">${log.timeStr || ''}</div>
+                                        ${badgeHtml}
+                                        ${scoreStr ? `<div class="log-score-tag">${scoreStr}</div>` : ''}
+                                    </div>
                                 </div>`;
                             }
-                            document.getElementById('uiTimelineLogs').innerHTML = logHtml || "<div style='text-align:center; color:#8C8E9F; padding: 20px;'>No events recorded yet.</div>";
+                            document.getElementById('uiTimelineLogs').innerHTML = logHtml || '<div class="empty-state"><i class="fa-solid fa-comment-dots"></i>No events recorded yet.</div>';
                         }
 
                         renderLineups(state);
 
-                    } catch(e) {
+                    } catch (e) {
                         console.error("Failed to parse state_json", e);
                     }
                 }
