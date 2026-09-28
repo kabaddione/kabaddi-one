@@ -36,11 +36,9 @@
             --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             --left-team-color: #4CAF50;
             --right-team-color: #2196F3;
-
             --surface-1: #131629;
             --surface-2: #1a1d33;
             --surface-3: #22263f;
-            --surface-glass: rgba(30, 33, 58, 0.6);
             --glass-border: rgba(255, 255, 255, 0.06);
             --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
             --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
@@ -54,7 +52,7 @@
         img { max-width: 100%; display: block; }
 
         .bg-orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-        .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; -webkit-backface-visibility: hidden; backface-visibility: hidden; will-change: transform; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 18s ease-in-out infinite; }
         .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
         .bg-orb:nth-child(2) { width: 450px; height: 450px; background: #6C3CE0; top: 50%; right: -12%; animation-delay: -6s; animation-duration: 20s; }
         .bg-orb:nth-child(3) { width: 350px; height: 350px; background: var(--accent-secondary); bottom: -10%; left: 20%; animation-delay: -12s; }
@@ -81,7 +79,7 @@
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
         @media (max-width: 768px) {
-            .nav-links { position: fixed; top: 0; right: -100%; width: 75%; max-width: 320px; height: 100vh; background: rgba(15,15,36,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); flex-direction: column; justify-content: center; gap: 28px; transition: var(--transition-smooth); padding: 40px; border-left: 1px solid var(--border-subtle); margin-left: 0; }
+            .nav-links { position: fixed; top: 0; right: -100%; width: 75%; max-width: 320px; height: 100vh; background: rgba(15,15,36,0.97); backdrop-filter: blur(20px); flex-direction: column; justify-content: center; gap: 28px; transition: var(--transition-smooth); padding: 40px; border-left: 1px solid var(--border-subtle); margin-left: 0; }
             .nav-links.active { right: 0; }
             .nav-links a { font-size: 1.1rem; }
             .nav-links a::after { display: none; }
@@ -111,7 +109,6 @@
         /* ============= LIVE WRAPPER ============= */
         .live-wrapper { padding: calc(var(--nav-height) + 28px) 16px 60px; max-width: 620px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
 
-        /* Score board */
         .score-board { position: relative; border-radius: 28px; padding: 20px 20px 24px; overflow: hidden; background: linear-gradient(165deg, #1c2040 0%, #131629 55%, #0f1122 100%); box-shadow: var(--shadow-lift), var(--shadow-inset); border: 1px solid var(--glass-border); isolation: isolate; }
         .score-board::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--left-team-color) 25%, transparent) 0%, transparent 55%), radial-gradient(ellipse at top right, color-mix(in srgb, var(--right-team-color) 25%, transparent) 0%, transparent 55%); opacity: 0.6; z-index: -1; pointer-events: none; }
         .score-board::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); pointer-events: none; }
@@ -145,13 +142,51 @@
         .raider-banner i { font-size: 11px; }
         .raider-banner.idle { color: #8C8E9F; font-weight: 500; }
 
+        /* ============ MAT SECTION (UPDATED) ============ */
         .mat-section { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .mat-title { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #8C8E9F; }
-        .mat-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-        .team-mat { display: flex; gap: 5px; align-items: center; }
+        .mat-row { display: flex; align-items: flex-start; justify-content: center; gap: 8px; width: 100%; }
+
+        .team-mat { display: flex; gap: 6px; align-items: flex-start; }
         .team-mat.left { justify-content: flex-end; }
         .team-mat.right { justify-content: flex-start; }
-        .mat-divider { width: 1px; height: 20px; background: linear-gradient(180deg, transparent, rgba(255,255,255,0.15), transparent); flex-shrink: 0; }
+
+        .mat-dot-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
+        .mat-dot-jersey {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--dot-color, #8C8E9F);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            letter-spacing: -0.3px;
+            transition: all 0.3s ease;
+        }
+        .mat-dot-cell.is-out .mat-dot-jersey { color: #555; opacity: 0.6; }
+
+        /* mat.png divider between the two teams */
+        .mat-divider-img {
+            width: 20px;
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            margin-top: 0;
+        }
+        .mat-divider-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.6;
+        }
+        /* Fallback in case image fails */
+        .mat-divider-img.fallback {
+            background: linear-gradient(180deg, transparent, rgba(255,255,255,0.15), transparent);
+            width: 1px;
+        }
+        .mat-divider-img.fallback img { display: none; }
+
         .mat-dot { width: 14px; height: 14px; border-radius: 50%; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; flex-shrink: 0; }
         .mat-dot.alive { background: var(--dot-color, #fff); box-shadow: 0 0 8px var(--dot-color, #fff), inset 0 -2px 3px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.25); }
         .mat-dot.out { background: transparent; border: 1.5px dashed rgba(255,255,255,0.2); opacity: 0.5; }
@@ -183,12 +218,24 @@
         .log-stream { display: flex; flex-direction: column; gap: 2px; max-height: 560px; overflow-y: auto; padding: 10px 8px 10px 10px; }
         .log-stream::-webkit-scrollbar { width: 4px; }
         .log-stream::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        .log-row { display: grid; grid-template-columns: 38px 1fr auto; gap: 12px; align-items: center; padding: 12px 10px; border-radius: 14px; transition: background 0.2s ease; position: relative; }
+        .log-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 12px 10px; border-radius: 14px; transition: background 0.2s ease; position: relative; }
         .log-row:hover { background: rgba(255,255,255,0.03); }
-        .log-row + .log-row::before { content: ''; position: absolute; top: -1px; left: 58px; right: 14px; height: 1px; background: rgba(255,255,255,0.04); }
-        .log-icon-circle { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; background: rgba(255,255,255,0.04); }
-        .log-icon-circle img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
-        .log-icon-circle i { font-size: 14px; color: #fff; }
+        .log-row + .log-row::before { content: ''; position: absolute; top: -1px; left: 64px; right: 14px; height: 1px; background: rgba(255,255,255,0.04); }
+        .log-icon-circle {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            overflow: hidden;
+            padding: 6px;
+        }
+        .log-icon-circle img { width: 100%; height: 100%; object-fit: contain; }
+        .log-icon-circle i { font-size: 16px; color: #fff; }
         .log-body { min-width: 0; }
         .log-title { font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 2px; letter-spacing: -0.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .log-desc { font-size: 11.5px; color: #8C8E9F; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -199,7 +246,6 @@
 
         /* ============= STATS TAB ============= */
         .stats-section { display: flex; flex-direction: column; gap: 14px; }
-
         .seg-toggle { display: flex; gap: 4px; padding: 4px; background: var(--surface-1); border-radius: 100px; border: 1px solid var(--glass-border); }
         .seg-btn { flex: 1; padding: 10px 8px; text-align: center; font-size: 12px; font-weight: 800; border-radius: 100px; color: #8C8E9F; cursor: pointer; transition: all 0.25s ease; white-space: nowrap; }
         .seg-btn.active { background: linear-gradient(135deg, #8E24AA, #6A1B9A); color: #fff; box-shadow: 0 4px 12px rgba(142,36,170,0.35); }
@@ -254,24 +300,49 @@
         .player-card:last-child { margin-bottom: 0; }
         .player-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 
-        .player-card-head { display: grid; grid-template-columns: 44px auto 1fr auto auto; gap: 10px; align-items: center; padding: 10px 12px; cursor: pointer; }
-        .player-avatar-wrap { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); position: relative; }
+        /* Player card head — avatar + name + tags + pts + chevron */
+        .player-card-head {
+            display: grid;
+            grid-template-columns: 44px 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+        .player-avatar-wrap { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
         .player-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .player-avatar-wrap i { color: #555; font-size: 20px; }
 
-        .on-mat-time-badge { font-size: 10px; font-weight: 900; color: #4DA8DA; background: rgba(77,168,218,0.12); border: 1px solid rgba(77,168,218,0.25); padding: 3px 7px; border-radius: 6px; white-space: nowrap; letter-spacing: 0.3px; font-variant-numeric: tabular-nums; }
-        .on-mat-time-badge.empty { background: transparent; border-color: transparent; color: #555; }
-
         .player-main { min-width: 0; }
-        .player-main-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+        .player-main-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .jersey-chip {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 800;
+            color: #8C8E9F;
+            background: rgba(255,255,255,0.06);
+            padding: 1px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+        }
         .captain-badge { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #8E24AA; color: #fff; font-size: 9px; font-weight: 900; flex-shrink: 0; }
         .player-main-role { font-size: 10px; font-weight: 700; color: #8C8E9F; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .player-tags { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
         .tag-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; flex-shrink: 0; }
-        .tag-sub-in { background: rgba(34,197,94,0.15); color: #22C55E; border: 1px solid rgba(34,197,94,0.25); gap: 3px; padding: 0 6px; width: auto; }
-        .tag-sub-out { background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.25); gap: 3px; padding: 0 6px; width: auto; }
-        .tag-sub-in .tag-time, .tag-sub-out .tag-time { font-size: 9px; font-weight: 800; font-variant-numeric: tabular-nums; }
         .tag-card { border: 1px solid rgba(0,0,0,0.3); }
         .tag-card.green { background: #22C55E; }
         .tag-card.yellow { background: #FBC02D; }
@@ -283,6 +354,73 @@
 
         .player-card-body { display: none; padding: 14px 12px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.04); }
         .player-card.expanded .player-card-body { display: block; }
+
+        /* NEW: On-mat banner at top of expanded body */
+        .player-on-mat-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(77,168,218,0.12), rgba(77,168,218,0.04));
+            border: 1px solid rgba(77,168,218,0.25);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+        }
+        .player-on-mat-banner .pomb-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4DA8DA;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .player-on-mat-banner .pomb-left i { font-size: 13px; }
+        .player-on-mat-banner .pomb-time {
+            font-size: 18px;
+            font-weight: 900;
+            color: #4DA8DA;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 12px rgba(77,168,218,0.4);
+        }
+
+        /* NEW: Substitution indicator with timestamp below arrow */
+        .sub-indicator {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+        .sub-indicator i { font-size: 15px; }
+        .sub-indicator.sub-in {
+            background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05));
+            border: 1px solid rgba(34,197,94,0.3);
+            color: #22C55E;
+        }
+        .sub-indicator.sub-out {
+            background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05));
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #EF4444;
+        }
+        .sub-indicator .sub-time { font-size: 11px; letter-spacing: 0.3px; }
+        .sub-indicator .sub-label {
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.75;
+        }
+        .sub-indicator-wrap { display: flex; gap: 8px; margin-bottom: 14px; }
 
         .p-body-pts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
         .p-body-pt { text-align: center; padding: 10px 4px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); }
@@ -361,9 +499,16 @@
             .tab { font-size: 11px; padding: 9px 6px; }
             .stat-row-inner { grid-template-columns: 1fr; }
             .graph-canvas-wrap { height: 260px; }
-            .log-row { grid-template-columns: 34px 1fr auto; gap: 10px; padding: 10px 8px; }
-            .log-icon-circle { width: 34px; height: 34px; }
-            .log-icon-circle img { padding: 2px; }
+            .log-row { grid-template-columns: 38px 1fr auto; gap: 10px; padding: 10px 8px; }
+            .log-icon-circle { width: 38px; height: 38px; }
+            .mat-dot-jersey { font-size: 8px; }
+            .mat-dot { width: 12px; height: 12px; }
+            .mat-dot-cell { gap: 2px; }
+            .mat-divider-img { width: 16px; height: 28px; }
+            .player-card-head { grid-template-columns: 40px 1fr auto auto; gap: 8px; }
+            .player-avatar-wrap { width: 40px; height: 40px; }
+            .player-main-name { font-size: 13px; }
+            .player-pts { font-size: 16px; }
         }
     </style>
 </head>
@@ -398,7 +543,6 @@
 
     <div class="live-wrapper">
 
-        <!-- SCORE BOARD -->
         <div class="score-board">
             <div class="board-top">
                 <div class="badge-id" id="uiMatchId"><i class="fa-solid fa-hashtag"></i> ------</div>
@@ -429,13 +573,12 @@
                 <div class="mat-title">On The Mat</div>
                 <div class="mat-row" id="uiMatDots">
                     <div class="team-mat left"></div>
-                    <div class="mat-divider"></div>
+                    <div class="mat-divider-img"><img src="/images/mat.png" alt=""></div>
                     <div class="team-mat right"></div>
                 </div>
             </div>
         </div>
 
-        <!-- QUICK STATS -->
         <div class="quick-stats">
             <div class="quick-stat-team left-stat" id="uiLeftSubBg" style="--team-accent: var(--left-team-color);">
                 <div class="stat-row-inner">
@@ -455,7 +598,6 @@
             </div>
         </div>
 
-        <!-- TABS -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('commentary', this)">Live</div>
             <div class="tab" onclick="switchTab('stats', this)">Stats</div>
@@ -464,22 +606,17 @@
             <div class="tab" onclick="switchTab('details', this)">Info</div>
         </div>
 
-        <!-- COMMENTARY -->
         <div class="tab-content active" id="tab-commentary">
             <div class="commentary-panel"><div class="log-stream" id="uiTimelineLogs"></div></div>
         </div>
 
-        <!-- STATS -->
         <div class="tab-content" id="tab-stats">
             <div class="stats-section">
-
-                <!-- Half toggle -->
                 <div class="seg-toggle">
                     <div class="seg-btn active" id="segFirstHalf" onclick="switchHalf('first', this)">First Half</div>
                     <div class="seg-btn" id="segSecondHalf" onclick="switchHalf('second', this)">Second Half</div>
                 </div>
 
-                <!-- Points comparison -->
                 <div class="stat-panel">
                     <div class="panel-header">
                         <div class="panel-team">
@@ -494,54 +631,32 @@
                     </div>
 
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftTotal">0</div>
-                            <div class="cmp-name">Total Points</div>
-                            <div class="cmp-value right" id="stRightTotal">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftTotal">0</div><div class="cmp-name">Total Points</div><div class="cmp-value right" id="stRightTotal">0</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftTotal" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightTotal" style="width:50%"></div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftRaid">0</div>
-                            <div class="cmp-name">Raid Points</div>
-                            <div class="cmp-value right" id="stRightRaid">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftRaid">0</div><div class="cmp-name">Raid Points</div><div class="cmp-value right" id="stRightRaid">0</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftRaid" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightRaid" style="width:50%"></div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftTackle">0</div>
-                            <div class="cmp-name">Tackle Points</div>
-                            <div class="cmp-value right" id="stRightTackle">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftTackle">0</div><div class="cmp-name">Tackle Points</div><div class="cmp-value right" id="stRightTackle">0</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftTackle" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightTackle" style="width:50%"></div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftAllOut">0</div>
-                            <div class="cmp-name">All out Points</div>
-                            <div class="cmp-value right" id="stRightAllOut">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftAllOut">0</div><div class="cmp-name">All out Points</div><div class="cmp-value right" id="stRightAllOut">0</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftAllOut" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightAllOut" style="width:50%"></div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftExtra">0</div>
-                            <div class="cmp-name">Extra Points</div>
-                            <div class="cmp-value right" id="stRightExtra">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftExtra">0</div><div class="cmp-name">Extra Points</div><div class="cmp-value right" id="stRightExtra">0</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftExtra" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightExtra" style="width:50%"></div></div>
                     </div>
                 </div>
 
-                <!-- Raids / Tackles toggle -->
                 <div class="seg-toggle">
                     <div class="seg-btn active" id="segRaids" onclick="switchRaidView('raids', this)">Raids</div>
                     <div class="seg-btn" id="segTackles" onclick="switchRaidView('tackles', this)">Tackles</div>
                 </div>
 
-                <!-- Breakdown panel -->
                 <div class="stat-panel">
                     <div class="panel-header">
                         <div class="panel-team">
@@ -556,32 +671,16 @@
                     </div>
 
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftTotalPerf">0</div>
-                            <div class="cmp-name" id="stTotalLabel">Total Raids</div>
-                            <div class="cmp-value right" id="stRightTotalPerf">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftTotalPerf">0</div><div class="cmp-name" id="stTotalLabel">Total Raids</div><div class="cmp-value right" id="stRightTotalPerf">0</div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftSuccPerf">0</div>
-                            <div class="cmp-name" id="stSuccLabel">Successful Raids</div>
-                            <div class="cmp-value right" id="stRightSuccPerf">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftSuccPerf">0</div><div class="cmp-name" id="stSuccLabel">Successful Raids</div><div class="cmp-value right" id="stRightSuccPerf">0</div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftSuperPerf">0</div>
-                            <div class="cmp-name" id="stSuperLabel">Super Raids</div>
-                            <div class="cmp-value right" id="stRightSuperPerf">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftSuperPerf">0</div><div class="cmp-name" id="stSuperLabel">Super Raids</div><div class="cmp-value right" id="stRightSuperPerf">0</div></div>
                     </div>
                     <div class="cmp-row">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftRatePerf">0%</div>
-                            <div class="cmp-name" id="stRateLabel">Raid Success Rate</div>
-                            <div class="cmp-value right" id="stRightRatePerf">0%</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftRatePerf">0%</div><div class="cmp-name" id="stRateLabel">Raid Success Rate</div><div class="cmp-value right" id="stRightRatePerf">0%</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftRatePerf" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightRatePerf" style="width:50%"></div></div>
                     </div>
 
@@ -589,10 +688,7 @@
                         <div class="strike-side">
                             <div class="donut-shell">
                                 <div class="donut-ring left" id="pbLeftStrikeChart">
-                                    <div class="donut-hole">
-                                        <div class="donut-pct" id="stLeftStrikeVal">0%</div>
-                                        <div class="donut-label">STRIKE</div>
-                                    </div>
+                                    <div class="donut-hole"><div class="donut-pct" id="stLeftStrikeVal">0%</div><div class="donut-label">STRIKE</div></div>
                                 </div>
                             </div>
                             <div class="strike-team-name" id="stLeftStrikeTeam">Left Team</div>
@@ -600,10 +696,7 @@
                         <div class="strike-side">
                             <div class="donut-shell">
                                 <div class="donut-ring right" id="pbRightStrikeChart">
-                                    <div class="donut-hole">
-                                        <div class="donut-pct" id="stRightStrikeVal">0%</div>
-                                        <div class="donut-label">STRIKE</div>
-                                    </div>
+                                    <div class="donut-hole"><div class="donut-pct" id="stRightStrikeVal">0%</div><div class="donut-label">STRIKE</div></div>
                                 </div>
                             </div>
                             <div class="strike-team-name" id="stRightStrikeTeam">Right Team</div>
@@ -611,31 +704,23 @@
                     </div>
 
                     <div class="cmp-row" style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.05);">
-                        <div class="cmp-labels">
-                            <div class="cmp-value left" id="stLeftStreakPerf">0</div>
-                            <div class="cmp-name" id="stStreakLabel">Longest Successful Raid Streak</div>
-                            <div class="cmp-value right" id="stRightStreakPerf">0</div>
-                        </div>
+                        <div class="cmp-labels"><div class="cmp-value left" id="stLeftStreakPerf">0</div><div class="cmp-name" id="stStreakLabel">Longest Successful Raid Streak</div><div class="cmp-value right" id="stRightStreakPerf">0</div></div>
                         <div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftStreakPerf" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightStreakPerf" style="width:50%"></div></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- LINEUP -->
         <div class="tab-content" id="tab-lineup">
             <div class="lineup-panel">
                 <div class="team-toggle">
                     <div class="team-toggle-btn active-left" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div>
                     <div class="team-toggle-btn" id="togRight" onclick="switchLineupTeam('right')">Right Team</div>
                 </div>
-
                 <div class="roster-group">
                     <div class="roster-title"><span class="roster-title-dot"></span> Starting 7</div>
                     <div class="lineup-grid" id="uiStarting7Grid"></div>
                 </div>
-
                 <div class="roster-group">
                     <div class="roster-title"><span class="roster-title-dot sub"></span> Substitutes</div>
                     <div class="lineup-grid" id="uiSubstitutesGrid"></div>
@@ -643,7 +728,6 @@
             </div>
         </div>
 
-        <!-- GRAPH -->
         <div class="tab-content" id="tab-graph">
             <div class="graph-panel">
                 <div class="graph-title-row">
@@ -667,7 +751,6 @@
             </div>
         </div>
 
-        <!-- DETAILS -->
         <div class="tab-content" id="tab-details">
             <div class="details-panel">
                 <div class="info-card">
@@ -765,7 +848,6 @@
         window.currentAbsoluteMatchMinute = 0;
         window.halfStatsCache = null;
 
-        // ============ UI HELPERS ============
         function togglePlayerExpand(element, playerId) {
             if (window.expandedPlayerIds.has(playerId)) {
                 window.expandedPlayerIds.delete(playerId);
@@ -825,51 +907,42 @@
             return { left: ((l / total) * 100) + "%", right: ((r / total) * 100) + "%" };
         }
 
+        // ============ TIME FORMATTER (MM:SS) ============
         function formatOnMatTime(seconds) {
-            if (!seconds || seconds <= 0) return "--";
+            if (!seconds || seconds <= 0) return '00:00';
             const m = Math.floor(seconds / 60);
             const s = seconds % 60;
-            return `${m}'${String(s).padStart(2, '0')}"`;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
 
-        // ============ PNG LOG ICONS (MAPPED FROM ANDROID EVENTS FILE) ============
+        // ============ PNG ICON MAPPER (matches uploaded filenames) ============
         function getLogIconName(title, logType) {
             const t = (title || '').toLowerCase();
-
-            // Manual events
             if (t.includes('manual')) return 'manual';
-
-            // Period events
             if (t.includes('starting 7')) return 'starting7';
             if (t.includes('match started')) return 'whistle';
             if (t.includes('half time')) return 'whistle';
             if (t.includes('full time')) return 'trophy';
             if (t.includes('toss')) return 'coin';
-
-            // Game events
             if (t.includes('super raid')) return 'superraid';
             if (t.includes('super tackle')) return 'supertackle';
             if (t.includes('all out')) return 'allout';
             if (t.includes('do-or-die') || t.includes('do or die')) return 'hooter';
             if (t.includes('self out')) return 'selfout';
-            if (t.includes('empty raid') || t.includes('empty')) return 'empty';
-
-            // Card & admin
+            if (t.includes('empty')) return 'empty';
             if (t.includes('time-out') || t.includes('timeout')) return 'timeout';
             if (t.includes('card')) return 'card';
             if (t.includes('substitution')) return 'substitution';
             if (t.includes('technical')) return 'technical';
-
-            // Standard points
             if (t.includes('bonus')) return 'bonus';
             if (t.includes('touch')) return 'touch';
             if (t.includes('tackle')) return 'tackle';
-
-            return 'ic_custom_stats';
+            if (t.includes('raid')) return 'raid';
+            return 'default_event';
         }
 
         function getLogIconPath(title, logType) {
-            return `/images/log_icons/${getLogIconName(title, logType)}.png`;
+            return `/images/${getLogIconName(title, logType)}.png`;
         }
 
         // ============ HALF-WISE STATS COMPUTATION ============
@@ -877,15 +950,11 @@
             const logs = window.matchLogsForGraph || [];
             const sortedLogs = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
 
+            const blank = () => ({ raid: 0, tackle: 0, allOut: 0, extra: 0, totalRaids: 0, succRaids: 0, superRaids: 0, totalTackles: 0, succTackles: 0, superTackles: 0, longestStreak: 0, currentStreak: 0, total: 0 });
+
             const stats = {
-                left: {
-                    first: { raid: 0, tackle: 0, allOut: 0, extra: 0, totalRaids: 0, succRaids: 0, superRaids: 0, totalTackles: 0, succTackles: 0, superTackles: 0, longestStreak: 0, currentStreak: 0 },
-                    second: { raid: 0, tackle: 0, allOut: 0, extra: 0, totalRaids: 0, succRaids: 0, superRaids: 0, totalTackles: 0, succTackles: 0, superTackles: 0, longestStreak: 0, currentStreak: 0 }
-                },
-                right: {
-                    first: { raid: 0, tackle: 0, allOut: 0, extra: 0, totalRaids: 0, succRaids: 0, superRaids: 0, totalTackles: 0, succTackles: 0, superTackles: 0, longestStreak: 0, currentStreak: 0 },
-                    second: { raid: 0, tackle: 0, allOut: 0, extra: 0, totalRaids: 0, succRaids: 0, superRaids: 0, totalTackles: 0, succTackles: 0, superTackles: 0, longestStreak: 0, currentStreak: 0 }
-                }
+                left: { first: blank(), second: blank() },
+                right: { first: blank(), second: blank() }
             };
 
             for (let log of sortedLogs) {
@@ -906,12 +975,12 @@
                     s.superRaids += 1;
                     s.totalRaids += 1;
                     s.raid += pts;
-                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; } 
+                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
                 } else if (t.includes('bonus') || t.includes('touch')) {
                     s.totalRaids += 1;
                     s.raid += pts;
-                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; } 
+                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
                 } else if (t.includes('empty')) {
                     s.totalRaids += 1;
@@ -931,13 +1000,9 @@
                     s.extra += pts;
                 }
             }
-
-            // Totals
-            for (let teamKey of ['left', 'right']) {
-                for (let halfKey of ['first', 'second']) {
-                    const s = stats[teamKey][halfKey];
-                    s.total = s.raid + s.tackle + s.allOut + s.extra;
-                }
+            for (let teamKey of ['left', 'right']) for (let halfKey of ['first', 'second']) {
+                const s = stats[teamKey][halfKey];
+                s.total = s.raid + s.tackle + s.allOut + s.extra;
             }
             return stats;
         }
@@ -951,16 +1016,12 @@
             const half = window.currentHalf;
             const view = window.currentRaidView;
             const halfStats = window.halfStatsCache || computeHalfStats();
-
-            // If we have enough logs to compute half-wise, use them
-            // Otherwise fallback to current totals
             const hasHalfData = (halfStats.left.first.total > 0 || halfStats.right.first.total > 0 || halfStats.left.second.total > 0 || halfStats.right.second.total > 0);
 
             let lRaid, rRaid, lTackle, rTackle, lAllOut, rAllOut, lExtra, rExtra, lTotal, rTotal;
 
             if (hasHalfData) {
-                const lH = halfStats.left[half];
-                const rH = halfStats.right[half];
+                const lH = halfStats.left[half], rH = halfStats.right[half];
                 lRaid = lH.raid; rRaid = rH.raid;
                 lTackle = lH.tackle; rTackle = rH.tackle;
                 lAllOut = lH.allOut; rAllOut = rH.allOut;
@@ -974,7 +1035,6 @@
                 lTotal = data.left_score || 0; rTotal = data.right_score || 0;
             }
 
-            // Update values
             document.getElementById('stLeftRaid').innerText = lRaid;
             document.getElementById('stRightRaid').innerText = rRaid;
             document.getElementById('stLeftTackle').innerText = lTackle;
@@ -1002,7 +1062,6 @@
             document.getElementById('pbLeftTotal').style.width = wTotal.left;
             document.getElementById('pbRightTotal').style.width = wTotal.right;
 
-            // --- Raids/Tackles breakdown ---
             let lTot, rTot, lSucc, rSucc, lSuper, rSuper, lStreak, rStreak;
             let totalLabel, succLabel, superLabel, rateLabel, streakLabel;
 
@@ -1017,11 +1076,8 @@
                     lSucc = state.leftSuccessfulRaids || 0; rSucc = state.rightSuccessfulRaids || 0;
                     lSuper = 0; rSuper = 0; lStreak = 0; rStreak = 0;
                 }
-                totalLabel = 'Total Raids';
-                succLabel = 'Successful Raids';
-                superLabel = 'Super Raids';
-                rateLabel = 'Raid Success Rate';
-                streakLabel = 'Longest Successful Raid Streak';
+                totalLabel = 'Total Raids'; succLabel = 'Successful Raids'; superLabel = 'Super Raids';
+                rateLabel = 'Raid Success Rate'; streakLabel = 'Longest Successful Raid Streak';
             } else {
                 lTot = hasHalfData ? halfStats.left[half].totalTackles : (state.leftTotalTackles || 0);
                 rTot = hasHalfData ? halfStats.right[half].totalTackles : (state.rightTotalTackles || 0);
@@ -1030,11 +1086,8 @@
                 lSuper = hasHalfData ? halfStats.left[half].superTackles : 0;
                 rSuper = hasHalfData ? halfStats.right[half].superTackles : 0;
                 lStreak = 0; rStreak = 0;
-                totalLabel = 'Total Tackles';
-                succLabel = 'Successful Tackles';
-                superLabel = 'Super Tackles';
-                rateLabel = 'Tackle Success Rate';
-                streakLabel = 'Longest Successful Tackle Streak';
+                totalLabel = 'Total Tackles'; succLabel = 'Successful Tackles'; superLabel = 'Super Tackles';
+                rateLabel = 'Tackle Success Rate'; streakLabel = 'Longest Successful Tackle Streak';
             }
 
             document.getElementById('stTotalLabel').innerText = totalLabel;
@@ -1058,15 +1111,12 @@
             document.getElementById('pbLeftRatePerf').style.width = wRate.left;
             document.getElementById('pbRightRatePerf').style.width = wRate.right;
 
-            // Strike rate (successful / total)
             const lStrike = lTot > 0 ? ((lSucc / lTot) * 100).toFixed(1) : '0';
             const rStrike = rTot > 0 ? ((rSucc / rTot) * 100).toFixed(1) : '0';
             document.getElementById('stLeftStrikeVal').innerText = lStrike + '%';
             document.getElementById('stRightStrikeVal').innerText = rStrike + '%';
-            const lDeg = (lStrike / 100) * 360;
-            const rDeg = (rStrike / 100) * 360;
-            document.getElementById('pbLeftStrikeChart').style.setProperty('--deg', lDeg + 'deg');
-            document.getElementById('pbRightStrikeChart').style.setProperty('--deg', rDeg + 'deg');
+            document.getElementById('pbLeftStrikeChart').style.setProperty('--deg', ((lStrike / 100) * 360) + 'deg');
+            document.getElementById('pbRightStrikeChart').style.setProperty('--deg', ((rStrike / 100) * 360) + 'deg');
 
             document.getElementById('stLeftStreakPerf').innerText = lStreak;
             document.getElementById('stRightStreakPerf').innerText = rStreak;
@@ -1277,35 +1327,34 @@
             }
         });
 
-        // ============ PLAYER CARD RENDERING ============
+        // ============ SUBSTITUTION PARSER ============
+        // Returns map: jerseyNumber → { inMinute, outMinute }
         function parseSubsFromLogs(logs) {
-            // Returns { playerIdOrName: { inMinute, outMinute } }
             const subInfo = {};
             const sorted = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
 
             for (let log of sorted) {
                 const t = (log.title || '').toLowerCase();
-                const d = log.desc || '';
+                const d = (log.desc || '');
                 if (!t.includes('substitution') && !d.toLowerCase().includes('replaced')) continue;
 
-                // Parse "Player (X) replaced by Player (Y)" → X out, Y in
-                const outInMatch = d.match(/Player\s*\((\d+)\)\s+replaced by\s+Player\s*\((\d+)\)/i);
-                if (outInMatch) {
-                    const outNum = outInMatch[1];
-                    const inNum = outInMatch[2];
+                // Match "Player (X) replaced by Player (Y)"
+                const m = d.match(/Player\s*\((\d+)\)\s+replaced by\s+Player\s*\((\d+)\)/i);
+                if (m) {
+                    const outJersey = m[1];
+                    const inJersey = m[2];
                     const timeMatch = (log.timeStr || '').match(/(\d+)'/);
                     const minute = timeMatch ? parseInt(timeMatch[1]) : 0;
-                    
-                    if (!subInfo[outNum]) subInfo[outNum] = {};
-                    subInfo[outNum].outMinute = minute;
-                    
-                    if (!subInfo[inNum]) subInfo[inNum] = {};
-                    subInfo[inNum].inMinute = minute;
+                    if (!subInfo[outJersey]) subInfo[outJersey] = {};
+                    subInfo[outJersey].outMinute = minute;
+                    if (!subInfo[inJersey]) subInfo[inJersey] = {};
+                    subInfo[inJersey].inMinute = minute;
                 }
             }
             return subInfo;
         }
 
+        // ============ LINEUP RENDERING ============
         function renderLineups(state) {
             if (!state.leftRosterJson || !state.rightRosterJson) return;
             let lRoster, rRoster;
@@ -1316,8 +1365,6 @@
 
             const activeRoster = window.currentLineupTeam === 'left' ? lRoster : rRoster;
             const isLeftTeam = window.currentLineupTeam === 'left';
-            const teamClass = isLeftTeam ? "left" : "right";
-            const teamColor = isLeftTeam ? window.leftTeamColorForGraph : window.rightTeamColorForGraph;
             const subsByJersey = parseSubsFromLogs(window.matchLogsForGraph);
 
             let startersHtml = "", subsHtml = "";
@@ -1325,64 +1372,69 @@
             const createPlayerHtml = (player) => {
                 const role = player.positionOnMat || "Substitute";
                 const totalPts = (player.raidPoints || 0) + (player.tacklePoints || 0);
-                const nameDisplay = player.name;
-
-                // Determine sub in/out
                 const jersey = player.jerseyNumber || '';
-                const subInfo = subsByJersey[jersey] || {};
-                const isStarting = player.isStarting7 === true;
                 const onMat = player.onMatSeconds || 0;
+                const isStarting = player.isStarting7 === true;
 
-                // Sub-in: was not starting, but has been on mat → they came in
-                // Sub-out: was starting, but positionOnMat is empty OR they're disqualified → they went out
-                const subbedIn = (!isStarting && onMat > 0);
-                const subbedOut = (isStarting && (player.positionOnMat === "" || player.isDisqualified));
-
-                // On-mat time display
-                const onMatTime = onMat > 0 ? formatOnMatTime(onMat) : '';
+                // Sub detection
+                const subInfo = subsByJersey[jersey] || {};
+                const subbedIn = (!isStarting && onMat > 0 && subInfo.inMinute !== undefined);
+                const subbedOut = (isStarting && subInfo.outMinute !== undefined);
 
                 // Cards
                 const hasGreen = player.greenCards > 0;
                 const hasYellow = player.yellowCards > 0;
                 const hasRed = player.redCards > 0 || player.isDisqualified;
 
-                // Expanded analytics computation
+                // Expanded analytics
                 const tRaid = player.totalRaids || 0;
                 const succRaid = player.raidPoints > 0 ? player.raidPoints : 0;
                 const unsRaid = Math.max(0, tRaid - succRaid);
                 const tTack = player.totalTackles || 0;
                 const succTack = player.tacklePoints || 0;
                 const unsTack = Math.max(0, tTack - succTack);
-                const superTack = 0; // Not directly tracked
+                const superTack = 0;
 
                 const raidSuccDeg = tRaid > 0 ? (succRaid / tRaid) * 360 : 0;
                 const raidUnsDeg = tRaid > 0 ? (unsRaid / tRaid) * 360 : 0;
-                // Empty raids not directly available per player — approximate
                 const raidEmpty = 0;
-                const raidEmptyDeg = 0;
-
                 const tackSuccDeg = tTack > 0 ? (succTack / tTack) * 360 : 0;
                 const tackUnsDeg = tTack > 0 ? (unsTack / tTack) * 360 : 0;
-                const tackSuperDeg = 0;
 
                 const imgContent = (player.imageUri && player.imageUri.startsWith("data:image"))
                     ? `<img src="${player.imageUri}" alt="">` : `<i class="fa-solid fa-user"></i>`;
 
                 const expandedClass = window.expandedPlayerIds.has(player.id) ? "expanded" : "";
 
-                // Build tags (on-mat time, sub icons, cards)
+                // Tags in head (only cards now)
                 let tagsHtml = '';
-                if (subbedIn && subInfo.inMinute) {
-                    tagsHtml += `<div class="tag-icon tag-sub-in"><i class="fa-solid fa-arrow-right-to-bracket"></i><span class="tag-time">${subInfo.inMinute}'</span></div>`;
-                }
-                if (subbedOut && subInfo.outMinute) {
-                    tagsHtml += `<div class="tag-icon tag-sub-out"><i class="fa-solid fa-arrow-right-from-bracket"></i><span class="tag-time">${subInfo.outMinute}'</span></div>`;
-                }
                 if (hasGreen) tagsHtml += `<div class="tag-icon tag-card green"></div>`;
                 if (hasYellow) tagsHtml += `<div class="tag-icon tag-card yellow"></div>`;
                 if (hasRed) tagsHtml += `<div class="tag-icon tag-card red"></div>`;
 
-                // Raid sequence placeholder (real sequence not available per player in current data)
+                // Sub indicators (arrow with timestamp below) inside expanded body
+                let subIndicatorsHtml = '';
+                if (subbedIn && subInfo.inMinute !== undefined) {
+                    subIndicatorsHtml += `
+                        <div class="sub-indicator sub-in">
+                            <i class="fa-solid fa-right-left"></i>
+                            <span class="sub-time">${subInfo.inMinute}'</span>
+                            <span class="sub-label">IN</span>
+                        </div>`;
+                }
+                if (subbedOut && subInfo.outMinute !== undefined) {
+                    subIndicatorsHtml += `
+                        <div class="sub-indicator sub-out">
+                            <i class="fa-solid fa-right-left"></i>
+                            <span class="sub-time">${subInfo.outMinute}'</span>
+                            <span class="sub-label">OUT</span>
+                        </div>`;
+                }
+                const subIndicatorsWrap = subIndicatorsHtml
+                    ? `<div class="sub-indicator-wrap">${subIndicatorsHtml}</div>`
+                    : '';
+
+                // Raid sequence dots (approximated from available data)
                 const raidSeqDots = [];
                 for (let i = 0; i < tRaid; i++) {
                     let cls = 'success';
@@ -1398,9 +1450,12 @@
                 <div class="player-card ${expandedClass}" onclick="togglePlayerExpand(this, '${player.id}')">
                     <div class="player-card-head">
                         <div class="player-avatar-wrap">${imgContent}</div>
-                        <div class="on-mat-time-badge ${onMat > 0 ? '' : 'empty'}">${onMatTime || '--'}</div>
                         <div class="player-main">
-                            <div class="player-main-name">${nameDisplay}${player.isCaptain ? '<span class="captain-badge">C</span>' : ''}</div>
+                            <div class="player-main-name">
+                                ${player.name || 'Player'}
+                                ${jersey ? `<span class="jersey-chip">#${jersey}</span>` : ''}
+                                ${player.isCaptain ? '<span class="captain-badge">C</span>' : ''}
+                            </div>
                             <div class="player-main-role">${role}</div>
                         </div>
                         <div class="player-tags">${tagsHtml}</div>
@@ -1408,6 +1463,14 @@
                         <div class="player-chevron"><i class="fa-solid fa-chevron-down"></i></div>
                     </div>
                     <div class="player-card-body">
+                        <!-- On-Mat Time banner at top -->
+                        <div class="player-on-mat-banner">
+                            <div class="pomb-left"><i class="fa-solid fa-clock"></i> On Mat</div>
+                            <div class="pomb-time">${formatOnMatTime(onMat)}</div>
+                        </div>
+
+                        ${subIndicatorsWrap}
+
                         <div class="p-body-pts">
                             <div class="p-body-pt"><div class="p-body-pt-label">Total</div><div class="p-body-pt-value">${totalPts}</div></div>
                             <div class="p-body-pt"><div class="p-body-pt-label">Touch</div><div class="p-body-pt-value touch-color">${player.raidPoints > 0 ? player.raidPoints : 0}</div></div>
@@ -1418,21 +1481,15 @@
                         <div class="p-body-section-label">Total Raids ${tRaid}</div>
                         <div class="p-body-donuts">
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell raid-succ" style="--deg:${raidSuccDeg}deg;">
-                                    <div class="p-body-donut-hole">${succRaid}</div>
-                                </div>
+                                <div class="p-body-donut-shell raid-succ" style="--deg:${raidSuccDeg}deg;"><div class="p-body-donut-hole">${succRaid}</div></div>
                                 <div class="p-body-donut-caption">Successful</div>
                             </div>
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell raid-unsucc" style="--deg:${raidUnsDeg}deg;">
-                                    <div class="p-body-donut-hole">${unsRaid}</div>
-                                </div>
+                                <div class="p-body-donut-shell raid-unsucc" style="--deg:${raidUnsDeg}deg;"><div class="p-body-donut-hole">${unsRaid}</div></div>
                                 <div class="p-body-donut-caption">Unsuccessful</div>
                             </div>
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell raid-empty" style="--deg:${raidEmptyDeg}deg;">
-                                    <div class="p-body-donut-hole">${raidEmpty}</div>
-                                </div>
+                                <div class="p-body-donut-shell raid-empty" style="--deg:0deg;"><div class="p-body-donut-hole">${raidEmpty}</div></div>
                                 <div class="p-body-donut-caption">Empty</div>
                             </div>
                         </div>
@@ -1441,21 +1498,15 @@
                         <div class="p-body-section-label" style="margin-top:16px;">Total Tackles ${tTack}</div>
                         <div class="p-body-donuts" style="margin-bottom:0;">
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell tack-succ" style="--deg:${tackSuccDeg}deg;">
-                                    <div class="p-body-donut-hole">${succTack}</div>
-                                </div>
+                                <div class="p-body-donut-shell tack-succ" style="--deg:${tackSuccDeg}deg;"><div class="p-body-donut-hole">${succTack}</div></div>
                                 <div class="p-body-donut-caption">Successful</div>
                             </div>
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell tack-unsucc" style="--deg:${tackUnsDeg}deg;">
-                                    <div class="p-body-donut-hole">${unsTack}</div>
-                                </div>
+                                <div class="p-body-donut-shell tack-unsucc" style="--deg:${tackUnsDeg}deg;"><div class="p-body-donut-hole">${unsTack}</div></div>
                                 <div class="p-body-donut-caption">Unsuccessful</div>
                             </div>
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell tack-super" style="--deg:${tackSuperDeg}deg;">
-                                    <div class="p-body-donut-hole">${superTack}</div>
-                                </div>
+                                <div class="p-body-donut-shell tack-super" style="--deg:0deg;"><div class="p-body-donut-hole">${superTack}</div></div>
                                 <div class="p-body-donut-caption">Super</div>
                             </div>
                         </div>
@@ -1472,7 +1523,49 @@
             document.getElementById('uiSubstitutesGrid').innerHTML = subsHtml || '<div class="empty-state"><i class="fa-solid fa-user-plus"></i>No substitutes.</div>';
         }
 
-        // ============ GRAPH INTERSECTION OBSERVER ============
+        // ============ MAT DOTS RENDERING ============
+        // Uses starting-7 roster order to map jersey numbers to dot indices
+        function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
+            const lStates = state.leftDotStates || [];
+            const rStates = state.rightDotStates || [];
+
+            const lStarters = leftRoster.filter(p => p.isStarting7);
+            const rStarters = rightRoster.filter(p => p.isStarting7);
+
+            const buildCells = (states, starters, isLeftTeam, color) => {
+                const items = states.map((alive, i) => ({
+                    alive,
+                    jersey: starters[i]?.jerseyNumber || ''
+                }));
+
+                // Order: LEFT team alive→out (out near center), RIGHT team out→alive (out near center)
+                if (isLeftTeam) items.sort((a, b) => (b.alive ? 1 : 0) - (a.alive ? 1 : 0));
+                else items.sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0));
+
+                return items.map(item => `
+                    <div class="mat-dot-cell ${item.alive ? '' : 'is-out'}">
+                        <div class="mat-dot ${item.alive ? 'alive' : 'out'}" style="--dot-color: ${color};"></div>
+                        <div class="mat-dot-jersey" style="--dot-color: ${color};">${item.jersey || ''}</div>
+                    </div>
+                `).join('');
+            };
+
+            document.getElementById('uiMatDots').innerHTML = `
+                <div class="team-mat left">${buildCells(lStates, lStarters, true, leftColor)}</div>
+                <div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt=""></div>
+                <div class="team-mat right">${buildCells(rStates, rStarters, false, rightColor)}</div>
+            `;
+
+            // Fallback if mat.png fails to load
+            const matImg = document.querySelector('#matDividerImg img');
+            if (matImg) {
+                matImg.onerror = function() {
+                    this.parentElement.classList.add('fallback');
+                };
+            }
+        }
+
+        // ============ GRAPH OBSERVER ============
         const graphObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -1611,7 +1704,6 @@
                         document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                         document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
 
-                        // Active raider banner
                         const banner = document.getElementById('uiActiveRaider');
                         if (data.active_raider_name && data.active_raider_name !== "") {
                             const isLeftRaid = data.active_raider_team === "left";
@@ -1623,30 +1715,13 @@
                             banner.innerHTML = '<i class="fa-solid fa-person-running"></i> Waiting for raid...';
                         }
 
-                        // ================= MAT DOTS (FIXED) =================
-                        // LEFT TEAM: alive → out (all out players at far right, near center divider)
-                        // RIGHT TEAM: out → alive (all out players at far left, near center divider)
-                        const renderTeamDots = (states, isLeftTeam, color) => {
-                            if (!states || states.length === 0) return '';
-                            let arr = states.map((alive, i) => ({ alive, origIndex: i }));
-                            if (isLeftTeam) {
-                                // Left team: alive first (left), out last (right = near center)
-                                arr.sort((a, b) => (b.alive ? 1 : 0) - (a.alive ? 1 : 0));
-                            } else {
-                                // Right team: out first (left = near center), alive last (right)
-                                arr.sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0));
-                            }
-                            return arr.map(d => d.alive
-                                ? `<div class="mat-dot alive" style="--dot-color: ${color};"></div>`
-                                : `<div class="mat-dot out"></div>`
-                            ).join('');
-                        };
+                        // Parse rosters once
+                        let lRoster = [], rRoster = [];
+                        try { lRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
+                        try { rRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-                        document.getElementById('uiMatDots').innerHTML = `
-                            <div class="team-mat left">${renderTeamDots(state.leftDotStates, true, leftColor)}</div>
-                            <div class="mat-divider"></div>
-                            <div class="team-mat right">${renderTeamDots(state.rightDotStates, false, rightColor)}</div>
-                        `;
+                        // Render mat dots with jersey numbers
+                        renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
 
                         // Logs
                         if (state.logsJson) {
@@ -1655,7 +1730,6 @@
                             window.matchLogsForGraph = logs;
                             window.halfStatsCache = computeHalfStats();
 
-                            // Graph redraw
                             if (document.getElementById('tab-graph').classList.contains('active')) {
                                 drawGraph();
                             }
@@ -1676,7 +1750,7 @@
                                 logHtml += `
                                 <div class="log-row">
                                     <div class="log-icon-circle">
-                                        <img src="${iconPath}" alt="${log.title}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fa-solid fa-circle-info\\'></i>';">
+                                        <img src="${iconPath}" alt="" onerror="this.onerror=null; this.src='/images/default_event.png';">
                                     </div>
                                     <div class="log-body">
                                         <div class="log-title">${log.title || 'Event'}</div>
@@ -1702,20 +1776,17 @@
             });
         }
 
-        // ============ INIT ============
         document.addEventListener('DOMContentLoaded', () => {
             switchLineupTeam('left');
             switchHalf('first');
             switchRaidView('raids');
 
-            // Graph observer
             const graphTab = document.getElementById('tab-graph');
             if (graphTab) {
                 const canvasWrap = graphTab.querySelector('.graph-canvas-wrap');
                 if (canvasWrap) graphObserver.observe(canvasWrap);
             }
 
-            // Also observe tab-content activation
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach(m => {
                     if (m.target.id === 'tab-graph' && m.target.classList.contains('active')) {
