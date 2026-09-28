@@ -151,7 +151,7 @@
         .team-mat.left { justify-content: flex-end; }
         .team-mat.right { justify-content: flex-start; }
 
-        .mat-dot-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; min-width: 22px; }
+        .mat-dot-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; min-width: 22px; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .mat-dot-jersey {
             font-size: 9px;
             font-weight: 800;
@@ -570,7 +570,6 @@
         </div>
 
         <div class="quick-stats">
-            <!-- LEFT TEAM: [Fouls, Time-Out] [Subs, Empty] -->
             <div class="quick-stat-team left-stat" id="uiLeftSubBg" style="--team-accent: var(--left-team-color);">
                 <div class="stat-row-inner">
                     <div class="mini-stat">
@@ -595,8 +594,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- RIGHT TEAM (MIRRORED): [Time-Out, Fouls] [Empty, Subs] -->
             <div class="quick-stat-team right-stat" id="uiRightSubBg" style="--team-accent: var(--right-team-color);">
                 <div class="stat-row-inner">
                     <div class="mini-stat">
@@ -1491,62 +1488,89 @@
         }
 
         // ============================================================
-        // ============ MAT DOTS RENDERING (ROBUST, ID-BASED) ========
+        // ========== MAT DOTS RENDERING (REVIVAL-TURN ORDER) ========
         // ============================================================
-        // The app sends:
-        //   - leftDotStates / rightDotStates (unused now — old approach)
-        //   - leftOutIds / rightOutIds (comma-separated player IDs)
+        // Rules implemented here:
         //
-        // The out-IDs fields may use any team prefix, so we merge both
-        // and match by exact player ID. This eliminates any index-shift
-        // bugs caused by substitutions or roster reordering.
+        //   • Parse out IDs in the ORDER they appear across
+        //     state.leftOutIds + state.rightOutIds. This order represents
+        //     the "revival turn order" — the FIRST listed player will be
+        //     revived first (oldest out), the LAST listed player will be
+        //     revived last (newest out).
+        //
+        //   • LEFT team display (from outer edge → centre divider):
+        //       [Alive players] → [oldest out] → … → [newest out]
+        //     So the newest out sits at the FAR CENTRE, closest to the
+        //     mat.png divider, indicating their next revival turn.
+        //
+        //   • RIGHT team display is a mirror image:
+        //       [newest out] → [older outs …] → [oldest out] → [Alive]
+        //     The newest out sits at the FAR CENTRE (left of the right
+        //     team block), also next to the divider.
+        //
+        //   • Only starters (isStarting7 === true) are eligible for
+        //     dots. Any out-ID not matching a starter is skipped.
         // ============================================================
-        function parseOutIdSet(str) {
-            if (!str || typeof str !== 'string') return new Set();
-            return new Set(
-                str.split(',')
-                   .map(s => s.trim())
-                   .filter(Boolean)
-            );
-        }
-
         function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
-            // Merge both out-id lists → complete set of OUT player IDs
-            const allOutIds = new Set([
-                ...parseOutIdSet(state.leftOutIds),
-                ...parseOutIdSet(state.rightOutIds)
-            ]);
+            // ── 1. Collect out IDs in ORDER (across both strings) ──
+            const outIdOrder = [];
+            const pushIds = (str) => {
+                if (typeof str !== 'string' || !str) return;
+                str.split(',').map(s => s.trim()).filter(Boolean).forEach(id => outIdOrder.push(id));
+            };
+            pushIds(state.leftOutIds);
+            pushIds(state.rightOutIds);
 
+            // ── 2. Split into team-specific ordered lists ──
+            const leftOutOrder = outIdOrder.filter(id => id.startsWith('left_'));
+            const rightOutOrder = outIdOrder.filter(id => id.startsWith('right_'));
+
+            // ── 3. Get starting 7 for each team ──
             const lStarters = leftRoster.filter(p => p.isStarting7);
             const rStarters = rightRoster.filter(p => p.isStarting7);
 
-            const buildCells = (starters, isLeftTeam, color) => {
-                // Map each starter → alive/out state using exact ID
-                const items = starters.map(p => ({
-                    alive: !allOutIds.has(p.id),
-                    jersey: p.jerseyNumber || ''
-                }));
+            // ── 4. Build left team display items ──
+            // Order from left → right: Alive | oldest out | … | newest out
+            const leftOutSet = new Set(leftOutOrder);
+            const leftAlive = lStarters.filter(p => !leftOutSet.has(p.id));
+            const leftOutPlayers = leftOutOrder
+                .map(id => lStarters.find(p => p.id === id))
+                .filter(Boolean);   // skips IDs not in starting 7 (e.g., subs)
 
-                // Left team: alive (left) → out (right, near center)
-                // Right team: out (left, near center) → alive (right)
-                if (isLeftTeam) {
-                    items.sort((a, b) => (b.alive ? 1 : 0) - (a.alive ? 1 : 0));
-                } else {
-                    items.sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0));
-                }
+            const leftItems = [
+                ...leftAlive.map(p => ({ alive: true,  jersey: p.jerseyNumber || '' })),
+                ...leftOutPlayers.map(p => ({ alive: false, jersey: p.jerseyNumber || '' }))
+                // leftOutPlayers is oldest → newest, so newest sits right
+                // next to the centre divider ✓
+            ];
 
-                return items.map(item => `
-                    <div class="mat-dot-cell ${item.alive ? '' : 'is-out'}">
-                        <div class="mat-dot ${item.alive ? 'alive' : 'out'}" style="--dot-color: ${color};"></div>
-                        <div class="mat-dot-jersey" style="--dot-color: ${color};">${item.jersey || '·'}</div>
-                    </div>
-                `).join('');
-            };
+            // ── 5. Build right team display items ──
+            // Order from left → right: newest out | … | oldest out | Alive
+            const rightOutSet = new Set(rightOutOrder);
+            const rightAlive = rStarters.filter(p => !rightOutSet.has(p.id));
+            const rightOutPlayers = rightOutOrder
+                .map(id => rStarters.find(p => p.id === id))
+                .filter(Boolean);
+
+            const rightItems = [
+                // Reverse the out-order so newest is first (leftmost,
+                // next to the centre divider) ✓
+                ...[...rightOutPlayers].reverse().map(p => ({ alive: false, jersey: p.jerseyNumber || '' })),
+                ...rightAlive.map(p => ({ alive: true, jersey: p.jerseyNumber || '' }))
+            ];
+
+            // ── 6. Render ──
+            const buildCells = (items, color) => items.map(item => `
+                <div class="mat-dot-cell ${item.alive ? '' : 'is-out'}">
+                    <div class="mat-dot ${item.alive ? 'alive' : 'out'}" style="--dot-color: ${color};"></div>
+                    <div class="mat-dot-jersey" style="--dot-color: ${color};">${item.jersey || '·'}</div>
+                </div>
+            `).join('');
 
             document.getElementById('uiMatDots').innerHTML = `
-                <div class="team-mat left">${buildCells(lStarters, true, leftColor)}</div>
+                <div class="team-mat left">${buildCells(leftItems, leftColor)}</div>
                 <div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt="" onerror="this.parentElement.classList.add('fallback');"></div>
-                <div class="team-mat right">${buildCells(rStarters, false, rightColor)}</div>
+                <div class="team-mat right">${buildCells(rightItems, rightColor)}</div>
             `;
         }
 
@@ -1703,7 +1727,7 @@
                         try { lRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
                         try { rRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-                        // Robust mat dots rendering — uses out IDs, not index mapping
+                        // Revival-turn ordered mat dots
                         renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
 
                         if (state.logsJson) {
