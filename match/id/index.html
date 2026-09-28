@@ -165,7 +165,6 @@
         }
         .mat-dot-cell.is-out .mat-dot-jersey { color: #555; opacity: 0.7; }
 
-        /* mat.png divider */
         .mat-divider-img {
             width: 40px;
             height: 34px;
@@ -205,11 +204,23 @@
         .quick-stat-team { position: relative; padding: 12px 14px; border-radius: 16px; background: linear-gradient(145deg, var(--surface-2), var(--surface-1)); border: 1px solid var(--glass-border); overflow: hidden; }
         .quick-stat-team::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; z-index: 1; }
         .quick-stat-team.left-stat::before { background: var(--left-team-color); }
-        .quick-stat-team.right-stat::before { background: var(--right-team-color); }
-        .stat-row-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; position: relative; z-index: 2; }
-        .mini-stat { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #fff; }
+        .quick-stat-team.right-stat::before { background: var(--right-team-color); left: auto; right: 0; }
+        .stat-row-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; position: relative; z-index: 2; }
+        .mini-stat { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #fff; min-width: 0; }
         .mini-stat .stat-icon-wrap { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: var(--team-accent, #fff); font-size: 10px; flex-shrink: 0; }
-        .mini-stat-value { font-variant-numeric: tabular-nums; }
+        .mini-stat-value { font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 900; line-height: 1; }
+        .mini-stat-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #8C8E9F;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        /* MIRROR right team layout */
+        .quick-stat-team.right-stat .mini-stat { flex-direction: row-reverse; }
+        .quick-stat-team.right-stat .mini-stat-label { text-align: right; }
 
         /* TABS */
         .tabs { display: flex; gap: 6px; margin: 20px 0 16px; padding: 5px; background: var(--surface-1); border-radius: 100px; border: 1px solid var(--glass-border); overflow-x: auto; scrollbar-width: none; }
@@ -308,7 +319,6 @@
         .player-card:last-child { margin-bottom: 0; }
         .player-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 
-        /* PLAYER HEAD */
         .player-card-head {
             display: grid;
             grid-template-columns: 44px minmax(0, 1fr) auto auto auto;
@@ -337,7 +347,6 @@
         .captain-badge { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #8E24AA; color: #fff; font-size: 9px; font-weight: 900; flex-shrink: 0; }
         .player-main-role { font-size: 10px; font-weight: 700; color: #8C8E9F; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Tags section (sub icons + cards) placed right before points */
         .player-tags { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
         .tag-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; flex-shrink: 0; }
         .tag-card { border: 1px solid rgba(0,0,0,0.3); }
@@ -371,7 +380,6 @@
         .player-card-body { display: none; padding: 14px 12px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.04); }
         .player-card.expanded .player-card-body { display: block; }
 
-        /* On-Mat banner */
         .player-on-mat-banner {
             display: flex;
             align-items: center;
@@ -478,7 +486,11 @@
             .raid-timer-inner { width: 46px; height: 46px; font-size: 20px; }
             .info-grid { grid-template-columns: 1fr; }
             .tab { font-size: 11px; padding: 9px 6px; }
-            .stat-row-inner { grid-template-columns: 1fr; }
+            .stat-row-inner { grid-template-columns: 1fr 1fr; gap: 8px 6px; }
+            .mini-stat { gap: 4px; }
+            .mini-stat .stat-icon-wrap { width: 18px; height: 18px; font-size: 8px; }
+            .mini-stat-value { font-size: 12px; }
+            .mini-stat-label { font-size: 8px; letter-spacing: 0.3px; }
             .graph-canvas-wrap { height: 260px; }
             .log-row { grid-template-columns: 38px 1fr auto; gap: 10px; padding: 10px 8px; }
             .log-icon-circle { width: 38px; height: 38px; padding: 5px; }
@@ -564,18 +576,50 @@
         <div class="quick-stats">
             <div class="quick-stat-team left-stat" id="uiLeftSubBg" style="--team-accent: var(--left-team-color);">
                 <div class="stat-row-inner">
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div><span class="mini-stat-value" id="uiLeftFouls">0</span></div>
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div><span class="mini-stat-value" id="uiLeftTimeouts">0</span></div>
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div><span class="mini-stat-value" id="uiLeftSubs">0</span></div>
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div><span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span></div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div>
+                        <span class="mini-stat-value" id="uiLeftFouls">0</span>
+                        <span class="mini-stat-label">Fouls</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
+                        <span class="mini-stat-value" id="uiLeftTimeouts">0</span>
+                        <span class="mini-stat-label">Timeout</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div>
+                        <span class="mini-stat-value" id="uiLeftSubs">0</span>
+                        <span class="mini-stat-label">Subs</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div>
+                        <span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span>
+                        <span class="mini-stat-label">Empty</span>
+                    </div>
                 </div>
             </div>
             <div class="quick-stat-team right-stat" id="uiRightSubBg" style="--team-accent: var(--right-team-color);">
                 <div class="stat-row-inner">
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div><span class="mini-stat-value" id="uiRightFouls">0</span></div>
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div><span class="mini-stat-value" id="uiRightTimeouts">0</span></div>
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div><span class="mini-stat-value" id="uiRightSubs">0</span></div>
-                    <div class="mini-stat"><div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div><span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span></div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-hand"></i></div>
+                        <span class="mini-stat-value" id="uiRightFouls">0</span>
+                        <span class="mini-stat-label">Fouls</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
+                        <span class="mini-stat-value" id="uiRightTimeouts">0</span>
+                        <span class="mini-stat-label">Timeout</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-solid fa-right-left"></i></div>
+                        <span class="mini-stat-value" id="uiRightSubs">0</span>
+                        <span class="mini-stat-label">Subs</span>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="stat-icon-wrap"><i class="fa-regular fa-circle-xmark"></i></div>
+                        <span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span>
+                        <span class="mini-stat-label">Empty</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -883,7 +927,6 @@
             return { left: ((l / total) * 100) + "%", right: ((r / total) * 100) + "%" };
         }
 
-        // MM:SS format
         function formatOnMatTime(seconds) {
             if (!seconds || seconds <= 0) return '00:00';
             const m = Math.floor(seconds / 60);
@@ -1161,7 +1204,7 @@
             const w = rect.width, h = rect.height;
             ctx.clearRect(0, 0, w, h);
 
-            const padLeft = 42, padRight = 48, padTop = 20, padBottom = 40;
+            const padLeft = 42, padRight = 55, padTop = 20, padBottom = 40;
             const graphW = w - padLeft - padRight;
             const graphH = h - padTop - padBottom;
 
@@ -1235,6 +1278,7 @@
                     prevL = pt.l; prevR = pt.r;
                 });
 
+                // Score label AFTER the last dot (to the right)
                 const lastPt = dataPoints[dataPoints.length - 1];
                 const x = padLeft + ((lastPt.min / window.totalMatchMinutes) * graphW);
                 const score = isLeftTeam ? lastPt.l : lastPt.r;
@@ -1242,8 +1286,8 @@
                 ctx.font = "900 15px Inter, sans-serif";
                 ctx.fillStyle = color;
                 ctx.textBaseline = "middle";
-                ctx.textAlign = isLeftTeam ? "right" : "left";
-                ctx.fillText(score, isLeftTeam ? x - 14 : x + 14, y);
+                ctx.textAlign = "left";
+                ctx.fillText(score, x + 12, y);
             };
 
             if (finalL >= finalR) { drawLine(false, window.rightTeamColorForGraph); drawLine(true, window.leftTeamColorForGraph); }
@@ -1267,7 +1311,6 @@
         });
 
         // ============ SUBSTITUTION PARSER (TEAM-SPECIFIC) ============
-        // Returns: { left: { byJersey: {...} }, right: { byJersey: {...} } }
         function parseSubsFromLogs(logs) {
             const result = {
                 left:  { byJersey: {} },
@@ -1288,7 +1331,6 @@
                 const timeMatch = (log.timeStr || '').match(/(\d+)'/);
                 const minute = timeMatch ? parseInt(timeMatch[1]) : 0;
 
-                // Filter subs by team using log.isLeftTeam
                 const teamKey = log.isLeftTeam === true ? 'left'
                               : log.isLeftTeam === false ? 'right'
                               : null;
@@ -1313,10 +1355,8 @@
             } catch (e) { console.error("Roster parse error", e); return; }
 
             const activeRoster = window.currentLineupTeam === 'left' ? lRoster : rRoster;
-
-            // Parse team-specific subs
             const subsByTeam = parseSubsFromLogs(window.matchLogsForGraph);
-            const teamKey = window.currentLineupTeam; // 'left' or 'right'
+            const teamKey = window.currentLineupTeam;
             const subsByJersey = subsByTeam[teamKey].byJersey;
 
             let startersHtml = "", subsHtml = "";
@@ -1327,20 +1367,17 @@
                 const jersey = String(player.jerseyNumber || '');
                 const onMat = player.onMatSeconds || 0;
 
-                // Sub detection: validated against current list position
                 const subInfo = subsByJersey[jersey] || {};
                 const isCurrentlyStarting = player.isStarting7 === true;
-                // Sub-in mark ONLY if player is now in starting 7 AND has a sub-in record
+                // Sub-in mark ONLY if player is now in Starting 7 AND has sub-in record
                 const hasSubIn  = subInfo.inMinute !== undefined && isCurrentlyStarting;
-                // Sub-out mark ONLY if player is now on bench AND has a sub-out record
+                // Sub-out mark ONLY if player is now on Bench AND has sub-out record
                 const hasSubOut = subInfo.outMinute !== undefined && !isCurrentlyStarting;
 
-                // Cards
                 const hasGreen = (player.greenCards || 0) > 0;
                 const hasYellow = (player.yellowCards || 0) > 0;
                 const hasRed = (player.redCards || 0) > 0 || player.isDisqualified;
 
-                // Analytics
                 const tRaid = player.totalRaids || 0;
                 const succRaid = player.raidPoints > 0 ? player.raidPoints : 0;
                 const unsRaid = Math.max(0, tRaid - succRaid);
@@ -1359,7 +1396,6 @@
 
                 const expandedClass = window.expandedPlayerIds.has(player.id) ? "expanded" : "";
 
-                // Tags: sub icons + cards (in that order), before points
                 let tagsHtml = '';
                 if (hasSubIn) {
                     tagsHtml += `<div class="tag-icon tag-sub-in" title="Subbed In"><i class="fa-solid fa-right-left"></i><span class="tag-sub-time">${subInfo.inMinute}'</span></div>`;
@@ -1371,10 +1407,8 @@
                 if (hasYellow) tagsHtml += `<div class="tag-icon tag-card yellow"></div>`;
                 if (hasRed) tagsHtml += `<div class="tag-icon tag-card red"></div>`;
 
-                // Display name with jersey: "Player (1)"
                 const displayName = jersey ? `${player.name || 'Player'} (${jersey})` : (player.name || 'Player');
 
-                // Raid sequence
                 const raidSeqDots = [];
                 for (let i = 0; i < tRaid; i++) {
                     let cls = 'success';
@@ -1386,7 +1420,6 @@
                     ? `<div class="raid-seq-box"><div class="raid-seq-label">Raid Sequence</div><div class="raid-seq-dots">${raidSeqDots.join('')}</div></div>`
                     : '';
 
-                // NOTE: Sub indicators are NOT shown in expanded body anymore (only in header tags)
                 return `
                 <div class="player-card ${expandedClass}" onclick="togglePlayerExpand(this, '${player.id}')">
                     <div class="player-card-head">
@@ -1468,10 +1501,14 @@
             const rStarters = rightRoster.filter(p => p.isStarting7);
 
             const buildCells = (states, starters, isLeftTeam, color) => {
-                const items = states.map((alive, i) => ({
-                    alive,
-                    jersey: starters[i]?.jerseyNumber || ''
-                }));
+                const len = Math.min(states.length, starters.length);
+                const items = [];
+                for (let i = 0; i < len; i++) {
+                    items.push({
+                        alive: states[i],
+                        jersey: starters[i]?.jerseyNumber || '',
+                    });
+                }
                 if (isLeftTeam) items.sort((a, b) => (b.alive ? 1 : 0) - (a.alive ? 1 : 0));
                 else items.sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0));
 
@@ -1537,7 +1574,6 @@
 
                 if (data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
 
-                // RAID CLOCK + WAITING STATE
                 let raidIsIdle = true;
                 if (data.raid_clock) {
                     const rc = document.getElementById('uiRaidClock');
@@ -1547,7 +1583,6 @@
                     const deg = (timeInt / 30) * 360;
                     const color = timeInt <= 10 ? "#FF3B30" : "#FBC02D";
                     rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
-                    // If clock is at 30 → waiting state
                     if (timeInt >= 30) raidIsIdle = true;
                     else raidIsIdle = false;
                 }
@@ -1630,7 +1665,6 @@
                         document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                         document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
 
-                        // ACTIVE RAIDER / WAITING BANNER
                         const banner = document.getElementById('uiActiveRaider');
                         if (raidIsIdle || !data.active_raider_name || data.active_raider_name === "") {
                             banner.classList.add('idle');
@@ -1661,7 +1695,6 @@
                                 const log = logs[i];
                                 const iconPath = getLogIconPath(log.title, log.type);
 
-                                // TEAM COLOR for icon background
                                 let iconBg;
                                 if (log.isLeftTeam === true) iconBg = leftColor;
                                 else if (log.isLeftTeam === false) iconBg = rightColor;
