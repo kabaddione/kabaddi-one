@@ -42,6 +42,7 @@
             --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
             --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
             --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            --empty-raid-color: #9E9E9E; /* light grey — confirmed empty-raid colour */
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -423,7 +424,7 @@
         .p-body-donut-shell { position: relative; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .p-body-donut-shell.raid-succ { background: conic-gradient(#22C55E var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
         .p-body-donut-shell.raid-unsucc { background: conic-gradient(#8E24AA var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
-        .p-body-donut-shell.raid-empty { background: conic-gradient(#FF9800 var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
+        .p-body-donut-shell.raid-empty { background: conic-gradient(var(--empty-raid-color) var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
         .p-body-donut-shell.tack-succ { background: conic-gradient(#4DD0E1 var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
         .p-body-donut-shell.tack-unsucc { background: conic-gradient(#3949AB var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
         .p-body-donut-shell.tack-super { background: conic-gradient(#E91E63 var(--deg, 0deg), rgba(255,255,255,0.05) 0deg); }
@@ -436,7 +437,7 @@
         .raid-seq-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 6px currentColor; }
         .raid-seq-dot.success { background: #22C55E; color: #22C55E; }
         .raid-seq-dot.unsuccess { background: #8E24AA; color: #8E24AA; }
-        .raid-seq-dot.empty { background: #FF9800; color: #FF9800; }
+        .raid-seq-dot.empty { background: var(--empty-raid-color); color: var(--empty-raid-color); }
 
         /* GRAPH */
         .graph-panel { background: linear-gradient(165deg, var(--surface-2), var(--surface-1)); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); }
@@ -960,21 +961,55 @@
             return `/images/${getLogIconName(title, logType)}.png`;
         }
 
-        // ============ HALF-WISE STATS ============
-        function computeHalfStats() {
+        // ============================================================
+        // ============ HALF-WISE STATS (AUTHORITATIVE TOTALS) ========
+        // ============================================================
+        // FIX SUMMARY:
+        //   • Per-half point components (raid / tackle / allout / extra)
+        //     are still derived from the event log stream.
+        //   • TOTAL POINTS for each half is now derived from the
+        //     scoreboard's authoritative `left_score` / `right_score`.
+        //       – 1st Half total  = score captured at the "Half Time"
+        //                           log (if it exists). If we are still
+        //                           in the 1st half, it equals the
+        //                           current live scoreboard.
+        //       – 2nd Half total  = current scoreboard − 1st Half total.
+        //     This prevents the "half start" log (which the app stamps
+        //     with timeStr="2nd Half: 15'") from corrupting the 2nd-half
+        //     totals.
+        //   • PERIOD logs (toss / match start / half time / full time)
+        //     are skipped during event accumulation so they can never
+        //     mis-classify a half.
+        // ============================================================
+        function computeHalfStats(matchData) {
             const logs = window.matchLogsForGraph || [];
             const sortedLogs = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
-            const blank = () => ({ raid: 0, tackle: 0, allOut: 0, extra: 0, totalRaids: 0, succRaids: 0, superRaids: 0, totalTackles: 0, succTackles: 0, superTackles: 0, longestStreak: 0, currentStreak: 0, total: 0 });
-            const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
 
+            const blank = () => ({
+                raid: 0, tackle: 0, allOut: 0, extra: 0,
+                totalRaids: 0, succRaids: 0, superRaids: 0,
+                totalTackles: 0, succTackles: 0, superTackles: 0,
+                longestStreak: 0, currentStreak: 0, total: 0
+            });
+            const stats = {
+                left:  { first: blank(), second: blank() },
+                right: { first: blank(), second: blank() }
+            };
+
+            // ── 1. Accumulate per-half component stats from logs ──
             for (let log of sortedLogs) {
+                // Skip non-scoring period markers entirely
+                if (log.type === 'PERIOD') continue;
+
                 const ts = log.timeStr || '';
                 let half = null;
                 if (ts.includes('1st Half')) half = 'first';
                 else if (ts.includes('2nd Half')) half = 'second';
                 if (!half) continue;
 
-                const teamKey = log.isLeftTeam === true ? 'left' : (log.isLeftTeam === false ? 'right' : null);
+                const teamKey = log.isLeftTeam === true ? 'left'
+                              : log.isLeftTeam === false ? 'right'
+                              : null;
                 if (!teamKey) continue;
 
                 const s = stats[teamKey][half];
@@ -983,10 +1018,12 @@
 
                 if (t.includes('super raid')) {
                     s.superRaids += 1; s.totalRaids += 1; s.raid += pts;
-                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; } else s.currentStreak = 0;
+                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
+                    else s.currentStreak = 0;
                 } else if (t.includes('bonus') || t.includes('touch')) {
                     s.totalRaids += 1; s.raid += pts;
-                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; } else s.currentStreak = 0;
+                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
+                    else s.currentStreak = 0;
                 } else if (t.includes('empty')) {
                     s.totalRaids += 1; s.currentStreak = 0;
                 } else if (t.includes('super tackle')) {
@@ -995,13 +1032,73 @@
                 } else if (t.includes('tackle')) {
                     s.totalTackles += 1; s.tackle += pts;
                     if (pts > 0) s.succTackles += 1;
-                } else if (t.includes('all out')) { s.allOut += pts; }
-                else if (log.type === 'EXTRA' && pts > 0) { s.extra += pts; }
+                } else if (t.includes('all out')) {
+                    s.allOut += pts;
+                } else if (log.type === 'EXTRA' && pts > 0) {
+                    s.extra += pts;
+                }
             }
-            for (let teamKey of ['left', 'right']) for (let halfKey of ['first', 'second']) {
-                const s = stats[teamKey][halfKey];
-                s.total = s.raid + s.tackle + s.allOut + s.extra;
+
+            // ── 2. Snapshot captured at the Half Time log ──
+            let htLeft = null, htRight = null;
+            for (let log of sortedLogs) {
+                const t = (log.title || '').toLowerCase();
+                const d = (log.desc || '').toLowerCase();
+                const isHalfTime =
+                    t.includes('half time') || t.includes('half-time') ||
+                    d.includes('half time') || d.includes('half-time') ||
+                    d.includes('first half ends') || d.includes('first half end');
+                if (!isHalfTime) continue;
+                if (!log.scoreStr) continue;
+                const parts = log.scoreStr.replace(/Score:\s*/i, '').trim()
+                    .split('-').map(x => parseInt(x.trim()) || 0);
+                if (parts.length === 2) { htLeft = parts[0]; htRight = parts[1]; }
             }
+
+            // ── 3. Scoreboard-authoritative totals ──
+            const lScoreNow = Number(matchData && matchData.left_score) || 0;
+            const rScoreNow = Number(matchData && matchData.right_score) || 0;
+            const halfStatus = ((matchData && matchData.half_status) || '').toLowerCase();
+            const inSecondHalf = halfStatus.includes('2nd') || halfStatus.includes('second') ||
+                                 halfStatus.includes('over') || halfStatus.includes('end');
+
+            let lFirstTotal, rFirstTotal, lSecondTotal, rSecondTotal;
+
+            if (htLeft !== null) {
+                // Past half time → first half = half-time snapshot,
+                // second half = current scoreboard − first half.
+                lFirstTotal = htLeft;
+                rFirstTotal = htRight;
+                lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
+                rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
+            } else if (inSecondHalf) {
+                // No half-time log yet but we're already in 2nd half —
+                // fall back to log-derived first-half totals.
+                lFirstTotal = stats.left.first.total;
+                rFirstTotal = stats.right.first.total;
+                lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
+                rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
+            } else {
+                // Still in 1st half → scoreboard IS the 1st-half total.
+                lFirstTotal = Math.max(lScoreNow, 0);
+                rFirstTotal = Math.max(rScoreNow, 0);
+                lSecondTotal = 0;
+                rSecondTotal = 0;
+            }
+
+            stats.left.first.total   = lFirstTotal;
+            stats.right.first.total  = rFirstTotal;
+            stats.left.second.total  = lSecondTotal;
+            stats.right.second.total = rSecondTotal;
+
+            // ── 4. Component sums (used for the per-half breakdown rows) ──
+            for (let teamKey of ['left', 'right']) {
+                for (let halfKey of ['first', 'second']) {
+                    const s = stats[teamKey][halfKey];
+                    s.componentSum = s.raid + s.tackle + s.allOut + s.extra;
+                }
+            }
+
             return stats;
         }
 
@@ -1012,8 +1109,14 @@
 
             const half = window.currentHalf;
             const view = window.currentRaidView;
-            const halfStats = window.halfStatsCache || computeHalfStats();
-            const hasHalfData = (halfStats.left.first.total > 0 || halfStats.right.first.total > 0 || halfStats.left.second.total > 0 || halfStats.right.second.total > 0);
+            const halfStats = window.halfStatsCache || computeHalfStats(data);
+
+            const lScoreNow = Number(data.left_score) || 0;
+            const rScoreNow = Number(data.right_score) || 0;
+            const hasHalfData =
+                lScoreNow > 0 || rScoreNow > 0 ||
+                halfStats.left.first.total > 0 || halfStats.right.first.total > 0 ||
+                halfStats.left.second.total > 0 || halfStats.right.second.total > 0;
 
             let lRaid, rRaid, lTackle, rTackle, lAllOut, rAllOut, lExtra, rExtra, lTotal, rTotal;
 
@@ -1023,13 +1126,14 @@
                 lTackle = lH.tackle; rTackle = rH.tackle;
                 lAllOut = lH.allOut; rAllOut = rH.allOut;
                 lExtra = lH.extra; rExtra = rH.extra;
+                // ✅ Authoritative half totals (scoreboard-derived)
                 lTotal = lH.total; rTotal = rH.total;
             } else {
                 lRaid = state.leftRaidPoints || 0; rRaid = state.rightRaidPoints || 0;
                 lTackle = state.leftTacklePoints || 0; rTackle = state.rightTacklePoints || 0;
                 lAllOut = state.leftAllOutPoints || 0; rAllOut = state.rightAllOutPoints || 0;
                 lExtra = state.leftExtraPoints || 0; rExtra = state.rightExtraPoints || 0;
-                lTotal = data.left_score || 0; rTotal = data.right_score || 0;
+                lTotal = lScoreNow; rTotal = rScoreNow;
             }
 
             document.getElementById('stLeftRaid').innerText = lRaid;
@@ -1274,7 +1378,6 @@
                     prevL = pt.l; prevR = pt.r;
                 });
 
-                // Score label AFTER the last dot (to the right of the dot)
                 const lastPt = dataPoints[dataPoints.length - 1];
                 const x = padLeft + ((lastPt.min / window.totalMatchMinutes) * graphW);
                 const score = isLeftTeam ? lastPt.l : lastPt.r;
@@ -1341,6 +1444,66 @@
             return result;
         }
 
+        // ============================================================
+        // ============ RAID SEQUENCE HELPER ==========================
+        // ============================================================
+        // Prefers the authoritative `raidSequence` string from the
+        // player payload ("S,E,U" — S=success, E=empty, U=unsuccess).
+        // Falls back to `successfulRaids` / `emptyRaids` /
+        // `unsuccessfulRaids` counters when the sequence is missing
+        // or its length doesn't match `totalRaids`.
+        // Returns { arr, succRaid, emptyRaid, unsuccRaid }
+        // ============================================================
+        function resolveRaidBreakdown(player) {
+            const tRaid = parseInt(player.totalRaids) || 0;
+
+            // 1) Try the raidSequence string
+            let seqArr = [];
+            const rawSeq = (player.raidSequence || '').trim();
+            if (rawSeq) {
+                if (rawSeq.includes(',')) {
+                    seqArr = rawSeq.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+                } else {
+                    seqArr = rawSeq.split('').map(s => s.toUpperCase()).filter(c => c === 'S' || c === 'E' || c === 'U');
+                }
+            }
+
+            let succRaid = 0, emptyRaid = 0, unsuccRaid = 0;
+            if (seqArr.length === tRaid && tRaid > 0) {
+                seqArr.forEach(c => {
+                    if (c === 'S') succRaid++;
+                    else if (c === 'E') emptyRaid++;
+                    else if (c === 'U') unsuccRaid++;
+                });
+            } else {
+                // 2) Fall back to per-player counters
+                succRaid   = parseInt(player.successfulRaids)   || 0;
+                emptyRaid  = parseInt(player.emptyRaids)        || 0;
+                unsuccRaid = parseInt(player.unsuccessfulRaids) || 0;
+
+                // If counters are incomplete, pad remaining raids as
+                // unsuccessful so the donut chart fills correctly.
+                const sum = succRaid + emptyRaid + unsuccRaid;
+                if (sum < tRaid) unsuccRaid += (tRaid - sum);
+                if (sum > tRaid && sum > 0) {
+                    // Trim excess from unsuccessful first, then empty, then succ
+                    let excess = sum - tRaid;
+                    const trim = (v) => { const cut = Math.min(v, excess); excess -= cut; return v - cut; };
+                    unsuccRaid = trim(unsuccRaid);
+                    emptyRaid = trim(emptyRaid);
+                    succRaid = trim(succRaid);
+                }
+
+                // Rebuild the dot array from counters
+                seqArr = [];
+                for (let i = 0; i < succRaid; i++)   seqArr.push('S');
+                for (let i = 0; i < unsuccRaid; i++) seqArr.push('U');
+                for (let i = 0; i < emptyRaid; i++)  seqArr.push('E');
+            }
+
+            return { arr: seqArr, succRaid, emptyRaid, unsuccRaid };
+        }
+
         // ============ LINEUP RENDERING ============
         function renderLineups(state) {
             if (!state.leftRosterJson || !state.rightRosterJson) return;
@@ -1373,15 +1536,21 @@
                 const hasRed = (player.redCards || 0) > 0 || player.isDisqualified;
 
                 const tRaid = player.totalRaids || 0;
-                const succRaid = player.raidPoints > 0 ? player.raidPoints : 0;
-                const unsRaid = Math.max(0, tRaid - succRaid);
+
+                // ── Authoritative raid breakdown ──
+                const rb = resolveRaidBreakdown(player);
+                const succRaid = rb.succRaid;
+                const emptyRaid = rb.emptyRaid;
+                const unsuccRaid = rb.unsuccRaid;
+
                 const tTack = player.totalTackles || 0;
                 const succTack = player.tacklePoints || 0;
                 const unsTack = Math.max(0, tTack - succTack);
                 const superTack = 0;
 
                 const raidSuccDeg = tRaid > 0 ? (succRaid / tRaid) * 360 : 0;
-                const raidUnsDeg = tRaid > 0 ? (unsRaid / tRaid) * 360 : 0;
+                const raidUnsDeg = tRaid > 0 ? (unsuccRaid / tRaid) * 360 : 0;
+                const raidEmptyDeg = tRaid > 0 ? (emptyRaid / tRaid) * 360 : 0;
                 const tackSuccDeg = tTack > 0 ? (succTack / tTack) * 360 : 0;
                 const tackUnsDeg = tTack > 0 ? (unsTack / tTack) * 360 : 0;
 
@@ -1403,13 +1572,13 @@
 
                 const displayName = jersey ? `${player.name || 'Player'} (${jersey})` : (player.name || 'Player');
 
-                const raidSeqDots = [];
-                for (let i = 0; i < tRaid; i++) {
+                // ── Raid sequence dots (light-grey for empty) ──
+                const raidSeqDots = rb.arr.map(code => {
                     let cls = 'success';
-                    if (i >= succRaid && i < succRaid + unsRaid) cls = 'unsuccess';
-                    else if (i >= succRaid + unsRaid) cls = 'empty';
-                    raidSeqDots.push(`<div class="raid-seq-dot ${cls}"></div>`);
-                }
+                    if (code === 'U') cls = 'unsuccess';
+                    else if (code === 'E') cls = 'empty';
+                    return `<div class="raid-seq-dot ${cls}"></div>`;
+                });
                 const raidSeqHtml = raidSeqDots.length > 0
                     ? `<div class="raid-seq-box"><div class="raid-seq-label">Raid Sequence</div><div class="raid-seq-dots">${raidSeqDots.join('')}</div></div>`
                     : '';
@@ -1449,11 +1618,11 @@
                                 <div class="p-body-donut-caption">Successful</div>
                             </div>
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell raid-unsucc" style="--deg:${raidUnsDeg}deg;"><div class="p-body-donut-hole">${unsRaid}</div></div>
+                                <div class="p-body-donut-shell raid-unsucc" style="--deg:${raidUnsDeg}deg;"><div class="p-body-donut-hole">${unsuccRaid}</div></div>
                                 <div class="p-body-donut-caption">Unsuccessful</div>
                             </div>
                             <div class="p-body-donut">
-                                <div class="p-body-donut-shell raid-empty" style="--deg:0deg;"><div class="p-body-donut-hole">0</div></div>
+                                <div class="p-body-donut-shell raid-empty" style="--deg:${raidEmptyDeg}deg;"><div class="p-body-donut-hole">${emptyRaid}</div></div>
                                 <div class="p-body-donut-caption">Empty</div>
                             </div>
                         </div>
@@ -1490,29 +1659,19 @@
         // ============================================================
         // ========== MAT DOTS RENDERING (REVIVAL-TURN ORDER) ========
         // ============================================================
-        // Rules implemented here:
-        //
         //   • Parse out IDs in the ORDER they appear across
-        //     state.leftOutIds + state.rightOutIds. This order represents
-        //     the "revival turn order" — the FIRST listed player will be
-        //     revived first (oldest out), the LAST listed player will be
-        //     revived last (newest out).
+        //     state.leftOutIds + state.rightOutIds → revival turn order
+        //     (FIRST listed = oldest out = revived first).
         //
-        //   • LEFT team display (from outer edge → centre divider):
-        //       [Alive players] → [oldest out] → … → [newest out]
-        //     So the newest out sits at the FAR CENTRE, closest to the
-        //     mat.png divider, indicating their next revival turn.
+        //   • LEFT team display (outer edge → centre divider):
+        //       [Alive] → [oldest out] → … → [newest out]
         //
         //   • RIGHT team display is a mirror image:
-        //       [newest out] → [older outs …] → [oldest out] → [Alive]
-        //     The newest out sits at the FAR CENTRE (left of the right
-        //     team block), also next to the divider.
+        //       [newest out] → … → [oldest out] → [Alive]
         //
-        //   • Only starters (isStarting7 === true) are eligible for
-        //     dots. Any out-ID not matching a starter is skipped.
+        //   • Only starters (isStarting7 === true) are eligible.
         // ============================================================
         function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
-            // ── 1. Collect out IDs in ORDER (across both strings) ──
             const outIdOrder = [];
             const pushIds = (str) => {
                 if (typeof str !== 'string' || !str) return;
@@ -1521,31 +1680,23 @@
             pushIds(state.leftOutIds);
             pushIds(state.rightOutIds);
 
-            // ── 2. Split into team-specific ordered lists ──
             const leftOutOrder = outIdOrder.filter(id => id.startsWith('left_'));
             const rightOutOrder = outIdOrder.filter(id => id.startsWith('right_'));
 
-            // ── 3. Get starting 7 for each team ──
             const lStarters = leftRoster.filter(p => p.isStarting7);
             const rStarters = rightRoster.filter(p => p.isStarting7);
 
-            // ── 4. Build left team display items ──
-            // Order from left → right: Alive | oldest out | … | newest out
             const leftOutSet = new Set(leftOutOrder);
             const leftAlive = lStarters.filter(p => !leftOutSet.has(p.id));
             const leftOutPlayers = leftOutOrder
                 .map(id => lStarters.find(p => p.id === id))
-                .filter(Boolean);   // skips IDs not in starting 7 (e.g., subs)
+                .filter(Boolean);
 
             const leftItems = [
                 ...leftAlive.map(p => ({ alive: true,  jersey: p.jerseyNumber || '' })),
                 ...leftOutPlayers.map(p => ({ alive: false, jersey: p.jerseyNumber || '' }))
-                // leftOutPlayers is oldest → newest, so newest sits right
-                // next to the centre divider ✓
             ];
 
-            // ── 5. Build right team display items ──
-            // Order from left → right: newest out | … | oldest out | Alive
             const rightOutSet = new Set(rightOutOrder);
             const rightAlive = rStarters.filter(p => !rightOutSet.has(p.id));
             const rightOutPlayers = rightOutOrder
@@ -1553,13 +1704,10 @@
                 .filter(Boolean);
 
             const rightItems = [
-                // Reverse the out-order so newest is first (leftmost,
-                // next to the centre divider) ✓
                 ...[...rightOutPlayers].reverse().map(p => ({ alive: false, jersey: p.jerseyNumber || '' })),
                 ...rightAlive.map(p => ({ alive: true, jersey: p.jerseyNumber || '' }))
             ];
 
-            // ── 6. Render ──
             const buildCells = (items, color) => items.map(item => `
                 <div class="mat-dot-cell ${item.alive ? '' : 'is-out'}">
                     <div class="mat-dot ${item.alive ? 'alive' : 'out'}" style="--dot-color: ${color};"></div>
@@ -1734,7 +1882,9 @@
                             let logs = [];
                             try { logs = JSON.parse(state.logsJson); } catch (e) { console.error(e); }
                             window.matchLogsForGraph = logs;
-                            window.halfStatsCache = computeHalfStats();
+                            // ✅ Pass live match data so the half totals can be
+                            //    derived from the authoritative scoreboard.
+                            window.halfStatsCache = computeHalfStats(data);
 
                             if (document.getElementById('tab-graph').classList.contains('active')) drawGraph();
 
