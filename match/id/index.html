@@ -843,19 +843,6 @@
         // ============================================================
         // ============ PER-PLAYER POINTS BREAKDOWN ==================
         // ============================================================
-        // The app writes a single `raidPoints` field per player (touch +
-        // bonus combined). To split them out we parse the log stream:
-        //
-        //   • Title "Bonus Point"             → 1 bonus
-        //   • Title "Touch Point"             → N touch (N = log.points)
-        //   • Title "Touch Point" + desc has
-        //     "+ Bonus Point"                 → (N-1) touch + 1 bonus
-        //   • Title "Super Raid"              → N touch
-        //   • Title "Empty Raid"              → 0/0
-        //
-        // If the app later adds explicit `touchPoints` / `bonusPoints`
-        // fields, those take precedence automatically.
-        // ============================================================
         function computePlayerPointsFromLogs(logs) {
             const result = { left: {}, right: {} };
             const ensure = (team, jersey) => {
@@ -876,7 +863,6 @@
                 const t = (log.title || '').toLowerCase();
                 const d = (log.desc || '').toLowerCase();
 
-                // Skip tackle events (scored by defenders)
                 if (t.includes('tackle') || t.includes('tackled')) continue;
 
                 const jerseyMatch = (log.desc || '').match(/Player\s*\((\d+)\)/i);
@@ -891,16 +877,12 @@
                 const points = parseInt(log.points) || 0;
                 const bucket = ensure(team, jersey);
 
-                if (t.includes('empty')) {
-                    // No points
-                    continue;
-                }
+                if (t.includes('empty')) continue;
 
                 if (t.includes('super raid')) {
                     bucket.touch += points;
                     bucket.total += points;
                 } else if (t.includes('touch')) {
-                    // Could be pure touch, or touch + bonus
                     if (d.includes('bonus')) {
                         bucket.touch += Math.max(0, points - 1);
                         bucket.bonus += 1;
@@ -909,11 +891,9 @@
                     }
                     bucket.total += points;
                 } else if (t.includes('bonus')) {
-                    // Pure bonus raid
                     bucket.bonus += points;
                     bucket.total += points;
                 } else if (points > 0) {
-                    // Unknown scoring raid → assume touch
                     bucket.touch += points;
                     bucket.total += points;
                 }
@@ -1380,9 +1360,20 @@
         // ============================================================
         // ============ RAID BREAKDOWN RESOLVER ======================
         // ============================================================
+        // ✅ FIX: Show only COMPLETED raids. Mid-raid, the app may
+        //    already have incremented `totalRaids` (or counters) while
+        //    `raidSequence` lags. We now trust the sequence (or counters)
+        //    AS-IS and never pad with phantom "U" raids.
+        //
+        // Priority:
+        //   1. raidSequence string if it has content
+        //   2. Counters (successfulRaids/emptyRaids/unsuccessfulRaids)
+        //   3. Empty
+        //
+        // The card's display total = sum of derived counts, so the
+        // donut ring fills consistently and the label matches.
+        // ============================================================
         function resolveRaidBreakdown(player) {
-            const tRaid = parseInt(player.totalRaids) || 0;
-
             const rawSeq = (player.raidSequence || '').trim();
             let seqArr = [];
             if (rawSeq) {
@@ -1397,7 +1388,9 @@
                 }
             }
 
-            if (tRaid > 0 && seqArr.length === tRaid) {
+            // Use the sequence as-is when present — it only contains
+            // entries for COMPLETED raids.
+            if (seqArr.length > 0) {
                 let succRaid = 0, emptyRaid = 0, unsuccRaid = 0;
                 seqArr.forEach(c => {
                     if (c === 'S') succRaid++;
@@ -1407,22 +1400,10 @@
                 return { arr: seqArr, succRaid, emptyRaid, unsuccRaid };
             }
 
-            let succRaid   = parseInt(player.successfulRaids)   || 0;
-            let emptyRaid  = parseInt(player.emptyRaids)        || 0;
-            let unsuccRaid = parseInt(player.unsuccessfulRaids) || 0;
-
-            if (tRaid > 0) {
-                const sum = succRaid + emptyRaid + unsuccRaid;
-                if (sum < tRaid) {
-                    unsuccRaid += (tRaid - sum);
-                } else if (sum > tRaid) {
-                    let excess = sum - tRaid;
-                    const trim = (v) => { const cut = Math.min(v, excess); excess -= cut; return v - cut; };
-                    unsuccRaid = trim(unsuccRaid);
-                    emptyRaid  = trim(emptyRaid);
-                    succRaid   = trim(succRaid);
-                }
-            }
+            // Fallback: use counters as-is (no padding).
+            const succRaid   = parseInt(player.successfulRaids)   || 0;
+            const emptyRaid  = parseInt(player.emptyRaids)        || 0;
+            const unsuccRaid = parseInt(player.unsuccessfulRaids) || 0;
 
             const rebuilt = [];
             for (let i = 0; i < succRaid; i++)   rebuilt.push('S');
@@ -1463,16 +1444,18 @@
                 const hasYellow = (player.yellowCards || 0) > 0;
                 const hasRed = (player.redCards || 0) > 0 || player.isDisqualified;
 
-                const tRaid = player.totalRaids || 0;
-
                 // ── Raid outcome breakdown ──
                 const rb = resolveRaidBreakdown(player);
                 const succRaid = rb.succRaid;
                 const emptyRaid = rb.emptyRaid;
                 const unsuccRaid = rb.unsuccRaid;
 
+                // ✅ Display total = sum of COMPLETED raids. Never includes
+                //    the in-progress raid the app may have already counted
+                //    in `totalRaids`.
+                const displayTotal = succRaid + emptyRaid + unsuccRaid;
+
                 // ── Touch vs Bonus split ──
-                // Preference: explicit app fields > log-derived > fallback
                 let touchPoints = 0;
                 let bonusPoints = 0;
                 const hasExplicit = (typeof player.touchPoints === 'number') || (typeof player.bonusPoints === 'number');
@@ -1485,7 +1468,6 @@
                         touchPoints = logDerived.touch;
                         bonusPoints = logDerived.bonus;
                     } else {
-                        // Fallback: all raidPoints as touch (legacy safety net)
                         touchPoints = player.raidPoints || 0;
                         bonusPoints = 0;
                     }
@@ -1496,9 +1478,10 @@
                 const unsTack = Math.max(0, tTack - succTack);
                 const superTack = 0;
 
-                const raidSuccDeg = tRaid > 0 ? (succRaid / tRaid) * 360 : 0;
-                const raidUnsDeg = tRaid > 0 ? (unsuccRaid / tRaid) * 360 : 0;
-                const raidEmptyDeg = tRaid > 0 ? (emptyRaid / tRaid) * 360 : 0;
+                // ✅ Degrees use displayTotal so ring fills completely
+                const raidSuccDeg = displayTotal > 0 ? (succRaid / displayTotal) * 360 : 0;
+                const raidUnsDeg = displayTotal > 0 ? (unsuccRaid / displayTotal) * 360 : 0;
+                const raidEmptyDeg = displayTotal > 0 ? (emptyRaid / displayTotal) * 360 : 0;
                 const tackSuccDeg = tTack > 0 ? (succTack / tTack) * 360 : 0;
                 const tackUnsDeg = tTack > 0 ? (unsTack / tTack) * 360 : 0;
 
@@ -1558,7 +1541,7 @@
                             <div class="p-body-pt"><div class="p-body-pt-label">Tackle</div><div class="p-body-pt-value tackle-color">${player.tacklePoints || 0}</div></div>
                         </div>
 
-                        <div class="p-body-section-label">Total Raids ${tRaid}</div>
+                        <div class="p-body-section-label">Total Raids ${displayTotal}</div>
                         <div class="p-body-donuts">
                             <div class="p-body-donut">
                                 <div class="p-body-donut-shell raid-succ" style="--deg:${raidSuccDeg}deg;"><div class="p-body-donut-hole">${succRaid}</div></div>
@@ -1606,6 +1589,18 @@
         // ============================================================
         // ========== MAT DOTS RENDERING (REVIVAL-TURN ORDER) ========
         // ============================================================
+        //   • Out IDs parsed in revival-turn order (oldest → newest).
+        //   • Starters are sorted by jersey number ascending.
+        //
+        //   RIGHT team (matches existing behaviour):
+        //     left→right: [newest out, ..., oldest out, jersey1, j2, ...]
+        //     → jersey1 sits closest to the divider among alive players.
+        //
+        //   LEFT team (✅ FIXED to mirror):
+        //     left→right: [j7, j6, ..., j1, oldest out, ..., newest out]
+        //     → jersey1 sits closest to the divider among alive players.
+        //     → outs stay against the divider, preserving revival order.
+        // ============================================================
         function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
             const outIdOrder = [];
             const pushIds = (str) => {
@@ -1618,20 +1613,29 @@
             const leftOutOrder = outIdOrder.filter(id => id.startsWith('left_'));
             const rightOutOrder = outIdOrder.filter(id => id.startsWith('right_'));
 
-            const lStarters = leftRoster.filter(p => p.isStarting7);
-            const rStarters = rightRoster.filter(p => p.isStarting7);
+            const parseJersey = (j) => { const n = parseInt(j); return isNaN(n) ? 999 : n; };
 
+            const lStarters = leftRoster
+                .filter(p => p.isStarting7)
+                .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
+            const rStarters = rightRoster
+                .filter(p => p.isStarting7)
+                .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
+
+            // ─── LEFT TEAM ───
             const leftOutSet = new Set(leftOutOrder);
             const leftAlive = lStarters.filter(p => !leftOutSet.has(p.id));
             const leftOutPlayers = leftOutOrder
                 .map(id => lStarters.find(p => p.id === id))
                 .filter(Boolean);
 
+            // ✅ Reverse alive so jersey 1 sits rightmost (nearest divider).
             const leftItems = [
-                ...leftAlive.map(p => ({ alive: true,  jersey: p.jerseyNumber || '' })),
+                ...[...leftAlive].reverse().map(p => ({ alive: true,  jersey: p.jerseyNumber || '' })),
                 ...leftOutPlayers.map(p => ({ alive: false, jersey: p.jerseyNumber || '' }))
             ];
 
+            // ─── RIGHT TEAM (unchanged) ───
             const rightOutSet = new Set(rightOutOrder);
             const rightAlive = rStarters.filter(p => !rightOutSet.has(p.id));
             const rightOutPlayers = rightOutOrder
@@ -1817,7 +1821,6 @@
                             try { logs = JSON.parse(state.logsJson); } catch (e) { console.error(e); }
                             window.matchLogsForGraph = logs;
                             window.halfStatsCache = computeHalfStats(data);
-                            // ✅ Derive per-player touch/bonus split from logs
                             window.playerPointsBreakdown = computePlayerPointsFromLogs(logs);
 
                             if (document.getElementById('tab-graph').classList.contains('active')) drawGraph();
