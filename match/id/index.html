@@ -744,6 +744,16 @@
         window.halfStatsCache = null;
         window.playerPointsBreakdown = { left: {}, right: {} };
 
+        // ✅ Half-time mat state cache — preserves the last-played mat
+        //    configuration across the break so dots don't suddenly reset.
+        window.cachedMatState = {
+            leftOutIds: '',
+            rightOutIds: '',
+            leftRoster: [],
+            rightRoster: [],
+            valid: false
+        };
+
         function togglePlayerExpand(element, playerId) {
             if (window.expandedPlayerIds.has(playerId)) {
                 window.expandedPlayerIds.delete(playerId);
@@ -1360,19 +1370,6 @@
         // ============================================================
         // ============ RAID BREAKDOWN RESOLVER ======================
         // ============================================================
-        // ✅ FIX: Show only COMPLETED raids. Mid-raid, the app may
-        //    already have incremented `totalRaids` (or counters) while
-        //    `raidSequence` lags. We now trust the sequence (or counters)
-        //    AS-IS and never pad with phantom "U" raids.
-        //
-        // Priority:
-        //   1. raidSequence string if it has content
-        //   2. Counters (successfulRaids/emptyRaids/unsuccessfulRaids)
-        //   3. Empty
-        //
-        // The card's display total = sum of derived counts, so the
-        // donut ring fills consistently and the label matches.
-        // ============================================================
         function resolveRaidBreakdown(player) {
             const rawSeq = (player.raidSequence || '').trim();
             let seqArr = [];
@@ -1388,8 +1385,6 @@
                 }
             }
 
-            // Use the sequence as-is when present — it only contains
-            // entries for COMPLETED raids.
             if (seqArr.length > 0) {
                 let succRaid = 0, emptyRaid = 0, unsuccRaid = 0;
                 seqArr.forEach(c => {
@@ -1400,7 +1395,6 @@
                 return { arr: seqArr, succRaid, emptyRaid, unsuccRaid };
             }
 
-            // Fallback: use counters as-is (no padding).
             const succRaid   = parseInt(player.successfulRaids)   || 0;
             const emptyRaid  = parseInt(player.emptyRaids)        || 0;
             const unsuccRaid = parseInt(player.unsuccessfulRaids) || 0;
@@ -1444,33 +1438,40 @@
                 const hasYellow = (player.yellowCards || 0) > 0;
                 const hasRed = (player.redCards || 0) > 0 || player.isDisqualified;
 
-                // ── Raid outcome breakdown ──
                 const rb = resolveRaidBreakdown(player);
                 const succRaid = rb.succRaid;
                 const emptyRaid = rb.emptyRaid;
                 const unsuccRaid = rb.unsuccRaid;
-
-                // ✅ Display total = sum of COMPLETED raids. Never includes
-                //    the in-progress raid the app may have already counted
-                //    in `totalRaids`.
                 const displayTotal = succRaid + emptyRaid + unsuccRaid;
 
-                // ── Touch vs Bonus split ──
-                let touchPoints = 0;
-                let bonusPoints = 0;
-                const hasExplicit = (typeof player.touchPoints === 'number') || (typeof player.bonusPoints === 'number');
+                // ─────────────────────────────────────────────────
+                // ✅ FIX: Touch / Bonus split with log fallback
+                // ─────────────────────────────────────────────────
+                let touchPoints = 0, bonusPoints = 0;
+                const hasExplicit = (typeof player.touchPoints === 'number') ||
+                                    (typeof player.bonusPoints === 'number');
+                const logDerived = window.playerPointsBreakdown[teamKey]?.[jersey];
+                const logHasData = logDerived &&
+                                   (logDerived.touch > 0 ||
+                                    logDerived.bonus > 0 ||
+                                    logDerived.total > 0);
+
                 if (hasExplicit) {
                     touchPoints = parseInt(player.touchPoints) || 0;
                     bonusPoints = parseInt(player.bonusPoints) || 0;
-                } else {
-                    const logDerived = window.playerPointsBreakdown[teamKey]?.[jersey];
-                    if (logDerived && (logDerived.total > 0 || logDerived.touch > 0 || logDerived.bonus > 0)) {
+                    // If the app sends 0/0 defaults but the logs clearly have
+                    // data, trust the logs instead.
+                    if (touchPoints === 0 && bonusPoints === 0 && logHasData) {
                         touchPoints = logDerived.touch;
                         bonusPoints = logDerived.bonus;
-                    } else {
-                        touchPoints = player.raidPoints || 0;
-                        bonusPoints = 0;
                     }
+                } else if (logHasData) {
+                    touchPoints = logDerived.touch;
+                    bonusPoints = logDerived.bonus;
+                } else {
+                    // Last-resort fallback — attribute all raid points to touch
+                    touchPoints = player.raidPoints || 0;
+                    bonusPoints = 0;
                 }
 
                 const tTack = player.totalTackles || 0;
@@ -1478,7 +1479,6 @@
                 const unsTack = Math.max(0, tTack - succTack);
                 const superTack = 0;
 
-                // ✅ Degrees use displayTotal so ring fills completely
                 const raidSuccDeg = displayTotal > 0 ? (succRaid / displayTotal) * 360 : 0;
                 const raidUnsDeg = displayTotal > 0 ? (unsuccRaid / displayTotal) * 360 : 0;
                 const raidEmptyDeg = displayTotal > 0 ? (emptyRaid / displayTotal) * 360 : 0;
@@ -1589,18 +1589,6 @@
         // ============================================================
         // ========== MAT DOTS RENDERING (REVIVAL-TURN ORDER) ========
         // ============================================================
-        //   • Out IDs parsed in revival-turn order (oldest → newest).
-        //   • Starters are sorted by jersey number ascending.
-        //
-        //   RIGHT team (matches existing behaviour):
-        //     left→right: [newest out, ..., oldest out, jersey1, j2, ...]
-        //     → jersey1 sits closest to the divider among alive players.
-        //
-        //   LEFT team (✅ FIXED to mirror):
-        //     left→right: [j7, j6, ..., j1, oldest out, ..., newest out]
-        //     → jersey1 sits closest to the divider among alive players.
-        //     → outs stay against the divider, preserving revival order.
-        // ============================================================
         function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
             const outIdOrder = [];
             const pushIds = (str) => {
@@ -1622,20 +1610,17 @@
                 .filter(p => p.isStarting7)
                 .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
 
-            // ─── LEFT TEAM ───
             const leftOutSet = new Set(leftOutOrder);
             const leftAlive = lStarters.filter(p => !leftOutSet.has(p.id));
             const leftOutPlayers = leftOutOrder
                 .map(id => lStarters.find(p => p.id === id))
                 .filter(Boolean);
 
-            // ✅ Reverse alive so jersey 1 sits rightmost (nearest divider).
             const leftItems = [
                 ...[...leftAlive].reverse().map(p => ({ alive: true,  jersey: p.jerseyNumber || '' })),
                 ...leftOutPlayers.map(p => ({ alive: false, jersey: p.jerseyNumber || '' }))
             ];
 
-            // ─── RIGHT TEAM (unchanged) ───
             const rightOutSet = new Set(rightOutOrder);
             const rightAlive = rStarters.filter(p => !rightOutSet.has(p.id));
             const rightOutPlayers = rightOutOrder
@@ -1814,7 +1799,61 @@
                         try { lRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
                         try { rRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-                        renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
+                        // ─────────────────────────────────────────────
+                        // ✅ FIX: Preserve mat state across half-time break
+                        // ─────────────────────────────────────────────
+                        const halfStatusLower = ((data.half_status || '')).toLowerCase();
+                        const breakTitleLower = ((data.break_clock_title || '')).toLowerCase();
+                        const breakTimeStr = data.break_clock_time || '';
+                        const isInBreak = breakTitleLower.length > 0 &&
+                                          breakTimeStr.length > 0 &&
+                                          breakTimeStr !== '00:00';
+
+                        const isFirstHalfActive = halfStatusLower.includes('1st') ||
+                                                  halfStatusLower.includes('first');
+                        const isSecondHalfActive = halfStatusLower.includes('2nd') ||
+                                                   halfStatusLower.includes('second');
+                        const isMatchOverFlag = halfStatusLower.includes('over') ||
+                                                halfStatusLower.includes('end');
+
+                        // Half-time break = in a break, still in 1st half context,
+                        // not yet in 2nd half or match over
+                        const isHalfTimeBreak = isInBreak &&
+                                                !isSecondHalfActive &&
+                                                !isMatchOverFlag;
+
+                        if (isHalfTimeBreak && window.cachedMatState.valid) {
+                            // Show preserved 1st half end state
+                            const cachedState = {
+                                leftOutIds: window.cachedMatState.leftOutIds,
+                                rightOutIds: window.cachedMatState.rightOutIds
+                            };
+                            renderMatDots(
+                                cachedState,
+                                window.cachedMatState.leftRoster,
+                                window.cachedMatState.rightRoster,
+                                leftColor, rightColor
+                            );
+                        } else {
+                            // Normal render with fresh state
+                            renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
+
+                            // Cache when 1st half is actively playing
+                            if (isFirstHalfActive && !isInBreak) {
+                                window.cachedMatState = {
+                                    leftOutIds: state.leftOutIds || '',
+                                    rightOutIds: state.rightOutIds || '',
+                                    leftRoster: lRoster.slice(),
+                                    rightRoster: rRoster.slice(),
+                                    valid: true
+                                };
+                            }
+
+                            // Invalidate at 2nd half start or match over
+                            if (isSecondHalfActive || isMatchOverFlag) {
+                                window.cachedMatState.valid = false;
+                            }
+                        }
 
                         if (state.logsJson) {
                             let logs = [];
