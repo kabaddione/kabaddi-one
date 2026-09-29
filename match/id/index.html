@@ -964,22 +964,19 @@
         // ============================================================
         // ============ HALF-WISE STATS (AUTHORITATIVE TOTALS) ========
         // ============================================================
-        // FIX SUMMARY:
-        //   • Per-half point components (raid / tackle / allout / extra)
-        //     are still derived from the event log stream.
-        //   • TOTAL POINTS for each half is now derived from the
-        //     scoreboard's authoritative `left_score` / `right_score`.
-        //       – 1st Half total  = score captured at the "Half Time"
-        //                           log (if it exists). If we are still
-        //                           in the 1st half, it equals the
-        //                           current live scoreboard.
-        //       – 2nd Half total  = current scoreboard − 1st Half total.
-        //     This prevents the "half start" log (which the app stamps
-        //     with timeStr="2nd Half: 15'") from corrupting the 2nd-half
-        //     totals.
-        //   • PERIOD logs (toss / match start / half time / full time)
-        //     are skipped during event accumulation so they can never
-        //     mis-classify a half.
+        //   • Per-half component points (raid / tackle / allout /
+        //     extra) are derived from the event log stream.
+        //   • TOTAL POINTS per half is derived from the scoreboard's
+        //     `left_score` / `right_score`:
+        //       – 1st Half total = score captured at "Half Time" log
+        //                          (fallback: live score while 1st half
+        //                          still in progress).
+        //       – 2nd Half total = current scoreboard − 1st Half total.
+        //   • PERIOD logs (toss / match start / half time) are skipped
+        //     during event accumulation.
+        //   • After the app-side Kotlin fix, the app no longer counts
+        //     empty raids as successful, so the log-derived component
+        //     sums and the scoreboard-derived totals will agree.
         // ============================================================
         function computeHalfStats(matchData) {
             const logs = window.matchLogsForGraph || [];
@@ -1026,6 +1023,7 @@
                     else s.currentStreak = 0;
                 } else if (t.includes('empty')) {
                     s.totalRaids += 1; s.currentStreak = 0;
+                    // Empty raids contribute 0 to succRaids ✓
                 } else if (t.includes('super tackle')) {
                     s.superTackles += 1; s.totalTackles += 1; s.tackle += pts;
                     if (pts > 0) s.succTackles += 1;
@@ -1065,21 +1063,16 @@
             let lFirstTotal, rFirstTotal, lSecondTotal, rSecondTotal;
 
             if (htLeft !== null) {
-                // Past half time → first half = half-time snapshot,
-                // second half = current scoreboard − first half.
                 lFirstTotal = htLeft;
                 rFirstTotal = htRight;
                 lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
                 rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
             } else if (inSecondHalf) {
-                // No half-time log yet but we're already in 2nd half —
-                // fall back to log-derived first-half totals.
                 lFirstTotal = stats.left.first.total;
                 rFirstTotal = stats.right.first.total;
                 lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
                 rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
             } else {
-                // Still in 1st half → scoreboard IS the 1st-half total.
                 lFirstTotal = Math.max(lScoreNow, 0);
                 rFirstTotal = Math.max(rScoreNow, 0);
                 lSecondTotal = 0;
@@ -1091,7 +1084,7 @@
             stats.left.second.total  = lSecondTotal;
             stats.right.second.total = rSecondTotal;
 
-            // ── 4. Component sums (used for the per-half breakdown rows) ──
+            // ── 4. Component sums ──
             for (let teamKey of ['left', 'right']) {
                 for (let halfKey of ['first', 'second']) {
                     const s = stats[teamKey][halfKey];
@@ -1126,7 +1119,6 @@
                 lTackle = lH.tackle; rTackle = rH.tackle;
                 lAllOut = lH.allOut; rAllOut = rH.allOut;
                 lExtra = lH.extra; rExtra = rH.extra;
-                // ✅ Authoritative half totals (scoreboard-derived)
                 lTotal = lH.total; rTotal = rH.total;
             } else {
                 lRaid = state.leftRaidPoints || 0; rRaid = state.rightRaidPoints || 0;
@@ -1445,63 +1437,74 @@
         }
 
         // ============================================================
-        // ============ RAID SEQUENCE HELPER ==========================
+        // ============ RAID BREAKDOWN RESOLVER ======================
         // ============================================================
-        // Prefers the authoritative `raidSequence` string from the
-        // player payload ("S,E,U" — S=success, E=empty, U=unsuccess).
-        // Falls back to `successfulRaids` / `emptyRaids` /
-        // `unsuccessfulRaids` counters when the sequence is missing
-        // or its length doesn't match `totalRaids`.
-        // Returns { arr, succRaid, emptyRaid, unsuccRaid }
+        // The app (MainActivity.kt) now maintains `raidSequence`
+        // ("S,E,U" format) and the `successfulRaids` / `emptyRaids` /
+        // `unsuccessfulRaids` counters correctly — including the
+        // Self-Out-during-0-button case (which appends "S" and
+        // increments successfulRaids, never "E").
+        //
+        // Priority order (most → least trusted):
+        //   1. raidSequence string, if length === totalRaids
+        //   2. Roster counters, normalized to match totalRaids
+        //   3. Empty fallback (defensive — should never be needed)
         // ============================================================
         function resolveRaidBreakdown(player) {
             const tRaid = parseInt(player.totalRaids) || 0;
 
-            // 1) Try the raidSequence string
-            let seqArr = [];
+            // ── 1. raidSequence string (PRIMARY — now authoritative) ──
             const rawSeq = (player.raidSequence || '').trim();
+            let seqArr = [];
             if (rawSeq) {
                 if (rawSeq.includes(',')) {
-                    seqArr = rawSeq.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+                    seqArr = rawSeq.split(',')
+                        .map(s => s.trim().toUpperCase())
+                        .filter(c => c === 'S' || c === 'E' || c === 'U');
                 } else {
-                    seqArr = rawSeq.split('').map(s => s.toUpperCase()).filter(c => c === 'S' || c === 'E' || c === 'U');
+                    seqArr = rawSeq.split('')
+                        .map(c => c.toUpperCase())
+                        .filter(c => c === 'S' || c === 'E' || c === 'U');
                 }
             }
 
-            let succRaid = 0, emptyRaid = 0, unsuccRaid = 0;
-            if (seqArr.length === tRaid && tRaid > 0) {
+            if (tRaid > 0 && seqArr.length === tRaid) {
+                let succRaid = 0, emptyRaid = 0, unsuccRaid = 0;
                 seqArr.forEach(c => {
                     if (c === 'S') succRaid++;
                     else if (c === 'E') emptyRaid++;
                     else if (c === 'U') unsuccRaid++;
                 });
-            } else {
-                // 2) Fall back to per-player counters
-                succRaid   = parseInt(player.successfulRaids)   || 0;
-                emptyRaid  = parseInt(player.emptyRaids)        || 0;
-                unsuccRaid = parseInt(player.unsuccessfulRaids) || 0;
+                return { arr: seqArr, succRaid, emptyRaid, unsuccRaid };
+            }
 
-                // If counters are incomplete, pad remaining raids as
-                // unsuccessful so the donut chart fills correctly.
+            // ── 2. Roster counters (SECONDARY — also now authoritative) ──
+            let succRaid   = parseInt(player.successfulRaids)   || 0;
+            let emptyRaid  = parseInt(player.emptyRaids)        || 0;
+            let unsuccRaid = parseInt(player.unsuccessfulRaids) || 0;
+
+            if (tRaid > 0) {
                 const sum = succRaid + emptyRaid + unsuccRaid;
-                if (sum < tRaid) unsuccRaid += (tRaid - sum);
-                if (sum > tRaid && sum > 0) {
-                    // Trim excess from unsuccessful first, then empty, then succ
+                if (sum < tRaid) {
+                    // Pad missing raids as unsuccessful (safest default)
+                    unsuccRaid += (tRaid - sum);
+                } else if (sum > tRaid) {
+                    // Trim excess — prefer trusting success/empty over unsuccessful
                     let excess = sum - tRaid;
                     const trim = (v) => { const cut = Math.min(v, excess); excess -= cut; return v - cut; };
                     unsuccRaid = trim(unsuccRaid);
-                    emptyRaid = trim(emptyRaid);
-                    succRaid = trim(succRaid);
+                    emptyRaid  = trim(emptyRaid);
+                    succRaid   = trim(succRaid);
                 }
-
-                // Rebuild the dot array from counters
-                seqArr = [];
-                for (let i = 0; i < succRaid; i++)   seqArr.push('S');
-                for (let i = 0; i < unsuccRaid; i++) seqArr.push('U');
-                for (let i = 0; i < emptyRaid; i++)  seqArr.push('E');
             }
 
-            return { arr: seqArr, succRaid, emptyRaid, unsuccRaid };
+            // Rebuild the dot array from counters
+            const rebuilt = [];
+            for (let i = 0; i < succRaid; i++)   rebuilt.push('S');
+            for (let i = 0; i < unsuccRaid; i++) rebuilt.push('U');
+            for (let i = 0; i < emptyRaid; i++)  rebuilt.push('E');
+
+            return { arr: rebuilt, succRaid, emptyRaid, unsuccRaid };
         }
 
         // ============ LINEUP RENDERING ============
@@ -1537,7 +1540,7 @@
 
                 const tRaid = player.totalRaids || 0;
 
-                // ── Authoritative raid breakdown ──
+                // ── Authoritative raid breakdown (from raidSequence / counters) ──
                 const rb = resolveRaidBreakdown(player);
                 const succRaid = rb.succRaid;
                 const emptyRaid = rb.emptyRaid;
