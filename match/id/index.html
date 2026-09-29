@@ -1607,10 +1607,18 @@
                             <div class="pomb-time">${formatOnMatTime(onMat)}</div>
                         </div>
 
+                        // --- ADD THESE CALCULATIONS RIGHT BEFORE THE RETURN STATEMENT ---
+                        const totalRaidPts = player.raidPoints || 0;
+                        const bonusPts = player.bonusPoints || 0;
+                        const touchPts = Math.max(0, totalRaidPts - bonusPts);
+
+                        return `
+                        // ... (rest of your html string above this part) ...
+
                         <div class="p-body-pts">
                             <div class="p-body-pt"><div class="p-body-pt-label">Total</div><div class="p-body-pt-value">${totalPts}</div></div>
-                            <div class="p-body-pt"><div class="p-body-pt-label">Touch</div><div class="p-body-pt-value touch-color">${player.raidPoints > 0 ? player.raidPoints : 0}</div></div>
-                            <div class="p-body-pt"><div class="p-body-pt-label">Bonus</div><div class="p-body-pt-value bonus-color">0</div></div>
+                            <div class="p-body-pt"><div class="p-body-pt-label">Touch</div><div class="p-body-pt-value touch-color">${touchPts}</div></div>
+                            <div class="p-body-pt"><div class="p-body-pt-label">Bonus</div><div class="p-body-pt-value bonus-color">${bonusPts}</div></div>
                             <div class="p-body-pt"><div class="p-body-pt-label">Tackle</div><div class="p-body-pt-value tackle-color">${player.tacklePoints || 0}</div></div>
                         </div>
 
