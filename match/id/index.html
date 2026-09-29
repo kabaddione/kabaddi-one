@@ -744,16 +744,6 @@
         window.halfStatsCache = null;
         window.playerPointsBreakdown = { left: {}, right: {} };
 
-        // ✅ Half-time mat state cache — preserves the last-played mat
-        //    configuration across the break so dots don't suddenly reset.
-        window.cachedMatState = {
-            leftOutIds: '',
-            rightOutIds: '',
-            leftRoster: [],
-            rightRoster: [],
-            valid: false
-        };
-
         function togglePlayerExpand(element, playerId) {
             if (window.expandedPlayerIds.has(playerId)) {
                 window.expandedPlayerIds.delete(playerId);
@@ -851,7 +841,7 @@
         }
 
         // ============================================================
-        // ============ PER-PLAYER POINTS BREAKDOWN ==================
+        // ============ PER-PLAYER POINTS BREAKDOWN (LOG FALLBACK) ===
         // ============================================================
         function computePlayerPointsFromLogs(logs) {
             const result = { left: {}, right: {} };
@@ -1445,33 +1435,36 @@
                 const displayTotal = succRaid + emptyRaid + unsuccRaid;
 
                 // ─────────────────────────────────────────────────
-                // ✅ FIX: Touch / Bonus split with log fallback
+                // ✅ Touch / Bonus split — now robust against all app
+                //    payload shapes (with or without touchPoints field).
                 // ─────────────────────────────────────────────────
                 let touchPoints = 0, bonusPoints = 0;
-                const hasExplicit = (typeof player.touchPoints === 'number') ||
-                                    (typeof player.bonusPoints === 'number');
-                const logDerived = window.playerPointsBreakdown[teamKey]?.[jersey];
-                const logHasData = logDerived &&
-                                   (logDerived.touch > 0 ||
-                                    logDerived.bonus > 0 ||
-                                    logDerived.total > 0);
+                const raidPts = parseInt(player.raidPoints) || 0;
+                const hasTouchField = (typeof player.touchPoints === 'number');
+                const hasBonusField = (typeof player.bonusPoints === 'number');
 
-                if (hasExplicit) {
+                if (hasTouchField && hasBonusField) {
+                    // App sends both — trust them
                     touchPoints = parseInt(player.touchPoints) || 0;
                     bonusPoints = parseInt(player.bonusPoints) || 0;
-                    // If the app sends 0/0 defaults but the logs clearly have
-                    // data, trust the logs instead.
-                    if (touchPoints === 0 && bonusPoints === 0 && logHasData) {
+                } else if (hasBonusField) {
+                    // App sends only bonusPoints → derive touch
+                    bonusPoints = parseInt(player.bonusPoints) || 0;
+                    touchPoints = Math.max(0, raidPts - bonusPoints);
+                } else if (hasTouchField) {
+                    // App sends only touchPoints → derive bonus
+                    touchPoints = parseInt(player.touchPoints) || 0;
+                    bonusPoints = Math.max(0, raidPts - touchPoints);
+                } else {
+                    // No explicit fields → try log-derived first
+                    const logDerived = window.playerPointsBreakdown[teamKey]?.[jersey];
+                    if (logDerived && (logDerived.touch > 0 || logDerived.bonus > 0 || logDerived.total > 0)) {
                         touchPoints = logDerived.touch;
                         bonusPoints = logDerived.bonus;
+                    } else {
+                        touchPoints = raidPts;
+                        bonusPoints = 0;
                     }
-                } else if (logHasData) {
-                    touchPoints = logDerived.touch;
-                    bonusPoints = logDerived.bonus;
-                } else {
-                    // Last-resort fallback — attribute all raid points to touch
-                    touchPoints = player.raidPoints || 0;
-                    bonusPoints = 0;
                 }
 
                 const tTack = player.totalTackles || 0;
@@ -1587,22 +1580,27 @@
         }
 
         // ============================================================
-        // ========== MAT DOTS RENDERING (REVIVAL-TURN ORDER) ========
+        // ========== MAT DOTS RENDERING =============================
+        // ============================================================
+        // ✅ FIX: match each team's outIds DIRECTLY against its own
+        //    roster (no prefix filtering). This works regardless of
+        //    how the app labels IDs, including when teams switch sides
+        //    at half-time (so leftRosterJson contains right_* IDs).
+        //
+        // Display order:
+        //   • LEFT team  → [j7 ... j1(alive)] + [oldest out ... newest out]
+        //   • RIGHT team → [newest out ... oldest out] + [j1(alive) ... j7]
+        //   Both put the newest-out nearest the centre divider and
+        //   jersey 1 (alive) nearest the divider among alive players.
         // ============================================================
         function renderMatDots(state, leftRoster, rightRoster, leftColor, rightColor) {
-            const outIdOrder = [];
-            const pushIds = (str) => {
-                if (typeof str !== 'string' || !str) return;
-                str.split(',').map(s => s.trim()).filter(Boolean).forEach(id => outIdOrder.push(id));
-            };
-            pushIds(state.leftOutIds);
-            pushIds(state.rightOutIds);
-
-            const leftOutOrder = outIdOrder.filter(id => id.startsWith('left_'));
-            const rightOutOrder = outIdOrder.filter(id => id.startsWith('right_'));
-
             const parseJersey = (j) => { const n = parseInt(j); return isNaN(n) ? 999 : n; };
+            const parseIds = (str) => {
+                if (typeof str !== 'string' || !str) return [];
+                return str.split(',').map(s => s.trim()).filter(Boolean);
+            };
 
+            // Sort starters by jersey (ascending)
             const lStarters = leftRoster
                 .filter(p => p.isStarting7)
                 .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
@@ -1610,6 +1608,13 @@
                 .filter(p => p.isStarting7)
                 .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
 
+            // ✅ Out IDs come from the SAME team's outIds field.
+            //    Do NOT filter by ID prefix — the app's ID scheme
+            //    may be inverted after a side switch.
+            const leftOutOrder = parseIds(state.leftOutIds);
+            const rightOutOrder = parseIds(state.rightOutIds);
+
+            // ─── LEFT TEAM ───
             const leftOutSet = new Set(leftOutOrder);
             const leftAlive = lStarters.filter(p => !leftOutSet.has(p.id));
             const leftOutPlayers = leftOutOrder
@@ -1621,6 +1626,7 @@
                 ...leftOutPlayers.map(p => ({ alive: false, jersey: p.jerseyNumber || '' }))
             ];
 
+            // ─── RIGHT TEAM ───
             const rightOutSet = new Set(rightOutOrder);
             const rightAlive = rStarters.filter(p => !rightOutSet.has(p.id));
             const rightOutPlayers = rightOutOrder
@@ -1799,61 +1805,8 @@
                         try { lRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
                         try { rRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-                        // ─────────────────────────────────────────────
-                        // ✅ FIX: Preserve mat state across half-time break
-                        // ─────────────────────────────────────────────
-                        const halfStatusLower = ((data.half_status || '')).toLowerCase();
-                        const breakTitleLower = ((data.break_clock_title || '')).toLowerCase();
-                        const breakTimeStr = data.break_clock_time || '';
-                        const isInBreak = breakTitleLower.length > 0 &&
-                                          breakTimeStr.length > 0 &&
-                                          breakTimeStr !== '00:00';
-
-                        const isFirstHalfActive = halfStatusLower.includes('1st') ||
-                                                  halfStatusLower.includes('first');
-                        const isSecondHalfActive = halfStatusLower.includes('2nd') ||
-                                                   halfStatusLower.includes('second');
-                        const isMatchOverFlag = halfStatusLower.includes('over') ||
-                                                halfStatusLower.includes('end');
-
-                        // Half-time break = in a break, still in 1st half context,
-                        // not yet in 2nd half or match over
-                        const isHalfTimeBreak = isInBreak &&
-                                                !isSecondHalfActive &&
-                                                !isMatchOverFlag;
-
-                        if (isHalfTimeBreak && window.cachedMatState.valid) {
-                            // Show preserved 1st half end state
-                            const cachedState = {
-                                leftOutIds: window.cachedMatState.leftOutIds,
-                                rightOutIds: window.cachedMatState.rightOutIds
-                            };
-                            renderMatDots(
-                                cachedState,
-                                window.cachedMatState.leftRoster,
-                                window.cachedMatState.rightRoster,
-                                leftColor, rightColor
-                            );
-                        } else {
-                            // Normal render with fresh state
-                            renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
-
-                            // Cache when 1st half is actively playing
-                            if (isFirstHalfActive && !isInBreak) {
-                                window.cachedMatState = {
-                                    leftOutIds: state.leftOutIds || '',
-                                    rightOutIds: state.rightOutIds || '',
-                                    leftRoster: lRoster.slice(),
-                                    rightRoster: rRoster.slice(),
-                                    valid: true
-                                };
-                            }
-
-                            // Invalidate at 2nd half start or match over
-                            if (isSecondHalfActive || isMatchOverFlag) {
-                                window.cachedMatState.valid = false;
-                            }
-                        }
+                        // ✅ Render mat dots using the fixed ID-matching logic
+                        renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
 
                         if (state.logsJson) {
                             let logs = [];
