@@ -271,10 +271,13 @@
         .log-body { min-width: 0; }
         .log-title { font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .log-desc { font-size: 11.5px; color: #8C8E9F; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .log-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-        .log-time-tag { font-size: 10px; font-weight: 700; color: #8C8E9F; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); white-space: nowrap; }
+        .log-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
         .log-points-badge { font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.08); color: #fff; white-space: nowrap; }
-        .log-score-tag { font-size: 10px; font-weight: 700; color: #b0b0c8; font-variant-numeric: tabular-nums; }
+
+        /* ✅ UPDATED: time + score on one line, badge above */
+        .log-meta-line { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .log-time-tag { font-size: 10px; font-weight: 700; color: #8C8E9F; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); white-space: nowrap; }
+        .log-score-tag { font-size: 10px; font-weight: 700; color: #b0b0c8; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
         .stats-section { display: flex; flex-direction: column; gap: 14px; }
         .seg-toggle { display: flex; gap: 4px; padding: 4px; background: var(--surface-1); border-radius: 100px; border: 1px solid var(--glass-border); }
@@ -284,7 +287,8 @@
         .stat-panel { background: linear-gradient(165deg, var(--surface-2), var(--surface-1)); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); }
         .panel-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .panel-team { display: flex; align-items: center; gap: 10px; min-width: 0; }
-        .panel-team.right { justify-content: flex-end; flex-direction: row-reverse; }
+        /* ✅ FIXED: right team block anchored to the RIGHT edge of its cell (was flex-end on row-reverse → wrongly packed left) */
+        .panel-team.right { justify-content: flex-start; flex-direction: row-reverse; }
         .panel-team-name { font-size: 13px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
         .panel-team-logo { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #fff; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.3); overflow: hidden; }
         .panel-team-logo.left { background: var(--left-team-color); }
@@ -466,7 +470,6 @@
         <div class="bg-orb"></div>
     </div>
 
-    <!-- Event flash overlay -->
     <div class="event-flash" id="uiEventFlash"></div>
 
     <nav class="nav" id="navbar" aria-label="Main navigation">
@@ -528,7 +531,6 @@
             </div>
         </div>
 
-        <!-- Live meta bar -->
         <div class="live-meta" id="uiLiveMeta">
             <span id="uiLastUpdated">Updated just now</span>
             <span class="live-meta-sep">•</span>
@@ -931,7 +933,7 @@
         }
 
         // ============================================================
-        // ============ EVENT FLASH (raid outcomes / major events) ===
+        // ============ EVENT FLASH ==================================
         // ============================================================
         function showEventFlash(log) {
             const el = document.getElementById('uiEventFlash');
@@ -944,62 +946,30 @@
             let icon = '';
             let cls = '';
 
-            if (t.includes('super tackle')) {
-                text = 'SUPER TACKLE! ' + d;
-                icon = 'fa-fire';
-                cls = 'super';
-            } else if (t.includes('super raid')) {
-                text = 'SUPER RAID! ' + d;
-                icon = 'fa-bolt';
-                cls = 'super';
-            } else if (t.includes('all out')) {
-                text = 'ALL OUT! ' + d;
-                icon = 'fa-bomb';
-                cls = 'allout';
-            } else if (t.includes('do-or-die') || t.includes('do or die')) {
-                text = d || 'Do-or-Die Raid';
-                icon = 'fa-skull-crossbones';
-                cls = 'dod';
-            } else if (t.includes('touch')) {
-                text = d;
-                icon = 'fa-hand';
-                cls = 'raid';
-            } else if (t.includes('bonus')) {
-                text = d;
-                icon = 'fa-star';
-                cls = 'raid';
-            } else if (t.includes('tackle')) {
-                text = d;
-                icon = 'fa-shield';
-                cls = 'tackle';
-            } else if (t.includes('empty')) {
-                text = d;
-                icon = 'fa-ban';
-                cls = 'empty';
-            } else if (t.includes('self out')) {
-                text = d;
-                icon = 'fa-person-walking-arrow-right';
-                cls = 'empty';
-            } else {
-                return;
-            }
+            if (t.includes('super tackle'))      { text = 'SUPER TACKLE! ' + d; icon = 'fa-fire'; cls = 'super'; }
+            else if (t.includes('super raid'))   { text = 'SUPER RAID! ' + d;   icon = 'fa-bolt'; cls = 'super'; }
+            else if (t.includes('all out'))      { text = 'ALL OUT! ' + d;      icon = 'fa-bomb'; cls = 'allout'; }
+            else if (t.includes('do-or-die') || t.includes('do or die')) { text = d || 'Do-or-Die Raid'; icon = 'fa-skull-crossbones'; cls = 'dod'; }
+            else if (t.includes('touch'))        { text = d; icon = 'fa-hand'; cls = 'raid'; }
+            else if (t.includes('bonus'))        { text = d; icon = 'fa-star'; cls = 'raid'; }
+            else if (t.includes('tackle'))       { text = d; icon = 'fa-shield'; cls = 'tackle'; }
+            else if (t.includes('empty'))        { text = d; icon = 'fa-ban'; cls = 'empty'; }
+            else if (t.includes('self out'))     { text = d; icon = 'fa-person-walking-arrow-right'; cls = 'empty'; }
+            else { return; }
 
             if (!text) return;
 
             el.innerHTML = `<i class="fa-solid ${icon}"></i><span>${text}</span>`;
             el.className = 'event-flash ' + cls;
-            // trigger reflow to restart transition
             void el.offsetWidth;
             el.classList.add('visible');
 
             if (window.eventFlashTimeout) clearTimeout(window.eventFlashTimeout);
-            window.eventFlashTimeout = setTimeout(() => {
-                el.classList.remove('visible');
-            }, 4000);
+            window.eventFlashTimeout = setTimeout(() => { el.classList.remove('visible'); }, 4000);
         }
 
         // ============================================================
-        // ============ PER-PLAYER POINTS BREAKDOWN (LOG FALLBACK) ===
+        // ============ PER-PLAYER POINTS BREAKDOWN ==================
         // ============================================================
         function computePlayerPointsFromLogs(logs) {
             const result = { left: {}, right: {} };
@@ -1038,12 +1008,7 @@
         }
 
         // ============================================================
-        // ============ PER-PLAYER TACKLE BREAKDOWN (FROM LOGS) ======
-        // ============================================================
-        // Produces per-player COUNTS (not points):
-        //   { successful: <count of TACKLE + SUPER_TACKLE>,
-        //     superTackles: <count of SUPER_TACKLE> }
-        // The "successful" count includes super tackles (subset).
+        // ============ PER-PLAYER TACKLE BREAKDOWN (COUNTS) =========
         // ============================================================
         function computePlayerTacklesFromLogs(logs) {
             const result = { left: {}, right: {} };
@@ -1058,14 +1023,10 @@
                 if (!log) continue;
                 const t = (log.title || '').toLowerCase();
                 const type = (log.type || '').toUpperCase();
-
-                const isTackle = type === 'TACKLE' || type === 'SUPER_TACKLE' ||
-                                 t.includes('tackle');
+                const isTackle = type === 'TACKLE' || type === 'SUPER_TACKLE' || t.includes('tackle');
                 if (!isTackle) continue;
-                // Skip "tackled by" entries belonging to the raider
                 if (t.includes('empty') || t.includes('touch') || t.includes('bonus') || t.includes('raid')) continue;
 
-                // Format: "Player (X) tackled by Player (Y)" → Y is tackler
                 const m = (log.desc || '').match(/Player\s*\((\d+)\)\s*tackled by\s*Player\s*\((\d+)\)/i);
                 if (!m) continue;
 
@@ -1075,9 +1036,7 @@
 
                 const bucket = ensure(team, tacklerJersey);
                 bucket.successful += 1;
-                if (type === 'SUPER_TACKLE' || t.includes('super tackle')) {
-                    bucket.superTackles += 1;
-                }
+                if (type === 'SUPER_TACKLE' || t.includes('super tackle')) bucket.superTackles += 1;
             }
             return result;
         }
@@ -1095,10 +1054,7 @@
                 totalTackles: 0, succTackles: 0, superTackles: 0,
                 longestStreak: 0, currentStreak: 0, total: 0
             });
-            const stats = {
-                left:  { first: blank(), second: blank() },
-                right: { first: blank(), second: blank() }
-            };
+            const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
 
             for (let log of sortedLogs) {
                 if (log.type === 'PERIOD') continue;
@@ -1142,10 +1098,9 @@
             for (let log of sortedLogs) {
                 const t = (log.title || '').toLowerCase();
                 const d = (log.desc || '').toLowerCase();
-                const isHalfTime =
-                    t.includes('half time') || t.includes('half-time') ||
-                    d.includes('half time') || d.includes('half-time') ||
-                    d.includes('first half ends') || d.includes('first half end');
+                const isHalfTime = t.includes('half time') || t.includes('half-time') ||
+                                   d.includes('half time') || d.includes('half-time') ||
+                                   d.includes('first half ends') || d.includes('first half end');
                 if (!isHalfTime) continue;
                 if (!log.scoreStr) continue;
                 const parts = log.scoreStr.replace(/Score:\s*/i, '').trim().split('-').map(x => parseInt(x.trim()) || 0);
@@ -1160,25 +1115,21 @@
 
             let lFirstTotal, rFirstTotal, lSecondTotal, rSecondTotal;
             if (htLeft !== null) {
-                lFirstTotal = htLeft;
-                rFirstTotal = htRight;
+                lFirstTotal = htLeft; rFirstTotal = htRight;
                 lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
                 rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
             } else if (inSecondHalf) {
-                lFirstTotal = stats.left.first.total;
-                rFirstTotal = stats.right.first.total;
+                lFirstTotal = stats.left.first.total; rFirstTotal = stats.right.first.total;
                 lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
                 rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
             } else {
-                lFirstTotal = Math.max(lScoreNow, 0);
-                rFirstTotal = Math.max(rScoreNow, 0);
-                lSecondTotal = 0;
-                rSecondTotal = 0;
+                lFirstTotal = Math.max(lScoreNow, 0); rFirstTotal = Math.max(rScoreNow, 0);
+                lSecondTotal = 0; rSecondTotal = 0;
             }
 
-            stats.left.first.total   = lFirstTotal;
-            stats.right.first.total  = rFirstTotal;
-            stats.left.second.total  = lSecondTotal;
+            stats.left.first.total = lFirstTotal;
+            stats.right.first.total = rFirstTotal;
+            stats.left.second.total = lSecondTotal;
             stats.right.second.total = rSecondTotal;
 
             for (let teamKey of ['left', 'right']) {
@@ -1583,14 +1534,12 @@
                 const hasYellow = (player.yellowCards || 0) > 0;
                 const hasRed = (player.redCards || 0) > 0 || player.isDisqualified;
 
-                // ── Raid breakdown ──
                 const rb = resolveRaidBreakdown(player);
                 const succRaid = rb.succRaid;
                 const emptyRaid = rb.emptyRaid;
                 const unsuccRaid = rb.unsuccRaid;
                 const displayTotal = succRaid + emptyRaid + unsuccRaid;
 
-                // ── Touch / Bonus split ──
                 let touchPoints = 0, bonusPoints = 0;
                 const raidPts = parseInt(player.raidPoints) || 0;
                 const hasTouchField = (typeof player.touchPoints === 'number');
@@ -1616,15 +1565,10 @@
                     }
                 }
 
-                // ─────────────────────────────────────────────────
-                // ✅ FIX: tackle pie now uses COUNTS (not points).
-                //    Successful includes super tackles; super pie
-                //    highlights the subset.
-                // ─────────────────────────────────────────────────
                 const tTack = parseInt(player.totalTackles) || 0;
                 const tackleBreak = window.playerTackleBreakdown[teamKey]?.[jersey] || { successful: 0, superTackles: 0 };
-                const succTack = tackleBreak.successful;   // COUNT
-                const superTack = tackleBreak.superTackles; // COUNT (subset of succTack)
+                const succTack = tackleBreak.successful;
+                const superTack = tackleBreak.superTackles;
                 const unsTack = Math.max(0, tTack - succTack);
 
                 const raidSuccDeg = displayTotal > 0 ? (succRaid / displayTotal) * 360 : 0;
@@ -1741,14 +1685,9 @@
                 return str.split(',').map(s => s.trim()).filter(Boolean);
             };
 
-            const lStarters = leftRoster
-                .filter(p => p.isStarting7)
-                .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
-            const rStarters = rightRoster
-                .filter(p => p.isStarting7)
-                .sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
+            const lStarters = leftRoster.filter(p => p.isStarting7).sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
+            const rStarters = rightRoster.filter(p => p.isStarting7).sort((a, b) => parseJersey(a.jerseyNumber) - parseJersey(b.jerseyNumber));
 
-            // ✅ IDs come from same-team outIds field (no prefix filter)
             const leftOutOrder = parseIds(state.leftOutIds);
             const rightOutOrder = parseIds(state.rightOutIds);
 
@@ -1802,31 +1741,82 @@
         const urlParams = new URLSearchParams(window.location.search);
         const matchId = urlParams.get('match');
 
-        // ============ VIEWER PRESENCE (best-effort) ============
+        // ============================================================
+        // ============ VIEWER PRESENCE (heartbeat + onDisconnect) ===
+        // ============================================================
+        // Accurate live count:
+        //   • Each tab writes { lastSeen: <ms> } under viewers/{matchId}/{clientId}
+        //   • Heartbeat every 20s refreshes the timestamp
+        //   • onDisconnect() removes the entry on clean closes / drops
+        //   • Count only entries fresher than STALE_MS (55s) — protects
+        //     against unclean disconnects that bypass onDisconnect
+        //   • If Firebase rules deny write, count falls back to "1 watching"
+        //   • Uses localStorage so multiple tabs of the same browser
+        //     count as ONE viewer (otherwise each tab is a separate viewer)
+        // ============================================================
         function setupViewerPresence() {
             if (!matchId) return;
             const viewerEl = document.getElementById('uiViewerCount');
+            if (!viewerEl) return;
+
             try {
-                const clientId = 'v_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                // Stable client ID per browser (shared across tabs).
+                let clientId = null;
+                try {
+                    clientId = localStorage.getItem('kabaddione_client_id');
+                    if (!clientId) {
+                        clientId = 'v_' + Math.random().toString(36).slice(2, 11) + '_' + Date.now();
+                        localStorage.setItem('kabaddione_client_id', clientId);
+                    }
+                } catch (e) {
+                    // localStorage disabled → per-tab ID
+                    clientId = 'v_' + Math.random().toString(36).slice(2, 11) + '_' + Date.now();
+                }
+
                 const viewersRef = db.ref('viewers/' + matchId);
                 const myRef = viewersRef.child(clientId);
+
+                const HEARTBEAT_MS = 20000;
+                const STALE_MS = 55000;
+                let heartbeatTimer = null;
+
+                const beat = () => {
+                    myRef.set({ lastSeen: Date.now() }).catch(() => {});
+                };
 
                 db.ref('.info/connected').on('value', (snap) => {
                     if (snap.val() === true) {
                         myRef.onDisconnect().remove().then(() => {
-                            myRef.set({ joined: Date.now() }).catch(() => {});
-                        }).catch(() => {});
+                            beat();
+                            if (heartbeatTimer) clearInterval(heartbeatTimer);
+                            heartbeatTimer = setInterval(beat, HEARTBEAT_MS);
+                        }).catch(() => {
+                            // Rules denied write → still show self
+                            viewerEl.innerText = '1 watching';
+                        });
                     }
                 });
 
                 viewersRef.on('value', (snap) => {
-                    const count = snap.numChildren() || 1;
-                    if (viewerEl) viewerEl.innerText = Math.max(1, count) + ' watching';
+                    const now = Date.now();
+                    let count = 0;
+                    snap.forEach(child => {
+                        const v = child.val();
+                        if (v && typeof v.lastSeen === 'number' && (now - v.lastSeen) < STALE_MS) {
+                            count++;
+                        }
+                    });
+                    viewerEl.innerText = Math.max(1, count) + ' watching';
                 }, () => {
-                    if (viewerEl) viewerEl.innerText = '1 watching';
+                    viewerEl.innerText = '1 watching';
+                });
+
+                window.addEventListener('beforeunload', () => {
+                    if (heartbeatTimer) clearInterval(heartbeatTimer);
+                    myRef.remove().catch(() => {});
                 });
             } catch (e) {
-                if (viewerEl) viewerEl.innerText = '1 watching';
+                viewerEl.innerText = '1 watching';
             }
         }
 
@@ -1847,7 +1837,6 @@
             document.getElementById('uiMatchId').innerHTML = '<i class="fa-solid fa-hashtag"></i> ' + matchId.toUpperCase();
             document.getElementById('dtMatchId').innerText = matchId.toUpperCase();
 
-            // Try to set up viewer presence
             setupViewerPresence();
 
             db.ref('live_matches/' + matchId).on('value', (snapshot) => {
@@ -1862,7 +1851,6 @@
                 const dateStr = new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                 const timeStr = new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-                // Update live meta bar
                 updateLastUpdated(ts);
 
                 if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
@@ -1876,7 +1864,6 @@
 
                 if (data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
 
-                // ── Badge state ──
                 const liveBadge = document.getElementById('uiLiveBadge');
                 const halfStatusRaw = data.half_status || '';
                 const halfStatusLower = halfStatusRaw.toLowerCase();
@@ -1990,10 +1977,9 @@
                         document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
                         document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
 
-                        // ── Raider banner: match-over vs live ──
                         const banner = document.getElementById('uiActiveRaider');
                         if (matchOverFlag) {
-                            const result = data.match_result && data.match_result.trim()
+                            const result = (data.match_result && data.match_result.trim())
                                 ? data.match_result.trim()
                                 : (Number(data.left_score) === Number(data.right_score)
                                     ? 'Match Tied'
@@ -2026,10 +2012,8 @@
                             window.matchLogsForGraph = logs;
                             window.halfStatsCache = computeHalfStats(data);
                             window.playerPointsBreakdown = computePlayerPointsFromLogs(logs);
-                            // ✅ NEW: tackle breakdown from logs (counts, super split)
                             window.playerTackleBreakdown = computePlayerTacklesFromLogs(logs);
 
-                            // ✅ NEW: event flash for new log entries
                             if (logs.length > 0) {
                                 const latestLog = logs[logs.length - 1];
                                 if (window.lastSeenLogId !== undefined && latestLog.id !== window.lastSeenLogId) {
@@ -2058,6 +2042,7 @@
 
                                 const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i, '') : '';
 
+                                // ✅ Badge on top, time + score combined on one line below
                                 logHtml += `
                                 <div class="log-row">
                                     <div class="log-icon-circle" style="--icon-bg: ${iconBg};">
@@ -2068,9 +2053,11 @@
                                         <div class="log-desc">${log.desc || ''}</div>
                                     </div>
                                     <div class="log-side">
-                                        <div class="log-time-tag">${log.timeStr || ''}</div>
                                         ${badgeHtml}
-                                        ${scoreStr ? `<div class="log-score-tag">${scoreStr}</div>` : ''}
+                                        <div class="log-meta-line">
+                                            <span class="log-time-tag">${log.timeStr || ''}</span>
+                                            ${scoreStr ? `<span class="log-score-tag">${scoreStr}</span>` : ''}
+                                        </div>
                                     </div>
                                 </div>`;
                             }
