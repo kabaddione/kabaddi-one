@@ -529,70 +529,201 @@
             return r;
         }
 
-        // HALF STATS — touch events now register unsuccessful tackle for defenders
-        function computeHalfStats(matchData){
-            const logs=window.matchLogsForGraph||[];
-            const sortedLogs=[...logs].sort((a,b)=>(parseInt(a.id)||0)-(parseInt(b.id)||0));
-            const blank=()=>({raid:0,tackle:0,allOut:0,extra:0,totalRaids:0,succRaids:0,superRaids:0,totalTackles:0,succTackles:0,superTackles:0,unsuccTackles:0,longestStreak:0,currentStreak:0,total:0});
-            const stats={left:{first:blank(),second:blank()},right:{first:blank(),second:blank()}};
-            for(const log of sortedLogs){
-                if(log.type==='PERIOD')continue;
-                const ts=log.timeStr||'';let half=null;
-                if(ts.includes('1st Half'))half='first';else if(ts.includes('2nd Half'))half='second';
-                if(!half)continue;
-                const teamKey=log.isLeftTeam===true?'left':log.isLeftTeam===false?'right':null;if(!teamKey)continue;
-                const s=stats[teamKey][half];
-                const defKey=teamKey==='left'?'right':'left';
-                const defStats=stats[defKey][half];
-                const t=(log.title||'').toLowerCase();const pts=log.points||0;
-                if(t.includes('super raid')){
-                    s.superRaids+=1;s.totalRaids+=1;s.raid+=pts;
-                    if(pts>0){s.succRaids+=1;s.currentStreak+=1;if(s.currentStreak>s.longestStreak)s.longestStreak=s.currentStreak}else s.currentStreak=0;
-                    defStats.unsuccTackles+=1;defStats.totalTackles+=1;
-                }else if(t.includes('touch')){
-                    s.totalRaids+=1;s.raid+=pts;
-                    if(pts>0){s.succRaids+=1;s.currentStreak+=1;if(s.currentStreak>s.longestStreak)s.longestStreak=s.currentStreak}else s.currentStreak=0;
-                    defStats.unsuccTackles+=1;defStats.totalTackles+=1;
-                }else if(t.includes('bonus')){
-                    s.totalRaids+=1;s.raid+=pts;
-                    if(pts>0){s.succRaids+=1;s.currentStreak+=1;if(s.currentStreak>s.longestStreak)s.longestStreak=s.currentStreak}else s.currentStreak=0;
-                }else if(t.includes('empty')){
-                    s.totalRaids+=1;s.currentStreak=0;
-                }else if(t.includes('super tackle')){
-                    s.superTackles+=1;s.totalTackles+=1;s.tackle+=pts;
-                    if(pts>0)s.succTackles+=1;
-                    defStats.totalRaids+=1; // 🚨 WEB FIX: Add raid count to opponent!
-                }else if(t.includes('tackle')){
-                    s.totalTackles+=1;s.tackle+=pts;
-                    if(pts>0)s.succTackles+=1;
-                    defStats.totalRaids+=1; // 🚨 WEB FIX: Add raid count to opponent!
-                }else if(t.includes('all out')){
-                    s.allOut+=pts;
-                }else if(log.type==='EXTRA'&&pts>0){
-                    s.extra+=pts;
-                }
+        // ============================================================
+// ============ HALF-WISE STATS (with bonus+tackle fix) =======
+// ============================================================
+// Key behaviours:
+//   • touch / super raid  → raider's team: totalRaids+1, succRaids+1
+//                            defender's team: totalTackles+1, unsuccTackles+1
+//   • bonus (alone)       → raider's team: totalRaids+1, succRaids+1
+//   • empty raid          → raider's team: totalRaids+1
+//   • tackle / super      → defender's team: totalTackles+1, succTackles+1
+//                            raider's team: totalRaids+1  ← NEW (user's fix)
+//   • bonus + tackle      → raider's team: totalRaids+1, succRaids+1  (single raid)
+//                            defender's team: totalTackles+1, succTackles+1
+//                            → tackle branch SKIPS totalRaids (bonus branch already did it)
+// ============================================================
+function computeHalfStats(matchData) {
+    const logs = window.matchLogsForGraph || [];
+    const sortedLogs = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+
+    const blank = () => ({
+        raid: 0, tackle: 0, allOut: 0, extra: 0,
+        totalRaids: 0, succRaids: 0, superRaids: 0,
+        totalTackles: 0, succTackles: 0, superTackles: 0, unsuccTackles: 0,
+        longestStreak: 0, currentStreak: 0, total: 0
+    });
+    const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
+
+    for (let i = 0; i < sortedLogs.length; i++) {
+        const log = sortedLogs[i];
+        if (log.type === 'PERIOD') continue;
+
+        const ts = log.timeStr || '';
+        let half = null;
+        if (ts.includes('1st Half')) half = 'first';
+        else if (ts.includes('2nd Half')) half = 'second';
+        if (!half) continue;
+
+        const teamKey = log.isLeftTeam === true ? 'left'
+                       : log.isLeftTeam === false ? 'right'
+                       : null;
+        if (!teamKey) continue;
+
+        const s = stats[teamKey][half];
+        const defKey = teamKey === 'left' ? 'right' : 'left';
+        const defStats = stats[defKey][half];
+        const t = (log.title || '').toLowerCase();
+        const pts = log.points || 0;
+
+        // Detect a bonus+tackle continuation: the previous log was a
+        // bonus by the OPPOSITE team (the raider's team). In that case
+        // this tackle is the SAME raid as the preceding bonus.
+        let isPrecededByBonusByOpposite = false;
+        if (i > 0) {
+            const prev = sortedLogs[i - 1];
+            const prevT = (prev.title || '').toLowerCase();
+            if (prev.type === 'RAID' &&
+                prevT.includes('bonus') &&
+                prev.isLeftTeam !== log.isLeftTeam) {
+                isPrecededByBonusByOpposite = true;
             }
-            let htLeft=null,htRight=null;
-            for(const log of sortedLogs){
-                const t=(log.title||'').toLowerCase();const d=(log.desc||'').toLowerCase();
-                const isHalfTime=t.includes('half time')||t.includes('half-time')||d.includes('half time')||d.includes('half-time')||d.includes('first half ends')||d.includes('first half end');
-                if(!isHalfTime)continue;
-                if(!log.scoreStr)continue;
-                const parts=log.scoreStr.replace(/Score:\s*/i,'').trim().split('-').map(x=>parseInt(x.trim())||0);
-                if(parts.length===2){htLeft=parts[0];htRight=parts[1]}
-            }
-            const lScoreNow=Number(matchData&&matchData.left_score)||0;
-            const rScoreNow=Number(matchData&&matchData.right_score)||0;
-            const halfStatus=((matchData&&matchData.half_status)||'').toLowerCase();
-            const inSecondHalf=halfStatus.includes('2nd')||halfStatus.includes('second')||halfStatus.includes('over')||halfStatus.includes('end');
-            let lFirstTotal,rFirstTotal,lSecondTotal,rSecondTotal;
-            if(htLeft!==null){lFirstTotal=htLeft;rFirstTotal=htRight;lSecondTotal=Math.max(0,lScoreNow-lFirstTotal);rSecondTotal=Math.max(0,rScoreNow-rFirstTotal)}
-            else if(inSecondHalf){lFirstTotal=stats.left.first.total;rFirstTotal=stats.right.first.total;lSecondTotal=Math.max(0,lScoreNow-lFirstTotal);rSecondTotal=Math.max(0,rScoreNow-rFirstTotal)}
-            else{lFirstTotal=Math.max(lScoreNow,0);rFirstTotal=Math.max(rScoreNow,0);lSecondTotal=0;rSecondTotal=0}
-            stats.left.first.total=lFirstTotal;stats.right.first.total=rFirstTotal;
-            stats.left.second.total=lSecondTotal;stats.right.second.total=rSecondTotal;
-            return stats;
         }
+
+        if (t.includes('super raid')) {
+            // Super raid = touch + bonus in one event
+            s.superRaids += 1;
+            s.totalRaids += 1;
+            s.raid += pts;
+            if (pts > 0) {
+                s.succRaids += 1;
+                s.currentStreak += 1;
+                if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak;
+            } else {
+                s.currentStreak = 0;
+            }
+            // Defenders failed to stop the raider
+            defStats.unsuccTackles += 1;
+            defStats.totalTackles += 1;
+
+        } else if (t.includes('touch')) {
+            // Touch point raid
+            s.totalRaids += 1;
+            s.raid += pts;
+            if (pts > 0) {
+                s.succRaids += 1;
+                s.currentStreak += 1;
+                if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak;
+            } else {
+                s.currentStreak = 0;
+            }
+            // Defenders failed to stop the raider
+            defStats.unsuccTackles += 1;
+            defStats.totalTackles += 1;
+
+        } else if (t.includes('bonus')) {
+            // Bonus point raid. Note: if the NEXT log is a tackle by the
+            // opposing team, this bonus will be part of a bonus+tackle
+            // continuation. We still count the raid here (the tackle branch
+            // will skip its own totalRaids increment to avoid double-count).
+            s.totalRaids += 1;
+            s.raid += pts;
+            if (pts > 0) {
+                s.succRaids += 1;
+                s.currentStreak += 1;
+                if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak;
+            } else {
+                s.currentStreak = 0;
+            }
+
+        } else if (t.includes('empty')) {
+            // Empty raid — no score
+            s.totalRaids += 1;
+            s.currentStreak = 0;
+
+        } else if (t.includes('super tackle')) {
+            // Super tackle — defender scores 2 points
+            s.superTackles += 1;
+            s.totalTackles += 1;
+            s.tackle += pts;
+            if (pts > 0) s.succTackles += 1;
+            // ✅ NEW: raider's team used a raid — but ONLY if this isn't
+            //    the continuation of a bonus scored in the same raid
+            if (!isPrecededByBonusByOpposite) {
+                defStats.totalRaids += 1;
+            }
+
+        } else if (t.includes('tackle')) {
+            // Regular tackle — defender scores 1 point
+            s.totalTackles += 1;
+            s.tackle += pts;
+            if (pts > 0) s.succTackles += 1;
+            // ✅ NEW: raider's team used a raid — but ONLY if this isn't
+            //    the continuation of a bonus scored in the same raid
+            if (!isPrecededByBonusByOpposite) {
+                defStats.totalRaids += 1;
+            }
+
+        } else if (t.includes('all out')) {
+            s.allOut += pts;
+
+        } else if (log.type === 'EXTRA' && pts > 0) {
+            s.extra += pts;
+        }
+    }
+
+    // ── Half-time snapshot for authoritative totals ──
+    let htLeft = null, htRight = null;
+    for (const log of sortedLogs) {
+        const t = (log.title || '').toLowerCase();
+        const d = (log.desc || '').toLowerCase();
+        const isHalfTime = t.includes('half time') || t.includes('half-time') ||
+                           d.includes('half time') || d.includes('half-time') ||
+                           d.includes('first half ends') || d.includes('first half end');
+        if (!isHalfTime) continue;
+        if (!log.scoreStr) continue;
+        const parts = log.scoreStr.replace(/Score:\s*/i, '').trim()
+            .split('-').map(x => parseInt(x.trim()) || 0);
+        if (parts.length === 2) { htLeft = parts[0]; htRight = parts[1]; }
+    }
+
+    const lScoreNow = Number(matchData && matchData.left_score) || 0;
+    const rScoreNow = Number(matchData && matchData.right_score) || 0;
+    const halfStatus = ((matchData && matchData.half_status) || '').toLowerCase();
+    const inSecondHalf = halfStatus.includes('2nd') || halfStatus.includes('second') ||
+                         halfStatus.includes('over') || halfStatus.includes('end');
+
+    let lFirstTotal, rFirstTotal, lSecondTotal, rSecondTotal;
+    if (htLeft !== null) {
+        lFirstTotal = htLeft;
+        rFirstTotal = htRight;
+        lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
+        rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
+    } else if (inSecondHalf) {
+        lFirstTotal = stats.left.first.total;
+        rFirstTotal = stats.right.first.total;
+        lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
+        rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
+    } else {
+        lFirstTotal = Math.max(lScoreNow, 0);
+        rFirstTotal = Math.max(rScoreNow, 0);
+        lSecondTotal = 0;
+        rSecondTotal = 0;
+    }
+
+    stats.left.first.total = lFirstTotal;
+    stats.right.first.total = rFirstTotal;
+    stats.left.second.total = lSecondTotal;
+    stats.right.second.total = rSecondTotal;
+
+    for (const teamKey of ['left', 'right']) {
+        for (const halfKey of ['first', 'second']) {
+            const s = stats[teamKey][halfKey];
+            s.componentSum = s.raid + s.tackle + s.allOut + s.extra;
+        }
+    }
+    return stats;
+}
 
         function renderStats(){
             const state=window.latestGlobalState;const data=window.latestMatchData;if(!state||!data)return;
