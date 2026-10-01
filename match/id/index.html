@@ -274,7 +274,6 @@
         .log-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
         .log-points-badge { font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.08); color: #fff; white-space: nowrap; }
 
-        /* ✅ UPDATED: time + score on one line, badge above */
         .log-meta-line { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .log-time-tag { font-size: 10px; font-weight: 700; color: #8C8E9F; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); white-space: nowrap; }
         .log-score-tag { font-size: 10px; font-weight: 700; color: #b0b0c8; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -287,7 +286,6 @@
         .stat-panel { background: linear-gradient(165deg, var(--surface-2), var(--surface-1)); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); }
         .panel-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .panel-team { display: flex; align-items: center; gap: 10px; min-width: 0; }
-        /* ✅ FIXED: right team block anchored to the RIGHT edge of its cell (was flex-end on row-reverse → wrongly packed left) */
         .panel-team.right { justify-content: flex-start; flex-direction: row-reverse; }
         .panel-team-name { font-size: 13px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
         .panel-team-logo { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #fff; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.3); overflow: hidden; }
@@ -935,6 +933,11 @@
         // ============================================================
         // ============ EVENT FLASH ==================================
         // ============================================================
+        // ✅ FIX 1: Do-or-die now shows clear "DO OR DIE RAID!" text
+        //           instead of the log's raw "Crucial raid started".
+        //           Super/allout/DoD flashes hold for 5 seconds so
+        //           important events stay visible longer.
+        // ============================================================
         function showEventFlash(log) {
             const el = document.getElementById('uiEventFlash');
             if (!el || !log) return;
@@ -946,16 +949,46 @@
             let icon = '';
             let cls = '';
 
-            if (t.includes('super tackle'))      { text = 'SUPER TACKLE! ' + d; icon = 'fa-fire'; cls = 'super'; }
-            else if (t.includes('super raid'))   { text = 'SUPER RAID! ' + d;   icon = 'fa-bolt'; cls = 'super'; }
-            else if (t.includes('all out'))      { text = 'ALL OUT! ' + d;      icon = 'fa-bomb'; cls = 'allout'; }
-            else if (t.includes('do-or-die') || t.includes('do or die')) { text = d || 'Do-or-Die Raid'; icon = 'fa-skull-crossbones'; cls = 'dod'; }
-            else if (t.includes('touch'))        { text = d; icon = 'fa-hand'; cls = 'raid'; }
-            else if (t.includes('bonus'))        { text = d; icon = 'fa-star'; cls = 'raid'; }
-            else if (t.includes('tackle'))       { text = d; icon = 'fa-shield'; cls = 'tackle'; }
-            else if (t.includes('empty'))        { text = d; icon = 'fa-ban'; cls = 'empty'; }
-            else if (t.includes('self out'))     { text = d; icon = 'fa-person-walking-arrow-right'; cls = 'empty'; }
-            else { return; }
+            if (t.includes('super tackle')) {
+                text = 'SUPER TACKLE! ' + d;
+                icon = 'fa-fire';
+                cls = 'super';
+            } else if (t.includes('super raid')) {
+                text = 'SUPER RAID! ' + d;
+                icon = 'fa-bolt';
+                cls = 'super';
+            } else if (t.includes('all out')) {
+                text = 'ALL OUT! ' + d;
+                icon = 'fa-bomb';
+                cls = 'allout';
+            } else if (t.includes('do-or-die') || t.includes('do or die')) {
+                // ✅ Override the confusing "Crucial raid started" desc
+                text = 'DO OR DIE RAID!';
+                icon = 'fa-skull-crossbones';
+                cls = 'dod';
+            } else if (t.includes('touch')) {
+                text = d;
+                icon = 'fa-hand';
+                cls = 'raid';
+            } else if (t.includes('bonus')) {
+                text = d;
+                icon = 'fa-star';
+                cls = 'raid';
+            } else if (t.includes('tackle')) {
+                text = d;
+                icon = 'fa-shield';
+                cls = 'tackle';
+            } else if (t.includes('empty')) {
+                text = d;
+                icon = 'fa-ban';
+                cls = 'empty';
+            } else if (t.includes('self out')) {
+                text = d;
+                icon = 'fa-person-walking-arrow-right';
+                cls = 'empty';
+            } else {
+                return;
+            }
 
             if (!text) return;
 
@@ -965,11 +998,18 @@
             el.classList.add('visible');
 
             if (window.eventFlashTimeout) clearTimeout(window.eventFlashTimeout);
-            window.eventFlashTimeout = setTimeout(() => { el.classList.remove('visible'); }, 4000);
+            const duration = (cls === 'super' || cls === 'allout' || cls === 'dod') ? 5000 : 4000;
+            window.eventFlashTimeout = setTimeout(() => { el.classList.remove('visible'); }, duration);
         }
 
         // ============================================================
         // ============ PER-PLAYER POINTS BREAKDOWN ==================
+        // ============================================================
+        // ✅ FIX 2: Super Raid AND Touch Point now check for an embedded
+        //           "+ Bonus Point" in the description. If present, the
+        //           points are split: (points - 1) as touch, 1 as bonus.
+        //           Previously only "Touch Point" did this, so a
+        //           Super Raid ending with a bonus lost its bonus.
         // ============================================================
         function computePlayerPointsFromLogs(logs) {
             const result = { left: {}, right: {} };
@@ -996,13 +1036,25 @@
                 const bucket = ensure(team, jersey);
 
                 if (t.includes('empty')) continue;
-                if (t.includes('super raid')) { bucket.touch += points; bucket.total += points; }
-                else if (t.includes('touch')) {
-                    if (d.includes('bonus')) { bucket.touch += Math.max(0, points - 1); bucket.bonus += 1; }
-                    else { bucket.touch += points; }
+
+                // Super Raid OR Touch Point → both may embed "+ Bonus Point"
+                if (t.includes('super raid') || t.includes('touch')) {
+                    if (d.includes('bonus')) {
+                        // Total = N touch + 1 bonus
+                        bucket.touch += Math.max(0, points - 1);
+                        bucket.bonus += 1;
+                    } else {
+                        bucket.touch += points;
+                    }
                     bucket.total += points;
-                } else if (t.includes('bonus')) { bucket.bonus += points; bucket.total += points; }
-                else if (points > 0) { bucket.touch += points; bucket.total += points; }
+                } else if (t.includes('bonus')) {
+                    // Pure bonus-only raid
+                    bucket.bonus += points;
+                    bucket.total += points;
+                } else if (points > 0) {
+                    bucket.touch += points;
+                    bucket.total += points;
+                }
             }
             return result;
         }
@@ -1044,6 +1096,13 @@
         // ============================================================
         // ============ HALF-WISE STATS ==============================
         // ============================================================
+        // ✅ FIX 3: Defending team now registers an unsuccessful tackle
+        //           every time the opposing raider secures a touch
+        //           point (or super raid). This makes:
+        //               totalTackles = succTackles + unsuccTackles
+        //           so the tackle success-rate pie no longer sticks
+        //           at 100% forever.
+        // ============================================================
         function computeHalfStats(matchData) {
             const logs = window.matchLogsForGraph || [];
             const sortedLogs = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
@@ -1051,7 +1110,7 @@
             const blank = () => ({
                 raid: 0, tackle: 0, allOut: 0, extra: 0,
                 totalRaids: 0, succRaids: 0, superRaids: 0,
-                totalTackles: 0, succTackles: 0, superTackles: 0,
+                totalTackles: 0, succTackles: 0, superTackles: 0, unsuccTackles: 0,
                 longestStreak: 0, currentStreak: 0, total: 0
             });
             const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
@@ -1068,6 +1127,8 @@
                 if (!teamKey) continue;
 
                 const s = stats[teamKey][half];
+                const defKey = teamKey === 'left' ? 'right' : 'left';
+                const defStats = stats[defKey][half];
                 const t = (log.title || '').toLowerCase();
                 const pts = log.points || 0;
 
@@ -1075,12 +1136,24 @@
                     s.superRaids += 1; s.totalRaids += 1; s.raid += pts;
                     if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
-                } else if (t.includes('bonus') || t.includes('touch')) {
+                    // ✅ Touch secured → defenders failed = 1 unsuccessful tackle
+                    defStats.unsuccTackles += 1;
+                    defStats.totalTackles += 1;
+                } else if (t.includes('touch')) {
                     s.totalRaids += 1; s.raid += pts;
                     if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
+                    // ✅ Touch secured → defenders failed = 1 unsuccessful tackle
+                    defStats.unsuccTackles += 1;
+                    defStats.totalTackles += 1;
+                } else if (t.includes('bonus')) {
+                    s.totalRaids += 1; s.raid += pts;
+                    if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
+                    else s.currentStreak = 0;
+                    // ✅ Bonus alone → no tackle attempt registered
                 } else if (t.includes('empty')) {
                     s.totalRaids += 1; s.currentStreak = 0;
+                    // ✅ Empty raid → no tackle attempt
                 } else if (t.includes('super tackle')) {
                     s.superTackles += 1; s.totalTackles += 1; s.tackle += pts;
                     if (pts > 0) s.succTackles += 1;
@@ -1565,10 +1638,14 @@
                     }
                 }
 
-                const tTack = parseInt(player.totalTackles) || 0;
+                // ✅ FIX 4: App's totalTackles = total attempts. If it lags
+                //           behind log-derived success, prefer the higher
+                //           of the two so the pie accounts for known success.
+                const totalTackFromApp = parseInt(player.totalTackles) || 0;
                 const tackleBreak = window.playerTackleBreakdown[teamKey]?.[jersey] || { successful: 0, superTackles: 0 };
                 const succTack = tackleBreak.successful;
                 const superTack = tackleBreak.superTackles;
+                const tTack = Math.max(totalTackFromApp, succTack);
                 const unsTack = Math.max(0, tTack - succTack);
 
                 const raidSuccDeg = displayTotal > 0 ? (succRaid / displayTotal) * 360 : 0;
@@ -1744,23 +1821,12 @@
         // ============================================================
         // ============ VIEWER PRESENCE (heartbeat + onDisconnect) ===
         // ============================================================
-        // Accurate live count:
-        //   • Each tab writes { lastSeen: <ms> } under viewers/{matchId}/{clientId}
-        //   • Heartbeat every 20s refreshes the timestamp
-        //   • onDisconnect() removes the entry on clean closes / drops
-        //   • Count only entries fresher than STALE_MS (55s) — protects
-        //     against unclean disconnects that bypass onDisconnect
-        //   • If Firebase rules deny write, count falls back to "1 watching"
-        //   • Uses localStorage so multiple tabs of the same browser
-        //     count as ONE viewer (otherwise each tab is a separate viewer)
-        // ============================================================
         function setupViewerPresence() {
             if (!matchId) return;
             const viewerEl = document.getElementById('uiViewerCount');
             if (!viewerEl) return;
 
             try {
-                // Stable client ID per browser (shared across tabs).
                 let clientId = null;
                 try {
                     clientId = localStorage.getItem('kabaddione_client_id');
@@ -1769,7 +1835,6 @@
                         localStorage.setItem('kabaddione_client_id', clientId);
                     }
                 } catch (e) {
-                    // localStorage disabled → per-tab ID
                     clientId = 'v_' + Math.random().toString(36).slice(2, 11) + '_' + Date.now();
                 }
 
@@ -1791,7 +1856,6 @@
                             if (heartbeatTimer) clearInterval(heartbeatTimer);
                             heartbeatTimer = setInterval(beat, HEARTBEAT_MS);
                         }).catch(() => {
-                            // Rules denied write → still show self
                             viewerEl.innerText = '1 watching';
                         });
                     }
@@ -2042,7 +2106,6 @@
 
                                 const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i, '') : '';
 
-                                // ✅ Badge on top, time + score combined on one line below
                                 logHtml += `
                                 <div class="log-row">
                                     <div class="log-icon-circle" style="--icon-bg: ${iconBg};">
