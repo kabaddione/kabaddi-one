@@ -106,31 +106,19 @@
 
         .live-wrapper { padding: calc(var(--nav-height) + 28px) 16px 60px; max-width: 620px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
 
-        /* EVENT FLASH */
         .event-flash {
-            position: fixed;
-            top: 90px;
-            left: 50%;
+            position: fixed; top: 90px; left: 50%;
             transform: translateX(-50%) translateY(-24px) scale(0.95);
             background: rgba(20, 20, 40, 0.96);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            padding: 12px 22px;
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 800;
-            color: #fff;
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            padding: 12px 22px; border-radius: 100px;
+            font-size: 13px; font-weight: 800; color: #fff;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
+            z-index: 9999; opacity: 0; pointer-events: none;
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 2px solid rgba(255,255,255,0.12);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 92vw;
-            letter-spacing: 0.2px;
+            display: flex; align-items: center; gap: 10px;
+            max-width: 92vw; letter-spacing: 0.2px;
         }
         .event-flash.visible { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
         .event-flash i { font-size: 14px; flex-shrink: 0; }
@@ -148,7 +136,6 @@
         .event-flash.dod     { border-color: rgba(255,94,58,0.85);  box-shadow: 0 10px 45px rgba(255,94,58,0.55); background: rgba(55, 15, 5, 0.96); }
         .event-flash.dod i   { color: #FF5E3A; }
 
-        /* SCORE BOARD */
         .score-board { position: relative; border-radius: 28px; padding: 20px 20px 24px; overflow: hidden; background: linear-gradient(165deg, #1c2040 0%, #131629 55%, #0f1122 100%); box-shadow: var(--shadow-lift), var(--shadow-inset); border: 1px solid var(--glass-border); isolation: isolate; }
         .score-board::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--left-team-color) 25%, transparent) 0%, transparent 55%), radial-gradient(ellipse at top right, color-mix(in srgb, var(--right-team-color) 25%, transparent) 0%, transparent 55%); opacity: 0.6; z-index: -1; pointer-events: none; }
         .score-board::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); pointer-events: none; }
@@ -160,7 +147,6 @@
         .badge-live { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #FF3B30, #D32F2F); color: #fff; padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4); transition: all 0.3s ease; }
         .badge-live::before { content: ''; width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: livePulse 1.5s ease-in-out infinite; }
         @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
-
         .badge-live.badge-break { background: linear-gradient(135deg, #FBC02D, #F57F17); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.4); }
         .badge-live.badge-break::before { animation: none; opacity: 0.9; }
         .badge-live.badge-final { background: linear-gradient(135deg, #546E7A, #37474F); box-shadow: 0 4px 12px rgba(84, 110, 122, 0.35); }
@@ -189,36 +175,18 @@
         .raider-banner.idle { color: #8C8E9F; font-weight: 500; }
         .raider-banner.match-over {
             background: linear-gradient(135deg, rgba(255,184,48,0.18), rgba(255,94,58,0.18));
-            border-color: rgba(255,184,48,0.5);
-            color: #FFB830;
-            font-weight: 900;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            padding: 10px 22px;
-            box-shadow: 0 4px 20px rgba(255,184,48,0.25);
+            border-color: rgba(255,184,48,0.5); color: #FFB830;
+            font-weight: 900; font-size: 13px; letter-spacing: 0.5px;
+            padding: 10px 22px; box-shadow: 0 4px 20px rgba(255,184,48,0.25);
         }
         .raider-banner.match-over i { color: #FFB830; font-size: 14px; }
 
-        /* LIVE META BAR */
-        .live-meta {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 11px;
-            color: #8C8E9F;
-            margin: 12px 0 8px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            flex-wrap: wrap;
-        }
+        .live-meta { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; color: #8C8E9F; margin: 12px 0 8px; font-weight: 600; letter-spacing: 0.2px; flex-wrap: wrap; }
         .live-meta-sep { opacity: 0.5; }
 
-        /* MAT DOTS */
         .mat-section { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .mat-title { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #8C8E9F; }
         .mat-row { display: flex; align-items: flex-start; justify-content: center; gap: 10px; width: 100%; }
-
         .team-mat { display: flex; gap: 10px; align-items: flex-start; }
         .team-mat.left { justify-content: flex-end; }
         .team-mat.right { justify-content: flex-start; }
@@ -226,12 +194,10 @@
         .mat-dot-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; min-width: 22px; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .mat-dot-jersey { font-size: 9px; font-weight: 800; color: var(--dot-color, #8C8E9F); font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -0.3px; transition: all 0.3s ease; text-align: center; white-space: nowrap; }
         .mat-dot-cell.is-out .mat-dot-jersey { color: #555; opacity: 0.55; }
-
         .mat-divider-img { width: 40px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; align-self: flex-start; }
         .mat-divider-img img { width: 100%; height: 100%; object-fit: contain; opacity: 0.7; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         .mat-divider-img.fallback { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.2), transparent); width: 2px; }
         .mat-divider-img.fallback img { display: none; }
-
         .mat-dot { width: 14px; height: 14px; border-radius: 50%; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; flex-shrink: 0; }
         .mat-dot.alive { background: var(--dot-color, #fff); box-shadow: 0 0 8px var(--dot-color, #fff), inset 0 -2px 3px rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.25); }
         .mat-dot.alive::after { content: ''; position: absolute; top: 2px; left: 2px; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.6); }
@@ -273,7 +239,6 @@
         .log-desc { font-size: 11.5px; color: #8C8E9F; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .log-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
         .log-points-badge { font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.08); color: #fff; white-space: nowrap; }
-
         .log-meta-line { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .log-time-tag { font-size: 10px; font-weight: 700; color: #8C8E9F; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); white-space: nowrap; }
         .log-score-tag { font-size: 10px; font-weight: 700; color: #b0b0c8; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.04); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -331,36 +296,29 @@
         .player-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 14px; margin-bottom: 8px; overflow: hidden; transition: all 0.25s ease; }
         .player-card:last-child { margin-bottom: 0; }
         .player-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
-
         .player-card-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto auto auto; gap: 10px; align-items: center; padding: 10px 12px; cursor: pointer; }
         .player-avatar-wrap { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
         .player-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .player-avatar-wrap i { color: #555; font-size: 20px; }
-
         .player-main { min-width: 0; }
         .player-main-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
         .captain-badge { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #8E24AA; color: #fff; font-size: 9px; font-weight: 900; flex-shrink: 0; }
         .player-main-role { font-size: 10px; font-weight: 700; color: #8C8E9F; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
         .player-tags { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
         .tag-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; flex-shrink: 0; }
         .tag-card { border: 1px solid rgba(0,0,0,0.3); }
         .tag-card.green { background: #22C55E; }
         .tag-card.yellow { background: #FBC02D; }
         .tag-card.red { background: #EF4444; }
-
         .tag-sub-in { background: rgba(34,197,94,0.15); color: #22C55E; border: 1px solid rgba(34,197,94,0.35); width: auto; padding: 0 6px; gap: 3px; }
         .tag-sub-out { background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.35); width: auto; padding: 0 6px; gap: 3px; }
         .tag-sub-in i, .tag-sub-out i { font-size: 10px; }
         .tag-sub-time { font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 0.3px; }
-
         .player-pts { font-size: 18px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; padding: 0 4px; }
         .player-chevron { color: #8C8E9F; font-size: 12px; transition: transform 0.3s ease; width: 16px; text-align: center; }
         .player-card.expanded .player-chevron { transform: rotate(180deg); }
-
         .player-card-body { display: none; padding: 14px 12px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.04); }
         .player-card.expanded .player-card-body { display: block; }
-
         .player-on-mat-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: linear-gradient(135deg, rgba(77,168,218,0.12), rgba(77,168,218,0.04)); border: 1px solid rgba(77,168,218,0.25); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
         .player-on-mat-banner .pomb-left { display: flex; align-items: center; gap: 8px; color: #4DA8DA; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
         .player-on-mat-banner .pomb-left i { font-size: 13px; }
@@ -396,6 +354,10 @@
         .raid-seq-dot.success { background: #22C55E; color: #22C55E; }
         .raid-seq-dot.unsuccess { background: #8E24AA; color: #8E24AA; }
         .raid-seq-dot.empty { background: var(--empty-raid-color); color: var(--empty-raid-color); }
+        /* ✅ NEW: tackle sequence dot colours */
+        .raid-seq-dot.tack-succ { background: #4DD0E1; color: #4DD0E1; }
+        .raid-seq-dot.tack-unsucc { background: #3949AB; color: #3949AB; }
+        .raid-seq-dot.tack-super { background: #E91E63; color: #E91E63; }
 
         .graph-panel { background: linear-gradient(165deg, var(--surface-2), var(--surface-1)); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); }
         .graph-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -831,8 +793,10 @@
         window.halfStatsCache = null;
         window.playerPointsBreakdown = { left: {}, right: {} };
         window.playerTackleBreakdown = { left: {}, right: {} };
+        window.playerTackleSequence = { left: {}, right: {} };
         window.lastSeenLogId = undefined;
         window.eventFlashTimeout = null;
+        window.sidesSwapped = false;
 
         function togglePlayerExpand(element, playerId) {
             if (window.expandedPlayerIds.has(playerId)) {
@@ -931,61 +895,52 @@
         }
 
         // ============================================================
-        // ============ EVENT FLASH ==================================
+        // ============ EVENT FLASH (robust super tackle) ============
         // ============================================================
-        // ✅ FIX 1: Do-or-die now shows clear "DO OR DIE RAID!" text
-        //           instead of the log's raw "Crucial raid started".
-        //           Super/allout/DoD flashes hold for 5 seconds so
-        //           important events stay visible longer.
+        // Checks BOTH title and type so a super tackle fires the flash
+        // even if the app labels the entry differently in the future.
+        // Big events (super raid / super tackle / all out / DoD) hold
+        // for 5 seconds so they remain clearly visible.
         // ============================================================
         function showEventFlash(log) {
             const el = document.getElementById('uiEventFlash');
             if (!el || !log) return;
 
             const t = (log.title || '').toLowerCase();
+            const typeLower = (log.type || '').toLowerCase();
             const d = log.desc || '';
+            const combined = t + ' ' + typeLower;
 
             let text = '';
             let icon = '';
             let cls = '';
 
-            if (t.includes('super tackle')) {
+            if (combined.includes('super tackle') || typeLower === 'super_tackle') {
                 text = 'SUPER TACKLE! ' + d;
                 icon = 'fa-fire';
                 cls = 'super';
-            } else if (t.includes('super raid')) {
+            } else if (combined.includes('super raid')) {
                 text = 'SUPER RAID! ' + d;
                 icon = 'fa-bolt';
                 cls = 'super';
-            } else if (t.includes('all out')) {
+            } else if (combined.includes('all out')) {
                 text = 'ALL OUT! ' + d;
                 icon = 'fa-bomb';
                 cls = 'allout';
-            } else if (t.includes('do-or-die') || t.includes('do or die')) {
-                // ✅ Override the confusing "Crucial raid started" desc
+            } else if (combined.includes('do-or-die') || combined.includes('do or die')) {
                 text = 'DO OR DIE RAID!';
                 icon = 'fa-skull-crossbones';
                 cls = 'dod';
-            } else if (t.includes('touch')) {
-                text = d;
-                icon = 'fa-hand';
-                cls = 'raid';
-            } else if (t.includes('bonus')) {
-                text = d;
-                icon = 'fa-star';
-                cls = 'raid';
-            } else if (t.includes('tackle')) {
-                text = d;
-                icon = 'fa-shield';
-                cls = 'tackle';
-            } else if (t.includes('empty')) {
-                text = d;
-                icon = 'fa-ban';
-                cls = 'empty';
-            } else if (t.includes('self out')) {
-                text = d;
-                icon = 'fa-person-walking-arrow-right';
-                cls = 'empty';
+            } else if (combined.includes('touch')) {
+                text = d; icon = 'fa-hand'; cls = 'raid';
+            } else if (combined.includes('bonus')) {
+                text = d; icon = 'fa-star'; cls = 'raid';
+            } else if (combined.includes('tackle')) {
+                text = d; icon = 'fa-shield'; cls = 'tackle';
+            } else if (combined.includes('empty')) {
+                text = d; icon = 'fa-ban'; cls = 'empty';
+            } else if (combined.includes('self out')) {
+                text = d; icon = 'fa-person-walking-arrow-right'; cls = 'empty';
             } else {
                 return;
             }
@@ -1004,12 +959,6 @@
 
         // ============================================================
         // ============ PER-PLAYER POINTS BREAKDOWN ==================
-        // ============================================================
-        // ✅ FIX 2: Super Raid AND Touch Point now check for an embedded
-        //           "+ Bonus Point" in the description. If present, the
-        //           points are split: (points - 1) as touch, 1 as bonus.
-        //           Previously only "Touch Point" did this, so a
-        //           Super Raid ending with a bonus lost its bonus.
         // ============================================================
         function computePlayerPointsFromLogs(logs) {
             const result = { left: {}, right: {} };
@@ -1040,7 +989,6 @@
                 // Super Raid OR Touch Point → both may embed "+ Bonus Point"
                 if (t.includes('super raid') || t.includes('touch')) {
                     if (d.includes('bonus')) {
-                        // Total = N touch + 1 bonus
                         bucket.touch += Math.max(0, points - 1);
                         bucket.bonus += 1;
                     } else {
@@ -1048,7 +996,6 @@
                     }
                     bucket.total += points;
                 } else if (t.includes('bonus')) {
-                    // Pure bonus-only raid
                     bucket.bonus += points;
                     bucket.total += points;
                 } else if (points > 0) {
@@ -1062,10 +1009,15 @@
         // ============================================================
         // ============ PER-PLAYER TACKLE BREAKDOWN (COUNTS) =========
         // ============================================================
+        // ✅ Now tracks BOTH successful (via tackle logs) AND
+        //    unsuccessful (via touch logs where the defender was
+        //    touched). Also returns full sequence for the sequence
+        //    dots feature.
+        // ============================================================
         function computePlayerTacklesFromLogs(logs) {
             const result = { left: {}, right: {} };
             const ensure = (team, jersey) => {
-                if (!result[team][jersey]) result[team][jersey] = { successful: 0, superTackles: 0 };
+                if (!result[team][jersey]) result[team][jersey] = { successful: 0, superTackles: 0, unsuccessful: 0 };
                 return result[team][jersey];
             };
             if (!Array.isArray(logs)) return result;
@@ -1074,21 +1026,124 @@
             for (const log of sorted) {
                 if (!log) continue;
                 const t = (log.title || '').toLowerCase();
+                const d = log.desc || '';
+                const dLower = d.toLowerCase();
                 const type = (log.type || '').toUpperCase();
-                const isTackle = type === 'TACKLE' || type === 'SUPER_TACKLE' || t.includes('tackle');
-                if (!isTackle) continue;
-                if (t.includes('empty') || t.includes('touch') || t.includes('bonus') || t.includes('raid')) continue;
 
-                const m = (log.desc || '').match(/Player\s*\((\d+)\)\s*tackled by\s*Player\s*\((\d+)\)/i);
-                if (!m) continue;
+                // ── Successful / super tackles ──
+                const isTackleLog = type === 'TACKLE' || type === 'SUPER_TACKLE' ||
+                                    type.includes('TACKLE') ||
+                                    t.includes('tackle') || t.includes('tackled');
+                const isRaidEvent = t.includes('touch') || t.includes('super raid') || t.includes('bonus') || t.includes('raid') || t.includes('empty');
 
-                const tacklerJersey = String(m[2]);
-                const team = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
-                if (!team) continue;
+                if (isTackleLog && !isRaidEvent) {
+                    // Pattern: "Player (X) tackled by Player (Y)" → Y is tackler
+                    let m = d.match(/Player\s*\((\d+)\)\s*tackled by\s*Player\s*\((\d+)\)/i);
+                    if (!m) {
+                        // Fallback: any "…by Player (Y)" pattern
+                        m = d.match(/Player\s*\((\d+)\)[^()]*by\s*Player\s*\((\d+)\)/i);
+                    }
+                    if (m) {
+                        const tacklerJersey = String(m[2]);
+                        const team = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
+                        if (team) {
+                            const bucket = ensure(team, tacklerJersey);
+                            bucket.successful += 1;
+                            if (type === 'SUPER_TACKLE' || t.includes('super tackle')) bucket.superTackles += 1;
+                        }
+                    }
+                    continue;
+                }
 
-                const bucket = ensure(team, tacklerJersey);
-                bucket.successful += 1;
-                if (type === 'SUPER_TACKLE' || t.includes('super tackle')) bucket.superTackles += 1;
+                // ── Unsuccessful tackles ──
+                // A defender "fails" a tackle when the opposing raider
+                // touches them (they get touched = they're out = failed).
+                const isTouchLog = (type === 'RAID' || !type) && (t.includes('touch') || t.includes('super raid'));
+                if (isTouchLog && dLower.includes('touched')) {
+                    // "Player (X) touched Player (A), Player (B), … [+ Bonus Point]"
+                    const raiderMatch = d.match(/^\s*Player\s*\((\d+)\)\s*touched\s+(.+?)\s*(?:\+\s*Bonus\s*Point\s*)?$/i);
+                    if (raiderMatch) {
+                        const touchedPart = raiderMatch[2];
+                        const touchedJerseys = [];
+                        const re = /Player\s*\((\d+)\)/gi;
+                        let mm;
+                        while ((mm = re.exec(touchedPart)) !== null) {
+                            touchedJerseys.push(String(mm[1]));
+                        }
+                        // Defenders are the opposite team of the raider
+                        const raiderTeam = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
+                        const defenderTeam = raiderTeam === 'left' ? 'right' : (raiderTeam === 'right' ? 'left' : null);
+                        if (defenderTeam) {
+                            for (const j of touchedJerseys) {
+                                ensure(defenderTeam, j).unsuccessful += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        // ============================================================
+        // ============ PER-PLAYER TACKLE SEQUENCE ===================
+        // ============================================================
+        // Returns: { left: { jersey: ['S','ST','U', …] }, right: {...} }
+        //   S  = successful regular tackle
+        //   ST = super tackle
+        //   U  = unsuccessful (defender was touched by raider)
+        // ============================================================
+        function computePlayerTackleSequenceFromLogs(logs) {
+            const result = { left: {}, right: {} };
+            const ensure = (team, jersey) => {
+                if (!result[team][jersey]) result[team][jersey] = [];
+                return result[team][jersey];
+            };
+            if (!Array.isArray(logs)) return result;
+            const sorted = [...logs].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+
+            for (const log of sorted) {
+                if (!log) continue;
+                const t = (log.title || '').toLowerCase();
+                const d = log.desc || '';
+                const dLower = d.toLowerCase();
+                const type = (log.type || '').toUpperCase();
+
+                // Successful / super tackle
+                const isTackleLog = type === 'TACKLE' || type === 'SUPER_TACKLE' ||
+                                    type.includes('TACKLE') ||
+                                    t.includes('tackle') || t.includes('tackled');
+                const isRaidEvent = t.includes('touch') || t.includes('super raid') || t.includes('bonus') || t.includes('raid') || t.includes('empty');
+
+                if (isTackleLog && !isRaidEvent) {
+                    let m = d.match(/Player\s*\((\d+)\)\s*tackled by\s*Player\s*\((\d+)\)/i);
+                    if (!m) m = d.match(/Player\s*\((\d+)\)[^()]*by\s*Player\s*\((\d+)\)/i);
+                    if (m) {
+                        const tacklerJersey = String(m[2]);
+                        const team = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
+                        if (team) {
+                            const isSuper = type === 'SUPER_TACKLE' || t.includes('super tackle');
+                            ensure(team, tacklerJersey).push(isSuper ? 'ST' : 'S');
+                        }
+                    }
+                    continue;
+                }
+
+                // Unsuccessful tackle (defender touched by raider)
+                const isTouchLog = (type === 'RAID' || !type) && (t.includes('touch') || t.includes('super raid'));
+                if (isTouchLog && dLower.includes('touched')) {
+                    const raiderMatch = d.match(/^\s*Player\s*\((\d+)\)\s*touched\s+(.+?)\s*(?:\+\s*Bonus\s*Point\s*)?$/i);
+                    if (raiderMatch) {
+                        const touchedJerseys = [];
+                        const re = /Player\s*\((\d+)\)/gi;
+                        let mm;
+                        while ((mm = re.exec(raiderMatch[2])) !== null) touchedJerseys.push(String(mm[1]));
+                        const raiderTeam = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
+                        const defenderTeam = raiderTeam === 'left' ? 'right' : (raiderTeam === 'right' ? 'left' : null);
+                        if (defenderTeam) {
+                            for (const j of touchedJerseys) ensure(defenderTeam, j).push('U');
+                        }
+                    }
+                }
             }
             return result;
         }
@@ -1096,12 +1151,10 @@
         // ============================================================
         // ============ HALF-WISE STATS ==============================
         // ============================================================
-        // ✅ FIX 3: Defending team now registers an unsuccessful tackle
-        //           every time the opposing raider secures a touch
-        //           point (or super raid). This makes:
-        //               totalTackles = succTackles + unsuccTackles
-        //           so the tackle success-rate pie no longer sticks
-        //           at 100% forever.
+        // Touch/super-raid events now register an unsuccessful tackle
+        // for the DEFENDING team. Roster keeps totalTackles in sync:
+        //     totalTackles = succTackles + unsuccTackles
+        // so the tackle success pie no longer sticks at 100%.
         // ============================================================
         function computeHalfStats(matchData) {
             const logs = window.matchLogsForGraph || [];
@@ -1136,24 +1189,20 @@
                     s.superRaids += 1; s.totalRaids += 1; s.raid += pts;
                     if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
-                    // ✅ Touch secured → defenders failed = 1 unsuccessful tackle
                     defStats.unsuccTackles += 1;
                     defStats.totalTackles += 1;
                 } else if (t.includes('touch')) {
                     s.totalRaids += 1; s.raid += pts;
                     if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
-                    // ✅ Touch secured → defenders failed = 1 unsuccessful tackle
                     defStats.unsuccTackles += 1;
                     defStats.totalTackles += 1;
                 } else if (t.includes('bonus')) {
                     s.totalRaids += 1; s.raid += pts;
                     if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                     else s.currentStreak = 0;
-                    // ✅ Bonus alone → no tackle attempt registered
                 } else if (t.includes('empty')) {
                     s.totalRaids += 1; s.currentStreak = 0;
-                    // ✅ Empty raid → no tackle attempt
                 } else if (t.includes('super tackle')) {
                     s.superTackles += 1; s.totalTackles += 1; s.tackle += pts;
                     if (pts > 0) s.succTackles += 1;
@@ -1337,17 +1386,27 @@
         }
 
         // ============ GRAPH ENGINE ============
+        // ✅ Fixes the graph drop-to-0 bug:
+        //   When teams swap sides at half-time the app's position-based
+        //   score string swaps meaning. We now (a) detect the swap via
+        //   roster IDs and (b) translate position-scores into team-scores
+        //   consistently across the whole timeline. We also clamp values
+        //   monotonically so a transiently-stale log can never drop the
+        //   line back to 0.
+        // ============================================================
         function buildScoreTimeline() {
             const sortedLogs = [...window.matchLogsForGraph].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
             const halfDuration = window.totalMatchMinutes / 2;
             const timeline = [{ min: 0, l: 0, r: 0 }];
             let runningL = 0, runningR = 0, lastMinute = 0;
+            let inSecondHalf = false;
 
             for (let log of sortedLogs) {
                 const title = (log.title || '').toLowerCase();
                 const desc = (log.desc || '').toLowerCase();
                 const timeStr = log.timeStr || '';
                 const is2ndHalf = timeStr.includes('2nd Half');
+                if (is2ndHalf) inSecondHalf = true;
                 const isHalfStart = title.includes('half time') || desc.includes('second half begins') || desc.includes('first half begins');
 
                 let minuteInHalf = 0;
@@ -1366,7 +1425,20 @@
                 if (log.scoreStr) {
                     const clean = log.scoreStr.replace(/Score:\s*/i, '').trim();
                     const parts = clean.split('-').map(s => parseInt(s.trim()) || 0);
-                    if (parts.length === 2) { runningL = parts[0]; runningR = parts[1]; }
+                    if (parts.length === 2) {
+                        let tLeft, tRight;
+                        if (window.sidesSwapped && !inSecondHalf) {
+                            // 1st half, sides are reversed from current positions
+                            tLeft = parts[1];
+                            tRight = parts[0];
+                        } else {
+                            tLeft = parts[0];
+                            tRight = parts[1];
+                        }
+                        // Monotonic clamp — scores never decrease in a match
+                        runningL = Math.max(runningL, tLeft);
+                        runningR = Math.max(runningR, tRight);
+                    }
                 }
                 timeline.push({ min: absMinute, l: runningL, r: runningR });
             }
@@ -1638,14 +1710,25 @@
                     }
                 }
 
-                // ✅ FIX 4: App's totalTackles = total attempts. If it lags
-                //           behind log-derived success, prefer the higher
-                //           of the two so the pie accounts for known success.
-                const totalTackFromApp = parseInt(player.totalTackles) || 0;
-                const tackleBreak = window.playerTackleBreakdown[teamKey]?.[jersey] || { successful: 0, superTackles: 0 };
-                const succTack = tackleBreak.successful;
-                const superTack = tackleBreak.superTackles;
-                const tTack = Math.max(totalTackFromApp, succTack);
+                // ✅ FIX 4: Reconcile tackle stats.
+                // We compute succ + unsucc + super per player. If the app's
+                // tacklePoints suggests more successful tackles than the
+                // logs found, trust the app (avoid under-reporting).
+                const tackleBreak = window.playerTackleBreakdown[teamKey]?.[jersey] || { successful: 0, superTackles: 0, unsuccessful: 0 };
+                const succFromLogs = tackleBreak.successful || 0;
+                const superFromLogs = tackleBreak.superTackles || 0;
+                const unsuccFromLogs = tackleBreak.unsuccessful || 0;
+
+                const appTacklePoints = parseInt(player.tacklePoints) || 0;
+                const appTotalTackles = parseInt(player.totalTackles) || 0;
+
+                // Never under-report success (app points are a lower bound on count)
+                const succTack = Math.max(succFromLogs, appTacklePoints);
+                const superTack = Math.max(superFromLogs, 0);
+                // Total from either logs or app — pick the bigger so we
+                // never lose an attempt
+                const totalFromLogs = succTack + unsuccFromLogs;
+                const tTack = Math.max(totalFromLogs, appTotalTackles);
                 const unsTack = Math.max(0, tTack - succTack);
 
                 const raidSuccDeg = displayTotal > 0 ? (succRaid / displayTotal) * 360 : 0;
@@ -1677,6 +1760,18 @@
                 });
                 const raidSeqHtml = raidSeqDots.length > 0
                     ? `<div class="raid-seq-box"><div class="raid-seq-label">Raid Sequence</div><div class="raid-seq-dots">${raidSeqDots.join('')}</div></div>`
+                    : '';
+
+                // ✅ NEW: Tackle sequence dots
+                const tackleSeq = window.playerTackleSequence[teamKey]?.[jersey] || [];
+                const tackleSeqDots = tackleSeq.map(code => {
+                    let cls = 'tack-succ';
+                    if (code === 'U') cls = 'tack-unsucc';
+                    else if (code === 'ST') cls = 'tack-super';
+                    return `<div class="raid-seq-dot ${cls}"></div>`;
+                });
+                const tackleSeqHtml = tackleSeqDots.length > 0
+                    ? `<div class="raid-seq-box" style="margin-top:10px;"><div class="raid-seq-label">Tackle Sequence</div><div class="raid-seq-dots">${tackleSeqDots.join('')}</div></div>`
                     : '';
 
                 return `
@@ -1739,6 +1834,7 @@
                                 <div class="p-body-donut-caption">Super</div>
                             </div>
                         </div>
+                        ${tackleSeqHtml}
                     </div>
                 </div>`;
             };
@@ -1825,7 +1921,6 @@
             if (!matchId) return;
             const viewerEl = document.getElementById('uiViewerCount');
             if (!viewerEl) return;
-
             try {
                 let clientId = null;
                 try {
@@ -1837,51 +1932,35 @@
                 } catch (e) {
                     clientId = 'v_' + Math.random().toString(36).slice(2, 11) + '_' + Date.now();
                 }
-
                 const viewersRef = db.ref('viewers/' + matchId);
                 const myRef = viewersRef.child(clientId);
-
                 const HEARTBEAT_MS = 20000;
                 const STALE_MS = 55000;
                 let heartbeatTimer = null;
-
-                const beat = () => {
-                    myRef.set({ lastSeen: Date.now() }).catch(() => {});
-                };
-
+                const beat = () => { myRef.set({ lastSeen: Date.now() }).catch(() => {}); };
                 db.ref('.info/connected').on('value', (snap) => {
                     if (snap.val() === true) {
                         myRef.onDisconnect().remove().then(() => {
                             beat();
                             if (heartbeatTimer) clearInterval(heartbeatTimer);
                             heartbeatTimer = setInterval(beat, HEARTBEAT_MS);
-                        }).catch(() => {
-                            viewerEl.innerText = '1 watching';
-                        });
+                        }).catch(() => { viewerEl.innerText = '1 watching'; });
                     }
                 });
-
                 viewersRef.on('value', (snap) => {
                     const now = Date.now();
                     let count = 0;
                     snap.forEach(child => {
                         const v = child.val();
-                        if (v && typeof v.lastSeen === 'number' && (now - v.lastSeen) < STALE_MS) {
-                            count++;
-                        }
+                        if (v && typeof v.lastSeen === 'number' && (now - v.lastSeen) < STALE_MS) count++;
                     });
                     viewerEl.innerText = Math.max(1, count) + ' watching';
-                }, () => {
-                    viewerEl.innerText = '1 watching';
-                });
-
+                }, () => { viewerEl.innerText = '1 watching'; });
                 window.addEventListener('beforeunload', () => {
                     if (heartbeatTimer) clearInterval(heartbeatTimer);
                     myRef.remove().catch(() => {});
                 });
-            } catch (e) {
-                viewerEl.innerText = '1 watching';
-            }
+            } catch (e) { viewerEl.innerText = '1 watching'; }
         }
 
         // ============ LAST UPDATED FORMATTER ============
@@ -2068,6 +2147,12 @@
                         try { lRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
                         try { rRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
+                        // ✅ Detect side-swap via roster IDs so the graph
+                        //    knows whether position-scores need flipping
+                        try {
+                            window.sidesSwapped = lRoster.some(p => (p.id || '').startsWith('right_'));
+                        } catch (e) { window.sidesSwapped = false; }
+
                         renderMatDots(state, lRoster, rRoster, leftColor, rightColor);
 
                         if (state.logsJson) {
@@ -2077,6 +2162,7 @@
                             window.halfStatsCache = computeHalfStats(data);
                             window.playerPointsBreakdown = computePlayerPointsFromLogs(logs);
                             window.playerTackleBreakdown = computePlayerTacklesFromLogs(logs);
+                            window.playerTackleSequence = computePlayerTackleSequenceFromLogs(logs);
 
                             if (logs.length > 0) {
                                 const latestLog = logs[logs.length - 1];
