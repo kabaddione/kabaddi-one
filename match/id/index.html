@@ -561,9 +561,11 @@
                 }else if(t.includes('super tackle')){
                     s.superTackles+=1;s.totalTackles+=1;s.tackle+=pts;
                     if(pts>0)s.succTackles+=1;
+                    defStats.totalRaids+=1; // 🚨 WEB FIX: Add raid count to opponent!
                 }else if(t.includes('tackle')){
                     s.totalTackles+=1;s.tackle+=pts;
                     if(pts>0)s.succTackles+=1;
+                    defStats.totalRaids+=1; // 🚨 WEB FIX: Add raid count to opponent!
                 }else if(t.includes('all out')){
                     s.allOut+=pts;
                 }else if(log.type==='EXTRA'&&pts>0){
