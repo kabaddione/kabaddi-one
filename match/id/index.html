@@ -708,7 +708,16 @@ function computeHalfStats(matchData) {
         if (!isHalfTime) continue;
         if (!log.scoreStr) continue;
         const parts = log.scoreStr.replace(/Score:\s*/i, '').trim().split('-').map(x => parseInt(x.trim()) || 0);
-        if (parts.length === 2) { htLeft = parts[0]; htRight = parts[1]; }
+        if (parts.length === 2) { 
+            // 🚨 SIDES SWAP FIX: Flip the half-time snapshot scores if the teams swapped sides!
+            if (sidesSwapped) {
+                htLeft = parts[1]; 
+                htRight = parts[0];
+            } else {
+                htLeft = parts[0]; 
+                htRight = parts[1];
+            }
+        }
     }
 
     const lScoreNow = Number(matchData && matchData.left_score) || 0;
@@ -823,12 +832,17 @@ function buildScoreTimeline(){
             const parts=clean.split('-').map(s=>parseInt(s.trim())||0);
             if(parts.length===2){
                 let teamL,teamR;
-                if(sidesSwapped&&!logIs2ndHalf){
+                
+                // 🚨 GRAPH BUG FIX: The "Half Time" log is generated BEFORE the app physically swaps teams in memory.
+                // This means its score string still represents the 1st half team positions!
+                const isHalfTimeLog = title.includes('half time') || desc.includes('second half begins');
+                const isPreSwapLog = !logIs2ndHalf || isHalfTimeLog;
+
+                if(sidesSwapped && isPreSwapLog){
                     teamL=parts[1];teamR=parts[0];
                 }else{
                     teamL=parts[0];teamR=parts[1];
                 }
-                // 🚨 GRAPH BUG FIX: Removed Math.max() so teams keep their independent score lines when swapping sides!
                 runningL=teamL;
                 runningR=teamR;
             }
