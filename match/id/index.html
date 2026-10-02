@@ -76,6 +76,11 @@
         .event-flash.super{border-color:rgba(255,184,48,0.9);box-shadow:0 10px 45px rgba(255,184,48,0.55);background:rgba(60,40,5,0.96)}.event-flash.super i{color:#FFB830}
         .event-flash.allout{border-color:rgba(255,59,48,0.9);box-shadow:0 10px 45px rgba(255,59,48,0.6);background:rgba(60,8,5,0.96)}.event-flash.allout i{color:#FF3B30}
         .event-flash.dod{border-color:rgba(255,94,58,0.85);box-shadow:0 10px 45px rgba(255,94,58,0.55);background:rgba(55,15,5,0.96)}.event-flash.dod i{color:#FF5E3A}
+        .event-flash.sub{border-color:rgba(186,104,200,0.9);box-shadow:0 10px 45px rgba(186,104,200,0.5);background:rgba(35,12,50,0.96)}.event-flash.sub i{color:#BA68C8}
+.event-flash.card-red{border-color:rgba(239,68,68,0.95);box-shadow:0 10px 45px rgba(239,68,68,0.6);background:rgba(50,5,5,0.96)}.event-flash.card-red i{color:#EF4444}
+.event-flash.card-yellow{border-color:rgba(251,192,45,0.95);box-shadow:0 10px 45px rgba(251,192,45,0.6);background:rgba(55,40,5,0.96)}.event-flash.card-yellow i{color:#FBC02D}
+.event-flash.card-green{border-color:rgba(34,197,94,0.95);box-shadow:0 10px 45px rgba(34,197,94,0.6);background:rgba(5,45,15,0.96)}.event-flash.card-green i{color:#22C55E}
+.event-flash.card{border-color:rgba(255,255,255,0.5);box-shadow:0 10px 45px rgba(255,255,255,0.3)}.event-flash.card i{color:#fff}
         .score-board{position:relative;border-radius:28px;padding:20px 20px 24px;overflow:hidden;background:linear-gradient(165deg,#1c2040 0%,#131629 55%,#0f1122 100%);box-shadow:var(--shadow-lift);border:1px solid var(--glass-border);isolation:isolate}
         .score-board::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,color-mix(in srgb,var(--left-team-color) 25%,transparent) 0%,transparent 55%),radial-gradient(ellipse at top right,color-mix(in srgb,var(--right-team-color) 25%,transparent) 0%,transparent 55%);opacity:.6;z-index:-1;pointer-events:none}
         .board-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
@@ -127,6 +132,7 @@
         .mini-stat{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#fff;min-width:0}
         .mini-stat .stat-icon-wrap{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);color:var(--team-accent,#fff);font-size:10px;flex-shrink:0}
 .mini-stat .stat-icon-wrap img{width:100%;height:100%;object-fit:contain;padding:2px;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.3))}
+.mini-stat .stat-icon-wrap .png-tint{display:block;width:100%;height:100%;background-color:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:80% 80%;mask-size:80% 80%;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.3))}
         .mini-stat-value{font-variant-numeric:tabular-nums;font-size:14px;font-weight:900;line-height:1}
         .mini-stat-label{font-size:9px;font-weight:800;color:#8C8E9F;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;line-height:1}
         .tabs{display:flex;gap:6px;margin:20px 0 16px;padding:5px;background:var(--surface-1);border-radius:100px;border:1px solid var(--glass-border);overflow-x:auto;scrollbar-width:none}
@@ -302,9 +308,9 @@
             <div class="mat-section"><div class="mat-title">On The Mat</div><div class="mat-row" id="uiMatDots"><div class="team-mat left"></div><div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt=""></div><div class="team-mat right"></div></div></div>
         </div>
         <div class="live-meta" id="uiLiveMeta"><span id="uiLastUpdated">Updated just now</span><span class="live-meta-sep">•</span><span id="uiViewerCount">1 watching</span></div>
-        <div class="quick-stats">
-            <div class="quick-stat-team left-stat" style="--team-accent:var(--left-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/card.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-hand'}))"></div><span class="mini-stat-value" id="uiLeftFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/timeout.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-stopwatch'}))"></div><span class="mini-stat-value" id="uiLeftTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/substitution.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-right-left'}))"></div><span class="mini-stat-value" id="uiLeftSubs">0</span><span class="mini-stat-label">Subs</span></div><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/empty.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-regular fa-circle-xmark'}))"></div><span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div></div></div>
-            <div class="quick-stat-team right-stat" style="--team-accent:var(--right-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/timeout.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-stopwatch'}))"></div><span class="mini-stat-value" id="uiRightTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/card.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-hand'}))"></div><span class="mini-stat-value" id="uiRightFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/empty.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-regular fa-circle-xmark'}))"></div><span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div><div class="mini-stat"><div class="stat-icon-wrap"><img src="/images/substitution.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-right-left'}))"></div><span class="mini-stat-value" id="uiRightSubs">0</span><span class="mini-stat-label">Subs</span></div></div></div>
+                <div class="quick-stats">
+            <div class="quick-stat-team left-stat" style="--team-accent:var(--left-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/card.png" data-fa="fa-solid fa-hand"></span></div><span class="mini-stat-value" id="uiLeftFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/timeout.png" data-fa="fa-solid fa-stopwatch"></span></div><span class="mini-stat-value" id="uiLeftTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/substitution.png" data-fa="fa-solid fa-right-left"></span></div><span class="mini-stat-value" id="uiLeftSubs">0</span><span class="mini-stat-label">Subs</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/empty.png" data-fa="fa-regular fa-circle-xmark"></span></div><span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div></div></div>
+            <div class="quick-stat-team right-stat" style="--team-accent:var(--right-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/timeout.png" data-fa="fa-solid fa-stopwatch"></span></div><span class="mini-stat-value" id="uiRightTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/card.png" data-fa="fa-solid fa-hand"></span></div><span class="mini-stat-value" id="uiRightFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/empty.png" data-fa="fa-regular fa-circle-xmark"></span></div><span class="mini-stat-value" id="uiRightEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/substitution.png" data-fa="fa-solid fa-right-left"></span></div><span class="mini-stat-value" id="uiRightSubs">0</span><span class="mini-stat-label">Subs</span></div></div></div>
         </div>
         <div class="tabs">
             <div class="tab active" onclick="switchTab('commentary',this)">Live</div>
@@ -389,6 +395,32 @@
         window.lastSeenLogId=undefined;
         window.eventFlashTimeout=null;
 
+                // ============================================================
+        // ============ MINI-STAT PNG TINTING =========================
+        // ============================================================
+        // Uses each PNG as a CSS mask so it inherits currentColor
+        // (the team accent), matching the original FA icon look.
+        // If the PNG is missing, falls back to the FA icon.
+        // ============================================================
+        (function tintMiniStatIcons(){
+            document.querySelectorAll('.png-tint').forEach(el => {
+                const src = el.dataset.src;
+                const fa  = el.dataset.fa || 'fa-solid fa-circle';
+                if (!src) return;
+                const probe = new Image();
+                probe.onload = () => {
+                    el.style.webkitMaskImage = `url("${src}")`;
+                    el.style.maskImage        = `url("${src}")`;
+                };
+                probe.onerror = () => {
+                    const i = document.createElement('i');
+                    i.className = fa;
+                    el.replaceWith(i);
+                };
+                probe.src = src;
+            });
+        })();
+
         function togglePlayerExpand(el,pid){if(window.expandedPlayerIds.has(pid)){window.expandedPlayerIds.delete(pid);el.classList.remove('expanded')}else{document.querySelectorAll('.player-card').forEach(e=>e.classList.remove('expanded'));window.expandedPlayerIds.clear();window.expandedPlayerIds.add(pid);el.classList.add('expanded')}}
         function switchTab(tabId,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));el.classList.add('active');document.getElementById('tab-'+tabId).classList.add('active');if(tabId==='graph')requestAnimationFrame(()=>setTimeout(drawGraph,30))}
         function switchLineupTeam(side){window.currentLineupTeam=side;const L=document.getElementById('togLeft');const R=document.getElementById('togRight');L.className='team-toggle-btn'+(side==='left'?' active-left':'');R.className='team-toggle-btn'+(side==='right'?' active-right':'');if(window.latestGlobalState)renderLineups(window.latestGlobalState)}
@@ -402,25 +434,51 @@
         function getLogIconPath(title){return`/images/${getLogIconName(title)}.png`}
 
         // EVENT FLASH
-        function showEventFlash(log){
+                function showEventFlash(log){
             const el=document.getElementById('uiEventFlash');if(!el||!log)return;
-            const t=(log.title||'').toLowerCase();const typeLower=(log.type||'').toLowerCase();const d=log.desc||'';const combined=t+' '+typeLower;
+            const t=(log.title||'').toLowerCase();
+            const typeLower=(log.type||'').toLowerCase();
+            const d=log.desc||'';
+            const combined=t+' '+typeLower;
             let text='',icon='',cls='';
-            if(combined.includes('super tackle')||typeLower==='super_tackle'){text='SUPER TACKLE! '+d;icon='fa-fire';cls='super'}
-            else if(combined.includes('super raid')){text='SUPER RAID! '+d;icon='fa-bolt';cls='super'}
-            else if(combined.includes('all out')){text='ALL OUT! '+d;icon='fa-bomb';cls='allout'}
-            else if(combined.includes('do-or-die')||combined.includes('do or die')){text='DO OR DIE RAID!';icon='fa-skull-crossbones';cls='dod'}
-            else if(combined.includes('touch')){text=d;icon='fa-hand';cls='raid'}
-            else if(combined.includes('bonus')){text=d;icon='fa-star';cls='raid'}
-            else if(combined.includes('tackle')){text=d;icon='fa-shield';cls='tackle'}
-            else if(combined.includes('empty')){text=d;icon='fa-ban';cls='empty'}
-            else if(combined.includes('self out')){text=d;icon='fa-person-walking-arrow-right';cls='empty'}
-            else return;
+
+            if(combined.includes('super tackle')||typeLower==='super_tackle'){
+                text='SUPER TACKLE! '+d;icon='fa-fire';cls='super';
+            } else if(combined.includes('super raid')){
+                text='SUPER RAID! '+d;icon='fa-bolt';cls='super';
+            } else if(combined.includes('all out')){
+                text='ALL OUT! '+d;icon='fa-bomb';cls='allout';
+            } else if(combined.includes('do-or-die')||combined.includes('do or die')){
+                text='DO OR DIE RAID!';icon='fa-skull-crossbones';cls='dod';
+            } else if(combined.includes('red card')){
+                text='RED CARD — '+d;icon='fa-square';cls='card-red';
+            } else if(combined.includes('yellow card')){
+                text='YELLOW CARD — '+d;icon='fa-square';cls='card-yellow';
+            } else if(combined.includes('green card')){
+                text='GREEN CARD — '+d;icon='fa-square';cls='card-green';
+            } else if(combined.includes('card')){
+                text='CARD — '+d;icon='fa-square';cls='card';
+            } else if(combined.includes('substitution')||combined.includes('replaced by')){
+                text='SUBSTITUTION — '+d;icon='fa-right-left';cls='sub';
+            } else if(combined.includes('touch')){
+                text=d;icon='fa-hand';cls='raid';
+            } else if(combined.includes('bonus')){
+                text=d;icon='fa-star';cls='raid';
+            } else if(combined.includes('tackle')){
+                text=d;icon='fa-shield';cls='tackle';
+            } else if(combined.includes('empty')){
+                text=d;icon='fa-ban';cls='empty';
+            } else if(combined.includes('self out')){
+                text=d;icon='fa-person-walking-arrow-right';cls='empty';
+            } else {
+                return;
+            }
+
             if(!text)return;
             el.innerHTML=`<i class="fa-solid ${icon}"></i><span>${text}</span>`;
             el.className='event-flash '+cls;void el.offsetWidth;el.classList.add('visible');
             if(window.eventFlashTimeout)clearTimeout(window.eventFlashTimeout);
-            const dur=(cls==='super'||cls==='allout'||cls==='dod')?5000:4000;
+            const dur=(cls==='super'||cls==='allout'||cls==='dod'||cls==='sub'||cls==='card'||cls==='card-red'||cls==='card-yellow'||cls==='card-green')?5000:4000;
             window.eventFlashTimeout=setTimeout(()=>{el.classList.remove('visible')},dur);
         }
 
