@@ -556,40 +556,42 @@ function computeHalfStats(matchData) {
     const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
 
     for (let i = 0; i < sortedLogs.length; i++) {
-        const log = sortedLogs[i];
-        if (log.type === 'PERIOD') continue;
+            const log = sortedLogs[i];
+            if (log.type === 'PERIOD') continue;
 
-        const ts = log.timeStr || '';
-        let half = null;
-        if (ts.includes('1st Half')) half = 'first';
-        else if (ts.includes('2nd Half')) half = 'second';
-        if (!half) continue;
+            const ts = log.timeStr || '';
+            let half = null;
+            if (ts.includes('1st Half')) half = 'first';
+            else if (ts.includes('2nd Half')) half = 'second';
+            if (!half) continue;
 
-        const teamKey = log.isLeftTeam === true ? 'left'
-                       : log.isLeftTeam === false ? 'right'
-                       : null;
-        if (!teamKey) continue;
+            const teamKey = log.isLeftTeam === true ? 'left'
+                           : log.isLeftTeam === false ? 'right'
+                           : null;
+            if (!teamKey) continue;
 
-        const s = stats[teamKey][half];
-        const defKey = teamKey === 'left' ? 'right' : 'left';
-        const defStats = stats[defKey][half];
-        const t = (log.title || '').toLowerCase();
-        const pts = log.points || 0;
+            const s = stats[teamKey][half];
+            const defKey = teamKey === 'left' ? 'right' : 'left';
+            const defStats = stats[defKey][half];
+            const t = (log.title || '').toLowerCase();
+            const pts = log.points || 0;
 
-        // Detect a bonus+tackle continuation: the previous log was a
-        // bonus by the OPPOSITE team (the raider's team). In that case
-        // this tackle is the SAME raid as the preceding bonus.
-        let isPrecededByBonusByOpposite = false;
-        if (i > 0) {
-            const prev = sortedLogs[i - 1];
-            const prevT = (prev.title || '').toLowerCase();
-            if (prev.type === 'RAID' &&
-                prevT.includes('bonus') &&
-                prev.isLeftTeam !== log.isLeftTeam) {
-                isPrecededByBonusByOpposite = true;
+            // 🚨 THE FIX: A raider getting tackled + scoring a bonus generates TWO logs.
+            // The Tackle log is generated first, and the Bonus log is generated immediately after.
+            // We need to look AHEAD one index to see if the next log is a bonus point for the other team!
+            let isFollowedByBonusByOpposite = false;
+            if (i < sortedLogs.length - 1) {
+                const nextLog = sortedLogs[i + 1];
+                const nextT = (nextLog.title || '').toLowerCase();
+                
+                // If the next log is a Bonus, and it belongs to the OTHER team (the Raiders),
+                // then this tackle is part of the exact same raid event!
+                if (nextLog.type === 'RAID' && 
+                    nextT.includes('bonus') && 
+                    nextLog.isLeftTeam !== log.isLeftTeam) {
+                    isFollowedByBonusByOpposite = true;
+                }
             }
-        }
-
         if (t.includes('super raid')) {
             // Super raid = touch + bonus in one event
             s.superRaids += 1;
@@ -640,16 +642,16 @@ function computeHalfStats(matchData) {
             // Empty raid — no score
             s.totalRaids += 1;
             s.currentStreak = 0;
-
-        } else if (t.includes('super tackle')) {
+} else if (t.includes('super tackle')) {
             // Super tackle — defender scores 2 points
             s.superTackles += 1;
             s.totalTackles += 1;
             s.tackle += pts;
             if (pts > 0) s.succTackles += 1;
-            // ✅ NEW: raider's team used a raid — but ONLY if this isn't
-            //    the continuation of a bonus scored in the same raid
-            if (!isPrecededByBonusByOpposite) {
+            
+            // 🚨 NEW: Only charge the raider with a raid attempt if we haven't already
+            // charged them via the paired Bonus Point log!
+            if (!isFollowedByBonusByOpposite) {
                 defStats.totalRaids += 1;
             }
 
@@ -658,9 +660,10 @@ function computeHalfStats(matchData) {
             s.totalTackles += 1;
             s.tackle += pts;
             if (pts > 0) s.succTackles += 1;
-            // ✅ NEW: raider's team used a raid — but ONLY if this isn't
-            //    the continuation of a bonus scored in the same raid
-            if (!isPrecededByBonusByOpposite) {
+            
+            // 🚨 NEW: Only charge the raider with a raid attempt if we haven't already
+            // charged them via the paired Bonus Point log!
+            if (!isFollowedByBonusByOpposite) {
                 defStats.totalRaids += 1;
             }
 
