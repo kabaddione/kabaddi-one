@@ -603,6 +603,8 @@ function computeHalfStats(matchData) {
     });
     const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
 
+    const sidesSwapped = window.sidesSwapped === true;
+
     for (let i = 0; i < sortedLogs.length; i++) {
         const log = sortedLogs[i];
         if (log.type === 'PERIOD') continue;
@@ -613,7 +615,14 @@ function computeHalfStats(matchData) {
         else if (ts.includes('2nd Half')) half = 'second';
         if (!half) continue;
 
-        const teamKey = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
+        // 🚨 SIDE SWAP FIX: Ensure 1st half logs map to the correct team in the 2nd half UI
+        let isLogLeftTeam = log.isLeftTeam;
+        if (sidesSwapped && half === 'first') {
+            if (isLogLeftTeam === true) isLogLeftTeam = false;
+            else if (isLogLeftTeam === false) isLogLeftTeam = true;
+        }
+
+        const teamKey = isLogLeftTeam === true ? 'left' : isLogLeftTeam === false ? 'right' : null;
         if (!teamKey) continue;
 
         const s = stats[teamKey][half];
@@ -622,11 +631,8 @@ function computeHalfStats(matchData) {
         
         const t = (log.title || '').toLowerCase();
         const pts = log.points || 0;
-        
-        // 🚨 PREVENTS "MANUAL TOUCH" FROM CORRUPTING STRIKE RATES
         const isManual = t.includes('manual'); 
 
-        // 🚨 LOOK AHEAD FIX: If this is a tackle, does the raider get a bonus immediately after?
         let isFollowedByBonusByOpposite = false;
         if (i < sortedLogs.length - 1) {
             const nextLog = sortedLogs[i + 1];
@@ -641,7 +647,6 @@ function computeHalfStats(matchData) {
             if (!isManual) {
                 s.superRaids += 1; s.totalRaids += 1;
                 if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
-                // 🚨 BUG FIX: Raider escaped, so defense failed a tackle opportunity!
                 defStats.totalTackles += 1; defStats.unsuccTackles += 1;
             }
         } else if (t.includes('touch')) {
@@ -650,7 +655,6 @@ function computeHalfStats(matchData) {
                 s.totalRaids += 1;
                 if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                 else s.currentStreak = 0;
-                // 🚨 BUG FIX: Raider escaped, so defense failed a tackle opportunity!
                 defStats.totalTackles += 1; defStats.unsuccTackles += 1;
             }
         } else if (t.includes('bonus')) {
@@ -659,13 +663,11 @@ function computeHalfStats(matchData) {
                 s.totalRaids += 1;
                 if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
                 else s.currentStreak = 0;
-                // 🚨 BUG FIX: Standalone bonus means defense failed to tackle!
                 defStats.totalTackles += 1; defStats.unsuccTackles += 1;
             }
         } else if (t.includes('empty')) {
             if (!isManual) {
                 s.totalRaids += 1; s.currentStreak = 0;
-                // 🚨 BUG FIX: Empty raids also count as a tackle opportunity!
                 defStats.totalTackles += 1; defStats.unsuccTackles += 1;
             }
         } else if (t.includes('super tackle')) {
@@ -673,7 +675,6 @@ function computeHalfStats(matchData) {
             if (!isManual) {
                 s.superTackles += 1; s.totalTackles += 1;
                 if (pts > 0) s.succTackles += 1;
-                // 🚨 PREVENTS +2 TOTAL RAIDS BUG
                 if (!isFollowedByBonusByOpposite) defStats.totalRaids += 1;
             }
         } else if (t.includes('tackle')) {
@@ -681,8 +682,13 @@ function computeHalfStats(matchData) {
             if (!isManual) {
                 s.totalTackles += 1;
                 if (pts > 0) s.succTackles += 1;
-                // 🚨 PREVENTS +2 TOTAL RAIDS BUG
                 if (!isFollowedByBonusByOpposite) defStats.totalRaids += 1;
+            }
+        } else if (t.includes('self out')) {
+            // 🚨 SELF OUT FIX: A raider stepping out counts as a Successful Tackle for the defense!
+            if (!isManual) {
+                s.totalRaids += 1; s.currentStreak = 0;
+                defStats.totalTackles += 1; defStats.succTackles += 1;
             }
         } else if (t.includes('all out')) {
             s.allOut += pts;
@@ -788,48 +794,49 @@ function computeHalfStats(matchData) {
         }
 
         // GRAPH — team-based scores with monotonic clamp so lines never drop
-        function buildScoreTimeline(){
-            const sortedLogs=[...window.matchLogsForGraph].sort((a,b)=>(parseInt(a.id)||0)-(parseInt(b.id)||0));
-            const halfDuration=window.totalMatchMinutes/2;
-            const timeline=[{min:0,l:0,r:0}];
-            let runningL=0,runningR=0,lastMinute=0;
-            let inSecondHalf=false;
-            const sidesSwapped=window.sidesSwapped===true;
-            for(const log of sortedLogs){
-                const title=(log.title||'').toLowerCase();const desc=(log.desc||'').toLowerCase();
-                const timeStr=log.timeStr||'';
-                const logIs2ndHalf=timeStr.includes('2nd Half');
-                const isHalfStart=title.includes('half time')||desc.includes('second half begins')||desc.includes('first half begins');
-                let minuteInHalf=0;const m=timeStr.match(/(\d+)\s*'/);if(m)minuteInHalf=parseInt(m[1])||0;
-                let absMinute;
-                if(logIs2ndHalf)absMinute=isHalfStart?halfDuration:(halfDuration+minuteInHalf);
-                else absMinute=minuteInHalf;
-                if(absMinute>window.totalMatchMinutes)absMinute=window.totalMatchMinutes;
-                if(absMinute<0)absMinute=0;
-                if(absMinute<lastMinute)absMinute=lastMinute;
-                lastMinute=absMinute;
-                if(log.scoreStr){
-                    const clean=log.scoreStr.replace(/Score:\s*/i,'').trim();
-                    const parts=clean.split('-').map(s=>parseInt(s.trim())||0);
-                    if(parts.length===2){
-                        let teamL,teamR;
-                        // Blue line = current-left team; green = current-right team
-                        // If sides swapped (currently left = originally-right), 1st half logs
-                        // have Bangal on right (parts[1]) and Patna on left (parts[0]).
-                        // Flip when reading 1st half logs after swap detection.
-                        if(sidesSwapped&&!logIs2ndHalf){
-                            teamL=parts[1];teamR=parts[0];
-                        }else{
-                            teamL=parts[0];teamR=parts[1];
-                        }
-                        runningL=Math.max(runningL,teamL);
-                        runningR=Math.max(runningR,teamR);
-                    }
+function buildScoreTimeline(){
+    const sortedLogs=[...window.matchLogsForGraph].sort((a,b)=>(parseInt(a.id)||0)-(parseInt(b.id)||0));
+    const halfDuration=window.totalMatchMinutes/2;
+    const timeline=[{min:0,l:0,r:0}];
+    let runningL=0,runningR=0,lastMinute=0;
+    const sidesSwapped=window.sidesSwapped===true;
+
+    for(const log of sortedLogs){
+        const title=(log.title||'').toLowerCase();const desc=(log.desc||'').toLowerCase();
+        const timeStr=log.timeStr||'';
+        const logIs2ndHalf=timeStr.includes('2nd Half');
+        const isHalfStart=title.includes('half time')||desc.includes('second half begins')||desc.includes('first half begins');
+        
+        let minuteInHalf=0;const m=timeStr.match(/(\d+)\s*'/);if(m)minuteInHalf=parseInt(m[1])||0;
+        
+        let absMinute;
+        if(logIs2ndHalf)absMinute=isHalfStart?halfDuration:(halfDuration+minuteInHalf);
+        else absMinute=minuteInHalf;
+        
+        if(absMinute>window.totalMatchMinutes)absMinute=window.totalMatchMinutes;
+        if(absMinute<0)absMinute=0;
+        if(absMinute<lastMinute)absMinute=lastMinute;
+        lastMinute=absMinute;
+        
+        if(log.scoreStr){
+            const clean=log.scoreStr.replace(/Score:\s*/i,'').trim();
+            const parts=clean.split('-').map(s=>parseInt(s.trim())||0);
+            if(parts.length===2){
+                let teamL,teamR;
+                if(sidesSwapped&&!logIs2ndHalf){
+                    teamL=parts[1];teamR=parts[0];
+                }else{
+                    teamL=parts[0];teamR=parts[1];
                 }
-                timeline.push({min:absMinute,l:runningL,r:runningR});
+                // 🚨 GRAPH BUG FIX: Removed Math.max() so teams keep their independent score lines when swapping sides!
+                runningL=teamL;
+                runningR=teamR;
             }
-            return timeline;
         }
+        timeline.push({min:absMinute,l:runningL,r:runningR});
+    }
+    return timeline;
+}
 
         function sampleTimeline(timeline,res,upTo){
             const s=[];const maxM=Math.min(upTo,window.totalMatchMinutes);
