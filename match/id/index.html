@@ -589,18 +589,7 @@
         }
 
         // ============================================================
-// ============ HALF-WISE STATS (with bonus+tackle fix) =======
-// ============================================================
-// Key behaviours:
-//   • touch / super raid  → raider's team: totalRaids+1, succRaids+1
-//                            defender's team: totalTackles+1, unsuccTackles+1
-//   • bonus (alone)       → raider's team: totalRaids+1, succRaids+1
-//   • empty raid          → raider's team: totalRaids+1
-//   • tackle / super      → defender's team: totalTackles+1, succTackles+1
-//                            raider's team: totalRaids+1  ← NEW (user's fix)
-//   • bonus + tackle      → raider's team: totalRaids+1, succRaids+1  (single raid)
-//                            defender's team: totalTackles+1, succTackles+1
-//                            → tackle branch SKIPS totalRaids (bonus branch already did it)
+// ============ HALF-WISE STATS (with precise Kabaddi rules) ==
 // ============================================================
 function computeHalfStats(matchData) {
     const logs = window.matchLogsForGraph || [];
@@ -614,59 +603,93 @@ function computeHalfStats(matchData) {
     });
     const stats = { left: { first: blank(), second: blank() }, right: { first: blank(), second: blank() } };
 
-    for(let i=0; i<sortedLogs.length; i++){
-                const log = sortedLogs[i];
-                if(log.type==='PERIOD')continue;
-                const ts=log.timeStr||'';let half=null;
-                if(ts.includes('1st Half'))half='first';else if(ts.includes('2nd Half'))half='second';
-                if(!half)continue;
-                const teamKey=log.isLeftTeam===true?'left':log.isLeftTeam===false?'right':null;if(!teamKey)continue;
-                const s=stats[teamKey][half];
-                const defKey=teamKey==='left'?'right':'left';
-                const defStats=stats[defKey][half];
-                const t=(log.title||'').toLowerCase();const pts=log.points||0;
+    for (let i = 0; i < sortedLogs.length; i++) {
+        const log = sortedLogs[i];
+        if (log.type === 'PERIOD') continue;
 
-                // 🚨 THE FIX: Look ahead! If this is a tackle, is the NEXT log a bonus for the raider?
-                let isFollowedByBonusByOpposite = false;
-                if (i < sortedLogs.length - 1) {
-                    const nextLog = sortedLogs[i + 1];
-                    const nextT = (nextLog.title || '').toLowerCase();
-                    if (nextLog.type === 'RAID' && nextT.includes('bonus') && nextLog.isLeftTeam !== log.isLeftTeam) {
-                        isFollowedByBonusByOpposite = true;
-                    }
-                }
+        const ts = log.timeStr || '';
+        let half = null;
+        if (ts.includes('1st Half')) half = 'first';
+        else if (ts.includes('2nd Half')) half = 'second';
+        if (!half) continue;
 
-                if(t.includes('super raid')){
-                    s.superRaids+=1;s.totalRaids+=1;s.raid+=pts;
-                    if(pts>0){s.succRaids+=1;s.currentStreak+=1;if(s.currentStreak>s.longestStreak)s.longestStreak=s.currentStreak}else s.currentStreak=0;
-                    // Raider escaped! Give defense +1 Total Tackle and +1 Unsuccessful Tackle
-                    defStats.unsuccTackles+=1;defStats.totalTackles+=1;
-                }else if(t.includes('touch')){
-                    s.totalRaids+=1;s.raid+=pts;
-                    if(pts>0){s.succRaids+=1;s.currentStreak+=1;if(s.currentStreak>s.longestStreak)s.longestStreak=s.currentStreak}else s.currentStreak=0;
-                    // Raider escaped! Give defense +1 Total Tackle and +1 Unsuccessful Tackle
-                    defStats.unsuccTackles+=1;defStats.totalTackles+=1;
-                }else if(t.includes('bonus')){
-                    s.totalRaids+=1;s.raid+=pts;
-                    if(pts>0){s.succRaids+=1;s.currentStreak+=1;if(s.currentStreak>s.longestStreak)s.longestStreak=s.currentStreak}else s.currentStreak=0;
-                }else if(t.includes('empty')){
-                    s.totalRaids+=1;s.currentStreak=0;
-                }else if(t.includes('super tackle')){
-                    s.superTackles+=1;s.totalTackles+=1;s.tackle+=pts;
-                    if(pts>0)s.succTackles+=1;
-                    // 🚨 If a bonus follows this, DO NOT add +1 to total raids (prevents the +2 bug)
-                    if(!isFollowedByBonusByOpposite) defStats.totalRaids+=1;
-                }else if(t.includes('tackle')){
-                    s.totalTackles+=1;s.tackle+=pts;
-                    if(pts>0)s.succTackles+=1;
-                    // 🚨 If a bonus follows this, DO NOT add +1 to total raids (prevents the +2 bug)
-                    if(!isFollowedByBonusByOpposite) defStats.totalRaids+=1;
-                }else if(t.includes('all out')){
-                    s.allOut+=pts;
-                }else if(log.type==='EXTRA'&&pts>0){
-                    s.extra+=pts;
-                }
+        const teamKey = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
+        if (!teamKey) continue;
+
+        const s = stats[teamKey][half];
+        const defKey = teamKey === 'left' ? 'right' : 'left';
+        const defStats = stats[defKey][half];
+        
+        const t = (log.title || '').toLowerCase();
+        const pts = log.points || 0;
+        
+        // 🚨 PREVENTS "MANUAL TOUCH" FROM CORRUPTING STRIKE RATES
+        const isManual = t.includes('manual'); 
+
+        // 🚨 LOOK AHEAD FIX: If this is a tackle, does the raider get a bonus immediately after?
+        let isFollowedByBonusByOpposite = false;
+        if (i < sortedLogs.length - 1) {
+            const nextLog = sortedLogs[i + 1];
+            const nextT = (nextLog.title || '').toLowerCase();
+            if (nextLog.type === 'RAID' && nextT.includes('bonus') && nextLog.isLeftTeam !== log.isLeftTeam) {
+                isFollowedByBonusByOpposite = true;
             }
+        }
+
+        if (t.includes('super raid')) {
+            s.raid += pts;
+            if (!isManual) {
+                s.superRaids += 1; s.totalRaids += 1;
+                if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
+                // 🚨 BUG FIX: Raider escaped, so defense failed a tackle opportunity!
+                defStats.totalTackles += 1; defStats.unsuccTackles += 1;
+            }
+        } else if (t.includes('touch')) {
+            s.raid += pts;
+            if (!isManual) {
+                s.totalRaids += 1;
+                if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
+                else s.currentStreak = 0;
+                // 🚨 BUG FIX: Raider escaped, so defense failed a tackle opportunity!
+                defStats.totalTackles += 1; defStats.unsuccTackles += 1;
+            }
+        } else if (t.includes('bonus')) {
+            s.raid += pts;
+            if (!isManual) {
+                s.totalRaids += 1;
+                if (pts > 0) { s.succRaids += 1; s.currentStreak += 1; if (s.currentStreak > s.longestStreak) s.longestStreak = s.currentStreak; }
+                else s.currentStreak = 0;
+                // 🚨 BUG FIX: Standalone bonus means defense failed to tackle!
+                defStats.totalTackles += 1; defStats.unsuccTackles += 1;
+            }
+        } else if (t.includes('empty')) {
+            if (!isManual) {
+                s.totalRaids += 1; s.currentStreak = 0;
+                // 🚨 BUG FIX: Empty raids also count as a tackle opportunity!
+                defStats.totalTackles += 1; defStats.unsuccTackles += 1;
+            }
+        } else if (t.includes('super tackle')) {
+            s.tackle += pts;
+            if (!isManual) {
+                s.superTackles += 1; s.totalTackles += 1;
+                if (pts > 0) s.succTackles += 1;
+                // 🚨 PREVENTS +2 TOTAL RAIDS BUG
+                if (!isFollowedByBonusByOpposite) defStats.totalRaids += 1;
+            }
+        } else if (t.includes('tackle')) {
+            s.tackle += pts;
+            if (!isManual) {
+                s.totalTackles += 1;
+                if (pts > 0) s.succTackles += 1;
+                // 🚨 PREVENTS +2 TOTAL RAIDS BUG
+                if (!isFollowedByBonusByOpposite) defStats.totalRaids += 1;
+            }
+        } else if (t.includes('all out')) {
+            s.allOut += pts;
+        } else if (log.type === 'EXTRA' && pts > 0) {
+            s.extra += pts;
+        }
+    }
 
     // ── Half-time snapshot for authoritative totals ──
     let htLeft = null, htRight = null;
@@ -678,8 +701,7 @@ function computeHalfStats(matchData) {
                            d.includes('first half ends') || d.includes('first half end');
         if (!isHalfTime) continue;
         if (!log.scoreStr) continue;
-        const parts = log.scoreStr.replace(/Score:\s*/i, '').trim()
-            .split('-').map(x => parseInt(x.trim()) || 0);
+        const parts = log.scoreStr.replace(/Score:\s*/i, '').trim().split('-').map(x => parseInt(x.trim()) || 0);
         if (parts.length === 2) { htLeft = parts[0]; htRight = parts[1]; }
     }
 
@@ -691,20 +713,16 @@ function computeHalfStats(matchData) {
 
     let lFirstTotal, rFirstTotal, lSecondTotal, rSecondTotal;
     if (htLeft !== null) {
-        lFirstTotal = htLeft;
-        rFirstTotal = htRight;
+        lFirstTotal = htLeft; rFirstTotal = htRight;
         lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
         rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
     } else if (inSecondHalf) {
-        lFirstTotal = stats.left.first.total;
-        rFirstTotal = stats.right.first.total;
+        lFirstTotal = stats.left.first.total; rFirstTotal = stats.right.first.total;
         lSecondTotal = Math.max(0, lScoreNow - lFirstTotal);
         rSecondTotal = Math.max(0, rScoreNow - rFirstTotal);
     } else {
-        lFirstTotal = Math.max(lScoreNow, 0);
-        rFirstTotal = Math.max(rScoreNow, 0);
-        lSecondTotal = 0;
-        rSecondTotal = 0;
+        lFirstTotal = Math.max(lScoreNow, 0); rFirstTotal = Math.max(rScoreNow, 0);
+        lSecondTotal = 0; rSecondTotal = 0;
     }
 
     stats.left.first.total = lFirstTotal;
