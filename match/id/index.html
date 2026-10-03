@@ -539,8 +539,10 @@
                         const touchedJerseys=matches.slice(1).map(m=>String(m[1]));
                         const raiderTeam=log.isLeftTeam===true?'left':log.isLeftTeam===false?'right':null;
                         const defenderTeam=raiderTeam==='left'?'right':(raiderTeam==='right'?'left':null);
-                        if(defenderTeam){
-                            for(const j of touchedJerseys)ensure(defenderTeam,j).unsuccessful+=1;
+                        if(defenderTeam && touchedJerseys.length > 0){
+                            // 🚨 KABADDI RULE FIX: Only penalize the first defender (the initiator)
+                            const initiatorJersey = touchedJerseys[0];
+                            ensure(defenderTeam, initiatorJersey).unsuccessful += 1;
                         }
                     }
                 }
@@ -579,8 +581,10 @@
                         const touchedJerseys=matches.slice(1).map(m=>String(m[1]));
                         const raiderTeam=log.isLeftTeam===true?'left':log.isLeftTeam===false?'right':null;
                         const defenderTeam=raiderTeam==='left'?'right':(raiderTeam==='right'?'left':null);
-                        if(defenderTeam){
-                            for(const j of touchedJerseys)ensure(defenderTeam,j).push('U');
+                        if(defenderTeam && touchedJerseys.length > 0){
+                            // 🚨 KABADDI RULE FIX: Only give the "U" sequence to the first defender (initiator)
+                            const initiatorJersey = touchedJerseys[0];
+                            ensure(defenderTeam, initiatorJersey).push('U');
                         }
                     }
                 }
