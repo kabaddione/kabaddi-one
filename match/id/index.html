@@ -18,7 +18,6 @@
       gtag('js', new Date());
       gtag('config', 'G-YRYC0NEP1H');
     </script>
-    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -280,45 +279,16 @@
         .info-value{font-size:13px;font-weight:700;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis}
         .empty-state{text-align:center;padding:40px 20px;color:#8C8E9F;font-size:13px}
         .empty-state i{font-size:32px;opacity:.3;margin-bottom:12px;display:block}
-
-        /* ============================================
-           AD CONTAINERS — reserved space prevents CLS
-           ============================================ */
-        .ad-wrap{
-          display:flex;align-items:center;justify-content:center;
-          position:relative;width:100%;margin:14px 0;
-          min-height:60px;overflow:hidden;border-radius:12px;
-          background:rgba(255,255,255,0.015);
-          border:1px solid rgba(255,255,255,0.04);
-        }
+        .ad-wrap{display:flex;align-items:center;justify-content:center;position:relative;width:100%;margin:14px 0;min-height:60px;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04)}
         .ad-wrap.ad-inline{min-height:250px}
         .ad-wrap.ad-feed{min-height:90px;margin:10px 6px;border-radius:10px}
         .ad-wrap .adsbygoogle{display:block;width:100%}
-        .ad-wrap .ad-tag{
-          position:absolute;top:4px;right:6px;
-          font-size:8px;color:#555;letter-spacing:1px;
-          text-transform:uppercase;font-weight:700;
-          pointer-events:none;
-        }
-        /* Sticky bottom anchor ad */
-        .ad-anchor{
-          position:fixed;left:0;right:0;bottom:0;z-index:600;
-          background:rgba(10,10,26,0.96);backdrop-filter:blur(20px);
-          border-top:1px solid rgba(255,255,255,0.08);
-          padding:4px 40px 4px 4px;display:none;text-align:center;
-          box-shadow:0 -8px 24px rgba(0,0,0,0.4);
-        }
+        .ad-wrap .ad-tag{position:absolute;top:4px;right:6px;font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;font-weight:700;pointer-events:none}
+        .ad-anchor{position:fixed;left:0;right:0;bottom:0;z-index:600;background:rgba(10,10,26,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding:4px 40px 4px 4px;display:none;text-align:center;box-shadow:0 -8px 24px rgba(0,0,0,0.4)}
         .ad-anchor.visible{display:block}
         .ad-anchor .adsbygoogle{display:block;width:100%}
-        .ad-anchor-close{
-          position:absolute;top:50%;right:8px;transform:translateY(-50%);
-          width:24px;height:24px;border-radius:50%;
-          background:rgba(255,255,255,0.08);border:none;color:#fff;
-          font-size:12px;cursor:pointer;display:flex;
-          align-items:center;justify-content:center;line-height:1;padding:0;
-        }
+        .ad-anchor-close{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
         .ad-anchor-close:hover{background:rgba(255,255,255,0.15)}
-
         @media(max-width:480px){.live-wrapper{padding-left:12px;padding-right:12px}.team-score{font-size:54px}.main-timer{font-size:38px}.raid-timer-ring{width:56px;height:56px}.raid-timer-inner{width:46px;height:46px;font-size:20px}.info-grid{grid-template-columns:1fr}.tab{font-size:11px;padding:9px 6px}.stat-row-inner{grid-template-columns:1fr 1fr;gap:8px 6px}.mini-stat{gap:4px}.mini-stat .stat-icon-wrap{width:18px;height:18px;font-size:8px}.mini-stat-value{font-size:12px}.mini-stat-label{font-size:8px}.graph-canvas-wrap{height:260px}.log-row{grid-template-columns:38px 1fr auto;gap:10px;padding:10px 8px}.log-icon-circle{width:38px;height:38px;padding:5px}.mat-dot-jersey{font-size:8px}.mat-dot{width:12px;height:12px}.mat-dot-cell{gap:3px;min-width:18px}.team-mat{gap:7px}.mat-divider-img{width:18px;height:28px}.player-card-head{grid-template-columns:40px minmax(0,1fr) auto auto auto;gap:8px}.player-avatar-wrap{width:40px;height:40px}.player-main-name{font-size:13px}.player-pts{font-size:16px}.event-flash{font-size:11.5px;padding:10px 16px;top:80px}}
     </style>
 </head>
@@ -336,18 +306,10 @@
         </div>
     </nav>
     <div class="live-wrapper">
-
-        <!-- AD: Top Leaderboard -->
         <div class="ad-wrap ad-top">
             <span class="ad-tag">Ad</span>
-            <ins class="adsbygoogle" style="display:block"
-                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                 data-ad-slot="1111111111"
-                 data-ad-format="auto"
-                 data-ad-layout-key="-fb+5w+4e-db+86"
-                 data-full-width-responsive="true"></ins>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1111111111" data-ad-format="auto" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"></ins>
         </div>
-
         <div class="score-board">
             <div class="board-top"><div class="badge-id" id="uiMatchId"><i class="fa-solid fa-hashtag"></i> ------</div><div class="badge-live" id="uiLiveBadge">Live</div></div>
             <div class="board-meta" id="uiMatchDate"><i class="fa-solid fa-location-dot"></i> Fetching live stream connection...</div>
@@ -360,17 +322,10 @@
             <div class="raider-banner idle" id="uiActiveRaider"><i class="fa-solid fa-person-running"></i> Waiting for raid...</div>
             <div class="mat-section"><div class="mat-title">On The Mat</div><div class="mat-row" id="uiMatDots"><div class="team-mat left"></div><div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt=""></div><div class="team-mat right"></div></div></div>
         </div>
-
-        <!-- AD: Below Scoreboard -->
         <div class="ad-wrap ad-inline">
             <span class="ad-tag">Ad</span>
-            <ins class="adsbygoogle" style="display:block"
-                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                 data-ad-slot="2222222222"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="2222222222" data-ad-format="auto" data-full-width-responsive="true"></ins>
         </div>
-
         <div class="live-meta" id="uiLiveMeta"><span id="uiLastUpdated">Updated just now</span><span class="live-meta-sep">•</span><span id="uiViewerCount">1 watching</span></div>
         <div class="quick-stats">
             <div class="quick-stat-team left-stat" style="--team-accent:var(--left-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/card.png" data-fa="fa-solid fa-hand"></span></div><span class="mini-stat-value" id="uiLeftFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/timeout.png" data-fa="fa-solid fa-stopwatch"></span></div><span class="mini-stat-value" id="uiLeftTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/substitution.png" data-fa="fa-solid fa-right-left"></span></div><span class="mini-stat-value" id="uiLeftSubs">0</span><span class="mini-stat-label">Subs</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/empty.png" data-fa="fa-regular fa-circle-xmark"></span></div><span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div></div></div>
@@ -399,18 +354,10 @@
                     <div class="cmp-row"><div class="cmp-labels"><div class="cmp-value left" id="stLeftAllOut">0</div><div class="cmp-name">All out Points</div><div class="cmp-value right" id="stRightAllOut">0</div></div><div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftAllOut" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightAllOut" style="width:50%"></div></div></div>
                     <div class="cmp-row"><div class="cmp-labels"><div class="cmp-value left" id="stLeftExtra">0</div><div class="cmp-name">Extra Points</div><div class="cmp-value right" id="stRightExtra">0</div></div><div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftExtra" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightExtra" style="width:50%"></div></div></div>
                 </div>
-
-                <!-- AD: Inside Stats -->
                 <div class="ad-wrap ad-feed">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="3333333333"
-                         data-ad-format="fluid"
-                         data-ad-layout-key="-fb+5w+4e-db+86"
-                         data-full-width-responsive="true"></ins>
+                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="3333333333" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"></ins>
                 </div>
-
                 <div class="seg-toggle"><div class="seg-btn active" id="segRaids" onclick="switchRaidView('raids',this)">Raids</div><div class="seg-btn" id="segTackles" onclick="switchRaidView('tackles',this)">Tackles</div></div>
                 <div class="stat-panel">
                     <div class="panel-header"><div class="panel-team"><div class="panel-team-logo left" id="stPerfLeftLogo">LT</div><div class="panel-team-name" id="stPerfLeftName">Left Team</div></div><div class="panel-title">Points Break Down</div><div class="panel-team right"><div class="panel-team-logo right" id="stPerfRightLogo">RT</div><div class="panel-team-name" id="stPerfRightName">Right Team</div></div></div>
@@ -429,17 +376,10 @@
             <div class="lineup-panel">
                 <div class="team-toggle"><div class="team-toggle-btn active-left" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div><div class="team-toggle-btn" id="togRight" onclick="switchLineupTeam('right')">Right Team</div></div>
                 <div class="roster-group"><div class="roster-title"><span class="roster-title-dot"></span> Starting 7</div><div class="lineup-grid" id="uiStarting7Grid"></div></div>
-
-                <!-- AD: Inside Lineup -->
                 <div class="ad-wrap ad-feed">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="4444444444"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
+                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="4444444444" data-ad-format="auto" data-full-width-responsive="true"></ins>
                 </div>
-
                 <div class="roster-group"><div class="roster-title"><span class="roster-title-dot sub"></span> Substitutes</div><div class="lineup-grid" id="uiSubstitutesGrid"></div></div>
             </div>
         </div>
@@ -454,15 +394,9 @@
             <div class="details-panel">
                 <div class="info-card"><div class="info-card-title"><i class="fa-solid fa-circle-info"></i> Match Information</div><div class="info-grid"><div class="info-item full"><div class="info-icon"><i class="fa-solid fa-people-group"></i></div><div class="info-text"><div class="info-label">Teams</div><div class="info-value" id="dtTeams">Loading...</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-hashtag"></i></div><div class="info-text"><div class="info-label">Match ID</div><div class="info-value" id="dtMatchId">------</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-calendar-day"></i></div><div class="info-text"><div class="info-label">Date</div><div class="info-value" id="dtDate">Loading...</div></div></div><div class="info-item full"><div class="info-icon"><i class="fa-solid fa-location-dot"></i></div><div class="info-text"><div class="info-label">Venue</div><div class="info-value" id="dtVenue">Live Kabaddi Arena</div></div></div></div></div>
                 <div class="info-card"><div class="info-card-title"><i class="fa-solid fa-sliders"></i> Match Settings</div><div class="info-grid"><div class="info-item"><div class="info-icon"><i class="fa-solid fa-stopwatch"></i></div><div class="info-text"><div class="info-label">Half Duration</div><div class="info-value" id="dtDuration">20 Minutes</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-mug-hot"></i></div><div class="info-text"><div class="info-label">Break Duration</div><div class="info-value" id="dtBreak">5 Minutes</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-users"></i></div><div class="info-text"><div class="info-label">Players/Side</div><div class="info-value" id="dtPlayers">7 Players</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-right-left"></i></div><div class="info-text"><div class="info-label">Max Subs</div><div class="info-value" id="dtSubs">5</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-clock"></i></div><div class="info-text"><div class="info-label">Max Timeouts</div><div class="info-value" id="dtTimeouts">2</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-hourglass-half"></i></div><div class="info-text"><div class="info-label">Timeout Duration</div><div class="info-value" id="dtTimeoutDur">60 Seconds</div></div></div></div></div>
-
-                <!-- AD: Inside Details -->
                 <div class="ad-wrap ad-inline">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="5555555555"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
+                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="5555555555" data-ad-format="auto" data-full-width-responsive="true"></ins>
                 </div>
             </div>
         </div>
@@ -476,25 +410,18 @@
         </div>
     </footer>
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
-
-    <!-- AD: Sticky Bottom Anchor -->
     <div class="ad-anchor" id="adAnchor">
         <button class="ad-anchor-close" id="adAnchorClose" aria-label="Close ad">✕</button>
-        <ins class="adsbygoogle" style="display:block"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-             data-ad-slot="6666666666"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="6666666666" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
-
     <script>
         (function(){const navbar=document.getElementById('navbar');const hamburger=document.getElementById('hamburger');const navLinks=document.getElementById('navLinks');const backToTop=document.getElementById('backToTop');const allNavLinks=navLinks.querySelectorAll('a');hamburger.addEventListener('click',function(){const isActive=navLinks.classList.toggle('active');hamburger.classList.toggle('active');hamburger.setAttribute('aria-expanded',isActive);document.body.style.overflow=isActive?'hidden':''});allNavLinks.forEach(link=>link.addEventListener('click',()=>{navLinks.classList.remove('active');hamburger.classList.remove('active');hamburger.setAttribute('aria-expanded','false');document.body.style.overflow=''}));function updateNavbar(){if(window.scrollY>50)navbar.classList.add('scrolled');else navbar.classList.remove('scrolled')}window.addEventListener('scroll',updateNavbar,{passive:true});updateNavbar();function updateBackToTop(){if(window.scrollY>600)backToTop.classList.add('visible');else backToTop.classList.remove('visible')}window.addEventListener('scroll',updateBackToTop,{passive:true});backToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));updateBackToTop()})();
     </script>
     <script>
 // ============================================================
-// BUILD MARKER — proves new code is running
+// BUILD MARKER
 // ============================================================
-window.KABADDI_BUILD = 'v3';
+window.KABADDI_BUILD = 'v4';
 function updateBuildMarker(){
   let el = document.getElementById('kbBuildMarker');
   if(!el){
@@ -621,7 +548,6 @@ function getLogIconName(title){
 }
 function getLogIconPath(title){ return `/images/${getLogIconName(title)}.png`; }
 
-// Mini-stat PNG tint probe
 (function tintMiniStatIcons(){
   document.querySelectorAll('.png-tint').forEach(el => {
     const src = el.dataset.src; const fa = el.dataset.fa || 'fa-solid fa-circle';
@@ -667,7 +593,7 @@ function showEventFlash(log){
 }
 
 // ============================================================
-// Robustly split concatenated out-player IDs.
+// Split concatenated out-player IDs.
 // ============================================================
 function splitConcatenatedIds(blob, roster){
   if(!blob || !roster || !roster.length) return [];
@@ -683,7 +609,7 @@ function splitConcatenatedIds(blob, roster){
 }
 
 // ============================================================
-// Per-player stats derived directly from ROSTER.
+// Per-player stats from ROSTER (unused but kept for reference)
 // ============================================================
 function playerStatsFromRoster(player){
   const raidPts   = num(player.raidPoints);
@@ -691,36 +617,33 @@ function playerStatsFromRoster(player){
   const tacklePts = num(player.tacklePoints);
   const totalPts  = raidPts + tacklePts;
   const touchPts  = Math.max(0, raidPts - bonusPts);
-
   const succRaids  = num(player.successfulRaids);
   const unsuccRaids= num(player.unsuccessfulRaids);
   const emptyRaids = num(player.emptyRaids);
   const totalRaids = num(player.totalRaids) || (succRaids + unsuccRaids + emptyRaids);
-
   const succTack   = num(player.successfulTackles);
   const unsuccTack = num(player.unsuccessfulTackles);
   const superTack  = num(player.superTackles);
   const totalTack  = num(player.totalTackles) || (succTack + unsuccTack);
-
   const seqStr = String(player.raidSequence||'').trim();
   let seq = [];
   if(seqStr){
     if(seqStr.includes(',')) seq = seqStr.split(',').map(s=>s.trim().toUpperCase()).filter(c=>c==='S'||c==='E'||c==='U');
     else seq = seqStr.split('').map(c=>c.toUpperCase()).filter(c=>c==='S'||c==='E'||c==='U');
   }
-
-  return {
-    totalPts, raidPts, bonusPts, touchPts, tacklePts,
+  return { totalPts, raidPts, bonusPts, touchPts, tacklePts,
     succRaids, unsuccRaids, emptyRaids, totalRaids,
-    succTack, unsuccTack, superTack, totalTack,
-    seq
-  };
+    succTack, unsuccTack, superTack, totalTack, seq };
 }
 
 // ============================================================
-// ★ BULLETPROOF v3 ★ — computeHalfStats
-// Returns .left.match and .right.match PRE-MERGED so Match view
-// is guaranteed to equal 1st Half + 2nd Half.
+// ★ BULLETPROOF v4 ★ — computeHalfStats
+// Fixes:
+//   1. Removed defS.totalRaids++ from tackle branches
+//      (this was double-counting the same raid — the raider's
+//      own touch/bonus/empty event already counted it)
+//   2. Added explicit "self out" branch that counts as a raid
+//      for the team indicated by isLeftTeam
 // ============================================================
 function computeHalfStats(){
   const logs = window.matchLogsForGraph || [];
@@ -734,7 +657,6 @@ function computeHalfStats(){
   });
   const stats = { left:{first:blank(), second:blank()}, right:{first:blank(), second:blank()} };
 
-  // Walk chronologically; flip to 'second' once a "Half Time" event is seen
   let currentHalfKey = 'first';
 
   for(const log of sorted){
@@ -743,14 +665,12 @@ function computeHalfStats(){
     const t  = (log.title||'').toLowerCase();
     const ts = (log.timeStr||'').toLowerCase();
 
-    // Pivot: half-time event switches us to 2nd half
     const isHalfTimeEvent = t.includes('half time') || t.includes('half-time') || t.includes('half_time');
     if(isHalfTimeEvent){
       currentHalfKey = 'second';
       continue;
     }
 
-    // Explicit half tag in timeStr wins
     let half = null;
     if(ts.includes('1st half')  || ts.includes('first half'))  half = 'first';
     else if(ts.includes('2nd half') || ts.includes('second half')) half = 'second';
@@ -761,36 +681,36 @@ function computeHalfStats(){
     const teamKey = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
     if(!teamKey) continue;
 
-    const s      = stats[teamKey][half];
-    const defKey = teamKey === 'left' ? 'right' : 'left';
-    const defS   = stats[defKey][half];
-
+    const s = stats[teamKey][half];
     const pts = num(log.points);
 
     if(t.includes('super raid')){
       s.totalRaids++; s.raid += pts; s.superRaids++;
       if(pts>0){ s.succRaids++; s.currentStreak++; if(s.currentStreak>s.longestStreak) s.longestStreak=s.currentStreak; }
       else s.currentStreak=0;
-      defS.totalTackles++; defS.unsuccTackles++;
     } else if(t.includes('touch')){
       s.totalRaids++; s.raid += pts;
       if(pts>0){ s.succRaids++; s.currentStreak++; if(s.currentStreak>s.longestStreak) s.longestStreak=s.currentStreak; }
       else s.currentStreak=0;
-      defS.totalTackles++; defS.unsuccTackles++;
     } else if(t.includes('bonus')){
       s.totalRaids++; s.raid += pts;
       if(pts>0){ s.succRaids++; s.currentStreak++; if(s.currentStreak>s.longestStreak) s.longestStreak=s.currentStreak; }
       else s.currentStreak=0;
     } else if(t.includes('empty')){
       s.totalRaids++; s.emptyRaids++; s.currentStreak=0;
+    } else if(t.includes('self out') || t.includes('self_out')){
+      // Self-out = completed raid. Count as raid for the indicated team + extra point.
+      s.totalRaids++;
+      s.extra += pts;
+      s.currentStreak = 0;
     } else if(t.includes('super tackle')){
       s.totalTackles++; s.superTackles++; s.tackle += pts;
       if(pts>0) s.succTackles++;
-      defS.totalRaids++;
+      // NO defS.totalRaids++  ← FIXED
     } else if(t.includes('tackle')){
       s.totalTackles++; s.tackle += pts;
       if(pts>0) s.succTackles++;
-      defS.totalRaids++;
+      // NO defS.totalRaids++  ← FIXED
     } else if(t.includes('all out')){
       s.allOut += pts;
     } else if(log.type === 'EXTRA' && pts > 0){
@@ -807,7 +727,7 @@ function computeHalfStats(){
     }
   }
 
-  // Half-points totals (from scoreStr on the Half Time log)
+  // Half-points totals from scoreStr on "Half Time" log
   let htLeft = null, htRight = null;
   for(const log of sorted){
     const t = (log.title||'').toLowerCase();
@@ -821,8 +741,8 @@ function computeHalfStats(){
 
   const lNow = num(window.latestMatchData?.left_score);
   const rNow = num(window.latestMatchData?.right_score);
-  const hs   = (window.latestMatchData?.half_status||'').toLowerCase();
-  const inSecond = hs.includes('2nd') || hs.includes('second') || hs.includes('over') || hs.includes('end');
+  const hsStr = (window.latestMatchData?.half_status||'').toLowerCase();
+  const inSecond = hsStr.includes('2nd') || hsStr.includes('second') || hsStr.includes('over') || hsStr.includes('end');
 
   let lFirst, rFirst, lSecond, rSecond;
   if(htLeft !== null){
@@ -842,7 +762,7 @@ function computeHalfStats(){
   stats.left.second.total  = lSecond;
   stats.right.second.total = rSecond;
 
-  // ★ CRITICAL: Pre-merge Match = First + Second
+  // Pre-merge Match = First + Second (guaranteed Match = 1st + 2nd)
   stats.left.match  = mergeHalves(stats.left.first,  stats.left.second);
   stats.right.match = mergeHalves(stats.right.first, stats.right.second);
 
@@ -850,8 +770,7 @@ function computeHalfStats(){
 }
 
 // ============================================================
-// ★ mergeHalves — sums two half objects into Match totals.
-// Streak fields use MAX (they don't accumulate across halves).
+// mergeHalves
 // ============================================================
 function mergeHalves(h1, h2){
   h1 = h1 || {}; h2 = h2 || {};
@@ -870,26 +789,20 @@ function mergeHalves(h1, h2){
 }
 
 // ============================================================
-// ★ BULLETPROOF v3 ★ — renderStats
-// Always recomputes fresh (no cache). Reads .match for Match view.
-// Guarantees: Match === 1st Half + 2nd Half
+// renderStats — Match = .match, Half = .[half]
 // ============================================================
 function renderStats(){
   const state = window.latestGlobalState;
   const data  = window.latestMatchData;
   if(!state || !data) return;
 
-  const half = window.currentHalf;      // 'match' | 'first' | 'second'
-  const view = window.currentRaidView;  // 'raids' | 'tackles'
+  const half = window.currentHalf;
+  const view = window.currentRaidView;
 
-  // ★ Always recompute fresh — no cache, no stale data possible
   const hs = computeHalfStats();
-
-  // ★ hs.left.match is now pre-merged inside computeHalfStats
   const lStats = (half === 'match') ? hs.left.match  : hs.left[half];
   const rStats = (half === 'match') ? hs.right.match : hs.right[half];
 
-  // ── POINTS BREAKDOWN ──
   const lRaid   = lStats.raid   || 0,  rRaid   = rStats.raid   || 0;
   const lTackle = lStats.tackle || 0,  rTackle = rStats.tackle || 0;
   const lAllOut = lStats.allOut || 0,  rAllOut = rStats.allOut || 0;
@@ -931,7 +844,6 @@ function renderStats(){
   document.getElementById('pbLeftTotal').style.width  = wTt.left;
   document.getElementById('pbRightTotal').style.width = wTt.right;
 
-  // ── RAID / TACKLE PANEL ──
   let lTot, rTot, lSucc, rSucc, lUnsucc, rUnsucc, lEmpty, rEmpty, lSuper, rSuper, lStreak, rStreak;
   let totalLabel, succLabel, unsuccLabel, emptyLabel, superLabel, rateLabel, streakLabel;
 
@@ -942,7 +854,6 @@ function renderStats(){
     lEmpty  = lStats.emptyRaids   || 0; rEmpty  = rStats.emptyRaids   || 0;
     lSuper  = lStats.superRaids   || 0; rSuper  = rStats.superRaids   || 0;
     lStreak = lStats.longestStreak|| 0; rStreak = rStats.longestStreak|| 0;
-
     totalLabel  = 'Total Raids';
     succLabel   = 'Successful Raids';
     unsuccLabel = 'Unsuccessful Raids';
@@ -957,7 +868,6 @@ function renderStats(){
     lUnsucc = lStats.unsuccTackles     || 0; rUnsucc = rStats.unsuccTackles     || 0;
     lSuper  = lStats.superTackles      || 0; rSuper  = rStats.superTackles      || 0;
     lEmpty  = 0; rEmpty = 0; lStreak = 0; rStreak = 0;
-
     totalLabel  = 'Total Tackles';
     succLabel   = 'Successful Tackles';
     unsuccLabel = 'Unsuccessful Tackles';
@@ -1008,7 +918,6 @@ function renderStats(){
   document.getElementById('pbLeftStreakPerf').style.width  = wS.left;
   document.getElementById('pbRightStreakPerf').style.width = wS.right;
 
-  // ★ Build marker (proves new code is running)
   updateBuildMarker();
 }
 
@@ -1086,7 +995,6 @@ function drawGraph(){
     ctx.fillStyle="#8C8E9F"; ctx.font="700 10px Inter, sans-serif"; ctx.fillText(m+"'",x,padT+gH+8);
   }
   ctx.fillStyle="#7A7A95"; ctx.font="800 9px Inter, sans-serif"; ctx.fillText("MINUTES",padL+gW/2,padT+gH+26);
-
   const drawLine=(isLeft,color)=>{
     if(!dataPoints.length) return;
     ctx.lineWidth=3; ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineCap="round"; ctx.lineJoin="round";
@@ -1278,17 +1186,14 @@ function renderMatDots(state, lRoster, rRoster, lColor, rColor){
   const pJ = j => { const n=parseInt(j); return isNaN(n)?999:n; };
   const lStart = lRoster.filter(p=>p.isStarting7).sort((a,b)=>pJ(a.jerseyNumber)-pJ(b.jerseyNumber));
   const rStart = rRoster.filter(p=>p.isStarting7).sort((a,b)=>pJ(a.jerseyNumber)-pJ(b.jerseyNumber));
-
   const lOutOrder = splitConcatenatedIds(state.leftOutIds,  lStart);
   const rOutOrder = splitConcatenatedIds(state.rightOutIds, rStart);
-
   const lOutSet = new Set(lOutOrder);
   const rOutSet = new Set(rOutOrder);
   const lAlive = lStart.filter(p=>!lOutSet.has(p.id));
   const rAlive = rStart.filter(p=>!rOutSet.has(p.id));
   const lOutP = lOutOrder.map(id=>lStart.find(p=>p.id===id)).filter(Boolean);
   const rOutP = rOutOrder.map(id=>rStart.find(p=>p.id===id)).filter(Boolean);
-
   const lItems = [
     ...[...lAlive].reverse().map(p=>({alive:true, jersey:p.jerseyNumber||''})),
     ...lOutP.map(p=>({alive:false, jersey:p.jerseyNumber||''}))
@@ -1297,13 +1202,11 @@ function renderMatDots(state, lRoster, rRoster, lColor, rColor){
     ...[...rOutP].reverse().map(p=>({alive:false, jersey:p.jerseyNumber||''})),
     ...rAlive.map(p=>({alive:true, jersey:p.jerseyNumber||''}))
   ];
-
   const cells = (items, color) => items.map(it =>
     `<div class="mat-dot-cell ${it.alive?'':'is-out'}">
        <div class="mat-dot ${it.alive?'alive':'out'}" style="--dot-color: ${color};"></div>
        <div class="mat-dot-jersey" style="--dot-color: ${color};">${it.jersey||'·'}</div>
      </div>`).join('');
-
   document.getElementById('uiMatDots').innerHTML =
     `<div class="team-mat left">${cells(lItems,lColor)}</div>` +
     `<div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt="" onerror="this.parentElement.classList.add('fallback');"></div>` +
@@ -1328,9 +1231,6 @@ const db = firebase.database();
 const urlParams = new URLSearchParams(window.location.search);
 const matchId = urlParams.get('match');
 
-// ============================================================
-// VIEWER PRESENCE
-// ============================================================
 function setupViewerPresence(){
   if(!matchId) return;
   const viewerEl = document.getElementById('uiViewerCount'); if(!viewerEl) return;
@@ -1370,9 +1270,6 @@ function updateLastUpdated(ts){
   el.innerText = 'Updated '+dateStr+' · '+timeStr;
 }
 
-// ============================================================
-// MAIN FIREBASE LISTENER
-// ============================================================
 if(!matchId){
   document.getElementById('uiMatchDate').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
   document.getElementById('uiMatchDate').style.color = "#FF3B30";
@@ -1491,7 +1388,6 @@ if(!matchId){
         document.getElementById('uiLeftSubs').innerText      = state.leftSubs     || 0;
         document.getElementById('uiRightSubs').innerText     = state.rightSubs    || 0;
 
-        // ★ FIXED ★ — Active raider banner with robust raid-side detection
         const banner = document.getElementById('uiActiveRaider');
         if(matchOverFlag){
           const result = (data.match_result && data.match_result.trim())
@@ -1509,11 +1405,8 @@ if(!matchId){
           banner.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Waiting for raid to start...';
         } else {
           banner.classList.remove('match-over','idle');
-
-          // ---- Robust raid-side detection ----
           let isLeftRaid;
           const raw = state.currentRaidTeamsLeft;
-
           if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
           else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
           else if (data.active_raider_team === 'left')  isLeftRaid = true;
@@ -1524,8 +1417,6 @@ if(!matchId){
             else if (arid.startsWith('right_')) isLeftRaid = false;
             else isLeftRaid = true;
           }
-          // ------------------------------------
-
           const c = isLeftRaid ? leftColor : rightColor;
           banner.innerHTML = `<i class="fa-solid fa-person-running" style="color:${c};"></i> <span style="color:${c};">${data.active_raider_name}</span> is on raid`;
         }
@@ -1600,9 +1491,6 @@ document.addEventListener('DOMContentLoaded', () => {
   observer.observe(document.getElementById('tab-graph'), {attributes:true, attributeFilter:['class']});
 });
 
-// ============================================================
-// ADSENSE INITIALIZATION & STICKY ANCHOR
-// ============================================================
 (function initAds(){
   function pushAdSlots(scope){
     (scope || document).querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])')
@@ -1612,13 +1500,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   pushAdSlots(document);
   setTimeout(() => pushAdSlots(document), 1500);
-
   const anchor = document.getElementById('adAnchor');
   const anchorClose = document.getElementById('adAnchorClose');
   if (anchor && anchorClose) {
     const dismissed = sessionStorage.getItem('adAnchorDismissed') === '1';
     let shown = dismissed;
-
     function maybeShowAnchor(){
       if (shown) return;
       if (window.scrollY > 400) {
@@ -1629,7 +1515,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.addEventListener('scroll', maybeShowAnchor, { passive: true });
     maybeShowAnchor();
-
     anchorClose.addEventListener('click', () => {
       anchor.classList.remove('visible');
       shown = true;
