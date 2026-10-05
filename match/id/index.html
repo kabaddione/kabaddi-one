@@ -520,33 +520,78 @@ function formatOnMatTime(s){
 function num(v){ const n=parseInt(v); return isNaN(n)?0:n; }
 
 // ============================================================
-// ICON RESOLUTION
+// ROBUST ENGLISH LOGIC & ICON RESOLUTION (Language-Proof)
 // ============================================================
-function getLogIconName(title){
-  const t=(title||'').toLowerCase();
-  if(t.includes('manual')) return 'manual';
-  if(t.includes('starting 7')) return 'starting7';
-  if(t.includes('match started')||t.includes('match_started')) return 'whistle';
-  if(t.includes('half time')||t.includes('half_time')) return 'whistle';
-  if(t.includes('full time')||t.includes('full_time')) return 'trophy';
-  if(t.includes('toss')) return 'coin';
-  if(t.includes('super raid')||t.includes('super_raid')) return 'superraid';
-  if(t.includes('super tackle')||t.includes('super_tackle')) return 'supertackle';
-  if(t.includes('all out')||t.includes('all_out')) return 'allout';
-  if(t.includes('do-or-die')||t.includes('do or die')||t.includes('do_or_die')) return 'hooter';
-  if(t.includes('self out')||t.includes('self_out')) return 'selfout';
-  if(t.includes('empty')) return 'empty';
-  if(t.includes('time-out')||t.includes('timeout')||t.includes('time out')) return 'timeout';
-  if(t.includes('card')) return 'card';
-  if(t.includes('substitution')) return 'substitution';
-  if(t.includes('technical')) return 'technical';
-  if(t.includes('bonus')) return 'bonus';
-  if(t.includes('touch')) return 'touch';
-  if(t.includes('tackle')) return 'tackle';
-  if(t.includes('raid')) return 'raid';
-  return 'default_event';
+function getEnglishTitle(log) {
+    const t = (log.title || '').toLowerCase();
+    const p = Number(log.points) || 0;
+    const type = log.type || '';
+
+    // 1. Check for specific period events first (Half Time / Full Time / Toss)
+    if (type === 'PERIOD') {
+        if (t.includes('half') || t.includes('1st') || t.includes('2nd')) return 'Half Time';
+        if (t.includes('full') || t.includes('over')) return 'Full Time';
+        if (t.includes('toss')) return 'Toss Result';
+        if (t.includes('start')) return 'Match Started';
+        return 'Period Event';
+    }
+
+    // 2. Check for explicit types from Android Enum
+    switch(type) {
+        case 'RAID': 
+            if (p >= 3) return 'Super Raid';
+            if (p > 0) return 'Touch Point';
+            return 'Empty Raid';
+        case 'TACKLE':
+            return 'Tackle Point';
+        case 'SUPER_TACKLE':
+            return 'Super Tackle';
+        case 'ALL_OUT':
+            return 'All Out';
+        case 'TIMEOUT':
+            return 'Time-Out';
+        case 'CARD':
+            if (t.includes('red') || t.includes('लाल')) return 'Red Card';
+            if (t.includes('yellow') || t.includes('पीला')) return 'Yellow Card';
+            return 'Green Card';
+        case 'EXTRA':
+            if (t.includes('substitution') || t.includes('sub')) return 'Substitution';
+            if (t.includes('self') || t.includes('out')) return 'Self Out';
+            if (t.includes('7')) return 'Starting 7 Set';
+            return 'Technical Point';
+    }
+
+    // 3. Fallback to reading the raw points if type is missing
+    if (p >= 3) return 'Super Raid';
+    if (p > 0) return 'Touch Point';
+    return 'Match Event';
 }
-function getLogIconPath(title){ return `/images/${getLogIconName(title)}.png`; }
+
+function getLogIconName(log) {
+    const englishTitle = getEnglishTitle(log).toLowerCase();
+    
+    if(englishTitle.includes('manual')) return 'manual';
+    if(englishTitle.includes('starting 7')) return 'starting7';
+    if(englishTitle.includes('match started') || englishTitle.includes('half time')) return 'whistle';
+    if(englishTitle.includes('full time')) return 'trophy';
+    if(englishTitle.includes('toss')) return 'coin';
+    if(englishTitle.includes('super raid')) return 'superraid';
+    if(englishTitle.includes('super tackle')) return 'supertackle';
+    if(englishTitle.includes('all out')) return 'allout';
+    if(englishTitle.includes('do-or-die')) return 'hooter';
+    if(englishTitle.includes('self out')) return 'selfout';
+    if(englishTitle.includes('empty')) return 'empty';
+    if(englishTitle.includes('time-out')) return 'timeout';
+    if(englishTitle.includes('card')) return 'card';
+    if(englishTitle.includes('substitution')) return 'substitution';
+    if(englishTitle.includes('technical')) return 'technical';
+    if(englishTitle.includes('bonus')) return 'bonus';
+    if(englishTitle.includes('touch')) return 'touch';
+    if(englishTitle.includes('tackle')) return 'tackle';
+    
+    return 'default_event';
+}
+function getLogIconPath(log){ return `/images/${getLogIconName(log)}.png`; }
 
 (function tintMiniStatIcons(){
   document.querySelectorAll('.png-tint').forEach(el => {
@@ -560,29 +605,27 @@ function getLogIconPath(title){ return `/images/${getLogIconName(title)}.png`; }
 })();
 
 // ============================================================
-// EVENT FLASH BANNER
+// EVENT FLASH BANNER (Language-Proof)
 // ============================================================
 function showEventFlash(log){
   const el=document.getElementById('uiEventFlash'); if(!el||!log) return;
-  const t=(log.title||'').toLowerCase();
-  const typeLower=(log.type||'').toLowerCase();
-  const d=log.desc||''; const combined=t+' '+typeLower;
+  const englishTitle = getEnglishTitle(log); // Force it into English!
+  const d=log.desc||''; 
+  
   let text='', icon='', cls='';
-  if(combined.includes('super tackle')||typeLower==='super_tackle'){text='SUPER TACKLE! '+d;icon='fa-fire';cls='super'}
-  else if(combined.includes('super raid')){text='SUPER RAID! '+d;icon='fa-bolt';cls='super'}
-  else if(combined.includes('all out')){text='ALL OUT! '+d;icon='fa-bomb';cls='allout'}
-  else if(combined.includes('do-or-die')||combined.includes('do or die')){text='DO OR DIE RAID!';icon='fa-skull-crossbones';cls='dod'}
-  else if(combined.includes('red card')){text='RED CARD — '+d;icon='fa-square';cls='card-red'}
-  else if(combined.includes('yellow card')){text='YELLOW CARD — '+d;icon='fa-square';cls='card-yellow'}
-  else if(combined.includes('green card')){text='GREEN CARD — '+d;icon='fa-square';cls='card-green'}
-  else if(combined.includes('card')){text='CARD — '+d;icon='fa-square';cls='card'}
-  else if(combined.includes('substitution')||combined.includes('replaced by')){text='SUBSTITUTION — '+d;icon='fa-right-left';cls='sub'}
-  else if(combined.includes('touch')){text=d;icon='fa-hand';cls='raid'}
-  else if(combined.includes('bonus')){text=d;icon='fa-star';cls='raid'}
-  else if(combined.includes('tackle')){text=d;icon='fa-shield';cls='tackle'}
-  else if(combined.includes('empty')){text=d;icon='fa-ban';cls='empty'}
-  else if(combined.includes('self out')){text=d;icon='fa-person-walking-arrow-right';cls='empty'}
+  if(englishTitle === 'Super Tackle'){text='SUPER TACKLE! '+d;icon='fa-fire';cls='super'}
+  else if(englishTitle === 'Super Raid'){text='SUPER RAID! '+d;icon='fa-bolt';cls='super'}
+  else if(englishTitle === 'All Out'){text='ALL OUT! '+d;icon='fa-bomb';cls='allout'}
+  else if(englishTitle === 'Red Card'){text='RED CARD — '+d;icon='fa-square';cls='card-red'}
+  else if(englishTitle === 'Yellow Card'){text='YELLOW CARD — '+d;icon='fa-square';cls='card-yellow'}
+  else if(englishTitle === 'Green Card'){text='GREEN CARD — '+d;icon='fa-square';cls='card-green'}
+  else if(englishTitle === 'Substitution'){text='SUBSTITUTION — '+d;icon='fa-right-left';cls='sub'}
+  else if(englishTitle === 'Touch Point' || englishTitle === 'Bonus Point'){text=d;icon='fa-hand';cls='raid'}
+  else if(englishTitle === 'Tackle Point'){text=d;icon='fa-shield';cls='tackle'}
+  else if(englishTitle === 'Empty Raid'){text=d;icon='fa-ban';cls='empty'}
+  else if(englishTitle === 'Self Out'){text=d;icon='fa-person-walking-arrow-right';cls='empty'}
   else return;
+  
   if(!text) return;
   el.innerHTML=`<i class="fa-solid ${icon}"></i><span>${text}</span>`;
   el.className='event-flash '+cls;
@@ -730,7 +773,7 @@ function computeHalfStats(){
   // Half-points totals from scoreStr on "Half Time" log
   let htLeft = null, htRight = null;
   for(const log of sorted){
-    const t = (log.title||'').toLowerCase();
+    const t = getEnglishTitle(log).toLowerCase();
     const d = (log.desc||'').toLowerCase();
     const isHT = t.includes('half time') || t.includes('half-time') || t.includes('half_time')
                || d.includes('half time') || d.includes('first half end');
@@ -1445,7 +1488,7 @@ if(!matchId){
           let logHtml = "";
           for(let i=logs.length-1; i>=0; i--){
             const log = logs[i];
-            const iconPath = getLogIconPath(log.title);
+            const iconPath = getLogIconPath(log);
             let iconBg;
             if(log.isLeftTeam === true) iconBg = leftColor;
             else if(log.isLeftTeam === false) iconBg = rightColor;
@@ -1458,7 +1501,7 @@ if(!matchId){
             const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i,'') : '';
             logHtml += `<div class="log-row">
               <div class="log-icon-circle" style="--icon-bg: ${iconBg};"><img src="${iconPath}" alt="" onerror="this.onerror=null; this.src='/images/default_event.png';"></div>
-              <div class="log-body"><div class="log-title">${log.title||'Event'}</div><div class="log-desc">${log.desc||''}</div></div>
+              <div class="log-body"><div class="log-title">${getEnglishTitle(log)}</div><div class="log-desc">${log.desc||''}</div></div>
               <div class="log-side">${badgeHtml}<div class="log-meta-line"><span class="log-time-tag">${log.timeStr||''}</span>${scoreStr?`<span class="log-score-tag">${scoreStr}</span>`:''}</div></div>
             </div>`;
           }
