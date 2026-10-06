@@ -421,7 +421,7 @@
 // ============================================================
 // BUILD MARKER
 // ============================================================
-window.KABADDI_BUILD = 'v4';
+window.KABADDI_BUILD = 'v5';
 function updateBuildMarker(){
   let el = document.getElementById('kbBuildMarker');
   if(!el){
@@ -518,16 +518,15 @@ function formatOnMatTime(s){
   return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 }
 function num(v){ const n=parseInt(v); return isNaN(n)?0:n; }
+function numF(v){ const n=parseFloat(v); return isNaN(n)?0:n; }
 
 // ============================================================
-// ROBUST ENGLISH LOGIC & ICON RESOLUTION (Language-Proof)
+// ROBUST ENGLISH LOGIC & ICON RESOLUTION
 // ============================================================
 function getEnglishTitle(log) {
     const t = (log.title || '').toLowerCase();
     const p = Number(log.points) || 0;
     const type = log.type || '';
-
-    // 1. Check for specific period events first (Half Time / Full Time / Toss)
     if (type === 'PERIOD') {
         if (t.includes('half') || t.includes('1st') || t.includes('2nd')) return 'Half Time';
         if (t.includes('full') || t.includes('over')) return 'Full Time';
@@ -535,21 +534,15 @@ function getEnglishTitle(log) {
         if (t.includes('start')) return 'Match Started';
         return 'Period Event';
     }
-
-    // 2. Check for explicit types from Android Enum
     switch(type) {
         case 'RAID': 
             if (p >= 3) return 'Super Raid';
             if (p > 0) return 'Touch Point';
             return 'Empty Raid';
-        case 'TACKLE':
-            return 'Tackle Point';
-        case 'SUPER_TACKLE':
-            return 'Super Tackle';
-        case 'ALL_OUT':
-            return 'All Out';
-        case 'TIMEOUT':
-            return 'Time-Out';
+        case 'TACKLE': return 'Tackle Point';
+        case 'SUPER_TACKLE': return 'Super Tackle';
+        case 'ALL_OUT': return 'All Out';
+        case 'TIMEOUT': return 'Time-Out';
         case 'CARD':
             if (t.includes('red') || t.includes('लाल')) return 'Red Card';
             if (t.includes('yellow') || t.includes('पीला')) return 'Yellow Card';
@@ -560,16 +553,12 @@ function getEnglishTitle(log) {
             if (t.includes('7')) return 'Starting 7 Set';
             return 'Technical Point';
     }
-
-    // 3. Fallback to reading the raw points if type is missing
     if (p >= 3) return 'Super Raid';
     if (p > 0) return 'Touch Point';
     return 'Match Event';
 }
-
 function getLogIconName(log) {
     const englishTitle = getEnglishTitle(log).toLowerCase();
-    
     if(englishTitle.includes('manual')) return 'manual';
     if(englishTitle.includes('starting 7')) return 'starting7';
     if(englishTitle.includes('match started') || englishTitle.includes('half time')) return 'whistle';
@@ -588,7 +577,6 @@ function getLogIconName(log) {
     if(englishTitle.includes('bonus')) return 'bonus';
     if(englishTitle.includes('touch')) return 'touch';
     if(englishTitle.includes('tackle')) return 'tackle';
-    
     return 'default_event';
 }
 function getLogIconPath(log){ return `/images/${getLogIconName(log)}.png`; }
@@ -605,13 +593,12 @@ function getLogIconPath(log){ return `/images/${getLogIconName(log)}.png`; }
 })();
 
 // ============================================================
-// EVENT FLASH BANNER (Language-Proof)
+// EVENT FLASH BANNER
 // ============================================================
 function showEventFlash(log){
   const el=document.getElementById('uiEventFlash'); if(!el||!log) return;
-  const englishTitle = getEnglishTitle(log); // Force it into English!
+  const englishTitle = getEnglishTitle(log);
   const d=log.desc||''; 
-  
   let text='', icon='', cls='';
   if(englishTitle === 'Super Tackle'){text='SUPER TACKLE! '+d;icon='fa-fire';cls='super'}
   else if(englishTitle === 'Super Raid'){text='SUPER RAID! '+d;icon='fa-bolt';cls='super'}
@@ -625,7 +612,6 @@ function showEventFlash(log){
   else if(englishTitle === 'Empty Raid'){text=d;icon='fa-ban';cls='empty'}
   else if(englishTitle === 'Self Out'){text=d;icon='fa-person-walking-arrow-right';cls='empty'}
   else return;
-  
   if(!text) return;
   el.innerHTML=`<i class="fa-solid ${icon}"></i><span>${text}</span>`;
   el.className='event-flash '+cls;
@@ -636,7 +622,7 @@ function showEventFlash(log){
 }
 
 // ============================================================
-// Split concatenated out-player IDs.
+// Split concatenated out-player IDs
 // ============================================================
 function splitConcatenatedIds(blob, roster){
   if(!blob || !roster || !roster.length) return [];
@@ -652,7 +638,7 @@ function splitConcatenatedIds(blob, roster){
 }
 
 // ============================================================
-// Per-player stats from ROSTER (unused but kept for reference)
+// Per-player stats from ROSTER
 // ============================================================
 function playerStatsFromRoster(player){
   const raidPts   = num(player.raidPoints);
@@ -680,13 +666,7 @@ function playerStatsFromRoster(player){
 }
 
 // ============================================================
-// ★ BULLETPROOF v4 ★ — computeHalfStats
-// Fixes:
-//   1. Removed defS.totalRaids++ from tackle branches
-//      (this was double-counting the same raid — the raider's
-//      own touch/bonus/empty event already counted it)
-//   2. Added explicit "self out" branch that counts as a raid
-//      for the team indicated by isLeftTeam
+// computeHalfStats — log-derived fallback
 // ============================================================
 function computeHalfStats(){
   const logs = window.matchLogsForGraph || [];
@@ -704,21 +684,15 @@ function computeHalfStats(){
 
   for(const log of sorted){
     if(!log) continue;
-
     const t  = (log.title||'').toLowerCase();
     const ts = (log.timeStr||'').toLowerCase();
-
     const isHalfTimeEvent = t.includes('half time') || t.includes('half-time') || t.includes('half_time');
-    if(isHalfTimeEvent){
-      currentHalfKey = 'second';
-      continue;
-    }
+    if(isHalfTimeEvent){ currentHalfKey = 'second'; continue; }
 
     let half = null;
     if(ts.includes('1st half')  || ts.includes('first half'))  half = 'first';
     else if(ts.includes('2nd half') || ts.includes('second half')) half = 'second';
     if(!half) half = currentHalfKey;
-
     if(log.type === 'PERIOD') continue;
 
     const teamKey = log.isLeftTeam === true ? 'left' : log.isLeftTeam === false ? 'right' : null;
@@ -742,18 +716,15 @@ function computeHalfStats(){
     } else if(t.includes('empty')){
       s.totalRaids++; s.emptyRaids++; s.currentStreak=0;
     } else if(t.includes('self out') || t.includes('self_out')){
-      // Self-out = completed raid. Count as raid for the indicated team + extra point.
       s.totalRaids++;
       s.extra += pts;
       s.currentStreak = 0;
     } else if(t.includes('super tackle')){
       s.totalTackles++; s.superTackles++; s.tackle += pts;
       if(pts>0) s.succTackles++;
-      // NO defS.totalRaids++  ← FIXED
     } else if(t.includes('tackle')){
       s.totalTackles++; s.tackle += pts;
       if(pts>0) s.succTackles++;
-      // NO defS.totalRaids++  ← FIXED
     } else if(t.includes('all out')){
       s.allOut += pts;
     } else if(log.type === 'EXTRA' && pts > 0){
@@ -761,7 +732,6 @@ function computeHalfStats(){
     }
   }
 
-  // Derived fields per half
   for(const teamKey of ['left','right']){
     for(const halfKey of ['first','second']){
       const s = stats[teamKey][halfKey];
@@ -770,13 +740,11 @@ function computeHalfStats(){
     }
   }
 
-  // Half-points totals from scoreStr on "Half Time" log
   let htLeft = null, htRight = null;
   for(const log of sorted){
     const t = getEnglishTitle(log).toLowerCase();
     const d = (log.desc||'').toLowerCase();
-    const isHT = t.includes('half time') || t.includes('half-time') || t.includes('half_time')
-               || d.includes('half time') || d.includes('first half end');
+    const isHT = t.includes('half time') || d.includes('half time') || d.includes('first half end');
     if(!isHT || !log.scoreStr) continue;
     const parts = log.scoreStr.replace(/Score:\s*/i,'').trim().split('-').map(x=>num(x.trim()));
     if(parts.length===2){ htLeft=parts[0]; htRight=parts[1]; }
@@ -805,7 +773,6 @@ function computeHalfStats(){
   stats.left.second.total  = lSecond;
   stats.right.second.total = rSecond;
 
-  // Pre-merge Match = First + Second (guaranteed Match = 1st + 2nd)
   stats.left.match  = mergeHalves(stats.left.first,  stats.left.second);
   stats.right.match = mergeHalves(stats.right.first, stats.right.second);
 
@@ -832,7 +799,10 @@ function mergeHalves(h1, h2){
 }
 
 // ============================================================
-// renderStats — Match = .match, Half = .[half]
+// ★ BUILD v5 ★ — renderStats
+// Reads new team_stats_*_full / _half1 / _half2 fields as the
+// PRIMARY source. Falls back to log-derived computeHalfStats()
+// when the richer fields aren't present yet.
 // ============================================================
 function renderStats(){
   const state = window.latestGlobalState;
@@ -842,22 +812,50 @@ function renderStats(){
   const half = window.currentHalf;
   const view = window.currentRaidView;
 
-  const hs = computeHalfStats();
-  const lStats = (half === 'match') ? hs.left.match  : hs.left[half];
-  const rStats = (half === 'match') ? hs.right.match : hs.right[half];
-
-  const lRaid   = lStats.raid   || 0,  rRaid   = rStats.raid   || 0;
-  const lTackle = lStats.tackle || 0,  rTackle = rStats.tackle || 0;
-  const lAllOut = lStats.allOut || 0,  rAllOut = rStats.allOut || 0;
-  const lExtra  = lStats.extra  || 0,  rExtra  = rStats.extra  || 0;
-
-  let lTotal, rTotal;
+  // ─────────────────────────────────────────────────────────
+  // 1. Pick source of truth for team stats
+  // ─────────────────────────────────────────────────────────
+  let lTeam = null, rTeam = null;
   if (half === 'match') {
-    lTotal = num(data.left_score);
-    rTotal = num(data.right_score);
+    lTeam = data.team_stats_left_full  || data.team_stats_left  || null;
+    rTeam = data.team_stats_right_full || data.team_stats_right || null;
+  } else if (half === 'first') {
+    lTeam = data.team_stats_left_half1  || data.team_stats_left_full  || data.team_stats_left  || null;
+    rTeam = data.team_stats_right_half1 || data.team_stats_right_full || data.team_stats_right || null;
   } else {
-    lTotal = lStats.total || 0;
-    rTotal = rStats.total || 0;
+    lTeam = data.team_stats_left_half2  || null;
+    rTeam = data.team_stats_right_half2 || null;
+  }
+  const hasTeam = !!(lTeam && rTeam);
+
+  // Log-derived fallback (always available)
+  const logStats = computeHalfStats();
+  const lLog = (half === 'match') ? logStats.left.match : logStats.left[half];
+  const rLog = (half === 'match') ? logStats.right.match : logStats.right[half];
+
+  // ─────────────────────────────────────────────────────────
+  // 2. POINTS BREAKDOWN
+  // ─────────────────────────────────────────────────────────
+  let lRaid, rRaid, lTackle, rTackle, lAllOut, rAllOut, lExtra, rExtra, lTotal, rTotal;
+  if (half === 'match') {
+    // Match view uses state_json authoritative point totals
+    lRaid   = num(state.leftRaidPoints);
+    rRaid   = num(state.rightRaidPoints);
+    lTackle = num(state.leftTacklePoints);
+    rTackle = num(state.rightTacklePoints);
+    lAllOut = num(state.leftAllOutPoints);
+    rAllOut = num(state.rightAllOutPoints);
+    lExtra  = num(state.leftExtraPoints);
+    rExtra  = num(state.rightExtraPoints);
+    lTotal  = num(data.left_score);
+    rTotal  = num(data.right_score);
+  } else {
+    // Half view uses log-derived components
+    lRaid   = lLog.raid   || 0;  rRaid   = rLog.raid   || 0;
+    lTackle = lLog.tackle || 0;  rTackle = rLog.tackle || 0;
+    lAllOut = lLog.allOut || 0;  rAllOut = rLog.allOut || 0;
+    lExtra  = lLog.extra  || 0;  rExtra  = rLog.extra  || 0;
+    lTotal  = lLog.total  || 0;  rTotal  = rLog.total  || 0;
   }
 
   document.getElementById('stLeftRaid').innerText     = lRaid;
@@ -887,16 +885,35 @@ function renderStats(){
   document.getElementById('pbLeftTotal').style.width  = wTt.left;
   document.getElementById('pbRightTotal').style.width = wTt.right;
 
+  // ─────────────────────────────────────────────────────────
+  // 3. RAID / TACKLE PANEL — prefer team_stats_* when available
+  // ─────────────────────────────────────────────────────────
   let lTot, rTot, lSucc, rSucc, lUnsucc, rUnsucc, lEmpty, rEmpty, lSuper, rSuper, lStreak, rStreak;
   let totalLabel, succLabel, unsuccLabel, emptyLabel, superLabel, rateLabel, streakLabel;
 
   if (view === 'raids') {
-    lTot    = lStats.totalRaids   || 0; rTot    = rStats.totalRaids   || 0;
-    lSucc   = lStats.succRaids    || 0; rSucc   = rStats.succRaids    || 0;
-    lUnsucc = lStats.unsuccRaids  || 0; rUnsucc = rStats.unsuccRaids  || 0;
-    lEmpty  = lStats.emptyRaids   || 0; rEmpty  = rStats.emptyRaids   || 0;
-    lSuper  = lStats.superRaids   || 0; rSuper  = rStats.superRaids   || 0;
-    lStreak = lStats.longestStreak|| 0; rStreak = rStats.longestStreak|| 0;
+    if (hasTeam) {
+      lTot    = num(lTeam.totalRaids);
+      rTot    = num(rTeam.totalRaids);
+      lSucc   = num(lTeam.successfulRaids);
+      rSucc   = num(rTeam.successfulRaids);
+      lUnsucc = num(lTeam.unsuccessfulRaids);
+      rUnsucc = num(rTeam.unsuccessfulRaids);
+      lEmpty  = num(lTeam.emptyRaids);
+      rEmpty  = num(rTeam.emptyRaids);
+      lSuper  = num(lTeam.superRaids);
+      rSuper  = num(rTeam.superRaids);
+      lStreak = num(lTeam.longestRaidStreak);
+      rStreak = num(rTeam.longestRaidStreak);
+    } else {
+      // Fallback to log-derived
+      lTot    = lLog.totalRaids   || 0; rTot    = rLog.totalRaids   || 0;
+      lSucc   = lLog.succRaids    || 0; rSucc   = rLog.succRaids    || 0;
+      lUnsucc = lLog.unsuccRaids  || 0; rUnsucc = rLog.unsuccRaids  || 0;
+      lEmpty  = lLog.emptyRaids   || 0; rEmpty  = rLog.emptyRaids   || 0;
+      lSuper  = lLog.superRaids   || 0; rSuper  = rLog.superRaids   || 0;
+      lStreak = lLog.longestStreak|| 0; rStreak = rLog.longestStreak|| 0;
+    }
     totalLabel  = 'Total Raids';
     succLabel   = 'Successful Raids';
     unsuccLabel = 'Unsuccessful Raids';
@@ -906,11 +923,25 @@ function renderStats(){
     streakLabel = 'Longest Successful Raid Streak';
     document.getElementById('cmpEmptyRow').style.display = '';
   } else {
-    lTot    = lStats.totalTackles      || 0; rTot    = rStats.totalTackles      || 0;
-    lSucc   = lStats.succTackles       || 0; rSucc   = rStats.succTackles       || 0;
-    lUnsucc = lStats.unsuccTackles     || 0; rUnsucc = rStats.unsuccTackles     || 0;
-    lSuper  = lStats.superTackles      || 0; rSuper  = rStats.superTackles      || 0;
-    lEmpty  = 0; rEmpty = 0; lStreak = 0; rStreak = 0;
+    if (hasTeam) {
+      lTot    = num(lTeam.totalTackles);
+      rTot    = num(rTeam.totalTackles);
+      lSucc   = num(lTeam.successfulTackles);
+      rSucc   = num(rTeam.successfulTackles);
+      lUnsucc = num(lTeam.unsuccessfulTackles);
+      rUnsucc = num(rTeam.unsuccessfulTackles);
+      lSuper  = num(lTeam.superTackles);
+      rSuper  = num(rTeam.superTackles);
+      lStreak = num(lTeam.longestTackleStreak);
+      rStreak = num(rTeam.longestTackleStreak);
+      lEmpty = 0; rEmpty = 0;
+    } else {
+      lTot    = lLog.totalTackles    || 0; rTot    = rLog.totalTackles    || 0;
+      lSucc   = lLog.succTackles     || 0; rSucc   = rLog.succTackles     || 0;
+      lUnsucc = lLog.unsuccTackles   || 0; rUnsucc = rLog.unsuccTackles   || 0;
+      lSuper  = lLog.superTackles    || 0; rSuper  = rLog.superTackles    || 0;
+      lEmpty = 0; rEmpty = 0; lStreak = 0; rStreak = 0;
+    }
     totalLabel  = 'Total Tackles';
     succLabel   = 'Successful Tackles';
     unsuccLabel = 'Unsuccessful Tackles';
@@ -1449,7 +1480,7 @@ if(!matchId){
         } else {
           banner.classList.remove('match-over','idle');
           let isLeftRaid;
-          const raw = state.currentRaidTeamsLeft;
+          const raw = state.currentRaidTeamsLeft !== undefined ? state.currentRaidTeamsLeft : state.currentRaidTeamIsLeft;
           if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
           else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
           else if (data.active_raider_team === 'left')  isLeftRaid = true;
