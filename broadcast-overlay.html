@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KabaddiOne Broadcast Overlay</title>
+    <title>KabaddiOne Professional Broadcast Overlay</title>
     
-    <!-- Google Fonts for Professional Sports Typography & Hindi -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Teko:wght@500;600;700&family=Mukta:wght@600;800&display=swap" rel="stylesheet">
+    <!-- Professional Sports Typography & Hindi Support -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -30,416 +30,269 @@
             font-family: 'Oswald', sans-serif;
         }
 
+        /* =========================================
+           MASTER POSITIONING CONTAINER
+           ========================================= */
         .broadcast-stage {
             position: absolute;
-            bottom: 50px; /* Positioned slightly above the bottom edge */
+            bottom: 55px; /* Sits cleanly above the bottom of the screen */
             left: 0;
             width: 1920px;
             display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 10;
-            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.8)); /* Heavy drop shadow for the whole unit */
-        }
-
-        /* =========================================
-           MAIN SCOREBOARD CONTAINER
-           ========================================= */
-        .scoreboard-container {
-            display: flex;
-            align-items: flex-start; /* Align to top to let the bottom bar hang down */
-            position: relative;
-            width: 1600px;
-            height: 120px; /* Taller to accommodate the bottom timer bar */
-        }
-
-        /* =========================================
-           TEAM BLOCKS & NAMES
-           ========================================= */
-        .team-block {
-            display: flex;
             flex-direction: column;
-            position: relative;
-            width: 650px;
-            height: 80px;
-            z-index: 1;
+            align-items: center;
+            /* Heavy 3D shadow applied to the entire interlocking unit */
+            filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.8)); 
         }
 
-        .left-team-block {
-            align-items: flex-end; /* Push text to the right, near the score */
-            background: linear-gradient(to right, #004d00, #009900); /* Default Green */
-            /* Flat left, slanted right */
-            clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
-            border-top: 3px solid #D4AF37;
-            border-bottom: 3px solid #D4AF37;
-            border-left: 3px solid #D4AF37;
-            padding-right: 40px;
-        }
-
-        .right-team-block {
-            align-items: flex-start; /* Push text to the left, near the score */
-            background: linear-gradient(to left, #001a4d, #0055ff); /* Default Blue */
-            /* Slanted left, flat right */
-            clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%);
-            border-top: 3px solid #D4AF37;
-            border-bottom: 3px solid #D4AF37;
-            border-right: 3px solid #D4AF37;
-            padding-left: 40px;
-        }
-
-        .team-name {
-            color: white;
-            font-family: 'Mukta', sans-serif;
-            font-size: 38px;
-            font-weight: 800;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            line-height: 80px; /* Vertically center in the block */
-            white-space: nowrap;
-        }
-
-        /* Optional Mascot Overlays */
-        .mascot-left {
-            position: absolute;
-            left: 20px;
-            bottom: -5px;
-            width: 80px;
-            height: 95px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: bottom left;
-            z-index: 5;
-        }
-        .mascot-right {
-            position: absolute;
-            right: 20px;
-            bottom: -5px;
-            width: 80px;
-            height: 95px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: bottom right;
+        /* =========================================
+           TOP LAYER: RAID PROGRESS BARS
+           ========================================= */
+        .top-raid-bars {
+            display: flex;
+            justify-content: space-between;
+            width: 1100px; /* Spans across both team names */
+            margin-bottom: -5px; /* Tucks seamlessly into the top of the team bars */
             z-index: 5;
         }
 
-        /* =========================================
-           SCORES (WHITE TRAPEZOIDS)
-           ========================================= */
-        .score-wrapper {
-            position: absolute;
-            top: -5px; /* Stick out slightly above the team bars */
-            height: 90px;
-            width: 140px;
-            background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
+        .raid-track {
+            width: 420px;
+            height: 12px;
+            background: rgba(0,0,0,0.6);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 3;
-            border: 4px solid #D4AF37;
-            box-shadow: inset 0px -10px 15px rgba(0,0,0,0.1), 0px 5px 15px rgba(0,0,0,0.5);
-        }
-
-        /* Left score slants top-left to bottom-right */
-        .score-left-box {
-            right: -20px; /* Overlap the center */
-            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        /* Right score slants top-right to bottom-left */
-        .score-right-box {
-            left: -20px; /* Overlap the center */
-            clip-path: polygon(0 0, 85% 0, 100% 100%, 0 100%);
-        }
-
-        .score-text {
-            font-family: 'Teko', sans-serif;
-            font-size: 65px;
-            font-weight: 700;
-            color: #000;
-            line-height: 1;
-            text-align: center;
-        }
-
-        /* =========================================
-           CENTER CLOCK & DIAMOND
-           ========================================= */
-        .center-hub {
-            position: relative;
-            width: 300px;
-            height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 4;
-            /* Transparent gap between the scores */
-        }
-
-        /* The Gold Diamond for the Raid Timer */
-        .gold-diamond {
-            position: absolute;
-            top: 5px;
-            width: 75px;
-            height: 75px;
-            background: linear-gradient(135deg, #FFF3A3, #D4AF37, #AA7700);
-            transform: rotate(45deg);
-            border: 3px solid #FFF;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.8);
-            z-index: 5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .diamond-text {
-            transform: rotate(-45deg); /* Counter-rotate the text */
-            font-family: 'Teko', sans-serif;
-            font-size: 38px;
-            font-weight: 700;
-            color: #000;
-            line-height: 1;
-        }
-
-        /* =========================================
-           BOTTOM PURPLE TIMER BAR
-           ========================================= */
-        .bottom-timer-bar {
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 480px;
-            height: 35px;
-            background: linear-gradient(to right, #2c004d, #4A148C, #2c004d);
-            border-bottom: 3px solid #D4AF37;
-            clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            z-index: 2; /* Sits behind the diamond and scores */
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .main-timer-text {
-            font-family: 'Teko', sans-serif;
-            font-size: 26px;
-            color: #FFD700;
-            line-height: 1;
-        }
-
-        /* =========================================
-           PLAYER DOTS (On Mat)
-           ========================================= */
-        .dots-container {
-            position: absolute;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            height: 25px;
-            gap: 6px;
-        }
-
-        /* Embed dots inside the team block */
-        .left-team-block .dots-container {
-            right: 40px; /* Near the score */
-            bottom: 5px;
-        }
-
-        .right-team-block .dots-container {
-            left: 40px; /* Near the score */
-            bottom: 5px;
-        }
-
-        .player-icon {
-            width: 14px;
-            height: 16px;
-            /* Create the little "person" shape using SVG masks or just colored icons */
-            background-color: rgba(255,255,255,0.3);
-            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>') no-repeat center / contain;
-            -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>') no-repeat center / contain;
-            transition: all 0.3s ease;
-        }
-
-        .player-icon.active {
-            background-color: #00FF00; /* Neon Green when alive */
-        }
-        
-        .right-team-block .player-icon.active {
-            background-color: #00FFFF; /* Cyan for right team (PKL style) */
-        }
-
-        /* =========================================
-           TOP GLOWING RAID TIMER PROGRESS BARS
-           ========================================= */
-        /* These sit directly on top of the team bars, pointing inwards */
-        .raid-progress-track {
-            position: absolute;
-            top: -4px;
-            width: 250px;
-            height: 6px;
-            background: rgba(0,0,0,0.5);
-            z-index: 6;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
             overflow: hidden;
-            display: none; /* Hidden by default */
+            visibility: hidden; /* Hidden until a raid starts */
+            border: 2px solid #D4AF37;
+            border-bottom: none;
         }
 
+        /* Left side shrinks towards the right (center) */
         .track-left {
-            right: 0;
-            border-top-left-radius: 3px;
-            border-bottom-left-radius: 3px;
+            justify-content: flex-end; 
         }
 
+        /* Right side shrinks towards the left (center) */
         .track-right {
-            left: 0;
-            border-top-right-radius: 3px;
-            border-bottom-right-radius: 3px;
+            justify-content: flex-start;
         }
 
-        .raid-progress-fill {
+        .raid-fill {
             height: 100%;
+            width: 100%;
             background: #00FF00; /* Neon Green */
             box-shadow: 0px 0px 10px #00FF00;
-            width: 100%; /* Shrinks to 0% */
-            transition: width 1s linear; /* Smooth 1 second ticks */
+            transition: width 1s linear; /* Smooth ticking animation */
         }
-        
-        /* When time is low (<10s), turn red and pulse */
-        .raid-progress-fill.danger {
-            background: #FF0000;
+
+        .raid-fill.danger {
+            background: #FF0000; /* Turns red at 10 seconds */
             box-shadow: 0px 0px 15px #FF0000;
         }
 
-        /* The tracks only appear on the team that is currently raiding */
-        .left-team-block.raiding .track-left { display: block; }
-        .right-team-block.raiding .track-right { display: block; }
+        /* =========================================
+           LAYER 1: MAIN SCOREBOARD ROW (INTERLOCKING)
+           ========================================= */
+        .main-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 10;
+            height: 80px;
+        }
+
+        /* --- LEFT TEAM BAR --- */
+        .team-left-wrap {
+            width: 520px; height: 75px;
+            background: #dcb23c; /* Solid Gold Border */
+            clip-path: polygon(0 0, calc(100% - 35px) 0, 100% 100%, 0 100%);
+            padding: 3px; padding-right: 4px;
+            z-index: 1;
+        }
+        .team-left-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(to right, #003300, #009900); /* Default fallback */
+            clip-path: polygon(0 0, calc(100% - 33px) 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-right: 45px;
+            color: white; font-family: 'Mukta', sans-serif; font-size: 38px; font-weight: 800; text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+        }
+
+        /* --- LEFT SCORE BOX --- */
+        .score-left-wrap {
+            width: 130px; height: 80px;
+            background: #dcb23c;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 35px 100%);
+            margin-left: -50px; /* Negative margin pulls it OVER the team bar */
+            z-index: 2;
+            padding: 4px;
+        }
+        .score-left-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
+            clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 100%, 33px 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: black; font-family: 'Teko', sans-serif; font-size: 65px; font-weight: 700; line-height: 1; padding-left: 15px;
+        }
+
+        /* --- CENTER RAID CLOCK TRIANGLE --- */
+        .center-wrap {
+            width: 130px; height: 100px;
+            background: #dcb23c;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            margin: 0 -45px; /* Overlaps BOTH score boxes flawlessly */
+            z-index: 3;
+            padding: 4px;
+        }
+        .center-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #4a0080, #1a0033);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            display: flex; align-items: flex-start; justify-content: center;
+            padding-top: 10px;
+            color: #FFD700; font-family: 'Teko', sans-serif; font-size: 50px; font-weight: 700; line-height: 1; text-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+        }
+
+        /* --- RIGHT SCORE BOX --- */
+        .score-right-wrap {
+            width: 130px; height: 80px;
+            background: #dcb23c;
+            clip-path: polygon(15px 0, 100% 0, calc(100% - 35px) 100%, 0 100%);
+            margin-left: -45px; /* Tuck under the center triangle */
+            z-index: 2;
+            padding: 4px;
+        }
+        .score-right-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
+            clip-path: polygon(13px 0, 100% 0, calc(100% - 33px) 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: black; font-family: 'Teko', sans-serif; font-size: 65px; font-weight: 700; line-height: 1; padding-right: 15px;
+        }
+
+        /* --- RIGHT TEAM BAR --- */
+        .team-right-wrap {
+            width: 520px; height: 75px;
+            background: #dcb23c;
+            clip-path: polygon(35px 0, 100% 0, 100% 100%, 0 100%);
+            margin-left: -50px; /* Overlap under the score box */
+            z-index: 1;
+            padding: 3px; padding-left: 4px;
+        }
+        .team-right-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(to left, #001a4d, #0055ff); /* Default fallback */
+            clip-path: polygon(33px 0, 100% 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: flex-start;
+            padding-left: 45px;
+            color: white; font-family: 'Mukta', sans-serif; font-size: 38px; font-weight: 800; text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+        }
 
         /* =========================================
-           DYNAMIC EVENTS: DO-OR-DIE & SUBSTITUTION
+           LAYER 2: BOTTOM INFO & DOTS BAR
            ========================================= */
-        .event-banner {
-            position: absolute;
-            bottom: 125px; /* Pops up above the whole scoreboard */
+        .bottom-row {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 26px;
-            height: 45px;
-            padding: 0 40px;
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(20px);
-            z-index: 100;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.8);
+            width: 100%;
+            margin-top: -12px; /* Pulls it up securely underneath the main row */
+            z-index: 0; /* Ensures it sits BEHIND the main row */
         }
 
-        .event-banner.show {
-            opacity: 1;
-            transform: translateY(0);
+        /* --- LEFT DOTS BAR --- */
+        .dots-left-wrap {
+            width: 320px; height: 35px;
+            background: #dcb23c;
+            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 100%, 0 100%);
+            padding: 3px; padding-top: 10px; margin-right: 10px;
+        }
+        .dots-left-inner {
+            width: 100%; height: 100%;
+            background: #002200;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-right: 35px; gap: 8px;
         }
 
-        .dod-left {
-            left: 150px;
-            background: linear-gradient(to right, #D32F2F, #B71C1C);
-            clip-path: polygon(0 0, 92% 0, 88% 100%, 0 100%);
-            border-top: 3px solid #FF5252;
-            border-left: 3px solid #FF5252;
-            animation: siren 1s infinite;
+        /* --- CENTER INFO BAR --- */
+        .center-info-wrap {
+            width: 480px; height: 40px;
+            background: #dcb23c;
+            clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 100%, 0 100%);
+            padding: 3px; padding-top: 12px;
+        }
+        .center-info-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(to right, #2c004d, #4A148C, #2c004d);
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+            color: white; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .gold-text { color: #FFD700; font-family: 'Teko', sans-serif; font-size: 28px; line-height: 1; margin-top: 3px;}
+        .divider { color: #888; font-weight: 400; }
+
+        /* --- RIGHT DOTS BAR --- */
+        .dots-right-wrap {
+            width: 320px; height: 35px;
+            background: #dcb23c;
+            clip-path: polygon(18px 0, 100% 0, 100% 100%, 0 100%);
+            padding: 3px; padding-top: 10px; margin-left: 10px;
+        }
+        .dots-right-inner {
+            width: 100%; height: 100%;
+            background: #000b22;
+            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: flex-start;
+            padding-left: 35px; gap: 8px;
         }
 
-        .dod-right {
-            right: 150px;
-            background: linear-gradient(to left, #D32F2F, #B71C1C);
-            clip-path: polygon(8% 0, 100% 0, 100% 100%, 12% 100%);
-            border-top: 3px solid #FF5252;
-            border-right: 3px solid #FF5252;
-            animation: siren 1s infinite;
+        /* --- PLAYER DOTS --- */
+        .dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 2px solid #D4AF37;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
         }
+        .dot.active { background: #00FF00; border-color: #FFFFFF; box-shadow: 0px 0px 8px #00FF00; }
+        .right-dot.active { background: #00FFFF; box-shadow: 0px 0px 8px #00FFFF;}
 
-        .sub-popup {
-            position: absolute;
-            bottom: 125px;
-            right: 150px;
-            background: linear-gradient(to left, #1A0033, #4A148C);
-            border-top: 3px solid #D4AF37;
-            border-right: 3px solid #D4AF37;
-            padding: 5px 40px;
-            font-size: 22px;
-            clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: white;
-            height: 50px;
-        }
-
-        .sub-arrow-in { color: #00FF00; font-weight: bold; }
-
-        /* Center Event Popups (All Out, Super Tackle, Raid Point) */
-        .center-event-popup {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            background: linear-gradient(to bottom, #D32F2F, #8B0000);
-            border: 5px solid #FFD700;
-            border-radius: 15px;
-            padding: 20px 100px;
-            color: white;
-            font-family: 'Teko', sans-serif;
-            font-size: 80px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 6px;
-            box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 200;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .center-event-popup.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .center-event-popup.all-out {
-            background: linear-gradient(to bottom, #D32F2F, #8B0000);
-            font-size: 100px;
-            padding: 30px 150px;
-            box-shadow: 0px 0px 80px rgba(255, 0, 0, 0.9);
-        }
-
-        .center-event-popup.super-tackle {
-            background: linear-gradient(to bottom, #FF8F00, #E65100);
-            font-size: 80px;
-        }
-
-        .center-event-popup.raid-point {
-            background: linear-gradient(to bottom, #1976D2, #0D47A1);
-            font-size: 70px;
-        }
-
-        /* Animations */
+        /* =========================================
+           POPUP EVENT ANIMATIONS
+           ========================================= */
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); color: #FFD700; text-shadow: 0px 0px 20px #FFD700; }
+            50% { transform: scale(1.2); color: #FFD700; }
             100% { transform: scale(1); }
         }
         .score-pop { animation: pop 0.6s ease-in-out; }
 
-        @keyframes siren {
-            0% { box-shadow: inset 0 0 0px #FF0000; }
-            50% { box-shadow: inset 0 0 30px #FF0000; }
-            100% { box-shadow: inset 0 0 0px #FF0000; }
+        .sub-popup {
+            position: absolute; bottom: 135px; right: 180px;
+            background: linear-gradient(to left, #1A0033, #4A148C);
+            border: 3px solid #D4AF37;
+            padding: 5px 30px; font-size: 22px; color: white; font-weight: bold;
+            display: flex; align-items: center; gap: 15px;
+            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
+            opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
         }
-        
+        .sub-popup.show { opacity: 1; transform: translateY(0); }
+        .sub-in { color: #00FF00; }
+
+        .center-popup {
+            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
+            background: linear-gradient(to bottom, #D32F2F, #8B0000);
+            border: 5px solid #FFD700; border-radius: 10px;
+            padding: 20px 80px; color: white; font-family: 'Teko', sans-serif; font-size: 80px; font-weight: 700; letter-spacing: 4px;
+            box-shadow: 0px 0px 40px rgba(255, 215, 0, 0.8);
+            opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap; text-transform: uppercase;
+        }
+        .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
     </style>
 </head>
 <body>
@@ -447,82 +300,94 @@
     <!-- OBS RENDER STAGE -->
     <div class="broadcast-stage">
         
-        <!-- DO OR DIE OVERLAYS -->
-        <div id="dod-left" class="event-banner dod-left">🚨 DO-OR-DIE</div>
-        <div id="dod-right" class="event-banner dod-right">DO-OR-DIE 🚨</div>
-        
         <!-- SUBSTITUTION POPUP -->
-        <div id="sub-popup" class="event-banner sub-popup">
+        <div id="sub-popup" class="sub-popup">
             <span>सब्स्टीट्यूशन</span> 
-            <span id="sub-player-name" class="sub-arrow-in">▲ Player Name</span>
+            <span id="sub-player-name" class="sub-in">▲ Player Name</span>
         </div>
 
-        <div class="scoreboard-container">
-            
-            <!-- LEFT TEAM BLOCK -->
-            <div id="left-block" class="team-block left-team-block">
-                <!-- Glowing Raid Timer Bar (Points Inward to Center) -->
-                <div class="raid-progress-track track-left">
-                    <div id="raid-bar-left" class="raid-progress-fill" style="float: right;"></div>
-                </div>
+        <!-- TOP RAID PROGRESS BARS -->
+        <div class="top-raid-bars">
+            <div id="raid-track-left" class="raid-track track-left">
+                <div id="raid-bar-left" class="raid-fill"></div>
+            </div>
+            <div id="raid-track-right" class="raid-track track-right">
+                <div id="raid-bar-right" class="raid-fill"></div>
+            </div>
+        </div>
 
-                <div class="mascot-left"></div> <!-- Optional Mascot Image -->
-                <div id="left-name" class="team-name">पटना पायरेट्स</div>
-                
-                <!-- Player Alive Dots -->
-                <div class="dots-container">
-                    <div class="player-icon left-dot"></div><div class="player-icon left-dot"></div><div class="player-icon left-dot"></div><div class="player-icon left-dot"></div><div class="player-icon left-dot"></div><div class="player-icon left-dot"></div><div class="player-icon left-dot"></div>
-                </div>
-
-                <!-- Score Trapezoid (Overlaps Center) -->
-                <div class="score-wrapper score-left-box">
-                    <div id="left-score" class="score-text">0</div>
+        <!-- MAIN SCOREBOARD ROW -->
+        <div class="main-row">
+            <!-- Left Team -->
+            <div class="team-left-wrap">
+                <div class="team-left-inner" id="left-team-bg">
+                    <span id="left-name">TEAM A</span>
                 </div>
             </div>
 
-            <!-- CENTER HUB (Diamond & Lower Bar) -->
-            <div class="center-hub">
-                <!-- Central Gold Diamond (Raid Timer Text) -->
-                <div class="gold-diamond">
-                    <div id="raid-timer" class="diamond-text">30</div>
+            <!-- Left Score -->
+            <div class="score-left-wrap">
+                <div class="score-left-inner">
+                    <span id="left-score">0</span>
                 </div>
+            </div>
 
-                <!-- Lower Purple Bar (Half, Status, Main Time) -->
-                <div class="bottom-timer-bar">
+            <!-- Center Triangle (Raid Timer) -->
+            <div class="center-wrap">
+                <div class="center-inner">
+                    <span id="raid-timer">30</span>
+                </div>
+            </div>
+
+            <!-- Right Score -->
+            <div class="score-right-wrap">
+                <div class="score-right-inner">
+                    <span id="right-score">0</span>
+                </div>
+            </div>
+
+            <!-- Right Team -->
+            <div class="team-right-wrap">
+                <div class="team-right-inner" id="right-team-bg">
+                    <span id="right-name">TEAM B</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM DOTS & INFO ROW -->
+        <div class="bottom-row">
+            <!-- Left Dots -->
+            <div class="dots-left-wrap">
+                <div class="dots-left-inner" id="left-dots-bg">
+                    <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
+                </div>
+            </div>
+
+            <!-- Center Info Bar -->
+            <div class="center-info-wrap">
+                <div class="center-info-inner">
                     <span id="half-status">1st HALF</span>
-                    <span>|</span>
+                    <span class="divider">|</span>
                     <span id="match-status">फाइनल</span>
-                    <span>|</span>
-                    <span id="main-timer" class="main-timer-text">20:00</span>
+                    <span class="divider">|</span>
+                    <span id="main-timer" class="gold-text">20:00</span>
+                    <span class="divider">|</span>
+                    <span id="match-id" style="color: #bbb; font-size: 14px;">ABC123</span>
                 </div>
             </div>
 
-            <!-- RIGHT TEAM BLOCK -->
-            <div id="right-block" class="team-block right-team-block">
-                <!-- Glowing Raid Timer Bar (Points Inward to Center) -->
-                <div class="raid-progress-track track-right">
-                    <div id="raid-bar-right" class="raid-progress-fill" style="float: left;"></div>
-                </div>
-
-                <!-- Score Trapezoid (Overlaps Center) -->
-                <div class="score-wrapper score-right-box">
-                    <div id="right-score" class="score-text">0</div>
-                </div>
-
-                <div id="right-name" class="team-name">हरियाणा स्टीलर्स</div>
-                <div class="mascot-right"></div> <!-- Optional Mascot Image -->
-                
-                <!-- Player Alive Dots -->
-                <div class="dots-container">
-                    <div class="player-icon right-dot"></div><div class="player-icon right-dot"></div><div class="player-icon right-dot"></div><div class="player-icon right-dot"></div><div class="player-icon right-dot"></div><div class="player-icon right-dot"></div><div class="player-icon right-dot"></div>
+            <!-- Right Dots -->
+            <div class="dots-right-wrap">
+                <div class="dots-right-inner" id="right-dots-bg">
+                    <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
                 </div>
             </div>
-
         </div>
+
     </div>
 
-    <!-- CENTER EVENT POPUPS (Raid Point, Tackle, All Out, etc.) -->
-    <div id="center-event-popup" class="center-event-popup">RAID POINT</div>
+    <!-- CENTER SCREEN EVENT POPUP -->
+    <div id="center-popup" class="center-popup">EVENT</div>
 
     <script>
         // ==========================================
@@ -542,6 +407,7 @@
             document.getElementById('left-name').innerText = "NO MATCH ID";
             document.getElementById('right-name').innerText = "LINK URL ERROR";
         } else {
+            document.getElementById('match-id').innerText = matchId.toUpperCase();
             initBroadcastEngine(matchId);
         }
 
@@ -553,10 +419,6 @@
         let previousLogId = null;
         let previousAllOut = false;
         let previousSuperTackle = false;
-        let previousRaidPoint = false;
-        
-        let localRaidTimerInterval = null;
-        let currentRaidTimeLeft = 30;
 
         function initBroadcastEngine(id) {
             const matchRef = db.ref('live_matches/' + id);
@@ -569,13 +431,16 @@
                 document.getElementById('left-name').innerText = data.left_name || "TEAM A";
                 document.getElementById('right-name').innerText = data.right_name || "TEAM B";
 
-                // 🚨 APPLY DYNAMIC COLORS TO THE TEAM BLOCKS
-                const leftColor = data.left_color || "#004d00";
-                const rightColor = data.right_color || "#001a4d";
+                // 🚨 APPLY DYNAMIC GRADIENTS BASED ON TEAM COLORS
+                const leftColor = data.left_color || "#009900";
+                const rightColor = data.right_color || "#0055ff";
                 
-                // Create a sleek gradient based on the selected color
-                document.getElementById('left-block').style.background = `linear-gradient(to right, ${darkenColor(leftColor, 40)}, ${leftColor})`;
-                document.getElementById('right-block').style.background = `linear-gradient(to left, ${darkenColor(rightColor, 40)}, ${rightColor})`;
+                document.getElementById('left-team-bg').style.background = `linear-gradient(to right, ${darkenColor(leftColor, 60)}, ${leftColor})`;
+                document.getElementById('right-team-bg').style.background = `linear-gradient(to left, ${darkenColor(rightColor, 60)}, ${rightColor})`;
+                
+                // Darken dots background
+                document.getElementById('left-dots-bg').style.background = darkenColor(leftColor, 80);
+                document.getElementById('right-dots-bg').style.background = darkenColor(rightColor, 80);
 
                 // 2. UPDATE SCORES WITH POP ANIMATION
                 updateScoreWithAnimation('left-score', data.left_score || 0, previousLeftScore);
@@ -590,28 +455,22 @@
                     document.getElementById('match-status').innerText = "FULL TIME";
                     document.getElementById('main-timer').innerText = "00:00";
                 } else {
-                    document.getElementById('match-status').innerText = "फाइनल"; // Default Hindi Final
+                    document.getElementById('match-status').innerText = "फाइनल"; // Default Match Status
                 }
 
-                // 4. PARSE DEEP STATE JSON FOR DOTS, TIMERS, & EVENTS
+                // 4. PARSE DEEP STATE JSON FOR DOTS & TIMERS
                 if (data.state_json) {
                     try {
                         const state = JSON.parse(data.state_json);
                         
-                        // Render 7 Player Icons
+                        // Render 7 Dots
                         renderDots('left-dot', state.leftDotStates);
                         renderDots('right-dot', state.rightDotStates);
 
                         // Handle Raid Timer (Diamond Text & Shrinking Neon Bars)
                         handleRaidTimers(state, data.raid_clock);
 
-                        // Handle Do-Or-Die Siren Graphic
-                        handleDoOrDie(state);
-
-                        // Handle Center Event Popups (All Out, Super Tackle, Raid Point)
-                        handleCenterEvents(state);
-
-                        // Extract timeline logs to catch substitutions and events
+                        // Check for major events in the timeline
                         handleEventTimeline(state);
                     } catch (e) {
                         console.warn("State JSON parse error", e);
@@ -654,7 +513,7 @@
             }
         }
 
-        // --- PLAYER ICONS RENDERER ---
+        // --- DOTS RENDERER ---
         function renderDots(dotClassName, stateArray) {
             const dots = document.getElementsByClassName(dotClassName);
             if(stateArray && stateArray.length > 0) {
@@ -668,85 +527,54 @@
             }
         }
 
-        // --- RAID TIMER & NEON SHRINKING BARS ---
+        // --- TOP NEON RAID TIMER PROGRESS BARS ---
         function handleRaidTimers(state, raidClockStr) {
             const raidTimerText = document.getElementById('raid-timer');
-            const leftBlock = document.getElementById('left-block');
-            const rightBlock = document.getElementById('right-block');
-            const leftBar = document.getElementById('raid-bar-left');
-            const rightBar = document.getElementById('raid-bar-right');
+            const trackLeft = document.getElementById('raid-track-left');
+            const trackRight = document.getElementById('raid-track-right');
+            const barLeft = document.getElementById('raid-bar-left');
+            const barRight = document.getElementById('raid-bar-right');
 
             // Set the central diamond text
             const timeInt = parseInt(raidClockStr);
             raidTimerText.innerText = isNaN(timeInt) ? "30" : timeInt;
 
-            // Manage which side the bar appears on
+            // Manage which side the progress bar appears on
             if (state.raidTimerRunning) {
                 if (state.currentRaidTeamIsLeft) {
-                    leftBlock.classList.add('raiding');
-                    rightBlock.classList.remove('raiding');
+                    trackLeft.style.visibility = 'visible';
+                    trackRight.style.visibility = 'hidden';
                 } else {
-                    rightBlock.classList.add('raiding');
-                    leftBlock.classList.remove('raiding');
+                    trackRight.style.visibility = 'visible';
+                    trackLeft.style.visibility = 'hidden';
                 }
 
-                // Calculate width percentage (0 to 30 seconds)
+                // Calculate width percentage (shrinks from 100% to 0% based on 30 seconds)
                 const percentage = Math.max(0, Math.min(100, (timeInt / 30) * 100));
                 
-                leftBar.style.width = percentage + "%";
-                rightBar.style.width = percentage + "%";
+                barLeft.style.width = percentage + "%";
+                barRight.style.width = percentage + "%";
 
-                // Turn red if 10 seconds or less
+                // Turn red and pulse if 10 seconds or less
                 if (timeInt <= 10) {
-                    leftBar.classList.add('danger');
-                    rightBar.classList.add('danger');
+                    barLeft.classList.add('danger');
+                    barRight.classList.add('danger');
                 } else {
-                    leftBar.classList.remove('danger');
-                    rightBar.classList.remove('danger');
+                    barLeft.classList.remove('danger');
+                    barRight.classList.remove('danger');
                 }
-
             } else {
-                // If paused or stopped, hide the bars
-                leftBlock.classList.remove('raiding');
-                rightBlock.classList.remove('raiding');
-                leftBar.style.width = "100%";
-                rightBar.style.width = "100%";
-                leftBar.classList.remove('danger');
-                rightBar.classList.remove('danger');
+                // If paused or stopped, hide the bars completely
+                trackLeft.style.visibility = 'hidden';
+                trackRight.style.visibility = 'hidden';
+                barLeft.style.width = "100%";
+                barRight.style.width = "100%";
+                barLeft.classList.remove('danger');
+                barRight.classList.remove('danger');
             }
         }
 
-        // --- DO OR DIE GRAPHIC LOGIC ---
-        function handleDoOrDie(state) {
-            const dodLeft = document.getElementById('dod-left');
-            const dodRight = document.getElementById('dod-right');
-
-            const isLeftDoOrDie = state.currentRaidTeamIsLeft && state.leftEmptyRaids >= 2;
-            const isRightDoOrDie = !state.currentRaidTeamIsLeft && state.rightEmptyRaids >= 2;
-
-            if (isLeftDoOrDie && state.raidTimerRunning) {
-                dodLeft.classList.add('show');
-            } else {
-                dodLeft.classList.remove('show');
-            }
-
-            if (isRightDoOrDie && state.raidTimerRunning) {
-                dodRight.classList.add('show');
-            } else {
-                dodRight.classList.remove('show');
-            }
-        }
-
-        // --- CENTER EVENT POPUPS (All Out, Super Tackle, Raid Point) ---
-        function handleCenterEvents(state) {
-            const popup = document.getElementById('center-event-popup');
-            
-            // Note: Since these flags aren't directly in your MatchStateSnapshot currently, 
-            // you can trigger them via the handleEventTimeline (Logs) instead for 100% accuracy.
-        }
-
-        // --- LIVE SUBSTITUTION / EVENT LOGIC (TIMELINE) ---
-        // Reads the latest log in the array to pop up the substitution bar and central events
+        // --- EVENT TIMELINE PARSER (Subs, All Outs, Super Raids) ---
         function handleEventTimeline(state) {
             if(!state.logsJson) return;
             try {
@@ -755,10 +583,9 @@
 
                 const latestLog = logs[logs.length - 1];
                 
-                // Only trigger if this is a NEW log we haven't animated yet
+                // Only trigger if this is a NEW event we haven't animated yet
                 if(latestLog.id !== previousLogId) {
                     previousLogId = latestLog.id;
-
                     const title = latestLog.title || "";
 
                     if (title.includes("Substitution") || title.includes("सब्स्टीट्यूशन")) {
@@ -768,7 +595,7 @@
                     } else if (title.includes("Super Tackle") || latestLog.type === "SUPER_TACKLE") {
                         triggerCenterEvent("SUPER TACKLE", "super-tackle", 3000);
                     } else if (title.includes("Super Raid") || (latestLog.type === "RAID" && latestLog.points >= 3)) {
-                        triggerCenterEvent("SUPER RAID", "raid-point", 3000); // Uses blue raid point style
+                        triggerCenterEvent("SUPER RAID", "raid-point", 3000);
                     }
                 }
             } catch (e) {
@@ -788,10 +615,16 @@
             }, 5000);
         }
 
-        function triggerCenterEvent(text, className, duration) {
-            const popup = document.getElementById('center-event-popup');
+        function triggerCenterEvent(text, styleClass, duration) {
+            const popup = document.getElementById('center-popup');
             popup.innerText = text;
-            popup.className = "center-event-popup show " + className;
+            
+            // Apply unique background colors dynamically based on the event
+            if (styleClass === 'all-out') popup.style.background = 'linear-gradient(to bottom, #D32F2F, #8B0000)';
+            if (styleClass === 'super-tackle') popup.style.background = 'linear-gradient(to bottom, #FF8F00, #E65100)';
+            if (styleClass === 'raid-point') popup.style.background = 'linear-gradient(to bottom, #1976D2, #0D47A1)';
+
+            popup.classList.add('show');
             
             setTimeout(() => { 
                 popup.classList.remove('show'); 
