@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KabaddiOne Broadcast Overlay</title>
     
-    <!-- Google Fonts for Professional Sports Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Professional Sports Typography & Hindi -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Teko:wght@500;600;700&family=Mukta:wght@600;800&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -32,221 +32,310 @@
 
         .broadcast-stage {
             position: absolute;
-            bottom: 60px;
+            bottom: 80px; /* Positioned exactly like the reference */
             left: 0;
             width: 1920px;
             display: flex;
             justify-content: center;
             align-items: flex-end;
             z-index: 10;
+            filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); /* Heavy 3D shadow */
         }
 
         /* =========================================
-           METALLIC GOLD ACCENTS
+           METALLIC GOLD & GLOSSY GRADIENTS
            ========================================= */
-        .gold-gradient {
-            background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
+        .gold-border {
+            border: 3px solid #D4AF37;
+            box-shadow: inset 0px 0px 10px rgba(255, 215, 0, 0.5), 0px 0px 10px rgba(0,0,0,0.8);
+        }
+
+        .gold-text {
+            background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 50%, #AA7700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.8);
         }
 
         /* =========================================
-           MAIN SCOREBOARD ARCHITECTURE
+           MAIN SCOREBOARD CONTAINER
            ========================================= */
         .scoreboard-container {
             display: flex;
             align-items: center;
             position: relative;
-            width: 1700px;
-            height: 90px;
-            filter: drop-shadow(0px 10px 20px rgba(0,0,0,0.8));
+            width: 1750px;
+            height: 100px;
         }
 
-        /* Left & Right Team Blocks */
-        .team-block {
+        /* =========================================
+           LEFT TEAM BLOCK (GREEN)
+           ========================================= */
+        .left-team-block {
             display: flex;
             flex-direction: column;
             position: relative;
             width: 600px;
-            height: 100%;
-        }
-
-        /* The Main Name & Score Row */
-        .name-score-row {
-            display: flex;
-            height: 65px;
-            position: relative;
-            z-index: 2;
-            width: 100%;
-        }
-
-        .team-name {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 420px;
-            color: white;
-            font-size: 34px;
-            font-weight: 700;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            border: 3px solid #D4AF37;
-            border-bottom: none;
-            background: #1A1A1A;
-        }
-
-        /* EXACT PKL SLANTED SHAPES USING CLIP-PATH */
-        .left-name {
-            clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
-            padding-right: 30px;
-            border-right: none;
-            justify-content: flex-start;
-            padding-left: 30px;
-        }
-        
-        .right-name {
-            clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%);
-            padding-left: 30px;
-            border-left: none;
-            justify-content: flex-end;
-            padding-right: 30px;
-        }
-
-        /* Score Boxes */
-        .score-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #1A1A1A;
-            color: white;
-            font-family: 'Teko', sans-serif;
-            font-size: 60px;
-            font-weight: 700;
-            width: 180px;
-            margin: 0 -10px;
-            z-index: 3;
-            border: 3px solid #D4AF37;
-            box-shadow: inset 0px -10px 15px rgba(0,0,0,0.8), inset 0px 10px 15px rgba(255,255,255,0.1);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .left-score { 
-            clip-path: polygon(15% 0, 100% 0, 85% 100%, 0 100%); 
-            padding-right: 20px;
-        }
-        .right-score { 
-            clip-path: polygon(0 0, 85% 0, 100% 100%, 15% 100%); 
-            padding-left: 20px;
-        }
-
-        /* The Dots Bar (Underneath the team names) */
-        .dots-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            height: 25px;
-            margin-top: -3px;
+            height: 90px;
             z-index: 1;
-            width: 420px;
+        }
+
+        .left-name-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 65px;
+            background: linear-gradient(to right, #003300, #009933, #00CC44, #009933, #003300); /* Glossy Green */
+            clip-path: polygon(0% 0%, 98% 0%, 92% 100%, 0% 100%);
+            border-top: 3px solid #D4AF37;
+            border-left: 3px solid #D4AF37;
+            border-bottom: 3px solid #D4AF37;
+            position: relative;
+            padding-left: 80px; /* Space for mascot */
+            padding-right: 60px; /* Space for slant */
+        }
+
+        .left-mascot {
+            position: absolute;
+            left: 10px;
+            bottom: 0;
+            width: 70px;
+            height: 85px;
+            background: url('https://i.imgur.com/8YQ9Z7L.png') no-repeat center bottom; /* Placeholder for mascot */
+            background-size: contain;
+            z-index: 5;
+        }
+
+        .left-team-name {
+            color: white;
+            font-family: 'Mukta', sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+            letter-spacing: 1px;
+            white-space: nowrap;
         }
 
         .left-dots-bar {
-            clip-path: polygon(0 0, 92% 0, 88% 100%, 0 100%);
-            padding-right: 30px;
+            display: flex;
+            align-items: center;
             justify-content: flex-start;
-            padding-left: 30px;
+            gap: 8px;
+            height: 30px;
+            width: 90%;
+            background: linear-gradient(to right, #003300, #009933);
+            clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 0% 100%);
+            border-bottom: 3px solid #D4AF37;
+            border-left: 3px solid #D4AF37;
+            padding-left: 80px;
+            margin-top: -3px;
+            z-index: 0;
+        }
+
+        /* =========================================
+           RIGHT TEAM BLOCK (BLUE)
+           ========================================= */
+        .right-team-block {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            width: 600px;
+            height: 90px;
+            z-index: 1;
+        }
+
+        .right-name-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 65px;
+            background: linear-gradient(to left, #001a4d, #0055ff, #0077ff, #0055ff, #001a4d); /* Glossy Blue */
+            clip-path: polygon(2% 0%, 100% 0%, 100% 100%, 8% 100%);
+            border-top: 3px solid #D4AF37;
+            border-right: 3px solid #D4AF37;
+            border-bottom: 3px solid #D4AF37;
+            position: relative;
+            padding-right: 80px; /* Space for player face */
+            padding-left: 60px; /* Space for slant */
+        }
+
+        .right-player-face {
+            position: absolute;
+            right: 10px;
+            bottom: 0;
+            width: 70px;
+            height: 85px;
+            background: url('https://i.imgur.com/8YQ9Z7L.png') no-repeat center bottom; /* Placeholder for player face */
+            background-size: contain;
+            z-index: 5;
+        }
+
+        .right-team-name {
+            color: white;
+            font-family: 'Mukta', sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+            letter-spacing: 1px;
+            white-space: nowrap;
         }
 
         .right-dots-bar {
-            clip-path: polygon(8% 0, 100% 0, 100% 100%, 12% 100%);
-            padding-left: 30px;
+            display: flex;
+            align-items: center;
             justify-content: flex-end;
-            padding-right: 30px;
+            gap: 8px;
+            height: 30px;
+            width: 90%;
+            background: linear-gradient(to left, #001a4d, #0055ff);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 5% 100%);
+            border-bottom: 3px solid #D4AF37;
+            border-right: 3px solid #D4AF37;
+            padding-right: 80px;
+            margin-top: -3px;
+            z-index: 0;
         }
 
+        /* =========================================
+           DOTS
+           ========================================= */
         .dot {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.3);
-            background: transparent;
-            box-shadow: 0px 2px 4px rgba(0,0,0,0.5);
+            border: 2px solid #D4AF37;
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.8);
             transition: all 0.3s ease;
         }
         .dot.active { 
             background: #00FF00; 
-            border-color: #00FF00; 
-            box-shadow: 0px 0px 10px #00FF00;
+            border-color: #FFFFFF; 
+            box-shadow: 0px 0px 10px #00FF00, 0px 0px 5px #FFFFFF inset;
+        }
+        .right-dot.active {
+            background: #00FFFF; /* Cyan for right team in some PKL themes, or keep #00FF00 */
         }
 
         /* =========================================
-           CENTER TIMER & HALF INDICATOR
+           CENTER BLOCK (SCORES & TIMER)
            ========================================= */
         .center-block {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 260px;
-            height: 75px;
-            background: linear-gradient(to right, #1A1A1A, #000000, #1A1A1A);
-            border: 3px solid #D4AF37;
-            clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
-            margin: 0 -20px;
-            z-index: 4;
-            color: white;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.8);
+            position: relative;
+            width: 550px;
+            height: 110px;
+            z-index: 10;
+            margin: 0 -60px; /* Overlap with side blocks */
         }
 
-        .center-top-row {
+        /* Scoreboard Background (White Trapezoid) */
+        .score-background {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
+            clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+            border-bottom: 4px solid #D4AF37;
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.7);
+            z-index: 1;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
-            font-size: 14px;
-            color: #FFD700;
+            gap: 20px;
+        }
+
+        .score-box {
+            font-family: 'Teko', sans-serif;
+            font-size: 70px;
+            font-weight: 700;
+            color: #000;
+            width: 100px;
+            text-align: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        /* Central Gold Diamond */
+        .gold-diamond {
+            position: absolute;
+            top: 15px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FFF3A3, #D4AF37, #AA7700);
+            transform: rotate(45deg);
+            border: 2px solid #FFF;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.8);
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gold-diamond-text {
+            transform: rotate(-45deg);
+            font-family: 'Teko', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        /* Timer & Half Status Background (Purple) */
+        .timer-background {
+            position: absolute;
+            bottom: 0;
+            width: 400px;
+            height: 35px;
+            background: linear-gradient(to right, #1A0033, #4A148C, #1A0033);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+            border-top: 3px solid #D4AF37;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            font-size: 16px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: -5px;
         }
 
         .timer-text {
             font-family: 'Teko', sans-serif;
-            font-size: 42px;
-            font-weight: 700;
+            font-size: 24px;
+            color: #FFD700;
             line-height: 1;
-            margin-top: -5px;
-            color: #FFFFFF;
-            text-shadow: 0px 0px 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .trophy-icon {
-            width: 18px;
-            height: 18px;
-            fill: #FFD700;
         }
 
         /* =========================================
-           DYNAMIC EVENTS: DO-OR-DIE & SUBSTITUTION
+           DYNAMIC EVENTS (DO-OR-DIE, SUB, POPUPS)
            ========================================= */
         .event-banner {
             position: absolute;
-            bottom: 75px;
+            bottom: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 26px;
+            font-size: 28px;
             height: 50px;
-            padding: 0 40px;
+            padding: 0 50px;
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(20px);
-            z-index: 0;
+            transform: translateY(30px);
+            z-index: 100;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.6);
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.8);
         }
 
         .event-banner.show {
@@ -255,73 +344,65 @@
         }
 
         .dod-left {
-            left: 40px;
+            left: 100px;
             background: linear-gradient(to right, #D32F2F, #B71C1C);
-            clip-path: polygon(0 0, 90% 0, 85% 100%, 0 100%);
-            border-top: 3px solid #FF5252;
-            padding-right: 60px;
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+            border-top: 4px solid #FF5252;
+            border-left: 4px solid #FF5252;
+            animation: siren 1s infinite;
         }
 
         .dod-right {
-            right: 40px;
+            right: 100px;
             background: linear-gradient(to left, #D32F2F, #B71C1C);
-            clip-path: polygon(10% 0, 100% 0, 100% 100%, 15% 100%);
-            border-top: 3px solid #FF5252;
-            padding-left: 60px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 10% 100%);
+            border-top: 4px solid #FF5252;
+            border-right: 4px solid #FF5252;
+            animation: siren 1s infinite;
         }
 
         .sub-popup {
             position: absolute;
-            bottom: 75px;
-            right: 40px;
+            bottom: 90px;
+            right: 100px;
             background: linear-gradient(to right, #111, #333);
-            border: 2px solid #D4AF37;
-            padding: 5px 30px;
-            font-size: 20px;
+            border: 3px solid #D4AF37;
+            padding: 5px 40px;
+            font-size: 22px;
             clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             color: white;
-            height: 45px;
+            height: 55px;
+            z-index: 100;
         }
 
-        .sub-arrow-in { 
-            color: #00FF00; 
-            font-weight: bold; 
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .sub-arrow-out { 
-            color: #FF0000; 
-            font-weight: bold; 
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .sub-arrow-in { color: #00FF00; font-weight: bold; }
+        .sub-arrow-out { color: #FF0000; font-weight: bold; }
 
-        /* Center Event Popups (Raid Point, Tackle, All Out, etc.) */
+        /* Center Event Popups (All Out, Super Tackle, Raid Point) */
         .center-event-popup {
             position: absolute;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.5);
             background: linear-gradient(to bottom, #D32F2F, #8B0000);
-            border: 4px solid #FFD700;
-            border-radius: 10px;
-            padding: 15px 60px;
+            border: 5px solid #FFD700;
+            border-radius: 15px;
+            padding: 20px 100px;
             color: white;
             font-family: 'Teko', sans-serif;
-            font-size: 48px;
+            font-size: 80px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 4px;
-            box-shadow: 0px 0px 30px rgba(255, 215, 0, 0.5);
+            letter-spacing: 6px;
+            box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8);
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 100;
+            z-index: 200;
             pointer-events: none;
+            white-space: nowrap;
         }
 
         .center-event-popup.show {
@@ -331,72 +412,33 @@
 
         .center-event-popup.all-out {
             background: linear-gradient(to bottom, #D32F2F, #8B0000);
-            font-size: 72px;
-            padding: 20px 100px;
-            box-shadow: 0px 0px 50px rgba(255, 0, 0, 0.8);
+            font-size: 100px;
+            padding: 30px 150px;
+            box-shadow: 0px 0px 80px rgba(255, 0, 0, 0.9);
         }
 
         .center-event-popup.super-tackle {
             background: linear-gradient(to bottom, #FF8F00, #E65100);
-            font-size: 60px;
-            padding: 20px 80px;
+            font-size: 80px;
         }
 
         .center-event-popup.raid-point {
             background: linear-gradient(to bottom, #1976D2, #0D47A1);
-            font-size: 50px;
+            font-size: 70px;
         }
 
         /* Animations */
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.3); background: #FFF3A3; color: #000; }
+            50% { transform: scale(1.2); color: #FFD700; text-shadow: 0px 0px 20px #FFD700; }
             100% { transform: scale(1); }
         }
         .score-pop { animation: pop 0.6s ease-in-out; }
 
         @keyframes siren {
-            0% { box-shadow: inset 0 0 0px #FF0000; }
-            50% { box-shadow: inset 0 0 30px #FF0000; }
-            100% { box-shadow: inset 0 0 0px #FF0000; }
-        }
-        .siren-flash { animation: siren 1s infinite; }
-
-        /* Full Screen All Out Overlay */
-        .full-screen-all-out {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            z-index: 200;
-            pointer-events: none;
-        }
-
-        .full-screen-all-out.show {
-            opacity: 1;
-        }
-
-        .full-screen-all-out-text {
-            font-family: 'Teko', sans-serif;
-            font-size: 120px;
-            font-weight: 700;
-            color: #FFD700;
-            text-transform: uppercase;
-            letter-spacing: 10px;
-            text-shadow: 0px 0px 30px rgba(255, 0, 0, 0.8);
-            animation: pulse 1s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
+            0% { box-shadow: 0 0 0px #FF0000, 0px 0px 20px #FF0000; }
+            50% { box-shadow: 0 0 30px #FF0000, 0px 0px 40px #FF0000; }
+            100% { box-shadow: 0 0 0px #FF0000, 0px 0px 20px #FF0000; }
         }
 
     </style>
@@ -406,48 +448,63 @@
     <!-- OBS RENDER STAGE -->
     <div class="broadcast-stage">
         
-        <!-- DO OR DIE OVERLAYS (Hidden by default) -->
+        <!-- DO OR DIE OVERLAYS -->
         <div id="dod-left" class="event-banner dod-left">🚨 DO-OR-DIE</div>
+        <div id="dod-right" class="event-banner dod-right">DO-OR-DIE 🚨</div>
         
+        <!-- SUBSTITUTION POPUP -->
+        <div id="sub-popup" class="event-banner sub-popup">
+            <span>सब्स्टीट्यूशन (SUB)</span> 
+            <span id="sub-player-name" class="sub-arrow-in">▲ Player Name</span>
+        </div>
+
         <div class="scoreboard-container">
             
-            <!-- LEFT TEAM -->
-            <div class="team-block">
-                <div class="name-score-row">
-                    <div id="left-name" class="team-name left-name" style="background-color: #006400;">PATNA PIRATES</div>
-                    <div id="left-score" class="score-box left-score">0</div>
+            <!-- LEFT TEAM (GREEN) -->
+            <div class="left-team-block">
+                <div class="left-name-bar">
+                    <div class="left-mascot"></div>
+                    <div id="left-name" class="left-team-name">पटना पायरेट्स</div>
                 </div>
-                <!-- Left Dots Bar -->
-                <div id="left-dots-bar" class="dots-bar left-dots-bar gold-gradient">
-                    <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
+                <div class="left-dots-bar">
+                    <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
+                    <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
                 </div>
             </div>
 
-            <!-- CENTER TIMER -->
+            <!-- CENTER BLOCK (SCORES & TIMER) -->
             <div class="center-block">
-                <div class="center-top-row">
-                    <span id="half-status">1st HALF</span>
-                    <svg class="trophy-icon" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                    <span id="match-status">FINAL</span>
+                <!-- Background -->
+                <div class="score-background">
+                    <div id="left-score" class="score-box">0</div>
+                    
+                    <!-- Central Gold Diamond -->
+                    <div class="gold-diamond">
+                        <div id="raid-timer" class="gold-diamond-text">13</div>
+                    </div>
+                    
+                    <div id="right-score" class="score-box">0</div>
                 </div>
-                <div id="main-timer" class="timer-text">20:00</div>
+
+                <!-- Timer & Status Bar -->
+                <div class="timer-background">
+                    <span id="half-status">1st HALF</span>
+                    <span>|</span>
+                    <span id="match-status">फाइनल</span>
+                    <span>|</span>
+                    <span id="main-timer" class="timer-text">20:00</span>
+                </div>
             </div>
 
-            <!-- RIGHT TEAM -->
-            <div class="team-block">
-                <!-- Substitution Popup Anchor -->
-                <div id="sub-popup" class="event-banner sub-popup">
-                    <span>सब्स्टीट्यूशन (SUB)</span> <span id="sub-player-name" class="sub-arrow-in">▲ Player Name</span>
+            <!-- RIGHT TEAM (BLUE) -->
+            <div class="right-team-block">
+                <div class="right-name-bar">
+                    <div id="right-name" class="right-team-name">हरियाणा स्टीलर्स</div>
+                    <div class="right-player-face"></div>
                 </div>
-                <div id="dod-right" class="event-banner dod-right">DO-OR-DIE 🚨</div>
-
-                <div class="name-score-row">
-                    <div id="right-score" class="score-box right-score">0</div>
-                    <div id="right-name" class="team-name right-name" style="background-color: #1976D2;">BENGAL WARRIORS</div>
-                </div>
-                <!-- Right Dots Bar -->
-                <div id="right-dots-bar" class="dots-bar right-dots-bar gold-gradient">
-                    <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
+                <div class="right-dots-bar">
+                    <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
+                    <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
                 </div>
             </div>
 
@@ -456,11 +513,6 @@
 
     <!-- CENTER EVENT POPUPS (Raid Point, Tackle, All Out, etc.) -->
     <div id="center-event-popup" class="center-event-popup">RAID POINT</div>
-    
-    <!-- FULL SCREEN ALL OUT OVERLAY -->
-    <div id="full-screen-all-out" class="full-screen-all-out">
-        <div class="full-screen-all-out-text">ALL OUT</div>
-    </div>
 
     <script>
         // ==========================================
@@ -500,12 +552,9 @@
                 const data = snapshot.val();
                 if (!data) return;
 
-                // 1. UPDATE TEAM NAMES & COLORS
+                // 1. UPDATE TEAM NAMES
                 document.getElementById('left-name').innerText = data.left_name || "TEAM A";
                 document.getElementById('right-name').innerText = data.right_name || "TEAM B";
-                
-                document.getElementById('left-name').style.backgroundColor = data.left_color || "#006400";
-                document.getElementById('right-name').style.backgroundColor = data.right_color || "#1976D2";
 
                 // 2. UPDATE SCORES WITH POP ANIMATION
                 updateScoreWithAnimation('left-score', data.left_score || 0, previousLeftScore);
@@ -519,6 +568,8 @@
                 if(data.match_result) {
                     document.getElementById('match-status').innerText = "FULL TIME";
                     document.getElementById('main-timer').innerText = "00:00";
+                } else {
+                    document.getElementById('match-status').innerText = "फाइनल"; // Default Hindi Final
                 }
 
                 // 4. PARSE DEEP STATE JSON FOR DOTS & EVENTS
@@ -527,8 +578,13 @@
                         const state = JSON.parse(data.state_json);
                         
                         // Render 7 Dots physically on screen
-                        renderDots('left-dot', state.leftDotStates, data.left_color || "#006400");
-                        renderDots('right-dot', state.rightDotStates, data.right_color || "#1976D2");
+                        renderDots('left-dot', state.leftDotStates);
+                        renderDots('right-dot', state.rightDotStates);
+
+                        // Update Raid Timer inside Diamond
+                        if(state.raidTimer) {
+                            document.getElementById('raid-timer').innerText = state.raidTimer;
+                        }
 
                         // Handle Do-Or-Die Siren Graphic
                         handleDoOrDie(state);
@@ -559,17 +615,13 @@
         }
 
         // --- DOTS RENDERER ---
-        function renderDots(dotClassName, stateArray, activeColor) {
+        function renderDots(dotClassName, stateArray) {
             const dots = document.getElementsByClassName(dotClassName);
             if(stateArray && stateArray.length > 0) {
                 for(let i=0; i<7; i++) {
                     if(stateArray[i] === true) {
-                        dots[i].style.backgroundColor = activeColor;
-                        dots[i].style.borderColor = "#FFFFFF";
                         dots[i].classList.add('active');
                     } else {
-                        dots[i].style.backgroundColor = "transparent";
-                        dots[i].style.borderColor = "rgba(255,255,255,0.3)";
                         dots[i].classList.remove('active');
                     }
                 }
@@ -580,44 +632,32 @@
         function handleDoOrDie(state) {
             const dodLeft = document.getElementById('dod-left');
             const dodRight = document.getElementById('dod-right');
-            const leftNameBox = document.getElementById('left-name');
-            const rightNameBox = document.getElementById('right-name');
 
             const isLeftDoOrDie = state.currentRaidTeamIsLeft && state.leftEmptyRaids >= 2;
             const isRightDoOrDie = !state.currentRaidTeamIsLeft && state.rightEmptyRaids >= 2;
 
             if (isLeftDoOrDie) {
                 dodLeft.classList.add('show');
-                leftNameBox.classList.add('siren-flash');
             } else {
                 dodLeft.classList.remove('show');
-                leftNameBox.classList.remove('siren-flash');
             }
 
             if (isRightDoOrDie) {
                 dodRight.classList.add('show');
-                rightNameBox.classList.add('siren-flash');
             } else {
                 dodRight.classList.remove('show');
-                rightNameBox.classList.remove('siren-flash');
             }
         }
 
         // --- CENTER EVENT POPUPS (All Out, Super Tackle, Raid Point) ---
         function handleCenterEvents(state) {
             const popup = document.getElementById('center-event-popup');
-            const allOutOverlay = document.getElementById('full-screen-all-out');
             
             // All Out Detection
             if (state.isAllOut && !previousAllOut) {
                 popup.innerText = "ALL OUT";
                 popup.className = "center-event-popup show all-out";
-                allOutOverlay.classList.add('show');
-                
-                setTimeout(() => {
-                    popup.classList.remove('show');
-                    allOutOverlay.classList.remove('show');
-                }, 4000);
+                setTimeout(() => { popup.classList.remove('show'); }, 4000);
                 previousAllOut = true;
             } else if (!state.isAllOut) {
                 previousAllOut = false;
@@ -627,10 +667,7 @@
             if (state.isSuperTackle && !previousSuperTackle) {
                 popup.innerText = "SUPER TACKLE";
                 popup.className = "center-event-popup show super-tackle";
-                
-                setTimeout(() => {
-                    popup.classList.remove('show');
-                }, 3000);
+                setTimeout(() => { popup.classList.remove('show'); }, 3000);
                 previousSuperTackle = true;
             } else if (!state.isSuperTackle) {
                 previousSuperTackle = false;
@@ -640,10 +677,7 @@
             if (state.isRaidPoint && !previousRaidPoint) {
                 popup.innerText = "RAID POINT";
                 popup.className = "center-event-popup show raid-point";
-                
-                setTimeout(() => {
-                    popup.classList.remove('show');
-                }, 2000);
+                setTimeout(() => { popup.classList.remove('show'); }, 2000);
                 previousRaidPoint = true;
             } else if (!state.isRaidPoint) {
                 previousRaidPoint = false;
