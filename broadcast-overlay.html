@@ -31,18 +31,25 @@
         }
 
         /* =========================================
-           MASTER POSITIONING CONTAINER
+           MASTER POSITIONING CONTAINER & 3D SHADOW
            ========================================= */
         .broadcast-stage {
             position: absolute;
-            bottom: 55px; /* Sits cleanly above the bottom of the screen */
+            bottom: 60px;
             left: 0;
             width: 1920px;
             display: flex;
             flex-direction: column;
             align-items: center;
             /* Heavy 3D shadow applied to the entire interlocking unit */
-            filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.8)); 
+            filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); 
+        }
+
+        /* =========================================
+           METALLIC GOLD & GLOSSY GRADIENTS
+           ========================================= */
+        .gold-bg {
+            background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
         }
 
         /* =========================================
@@ -51,45 +58,36 @@
         .top-raid-bars {
             display: flex;
             justify-content: space-between;
-            width: 1100px; /* Spans across both team names */
-            margin-bottom: -5px; /* Tucks seamlessly into the top of the team bars */
+            width: 1080px;
+            margin-bottom: -4px;
             z-index: 5;
         }
 
         .raid-track {
             width: 420px;
-            height: 12px;
-            background: rgba(0,0,0,0.6);
+            height: 14px;
+            background: rgba(0,0,0,0.8);
             display: flex;
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
             overflow: hidden;
-            visibility: hidden; /* Hidden until a raid starts */
+            visibility: hidden;
             border: 2px solid #D4AF37;
             border-bottom: none;
         }
 
-        /* Left side shrinks towards the right (center) */
-        .track-left {
-            justify-content: flex-end; 
-        }
-
-        /* Right side shrinks towards the left (center) */
-        .track-right {
-            justify-content: flex-start;
-        }
+        .track-left { justify-content: flex-end; border-top-left-radius: 6px; }
+        .track-right { justify-content: flex-start; border-top-right-radius: 6px; }
 
         .raid-fill {
             height: 100%;
             width: 100%;
-            background: #00FF00; /* Neon Green */
-            box-shadow: 0px 0px 10px #00FF00;
-            transition: width 1s linear; /* Smooth ticking animation */
+            background: #00FF00;
+            box-shadow: 0px 0px 15px #00FF00;
+            transition: width 1s linear;
         }
 
         .raid-fill.danger {
-            background: #FF0000; /* Turns red at 10 seconds */
-            box-shadow: 0px 0px 15px #FF0000;
+            background: #FF0000;
+            box-shadow: 0px 0px 20px #FF0000;
         }
 
         /* =========================================
@@ -100,94 +98,89 @@
             align-items: flex-start;
             justify-content: center;
             z-index: 10;
-            height: 80px;
+            height: 85px;
         }
 
         /* --- LEFT TEAM BAR --- */
         .team-left-wrap {
-            width: 520px; height: 75px;
-            background: #dcb23c; /* Solid Gold Border */
-            clip-path: polygon(0 0, calc(100% - 35px) 0, 100% 100%, 0 100%);
-            padding: 3px; padding-right: 4px;
+            width: 460px; height: 80px;
+            clip-path: polygon(0 0, 95% 0, 100% 100%, 0 100%);
+            padding: 4px; padding-right: 5px;
             z-index: 1;
         }
         .team-left-inner {
             width: 100%; height: 100%;
-            background: linear-gradient(to right, #003300, #009900); /* Default fallback */
-            clip-path: polygon(0 0, calc(100% - 33px) 0, 100% 100%, 0 100%);
-            display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 45px;
-            color: white; font-family: 'Mukta', sans-serif; font-size: 38px; font-weight: 800; text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+            clip-path: polygon(0 0, 95% 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 800; text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+            box-shadow: inset 0px 20px 20px rgba(255,255,255,0.2), inset 0px -20px 20px rgba(0,0,0,0.5);
         }
 
         /* --- LEFT SCORE BOX --- */
         .score-left-wrap {
-            width: 130px; height: 80px;
-            background: #dcb23c;
-            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 35px 100%);
-            margin-left: -50px; /* Negative margin pulls it OVER the team bar */
+            width: 140px; height: 85px;
+            clip-path: polygon(15% 0, 100% 0, 85% 100%, 0 100%);
+            margin-left: -40px;
             z-index: 2;
-            padding: 4px;
+            padding: 5px;
         }
         .score-left-inner {
             width: 100%; height: 100%;
             background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
-            clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 100%, 33px 100%);
+            clip-path: polygon(15% 0, 100% 0, 85% 100%, 0 100%);
             display: flex; align-items: center; justify-content: center;
-            color: black; font-family: 'Teko', sans-serif; font-size: 65px; font-weight: 700; line-height: 1; padding-left: 15px;
+            color: black; font-family: 'Teko', sans-serif; font-size: 75px; font-weight: 700; line-height: 1; padding-left: 15px;
+            box-shadow: inset 0px 10px 15px rgba(0,0,0,0.2);
         }
 
         /* --- CENTER RAID CLOCK TRIANGLE --- */
         .center-wrap {
-            width: 130px; height: 100px;
-            background: #dcb23c;
+            width: 140px; height: 105px;
             clip-path: polygon(0 0, 100% 0, 50% 100%);
-            margin: 0 -45px; /* Overlaps BOTH score boxes flawlessly */
+            margin: 0 -45px;
             z-index: 3;
-            padding: 4px;
+            padding: 5px;
         }
         .center-inner {
             width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #4a0080, #1a0033);
+            background: linear-gradient(to bottom, #6A1B9A, #1A0033);
             clip-path: polygon(0 0, 100% 0, 50% 100%);
             display: flex; align-items: flex-start; justify-content: center;
-            padding-top: 10px;
-            color: #FFD700; font-family: 'Teko', sans-serif; font-size: 50px; font-weight: 700; line-height: 1; text-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+            padding-top: 15px;
+            color: #FFD700; font-family: 'Teko', sans-serif; font-size: 55px; font-weight: 700; line-height: 1; text-shadow: 0px 0px 15px rgba(255,215,0,0.8);
         }
 
         /* --- RIGHT SCORE BOX --- */
         .score-right-wrap {
-            width: 130px; height: 80px;
-            background: #dcb23c;
-            clip-path: polygon(15px 0, 100% 0, calc(100% - 35px) 100%, 0 100%);
-            margin-left: -45px; /* Tuck under the center triangle */
+            width: 140px; height: 85px;
+            clip-path: polygon(0 0, 85% 0, 100% 100%, 15% 100%);
+            margin-left: -45px;
             z-index: 2;
-            padding: 4px;
+            padding: 5px;
         }
         .score-right-inner {
             width: 100%; height: 100%;
             background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
-            clip-path: polygon(13px 0, 100% 0, calc(100% - 33px) 100%, 0 100%);
+            clip-path: polygon(0 0, 85% 0, 100% 100%, 15% 100%);
             display: flex; align-items: center; justify-content: center;
-            color: black; font-family: 'Teko', sans-serif; font-size: 65px; font-weight: 700; line-height: 1; padding-right: 15px;
+            color: black; font-family: 'Teko', sans-serif; font-size: 75px; font-weight: 700; line-height: 1; padding-right: 15px;
+            box-shadow: inset 0px 10px 15px rgba(0,0,0,0.2);
         }
 
         /* --- RIGHT TEAM BAR --- */
         .team-right-wrap {
-            width: 520px; height: 75px;
-            background: #dcb23c;
-            clip-path: polygon(35px 0, 100% 0, 100% 100%, 0 100%);
-            margin-left: -50px; /* Overlap under the score box */
+            width: 460px; height: 80px;
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
+            margin-left: -40px;
             z-index: 1;
-            padding: 3px; padding-left: 4px;
+            padding: 4px; padding-left: 5px;
         }
         .team-right-inner {
             width: 100%; height: 100%;
-            background: linear-gradient(to left, #001a4d, #0055ff); /* Default fallback */
-            clip-path: polygon(33px 0, 100% 0, 100% 100%, 0 100%);
-            display: flex; align-items: center; justify-content: flex-start;
-            padding-left: 45px;
-            color: white; font-family: 'Mukta', sans-serif; font-size: 38px; font-weight: 800; text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 800; text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+            box-shadow: inset 0px 20px 20px rgba(255,255,255,0.2), inset 0px -20px 20px rgba(0,0,0,0.5);
         }
 
         /* =========================================
@@ -198,96 +191,93 @@
             align-items: flex-start;
             justify-content: center;
             width: 100%;
-            margin-top: -12px; /* Pulls it up securely underneath the main row */
-            z-index: 0; /* Ensures it sits BEHIND the main row */
+            margin-top: -12px;
+            z-index: 0;
         }
 
         /* --- LEFT DOTS BAR --- */
         .dots-left-wrap {
-            width: 320px; height: 35px;
-            background: #dcb23c;
-            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 100%, 0 100%);
-            padding: 3px; padding-top: 10px; margin-right: 10px;
+            width: 340px; height: 38px;
+            clip-path: polygon(0 0, 95% 0, 100% 100%, 0 100%);
+            padding: 4px; padding-top: 12px; margin-right: -15px;
         }
         .dots-left-inner {
             width: 100%; height: 100%;
-            background: #002200;
-            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+            clip-path: polygon(0 0, 95% 0, 100% 100%, 0 100%);
             display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 35px; gap: 8px;
+            padding-right: 45px; gap: 10px;
         }
 
         /* --- CENTER INFO BAR --- */
         .center-info-wrap {
-            width: 480px; height: 40px;
-            background: #dcb23c;
-            clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 100%, 0 100%);
-            padding: 3px; padding-top: 12px;
+            width: 500px; height: 45px;
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+            padding: 4px; padding-top: 15px; z-index: 4;
         }
         .center-info-inner {
             width: 100%; height: 100%;
-            background: linear-gradient(to right, #2c004d, #4A148C, #2c004d);
-            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 100%, 0 100%);
-            display: flex; align-items: center; justify-content: center; gap: 20px;
+            background: linear-gradient(to bottom, #6A1B9A, #1A0033);
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center; gap: 25px;
             color: white; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
         }
-        .gold-text { color: #FFD700; font-family: 'Teko', sans-serif; font-size: 28px; line-height: 1; margin-top: 3px;}
-        .divider { color: #888; font-weight: 400; }
+        .gold-text { color: #FFD700; font-family: 'Teko', sans-serif; font-size: 32px; line-height: 1; margin-top: 5px;}
+        .divider { color: #888; font-weight: 400; font-size: 20px; }
 
         /* --- RIGHT DOTS BAR --- */
         .dots-right-wrap {
-            width: 320px; height: 35px;
-            background: #dcb23c;
-            clip-path: polygon(18px 0, 100% 0, 100% 100%, 0 100%);
-            padding: 3px; padding-top: 10px; margin-left: 10px;
+            width: 340px; height: 38px;
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
+            padding: 4px; padding-top: 12px; margin-left: -15px;
         }
         .dots-right-inner {
             width: 100%; height: 100%;
-            background: #000b22;
-            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
             display: flex; align-items: center; justify-content: flex-start;
-            padding-left: 35px; gap: 8px;
+            padding-left: 45px; gap: 10px;
         }
 
         /* --- PLAYER DOTS --- */
         .dot {
-            width: 14px; height: 14px;
+            width: 16px; height: 16px;
             border-radius: 50%;
             border: 2px solid #D4AF37;
             background: rgba(255,255,255,0.2);
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.8);
             transition: all 0.3s ease;
         }
-        .dot.active { background: #00FF00; border-color: #FFFFFF; box-shadow: 0px 0px 8px #00FF00; }
-        .right-dot.active { background: #00FFFF; box-shadow: 0px 0px 8px #00FFFF;}
+        .dot.active { background: #00FF00; border-color: #FFFFFF; box-shadow: 0px 0px 10px #00FF00; }
+        .right-dot.active { background: #00FFFF; box-shadow: 0px 0px 10px #00FFFF;}
 
         /* =========================================
            POPUP EVENT ANIMATIONS
            ========================================= */
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); color: #FFD700; }
+            50% { transform: scale(1.2); color: #FFD700; text-shadow: 0px 0px 20px #FFD700; }
             100% { transform: scale(1); }
         }
         .score-pop { animation: pop 0.6s ease-in-out; }
 
         .sub-popup {
-            position: absolute; bottom: 135px; right: 180px;
+            position: absolute; bottom: 145px; right: 180px;
             background: linear-gradient(to left, #1A0033, #4A148C);
             border: 3px solid #D4AF37;
-            padding: 5px 30px; font-size: 22px; color: white; font-weight: bold;
+            padding: 5px 30px; font-size: 24px; color: white; font-weight: bold;
             display: flex; align-items: center; gap: 15px;
             clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
             opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.8);
         }
         .sub-popup.show { opacity: 1; transform: translateY(0); }
         .sub-in { color: #00FF00; }
 
         .center-popup {
-            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
+            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
             background: linear-gradient(to bottom, #D32F2F, #8B0000);
-            border: 5px solid #FFD700; border-radius: 10px;
-            padding: 20px 80px; color: white; font-family: 'Teko', sans-serif; font-size: 80px; font-weight: 700; letter-spacing: 4px;
-            box-shadow: 0px 0px 40px rgba(255, 215, 0, 0.8);
+            border: 5px solid #FFD700; border-radius: 15px;
+            padding: 20px 100px; color: white; font-family: 'Teko', sans-serif; font-size: 90px; font-weight: 700; letter-spacing: 6px;
+            box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8);
             opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             white-space: nowrap; text-transform: uppercase;
         }
@@ -319,35 +309,35 @@
         <!-- MAIN SCOREBOARD ROW -->
         <div class="main-row">
             <!-- Left Team -->
-            <div class="team-left-wrap">
+            <div class="team-left-wrap gold-bg">
                 <div class="team-left-inner" id="left-team-bg">
                     <span id="left-name">TEAM A</span>
                 </div>
             </div>
 
             <!-- Left Score -->
-            <div class="score-left-wrap">
+            <div class="score-left-wrap gold-bg">
                 <div class="score-left-inner">
                     <span id="left-score">0</span>
                 </div>
             </div>
 
             <!-- Center Triangle (Raid Timer) -->
-            <div class="center-wrap">
+            <div class="center-wrap gold-bg">
                 <div class="center-inner">
                     <span id="raid-timer">30</span>
                 </div>
             </div>
 
             <!-- Right Score -->
-            <div class="score-right-wrap">
+            <div class="score-right-wrap gold-bg">
                 <div class="score-right-inner">
                     <span id="right-score">0</span>
                 </div>
             </div>
 
             <!-- Right Team -->
-            <div class="team-right-wrap">
+            <div class="team-right-wrap gold-bg">
                 <div class="team-right-inner" id="right-team-bg">
                     <span id="right-name">TEAM B</span>
                 </div>
@@ -357,27 +347,25 @@
         <!-- BOTTOM DOTS & INFO ROW -->
         <div class="bottom-row">
             <!-- Left Dots -->
-            <div class="dots-left-wrap">
+            <div class="dots-left-wrap gold-bg">
                 <div class="dots-left-inner" id="left-dots-bg">
                     <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
                 </div>
             </div>
 
             <!-- Center Info Bar -->
-            <div class="center-info-wrap">
+            <div class="center-info-wrap gold-bg">
                 <div class="center-info-inner">
                     <span id="half-status">1st HALF</span>
                     <span class="divider">|</span>
-                    <span id="match-status">फाइनल</span>
-                    <span class="divider">|</span>
                     <span id="main-timer" class="gold-text">20:00</span>
                     <span class="divider">|</span>
-                    <span id="match-id" style="color: #bbb; font-size: 14px;">ABC123</span>
+                    <span id="match-id" style="color: #bbb; font-size: 16px;">ABC123</span>
                 </div>
             </div>
 
             <!-- Right Dots -->
-            <div class="dots-right-wrap">
+            <div class="dots-right-wrap gold-bg">
                 <div class="dots-right-inner" id="right-dots-bg">
                     <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
                 </div>
@@ -419,6 +407,7 @@
         let previousLogId = null;
         let previousAllOut = false;
         let previousSuperTackle = false;
+        let previousRaidPoint = false;
 
         function initBroadcastEngine(id) {
             const matchRef = db.ref('live_matches/' + id);
@@ -435,10 +424,11 @@
                 const leftColor = data.left_color || "#009900";
                 const rightColor = data.right_color || "#0055ff";
                 
+                // Apply glossy gradient to team bars
                 document.getElementById('left-team-bg').style.background = `linear-gradient(to right, ${darkenColor(leftColor, 60)}, ${leftColor})`;
                 document.getElementById('right-team-bg').style.background = `linear-gradient(to left, ${darkenColor(rightColor, 60)}, ${rightColor})`;
                 
-                // Darken dots background
+                // Apply solid dark color to dots bars
                 document.getElementById('left-dots-bg').style.background = darkenColor(leftColor, 80);
                 document.getElementById('right-dots-bg').style.background = darkenColor(rightColor, 80);
 
@@ -451,13 +441,7 @@
                 // 3. UPDATE CENTER CLOCK & STATUS
                 document.getElementById('main-timer').innerText = data.main_clock || "00:00";
                 document.getElementById('half-status').innerText = data.half_status || "1st HALF";
-                if(data.match_result) {
-                    document.getElementById('match-status').innerText = "FULL TIME";
-                    document.getElementById('main-timer').innerText = "00:00";
-                } else {
-                    document.getElementById('match-status').innerText = "फाइनल"; // Default Match Status
-                }
-
+                
                 // 4. PARSE DEEP STATE JSON FOR DOTS & TIMERS
                 if (data.state_json) {
                     try {
