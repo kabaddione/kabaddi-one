@@ -50,12 +50,12 @@
             display: flex;
             justify-content: space-between;
             width: 1080px;
-            margin-bottom: -4px;
+            margin-bottom: -3px;
             z-index: 5;
         }
 
         .raid-track {
-            width: 420px;
+            width: 418px;
             height: 14px;
             background: rgba(0,0,0,0.8);
             display: flex;
@@ -71,8 +71,10 @@
             opacity: 1;
         }
 
-        .track-left { justify-content: flex-end; border-top-left-radius: 6px; }
-        .track-right { justify-content: flex-start; border-top-right-radius: 6px; }
+        .track-left { justify-content: flex-end; border-top-left-radius: 0px; margin-left: -87px;
+clip-path: polygon(0 0, 98% 0, 100% 100%, 2% 100%); }
+        .track-right { justify-content: flex-start; border-top-right-radius: 0px; clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+margin-right: -87px;}
 
         /* Uses --raid-bar-color (set from JS per team colour) */
         .raid-fill {
@@ -428,7 +430,7 @@
 
         <!-- SIDE BANNER (Sub / Foul / Card) -->
         <div id="side-banner" class="side-banner pos-right">
-            <span id="side-banner-label" class="side-banner-label">सब्स्टीट्यूशन</span>
+            <span id="side-banner-label" class="side-banner-label">Substitution</span>
             <span id="side-banner-detail" class="side-banner-detail">Player Name</span>
         </div>
 
