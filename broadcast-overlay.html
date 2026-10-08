@@ -101,9 +101,6 @@
         .raid-track.visible {
             visibility: visible;
             opacity: 1;
-        }
-        /* Glow applied per team colour (matches --raid-bar-color) */
-        .raid-track.visible {
             box-shadow: 0 0 14px var(--raid-bar-color, #00FF00),
                         0 0 6px var(--raid-bar-color, #00FF00),
                         inset 0 0 8px rgba(0,0,0,0.6);
@@ -121,7 +118,6 @@ margin-right: -87px;}
             box-shadow: 0px 0px 15px var(--raid-bar-color, #00FF00);
             transition: width 1s linear;
         }
-        /* NOTE: `.danger` class no longer applied — bar keeps team colour entire raid */
 
         /* =========================================
            DO-OR-DIE BANNER
@@ -293,7 +289,6 @@ margin-right: -87px;}
             clip-path: polygon(0% 0%, 100% 0%, 65% 80%, 35% 80%);
             overflow: hidden;
         }
-        /* Both items are absolutely positioned and slide on Y axis */
         #raid-timer {
             position: absolute;
             top: 15px; left: 0; right: 0;
@@ -453,7 +448,7 @@ margin-right: -87px;}
         }
 
         /* =========================================
-           CENTER EVENT POPUP (small one, kept for fallback)
+           CENTER EVENT POPUP (small fallback)
            ========================================= */
         @keyframes pop {
             0% { transform: scale(1); }
@@ -476,7 +471,6 @@ margin-right: -87px;}
 
         /* =========================================
            FULL-SCREEN EPIC EVENT OVERLAY
-           (Super Raid / Super Tackle / All Out)
            ========================================= */
         .epic-overlay {
             position: fixed;
@@ -485,7 +479,6 @@ margin-right: -87px;}
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            opacity: 0;
             visibility: hidden;
             pointer-events: none;
             overflow: hidden;
@@ -496,7 +489,7 @@ margin-right: -87px;}
             position: absolute;
             inset: 0;
             background: url('/images/kabaddione_bg.jpg') center/cover no-repeat;
-            opacity: 0;
+            opacity: 1;
             z-index: 1;
         }
         .epic-vignette {
@@ -504,7 +497,7 @@ margin-right: -87px;}
             inset: 0;
             background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
             z-index: 2;
-            opacity: 0;
+            opacity: 1;
         }
 
         .epic-horizontal-bar {
@@ -515,7 +508,7 @@ margin-right: -87px;}
             height: 6px;
             background: linear-gradient(90deg, transparent 0%, #FFD700 25%, #FFFFFF 50%, #FFD700 75%, transparent 100%);
             box-shadow: 0 0 30px #FFD700, 0 0 60px #FFD700;
-            transform: scaleX(0);
+            transform: scaleX(1);
             transform-origin: center;
             z-index: 3;
             border-radius: 3px;
@@ -529,8 +522,8 @@ margin-right: -87px;}
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transform: scale(15);
-            opacity: 0;
+            transform: scale(1);
+            opacity: 1;
             will-change: transform, opacity;
         }
 
@@ -739,7 +732,7 @@ margin-right: -87px;}
         // ==========================================
         let previousLeftScore = -1;
         let previousRightScore = -1;
-        let previousLogId = null;
+        let previousLogId = undefined; // <-- changed from null so first-snapshot skip works
         let previousAllOut = false;
         let previousSuperTackle = false;
         let previousRaidPoint = false;
@@ -957,8 +950,6 @@ margin-right: -87px;}
 
         // ==========================================
         // RAID TIMER BARS
-        //   • Applies team colour to bar + track glow
-        //   • No red danger state — colour stays constant entire raid
         // ==========================================
         function handleRaidTimers(state, raidClockStr, visualLeftKey, leftColor, rightColor) {
             const raidTimerText = document.getElementById('raid-timer');
@@ -967,7 +958,6 @@ margin-right: -87px;}
             const barLeft    = document.getElementById('raid-bar-left');
             const barRight   = document.getElementById('raid-bar-right');
 
-            // Apply team colours to bar AND track (for glow)
             barLeft.style.setProperty('--raid-bar-color',  leftColor);
             barRight.style.setProperty('--raid-bar-color', rightColor);
             trackLeft.style.setProperty('--raid-bar-color',  leftColor);
@@ -980,7 +970,6 @@ margin-right: -87px;}
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
-            // Swap raid clock <-> splash logo when paused/running
             updateRaidClockVisual(raidActive);
 
             if (raidActive) {
@@ -1005,7 +994,6 @@ margin-right: -87px;}
                 barLeft.style.width  = percentage + "%";
                 barRight.style.width = percentage + "%";
 
-                // NOTE: .danger class intentionally NOT applied
                 barLeft.classList.remove('danger');
                 barRight.classList.remove('danger');
             } else {
@@ -1020,11 +1008,8 @@ margin-right: -87px;}
 
         // ==========================================
         // RAID CLOCK ↔ SPLASH LOGO SWAP
-        //   Paused  → 30 hidden, splash logo slides up
-        //   Running → splash logo slides out top, 30 shows
         // ==========================================
         function updateRaidClockVisual(isRaidActive) {
-            // Skip on very first snapshot if state matches default
             if (previousRaidActive === null) {
                 previousRaidActive = isRaidActive;
                 const timerEl = document.getElementById('raid-timer');
@@ -1047,12 +1032,10 @@ margin-right: -87px;}
             const logoEl  = document.getElementById('splash-logo');
 
             if (isRaidActive) {
-                // Show 30, slide splash logo up + out
                 logoEl.classList.remove('show');
                 logoEl.classList.add('out');
                 timerEl.classList.remove('out');
             } else {
-                // Hide 30, bring splash logo up from bottom
                 timerEl.classList.add('out');
                 logoEl.classList.remove('out');
                 logoEl.classList.add('show');
@@ -1061,8 +1044,6 @@ margin-right: -87px;}
 
         // ==========================================
         // RAIDER NAME ROTATION
-        //   While raid is active, alternate the raiding team's bar text
-        //   between the team name (5 s) and the raider name (3 s).
         // ==========================================
         function handleRaiderNameRotation(state, data, visualLeftKey, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
@@ -1070,7 +1051,6 @@ margin-right: -87px;}
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
             if (!raidActive) {
-                // Raid ended → stop both rotations, restore team names
                 stopRaiderRotation('left');
                 stopRaiderRotation('right');
                 raiderRotationState.left.currentRaider  = null;
@@ -1078,7 +1058,6 @@ margin-right: -87px;}
                 return;
             }
 
-            // Which ACTUAL team is raiding?
             let actualLeftRaid = true;
             const raw = state.currentRaidTeamIsLeft !== undefined
                 ? state.currentRaidTeamIsLeft
@@ -1104,10 +1083,8 @@ margin-right: -87px;}
         function startRaiderRotation(side, raiderName) {
             const st = raiderRotationState[side];
 
-            // If already running with the same raider, do nothing
             if (st.active && st.currentRaider === raiderName) return;
 
-            // If already running with a different raider, update the text & continue cycle
             const container = document.querySelector(`#${side}-team-bg .name-rotator`);
             if (!container) return;
             const nameEl   = container.querySelector('.team-name-text');
@@ -1115,21 +1092,17 @@ margin-right: -87px;}
             raiderEl.innerText = raiderName;
 
             if (st.active && st.currentRaider !== raiderName) {
-                // Just update the stored name — cycle continues
                 st.currentRaider = raiderName;
                 return;
             }
 
-            // Fresh start
             if (st.timer) { clearTimeout(st.timer); st.timer = null; }
             st.active = true;
             st.currentRaider = raiderName;
 
-            // Reset visual state
             nameEl.classList.remove('out');
             raiderEl.classList.remove('show', 'out');
 
-            // First: slide team name out, raider name in
             nameEl.classList.add('out');
             raiderEl.classList.add('show');
 
@@ -1138,14 +1111,12 @@ margin-right: -87px;}
             const tick = () => {
                 if (!st.active) return;
                 if (showingRaider) {
-                    // Raider out, team name in
                     raiderEl.classList.remove('show');
                     raiderEl.classList.add('out');
                     nameEl.classList.remove('out');
                     showingRaider = false;
                     st.timer = setTimeout(tick, 5000);
                 } else {
-                    // Team name out, raider in
                     nameEl.classList.add('out');
                     raiderEl.classList.remove('out');
                     raiderEl.classList.add('show');
@@ -1153,7 +1124,7 @@ margin-right: -87px;}
                     st.timer = setTimeout(tick, 3000);
                 }
             };
-            st.timer = setTimeout(tick, 3000); // First raider shows for 3 s
+            st.timer = setTimeout(tick, 3000);
         }
 
         function stopRaiderRotation(side) {
@@ -1261,29 +1232,38 @@ margin-right: -87px;}
 
                 const latestLog = logs[logs.length - 1];
 
+                // Skip very first snapshot to avoid firing on pre-existing logs
+                if (previousLogId === undefined) {
+                    previousLogId = latestLog.id;
+                    return;
+                }
+
                 if (latestLog.id !== previousLogId) {
                     previousLogId = latestLog.id;
                     const title = (latestLog.title || '').toLowerCase();
                     const type  = latestLog.type  || '';
 
-                    if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
+                    // ── EPIC EVENTS FIRST (highest priority) ──
+                    if (type === 'ALL_OUT' || title.includes("all out") || title.includes("ऑल आउट") || title.includes("ऑलआउट")) {
+                        playEpicAnimation('all_out');
+                    }
+                    else if (type === 'SUPER_TACKLE' || title.includes("super tackle") || title.includes("सुपर टैकल") || title.includes("सुपरटैकल")) {
+                        playEpicAnimation('super_tackle');
+                    }
+                    else if (title.includes("super raid") || title.includes("सुपर रेड") || title.includes("सुपररेड") || (type === "RAID" && latestLog.points >= 3)) {
+                        playEpicAnimation('super_raid');
+                    }
+                    // ── SUBSTITUTION ──
+                    else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
                         showSideBanner('Substitution', latestLog.desc || '', latestLog.isLeftTeam, false);
                     }
+                    // ── CARD / FOUL ──
                     else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
                         let labelText = 'FOUL';
                         if (title.includes('red')    || title.includes('लाल'))  labelText = '🟥 RED CARD';
                         else if (title.includes('yellow') || title.includes('पीला')) labelText = '🟨 YELLOW CARD';
                         else if (title.includes('green')  || title.includes('हरा'))  labelText = '🟩 GREEN CARD';
                         showSideBanner(labelText, latestLog.desc || '', latestLog.isLeftTeam, true);
-                    }
-                    else if (type === 'ALL_OUT' || title.includes("all out")) {
-                        playEpicAnimation('all_out');
-                    }
-                    else if (type === 'SUPER_TACKLE' || title.includes("super tackle")) {
-                        playEpicAnimation('super_tackle');
-                    }
-                    else if (title.includes("super raid") || (type === "RAID" && latestLog.points >= 3)) {
-                        playEpicAnimation('super_raid');
                     }
                 }
             } catch (e) {
@@ -1292,10 +1272,10 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // FULL-SCREEN EPIC ANIMATION (Super Raid / Super Tackle / All Out)
-        //   Phase 1 (0–550ms)  : entry slam — bg fade-in, hBar scaleX, container overshoot
-        //   Phase 2 (550–1750): slow float hold — container to 1.05
-        //   Phase 3 (1750–2150): hyper-zoom exit — container to 25x + fade out
+        // FULL-SCREEN EPIC ANIMATION
+        //   Phase 1 (0–550ms)   : entry slam
+        //   Phase 2 (550–1750)  : slow float hold
+        //   Phase 3 (1750–2200) : hyper-zoom exit
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
