@@ -44,6 +44,58 @@
         }
 
         /* =========================================
+           LOGO BAR — "Powered by KabaddiOne"
+           Sits above the entire scoreboard, always visible
+           ========================================= */
+        .logo-bar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 20px;
+            padding: 0 16px;
+            background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9));
+            border: 1.5px solid #D4AF37;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            z-index: 6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15);
+        }
+        .logo-bar .logo-powered {
+            color: #999;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .logo-bar .logo-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            background: linear-gradient(135deg, #FF5E3A, #FF3D10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #fff;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: 0;
+            box-shadow: 0 0 8px rgba(255,94,58,0.6);
+        }
+        .logo-bar .logo-text {
+            color: #FFD700;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 8px rgba(255,215,0,0.4);
+        }
+
+        /* =========================================
            TOP LAYER: RAID PROGRESS BARS
            ========================================= */
         .top-raid-bars {
@@ -76,7 +128,6 @@ clip-path: polygon(0 0, 98% 0, 100% 100%, 2% 100%); }
         .track-right { justify-content: flex-start; border-top-right-radius: 0px; clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
 margin-right: -87px;}
 
-        /* Uses --raid-bar-color (set from JS per team colour) */
         .raid-fill {
             height: 100%;
             width: 100%;
@@ -85,7 +136,6 @@ margin-right: -87px;}
             transition: width 1s linear, background 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* When in the final 10 seconds → red danger with pulse */
         .raid-fill.danger {
             background: #FF0000;
             box-shadow: 0px 0px 20px #FF0000;
@@ -148,7 +198,6 @@ margin-right: -87px;}
 
         /* =========================================
            SIDE BANNER (Substitution + Foul/Card)
-           Position: toggled left/right depending on team
            ========================================= */
         .side-banner {
             position: absolute;
@@ -189,14 +238,12 @@ margin-right: -87px;}
             padding-right: 40px;
             flex-direction: row-reverse;
         }
-        /* Foul / Card variant */
         .side-banner.foul {
             background: linear-gradient(to right, #4A0000, #D32F2F);
             border-color: #FFD700;
             color: #FFD700;
         }
         .side-banner.foul .side-banner-detail { color: #FFFFFF; }
-        /* Sub variant (default) */
         .side-banner .side-banner-label {
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
@@ -345,23 +392,73 @@ margin-right: -87px;}
             clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
             padding: 4px; padding-top: 0px; z-index: 4; margin-top: 8px;
         }
+
+        /* -------------------------------------------------
+           CENTER INFO — split into 3 boxes, timer perfectly centered
+           ------------------------------------------------- */
         .center-info-inner {
+            position: relative;
             width: 100%; height: 100%;
             background: linear-gradient(to bottom, #6A1B9A, #1A0033);
             clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
-            display: flex; align-items: center; justify-content: center; gap: 25px;
-            color: white; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 45px;
+            color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            font-size: 13px;
             transition: background 0.4s ease;
         }
-        /* Break / Timeout variant for centre info bar */
+        /* Base pill for each of the three info boxes */
+        .info-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 26px;
+            padding: 0 14px;
+            background: rgba(0,0,0,0.42);
+            border: 1px solid rgba(255,215,0,0.4);
+            border-radius: 4px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4),
+                        inset 0 1px 0 rgba(255,255,255,0.08);
+            color: #FFFFFF;
+        }
+        .info-box-left  { justify-self: flex-start; }
+        .info-box-right { justify-self: flex-end; }
+
+        /* Center timer box — absolutely centered inside its parent
+           so it stays visually aligned with the raid-timer triangle above
+           regardless of how long the half-status / match-id text is */
+        .info-box-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            height: 30px;
+            padding: 0 18px;
+            background: rgba(0,0,0,0.62);
+            border: 1px solid rgba(255,215,0,0.6);
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.55),
+                        inset 0 1px 0 rgba(255,215,0,0.15);
+            z-index: 2;
+        }
+        .info-box-center .gold-text {
+            color: #FFD700;
+            font-family: 'Teko', sans-serif;
+            font-size: 26px;
+            line-height: 1;
+            margin-top: 2px;
+        }
+
+        /* Break / Final variants (still applied to the parent) */
         .center-info-inner.break-mode {
             background: linear-gradient(to bottom, #F57F17, #E65100);
         }
         .center-info-inner.final-mode {
             background: linear-gradient(to bottom, #37474F, #212121);
         }
-        .gold-text { color: #FFD700; font-family: 'Teko', sans-serif; font-size: 32px; line-height: 1; margin-top: 5px;}
-        .divider { color: #888; font-weight: 400; font-size: 20px; }
 
         .dots-right-wrap {
             width: 310px; height: 38px;
@@ -417,6 +514,13 @@ margin-right: -87px;}
 <body>
 
     <div class="broadcast-stage">
+
+        <!-- POWERED BY LOGO BAR (always visible) -->
+        <div class="logo-bar">
+            <span class="logo-powered">Powered by</span>
+            <div class="logo-icon">K1</div>
+            <span class="logo-text">KabaddiOne</span>
+        </div>
 
         <!-- DO-OR-DIE BANNERS -->
         <div id="dod-left" class="dod-banner dod-left">
@@ -485,13 +589,18 @@ margin-right: -87px;}
                 </div>
             </div>
 
+            <!-- Center Info — 3 separate boxes, timer perfectly centered -->
             <div class="center-info-wrap gold-bg">
                 <div class="center-info-inner" id="center-info-inner">
-                    <span id="half-status" style="margin-left: -15px;">1st HALF</span>
-                    <span class="divider">|</span>
-                    <span id="main-timer" class="gold-text">20:00</span>
-                    <span class="divider">|</span>
-                    <span id="match-id" style="color: #bbb; font-size: 16px;">ABC123</span>
+                    <div class="info-box info-box-left">
+                        <span id="half-status">1st HALF</span>
+                    </div>
+                    <div class="info-box info-box-center">
+                        <span id="main-timer" class="gold-text">20:00</span>
+                    </div>
+                    <div class="info-box info-box-right">
+                        <span id="match-id" style="color: #bbb; font-size: 13px; letter-spacing: 1.2px;">ABC123</span>
+                    </div>
                 </div>
             </div>
 
@@ -616,7 +725,7 @@ margin-right: -87px;}
                 previousLeftScore  = leftScore;
                 previousRightScore = rightScore;
 
-                // ── 4. CENTER CLOCK & STATUS (with Break/Timeout/Final override) ──
+                // ── 4. CENTER CLOCK & STATUS ──
                 applyCenterClockAndStatus(data);
 
                 // ── 5. STATE JSON ──
@@ -624,7 +733,6 @@ margin-right: -87px;}
                     try {
                         const state = JSON.parse(data.state_json);
 
-                        // 5a. DOTS — now use live-page logic (outIds + roster)
                         renderDots('left-dot',
                             state[visualLeftKey  + 'OutIds'],
                             state[visualLeftKey  + 'RosterJson'],
@@ -634,13 +742,8 @@ margin-right: -87px;}
                             state[visualRightKey + 'RosterJson'],
                             rightColor);
 
-                        // 5b. RAID TIMER BARS — now coloured with each team's colour
                         handleRaidTimers(state, data.raid_clock, visualLeftKey, leftColor, rightColor);
-
-                        // 5c. DO-OR-DIE
                         handleDoOrDie(state, visualLeftKey, visualRightKey, data.raid_clock);
-
-                        // 5d. EVENT TIMELINE
                         handleEventTimeline(state);
 
                     } catch (e) {
@@ -651,7 +754,7 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // CENTER CLOCK & STATUS (Half / Break / Timeout / Full-Time)
+        // CENTER CLOCK & STATUS
         // ==========================================
         function applyCenterClockAndStatus(data) {
             const timerEl   = document.getElementById('main-timer');
@@ -665,7 +768,6 @@ margin-right: -87px;}
                 || (data.half_status || '').toLowerCase().includes('over')
                 || (data.half_status || '').toLowerCase().includes('full time');
 
-            // Reset classes
             infoInner.classList.remove('break-mode', 'final-mode');
 
             if (matchOver) {
@@ -673,7 +775,6 @@ margin-right: -87px;}
                 timerEl.innerText  = "00:00";
                 infoInner.classList.add('final-mode');
             } else if (hasBreak) {
-                // Timeout or Half-Time break
                 statusEl.innerText = breakTitle.toUpperCase();
                 timerEl.innerText  = breakTime;
                 infoInner.classList.add('break-mode');
@@ -699,21 +800,16 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // DOTS RENDERER — exact same ordering logic as live page
-        //   Left side  : [reversed alive] + [out players in out-order]
-        //   Right side : [reversed out players] + [alive]
-        // Empty/replacement slots are inactive.
+        // DOTS RENDERER
         // ==========================================
         function renderDots(dotClassName, outIdsStr, rosterJsonStr, teamColor) {
             const dots = document.getElementsByClassName(dotClassName);
             if (!dots.length) return;
 
-            // Apply dynamic team colour via CSS variable (used by .dot.active)
             for (let i = 0; i < dots.length; i++) {
                 dots[i].style.setProperty('--dot-active-color', teamColor);
             }
 
-            // Parse roster
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const pJ = j => { const n = parseInt(j); return isNaN(n) ? 999 : n; };
@@ -750,10 +846,6 @@ margin-right: -87px;}
 
         // ==========================================
         // RAID TIMER BARS
-        //   - Left bar uses left team's colour
-        //   - Right bar uses right team's colour
-        //   - Shrinks 100% → 0% over 30 s
-        //   - Turns red + pulses under 10 s
         // ==========================================
         function handleRaidTimers(state, raidClockStr, visualLeftKey, leftColor, rightColor) {
             const raidTimerText = document.getElementById('raid-timer');
@@ -762,7 +854,6 @@ margin-right: -87px;}
             const barLeft    = document.getElementById('raid-bar-left');
             const barRight   = document.getElementById('raid-bar-right');
 
-            // Apply team colours to bars
             barLeft.style.setProperty('--raid-bar-color',  leftColor);
             barRight.style.setProperty('--raid-bar-color', rightColor);
 
@@ -770,12 +861,10 @@ margin-right: -87px;}
             const displayTime = isNaN(timeInt) ? 30 : timeInt;
             raidTimerText.innerText = displayTime;
 
-            // Active raid detection: state flag OR clock strictly under 30
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
             if (raidActive) {
-                // Which ACTUAL team is raiding?
                 let actualLeftRaid = true;
                 const raw = state.currentRaidTeamIsLeft !== undefined
                     ? state.currentRaidTeamIsLeft
@@ -783,7 +872,6 @@ margin-right: -87px;}
                 if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
                 else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
 
-                // Convert to visual side
                 const visualLeftRaid = (visualLeftKey === 'left') ? actualLeftRaid : !actualLeftRaid;
 
                 if (visualLeftRaid) {
@@ -875,7 +963,6 @@ margin-right: -87px;}
             const label  = document.getElementById('side-banner-label');
             const detail = document.getElementById('side-banner-detail');
 
-            // Determine VISUAL side
             let visualLeft;
             if (isLeftTeam === true)      visualLeft = !isSwapped;
             else if (isLeftTeam === false) visualLeft = isSwapped;
@@ -887,7 +974,6 @@ margin-right: -87px;}
             banner.className = 'side-banner ' + (visualLeft ? 'pos-left' : 'pos-right');
             if (isFoul) banner.classList.add('foul');
 
-            // Restart animation
             void banner.offsetWidth;
             banner.classList.add('show');
 
@@ -913,11 +999,9 @@ margin-right: -87px;}
                     const title = (latestLog.title || '').toLowerCase();
                     const type  = latestLog.type  || '';
 
-                    // ── SUBSTITUTION ──
                     if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
                         showSideBanner('Substitution', latestLog.desc || '', latestLog.isLeftTeam, false);
                     }
-                    // ── CARD / FOUL ──
                     else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
                         let labelText = 'FOUL';
                         if (title.includes('red')    || title.includes('लाल'))  labelText = '🟥 RED CARD';
@@ -925,15 +1009,12 @@ margin-right: -87px;}
                         else if (title.includes('green')  || title.includes('हरा'))  labelText = '🟩 GREEN CARD';
                         showSideBanner(labelText, latestLog.desc || '', latestLog.isLeftTeam, true);
                     }
-                    // ── ALL OUT ──
                     else if (type === 'ALL_OUT' || title.includes("all out")) {
                         triggerCenterEvent("ALL OUT", "all-out", 4000);
                     }
-                    // ── SUPER TACKLE ──
                     else if (type === 'SUPER_TACKLE' || title.includes("super tackle")) {
                         triggerCenterEvent("SUPER TACKLE", "super-tackle", 3000);
                     }
-                    // ── SUPER RAID ──
                     else if (title.includes("super raid") || (type === "RAID" && latestLog.points >= 3)) {
                         triggerCenterEvent("SUPER RAID", "raid-point", 3000);
                     }
