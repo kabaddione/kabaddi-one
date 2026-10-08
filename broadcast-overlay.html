@@ -44,8 +44,7 @@
         }
 
         /* =========================================
-           LOGO BAR — "Powered by KabaddiOne"
-           Sits above the entire scoreboard, always visible
+           LOGO BAR
            ========================================= */
         .logo-bar {
             display: inline-flex;
@@ -66,36 +65,15 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15);
             clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%);
         }
-        .logo-bar .logo-powered {
-            color: rgb(185, 185, 185);
-            font-size: 12px;
-            letter-spacing: 1.1px;
-            font-weight: 600;
-        }
+        .logo-bar .logo-powered { color: rgb(185, 185, 185); font-size: 12px; letter-spacing: 1.1px; font-weight: 600; }
         .logo-bar .logo-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
             box-shadow: 0 0 20px rgba(255,215,0,0.4);
             animation: logoPulse 3s ease-in-out infinite;
         }
-        .logo-bar .logo-text {
-            color: #FFF;
-            font-weight: 700;
-            font-size: 17px;
-            letter-spacing: 0.7px;
-            text-shadow: 0 0 8px rgba(255,215,0,0.4);
-        }
-        .logo-bar .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
+        .logo-bar .logo-text { color: #FFF; font-weight: 700; font-size: 17px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+        .logo-bar .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
 
         /* =========================================
            TOP LAYER: RAID PROGRESS BARS
@@ -118,11 +96,17 @@
             opacity: 0;
             border: 2px solid #D4AF37;
             border-bottom: none;
-            transition: opacity 0.35s ease, visibility 0.35s ease;
+            transition: opacity 0.35s ease, visibility 0.35s ease, box-shadow 0.4s ease;
         }
         .raid-track.visible {
             visibility: visible;
             opacity: 1;
+        }
+        /* Glow applied per team colour (matches --raid-bar-color) */
+        .raid-track.visible {
+            box-shadow: 0 0 14px var(--raid-bar-color, #00FF00),
+                        0 0 6px var(--raid-bar-color, #00FF00),
+                        inset 0 0 8px rgba(0,0,0,0.6);
         }
 
         .track-left { justify-content: flex-end; border-top-left-radius: 0px; margin-left: -87px;
@@ -135,18 +119,9 @@ margin-right: -87px;}
             width: 100%;
             background: var(--raid-bar-color, #00FF00);
             box-shadow: 0px 0px 15px var(--raid-bar-color, #00FF00);
-            transition: width 1s linear, background 0.3s ease, box-shadow 0.3s ease;
+            transition: width 1s linear;
         }
-
-        .raid-fill.danger {
-            background: #FF0000;
-            box-shadow: 0px 0px 20px #FF0000;
-            animation: raidDangerPulse 0.6s ease-in-out infinite alternate;
-        }
-        @keyframes raidDangerPulse {
-            from { box-shadow: 0 0 10px #FF0000; }
-            to   { box-shadow: 0 0 25px #FF0000, 0 0 40px #FF0000; }
-        }
+        /* NOTE: `.danger` class no longer applied — bar keeps team colour entire raid */
 
         /* =========================================
            DO-OR-DIE BANNER
@@ -176,30 +151,18 @@ margin-right: -87px;}
             pointer-events: none;
             z-index: 20;
         }
-        .dod-banner.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            animation: dodSiren 1s infinite alternate;
-        }
+        .dod-banner.show { opacity: 1; transform: translateY(0) scale(1); animation: dodSiren 1s infinite alternate; }
         .dod-banner.dod-left  { left: 200px; }
         .dod-banner.dod-right { right: 200px; }
-        .dod-banner .siren-icon {
-            font-size: 30px;
-            filter: drop-shadow(0 0 8px #FF0000);
-            animation: sirenRotate 0.6s infinite alternate;
-            display: inline-block;
-        }
+        .dod-banner .siren-icon { font-size: 30px; filter: drop-shadow(0 0 8px #FF0000); animation: sirenRotate 0.6s infinite alternate; display: inline-block; }
         @keyframes dodSiren {
             from { box-shadow: 0 0 15px rgba(255,0,0,0.5), 0 8px 20px rgba(0,0,0,0.6); }
             to   { box-shadow: 0 0 40px rgba(255,0,0,1), 0 8px 20px rgba(0,0,0,0.6); }
         }
-        @keyframes sirenRotate {
-            from { transform: scale(1); }
-            to   { transform: scale(1.15); }
-        }
+        @keyframes sirenRotate { from { transform: scale(1); } to { transform: scale(1.15); } }
 
         /* =========================================
-           SIDE BANNER (Substitution + Foul/Card)
+           SIDE BANNER
            ========================================= */
         .side-banner {
             position: absolute;
@@ -208,7 +171,7 @@ margin-right: -87px;}
             border: 3px solid #D4AF37;
             padding: 6px 30px;
             font-size: 20px;
-            color: color(srgb 1 0.8425 0.0108);
+            color: rgb(255, 215, 3);
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -223,39 +186,16 @@ margin-right: -87px;}
             height: 55px;
             max-width: 700px;
         }
-        .side-banner.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        .side-banner.pos-right {
-            right: 265px;
-            left: auto;
-            clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
-            padding-left: 40px;
-        }
-        .side-banner.pos-left {
-            left: 265px;
-            right: auto;
-            clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%);
-            padding-right: 40px;
-            flex-direction: row-reverse;
-        }
-        .side-banner.foul {
-            background: linear-gradient(to right, #4A0000, #D32F2F);
-            border-color: #FFD700;
-            color: #FFD700;
-        }
+        .side-banner.show { opacity: 1; transform: translateY(0) scale(1); }
+        .side-banner.pos-right { right: 265px; left: auto; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); padding-left: 40px; }
+        .side-banner.pos-left { left: 265px; right: auto; clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); padding-right: 40px; flex-direction: row-reverse; }
+        .side-banner.foul { background: linear-gradient(to right, #4A0000, #D32F2F); border-color: #FFD700; color: #FFD700; }
         .side-banner.foul .side-banner-detail { color: #FFFFFF; }
-        .side-banner .side-banner-label {
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        .side-banner .side-banner-label { font-family: 'Oswald', sans-serif; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
         .side-banner .side-banner-detail { color: #FFFFFF; }
 
         /* =========================================
-           LAYER 1: MAIN SCOREBOARD ROW
+           MAIN SCOREBOARD ROW
            ========================================= */
         .main-row {
             display: flex;
@@ -272,9 +212,7 @@ margin-right: -87px;}
             z-index: 1;
             transition: filter 0.4s ease;
         }
-        .team-left-wrap.dod-active {
-            filter: drop-shadow(0 0 20px #FF0000) drop-shadow(0 0 40px #FF0000);
-        }
+        .team-left-wrap.dod-active { filter: drop-shadow(0 0 20px #FF0000) drop-shadow(0 0 40px #FF0000); }
         .team-left-inner {
             width: 100%; height: 100%;
             clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%);
@@ -293,6 +231,37 @@ margin-right: -87px;}
             to   { box-shadow: inset 0px 20px 20px rgba(255,255,255,0.2), inset 0px -20px 20px rgba(0,0,0,0.5), inset 0 0 50px rgba(255,0,0,0.9); }
         }
 
+        /* Name / Raider name rotator */
+        .name-rotator {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .team-name-text, .raider-name-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            will-change: transform, opacity;
+        }
+        .team-name-text { transform: translateY(0); opacity: 1; }
+        .team-name-text.out { transform: translateY(-130%); opacity: 0; }
+        .raider-name-text {
+            transform: translateY(130%);
+            opacity: 0;
+            color: #FFD700;
+            text-shadow: 0 0 22px rgba(255,215,0,0.9),
+                         0 0 8px rgba(255,255,255,0.6),
+                         2px 2px 6px rgba(0,0,0,0.95);
+            font-weight: 900;
+        }
+        .raider-name-text.show { transform: translateY(0); opacity: 1; }
+        .raider-name-text.out { transform: translateY(-130%); opacity: 0; }
+
         .score-left-wrap {
             width: 180px; height: 85px;
             clip-path: polygon(0 0, 72% 0, 100% 100%, 28% 100%);
@@ -309,6 +278,9 @@ margin-right: -87px;}
             box-shadow: inset 0px 10px 15px rgba(0,0,0,0.2);
         }
 
+        /* =========================================
+           CENTER RAID CLOCK TRIANGLE (with splash logo swap)
+           ========================================= */
         .center-wrap {
             width: 140px; height: 105px;
             clip-path: polygon(0% 0%, 100% 0%, 65% 80%, 35% 80%);
@@ -317,13 +289,45 @@ margin-right: -87px;}
             padding: 5px;
         }
         .center-inner {
+            position: relative;
             width: 100%; height: 100%;
             background: linear-gradient(to bottom, #6A1B9A, #1A0033);
             clip-path: polygon(0% 0%, 100% 0%, 65% 80%, 35% 80%);
-            display: flex; align-items: flex-start; justify-content: center;
-            padding-top: 15px;
-            color: #FFD700; font-family: 'Teko', sans-serif; font-size: 45px; font-weight: 700; line-height: 1; text-shadow: 0px 0px 15px rgba(255,215,0,0.4);
+            overflow: hidden;
         }
+        /* Both items are absolutely positioned and slide on Y axis */
+        #raid-timer {
+            position: absolute;
+            top: 15px; left: 0; right: 0;
+            text-align: center;
+            color: #FFD700;
+            font-family: 'Teko', sans-serif;
+            font-size: 45px;
+            font-weight: 700;
+            line-height: 1;
+            text-shadow: 0 0 15px rgba(255,215,0,0.4);
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            will-change: transform, opacity;
+        }
+        #raid-timer.out { transform: translateY(-140%); opacity: 0; }
+
+        #splash-logo {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 78%;
+            max-height: 55px;
+            height: auto;
+            object-fit: contain;
+            transform: translate(-50%, calc(-50% + 140%));
+            opacity: 0;
+            transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            will-change: transform, opacity;
+            pointer-events: none;
+        }
+        #splash-logo.show { transform: translate(-50%, -50%); opacity: 1; }
+        #splash-logo.out  { transform: translate(-50%, calc(-50% - 140%)); opacity: 0; }
 
         .score-right-wrap {
             width: 180px; height: 85px;
@@ -349,9 +353,7 @@ margin-right: -87px;}
             padding: 4px; padding-left: 5px;
             transition: filter 0.4s ease;
         }
-        .team-right-wrap.dod-active {
-            filter: drop-shadow(0 0 20px #FF0000) drop-shadow(0 0 40px #FF0000);
-        }
+        .team-right-wrap.dod-active { filter: drop-shadow(0 0 20px #FF0000) drop-shadow(0 0 40px #FF0000); }
         .team-right-inner {
             width: 100%; height: 100%;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
@@ -366,7 +368,7 @@ margin-right: -87px;}
         }
 
         /* =========================================
-           LAYER 2: BOTTOM INFO & DOTS BAR
+           BOTTOM ROW
            ========================================= */
         .bottom-row {
             display: flex;
@@ -395,9 +397,6 @@ margin-right: -87px;}
             padding: 4px; padding-top: 0px; z-index: 4; margin-top: 8px;
         }
 
-        /* -------------------------------------------------
-           CENTER INFO — split into 3 boxes, timer perfectly centered
-           ------------------------------------------------- */
         .center-info-inner {
             position: relative;
             width: 100%; height: 100%;
@@ -411,49 +410,22 @@ margin-right: -87px;}
             font-size: 15px;
             transition: background 0.4s ease;
         }
-        /* Base pill for each of the three info boxes */
-        .info-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 26px;
-            padding: 0 14px;
-            white-space: nowrap;
-            color: #FFFFFF;
-        }
+        .info-box { display: flex; align-items: center; justify-content: center; height: 26px; padding: 0 14px; white-space: nowrap; color: #FFFFFF; }
         .info-box-left  { justify-self: flex-start; }
         .info-box-right { justify-self: flex-end; }
-
-        /* Center timer box — absolutely centered inside its parent
-           so it stays visually aligned with the raid-timer triangle above
-           regardless of how long the half-status / match-id text is */
         .info-box-center {
             position: absolute;
-            left: 50%;
-            top: 50%;
+            left: 50%; top: 50%;
             transform: translate(-50%, -50%);
-            height: 23px;
-            padding: 0 18px;
+            height: 23px; padding: 0 18px;
             border-left: 3px solid #888;
             border-right: 3px solid #888;
-            border-radius: 0px;
-            z-index: 2;
+            border-radius: 0px; z-index: 2;
         }
-        .info-box-center .gold-text {
-            color: #FFD700;
-            font-family: 'Teko', sans-serif;
-            font-size: 30px;
-            line-height: 1;
-            margin-top: 6px;
-        }
+        .info-box-center .gold-text { color: #FFD700; font-family: 'Teko', sans-serif; font-size: 30px; line-height: 1; margin-top: 6px; }
 
-        /* Break / Final variants (still applied to the parent) */
-        .center-info-inner.break-mode {
-            background: linear-gradient(to bottom, #F57F17, #E65100);
-        }
-        .center-info-inner.final-mode {
-            background: linear-gradient(to bottom, #37474F, #212121);
-        }
+        .center-info-inner.break-mode { background: linear-gradient(to bottom, #F57F17, #E65100); }
+        .center-info-inner.final-mode { background: linear-gradient(to bottom, #37474F, #212121); }
 
         .dots-right-wrap {
             width: 310px; height: 38px;
@@ -467,7 +439,6 @@ margin-right: -87px;}
             padding-left: 45px; gap: 10px;padding-top: 5px;
         }
 
-        /* ---- PLAYER DOTS ---- */
         .dot {
             width: 16px; height: 16px;
             border-radius: 50%;
@@ -484,7 +455,7 @@ margin-right: -87px;}
         }
 
         /* =========================================
-           POPUPS
+           CENTER EVENT POPUP (small one, kept for fallback)
            ========================================= */
         @keyframes pop {
             0% { transform: scale(1); }
@@ -501,8 +472,125 @@ margin-right: -87px;}
             box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8);
             opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             white-space: nowrap; text-transform: uppercase;
+            z-index: 200;
         }
         .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        /* =========================================
+           FULL-SCREEN EPIC EVENT OVERLAY
+           (Super Raid / Super Tackle / All Out)
+           ========================================= */
+        .epic-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .epic-overlay.visible { visibility: visible; }
+
+        .epic-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/kabaddione_bg.jpg') center/cover no-repeat;
+            opacity: 0;
+            z-index: 1;
+        }
+        .epic-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
+            z-index: 2;
+            opacity: 0;
+        }
+
+        .epic-horizontal-bar {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            width: 90%;
+            height: 6px;
+            background: linear-gradient(90deg, transparent 0%, #FFD700 25%, #FFFFFF 50%, #FFD700 75%, transparent 100%);
+            box-shadow: 0 0 30px #FFD700, 0 0 60px #FFD700;
+            transform: scaleX(0);
+            transform-origin: center;
+            z-index: 3;
+            border-radius: 3px;
+        }
+
+        .epic-main-container {
+            position: relative;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transform: scale(15);
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        .epic-text {
+            font-family: 'Teko', sans-serif;
+            font-weight: 700;
+            line-height: 0.9;
+            letter-spacing: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #ABABAB 50%, #FFFFFF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,215,0,0.6));
+        }
+        .epic-text-super { font-size: 110px; letter-spacing: 18px; }
+        .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
+
+        /* Entry phase */
+        .epic-overlay.entry .epic-bg { animation: epicBgFadeIn 0.35s ease-out forwards; }
+        .epic-overlay.entry .epic-vignette { animation: epicBgFadeIn 0.35s ease-out forwards; }
+        .epic-overlay.entry .epic-horizontal-bar { animation: epicHBar 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+        .epic-overlay.entry .epic-main-container {
+            animation: epicContainerEntry 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Hold phase */
+        .epic-overlay.hold .epic-main-container {
+            animation: epicHold 1.2s linear forwards;
+        }
+
+        /* Exit phase */
+        .epic-overlay.exit .epic-bg { animation: epicBgFadeOut 0.4s ease forwards; }
+        .epic-overlay.exit .epic-vignette { animation: epicBgFadeOut 0.4s ease forwards; }
+        .epic-overlay.exit .epic-main-container {
+            animation: epicContainerExit 0.4s cubic-bezier(0.5, 0, 0.7, 1.5) forwards;
+        }
+
+        @keyframes epicBgFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes epicBgFadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes epicHBar {
+            from { transform: scaleX(0); }
+            to   { transform: scaleX(1); }
+        }
+        @keyframes epicContainerEntry {
+            0%   { transform: scale(15); opacity: 0; }
+            55%  { transform: scale(1.12); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes epicHold {
+            from { transform: scale(1); }
+            to   { transform: scale(1.05); }
+        }
+        @keyframes epicContainerExit {
+            0%   { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(25); opacity: 0; }
+        }
 
     </style>
 </head>
@@ -510,7 +598,7 @@ margin-right: -87px;}
 
     <div class="broadcast-stage">
 
-        <!-- POWERED BY LOGO BAR (always visible) -->
+        <!-- LOGO BAR -->
         <div class="logo-bar">
             <span class="logo-powered">Powered by</span>
             <div class="logo-icon"><img src="/images/kabaddione_logo.png" alt="KabaddiOne Logo"></div>
@@ -527,7 +615,7 @@ margin-right: -87px;}
             <span class="siren-icon">🚨</span>
         </div>
 
-        <!-- SIDE BANNER (Sub / Foul / Card) -->
+        <!-- SIDE BANNER -->
         <div id="side-banner" class="side-banner pos-right">
             <span id="side-banner-label" class="side-banner-label">Substitution</span>
             <span id="side-banner-detail" class="side-banner-detail">Player Name</span>
@@ -547,7 +635,10 @@ margin-right: -87px;}
         <div class="main-row">
             <div class="team-left-wrap gold-bg" id="left-team-wrap">
                 <div class="team-left-inner" id="left-team-bg">
-                    <span id="left-name">TEAM A</span>
+                    <div class="name-rotator">
+                        <span id="left-name" class="team-name-text">TEAM A</span>
+                        <span id="left-raider-name" class="raider-name-text"></span>
+                    </div>
                 </div>
             </div>
 
@@ -559,7 +650,8 @@ margin-right: -87px;}
 
             <div class="center-wrap gold-bg">
                 <div class="center-inner">
-                    <span id="raid-timer">30</span>
+                    <span id="raid-timer" class="out">30</span>
+                    <img id="splash-logo" class="show" src="/images/ic_splash_logo1.png" alt="">
                 </div>
             </div>
 
@@ -571,7 +663,10 @@ margin-right: -87px;}
 
             <div class="team-right-wrap gold-bg" id="right-team-wrap">
                 <div class="team-right-inner" id="right-team-bg">
-                    <span id="right-name">TEAM B</span>
+                    <div class="name-rotator">
+                        <span id="right-name" class="team-name-text">TEAM B</span>
+                        <span id="right-raider-name" class="raider-name-text"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -584,7 +679,6 @@ margin-right: -87px;}
                 </div>
             </div>
 
-            <!-- Center Info — 3 separate boxes, timer perfectly centered -->
             <div class="center-info-wrap gold-bg">
                 <div class="center-info-inner" id="center-info-inner">
                     <div class="info-box info-box-left">
@@ -610,12 +704,23 @@ margin-right: -87px;}
 
     <div id="center-popup" class="center-popup">EVENT</div>
 
+    <!-- FULL-SCREEN EPIC EVENT OVERLAY -->
+    <div id="epic-overlay" class="epic-overlay">
+        <div class="epic-bg"></div>
+        <div class="epic-vignette"></div>
+        <div class="epic-horizontal-bar"></div>
+        <div class="epic-main-container">
+            <div id="epic-super-text" class="epic-text epic-text-super">SUPER</div>
+            <div id="epic-event-text" class="epic-text epic-text-event">TACKLE</div>
+        </div>
+    </div>
+
     <script>
         // ==========================================
         // FIREBASE INIT
         // ==========================================
         const firebaseConfig = {
-            databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app"
+            databaseURL: "https://kabaddi-scorecard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -644,6 +749,15 @@ margin-right: -87px;}
         let isSwapped = false;
         let lastLeftColor = null;
         let lastRightColor = null;
+
+        // Raid clock visual state (null = first snapshot)
+        let previousRaidActive = null;
+
+        // Raider name rotation state
+        const raiderRotationState = {
+            left:  { active: false, timer: null, currentRaider: null },
+            right: { active: false, timer: null, currentRaider: null }
+        };
 
         // ==========================================
         // UTILITIES
@@ -739,6 +853,10 @@ margin-right: -87px;}
 
                         handleRaidTimers(state, data.raid_clock, visualLeftKey, leftColor, rightColor);
                         handleDoOrDie(state, visualLeftKey, visualRightKey, data.raid_clock);
+
+                        // Raider name rotation (integrates with raid clock active detection)
+                        handleRaiderNameRotation(state, data, visualLeftKey, leftColor, rightColor);
+
                         handleEventTimeline(state);
 
                     } catch (e) {
@@ -841,6 +959,8 @@ margin-right: -87px;}
 
         // ==========================================
         // RAID TIMER BARS
+        //   • Applies team colour to bar + track glow
+        //   • No red danger state — colour stays constant entire raid
         // ==========================================
         function handleRaidTimers(state, raidClockStr, visualLeftKey, leftColor, rightColor) {
             const raidTimerText = document.getElementById('raid-timer');
@@ -849,8 +969,11 @@ margin-right: -87px;}
             const barLeft    = document.getElementById('raid-bar-left');
             const barRight   = document.getElementById('raid-bar-right');
 
+            // Apply team colours to bar AND track (for glow)
             barLeft.style.setProperty('--raid-bar-color',  leftColor);
             barRight.style.setProperty('--raid-bar-color', rightColor);
+            trackLeft.style.setProperty('--raid-bar-color',  leftColor);
+            trackRight.style.setProperty('--raid-bar-color', rightColor);
 
             const timeInt = parseInt(raidClockStr);
             const displayTime = isNaN(timeInt) ? 30 : timeInt;
@@ -858,6 +981,9 @@ margin-right: -87px;}
 
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
+
+            // Swap raid clock <-> splash logo when paused/running
+            updateRaidClockVisual(raidActive);
 
             if (raidActive) {
                 let actualLeftRaid = true;
@@ -881,13 +1007,9 @@ margin-right: -87px;}
                 barLeft.style.width  = percentage + "%";
                 barRight.style.width = percentage + "%";
 
-                if (displayTime <= 10) {
-                    barLeft.classList.add('danger');
-                    barRight.classList.add('danger');
-                } else {
-                    barLeft.classList.remove('danger');
-                    barRight.classList.remove('danger');
-                }
+                // NOTE: .danger class intentionally NOT applied
+                barLeft.classList.remove('danger');
+                barRight.classList.remove('danger');
             } else {
                 trackLeft.classList.remove('visible');
                 trackRight.classList.remove('visible');
@@ -896,6 +1018,158 @@ margin-right: -87px;}
                 barLeft.classList.remove('danger');
                 barRight.classList.remove('danger');
             }
+        }
+
+        // ==========================================
+        // RAID CLOCK ↔ SPLASH LOGO SWAP
+        //   Paused  → 30 hidden, splash logo slides up
+        //   Running → splash logo slides out top, 30 shows
+        // ==========================================
+        function updateRaidClockVisual(isRaidActive) {
+            // Skip on very first snapshot if state matches default
+            if (previousRaidActive === null) {
+                previousRaidActive = isRaidActive;
+                const timerEl = document.getElementById('raid-timer');
+                const logoEl  = document.getElementById('splash-logo');
+                if (isRaidActive) {
+                    logoEl.classList.remove('show');
+                    logoEl.classList.remove('out');
+                    timerEl.classList.remove('out');
+                } else {
+                    timerEl.classList.add('out');
+                    logoEl.classList.remove('out');
+                    logoEl.classList.add('show');
+                }
+                return;
+            }
+            if (isRaidActive === previousRaidActive) return;
+            previousRaidActive = isRaidActive;
+
+            const timerEl = document.getElementById('raid-timer');
+            const logoEl  = document.getElementById('splash-logo');
+
+            if (isRaidActive) {
+                // Show 30, slide splash logo up + out
+                logoEl.classList.remove('show');
+                logoEl.classList.add('out');
+                timerEl.classList.remove('out');
+            } else {
+                // Hide 30, bring splash logo up from bottom
+                timerEl.classList.add('out');
+                logoEl.classList.remove('out');
+                logoEl.classList.add('show');
+            }
+        }
+
+        // ==========================================
+        // RAIDER NAME ROTATION
+        //   While raid is active, alternate the raiding team's bar text
+        //   between the team name (5 s) and the raider name (3 s).
+        // ==========================================
+        function handleRaiderNameRotation(state, data, visualLeftKey, leftColor, rightColor) {
+            const timeInt = parseInt(data.raid_clock);
+            const raidActive = state.raidTimerRunning === true
+                || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
+
+            if (!raidActive) {
+                // Raid ended → stop both rotations, restore team names
+                stopRaiderRotation('left');
+                stopRaiderRotation('right');
+                raiderRotationState.left.currentRaider  = null;
+                raiderRotationState.right.currentRaider = null;
+                return;
+            }
+
+            // Which ACTUAL team is raiding?
+            let actualLeftRaid = true;
+            const raw = state.currentRaidTeamIsLeft !== undefined
+                ? state.currentRaidTeamIsLeft
+                : state.currentRaidTeamsLeft;
+            if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
+            else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
+
+            const visualLeftRaid = (visualLeftKey === 'left') ? actualLeftRaid : !actualLeftRaid;
+
+            const raiderName = (data.active_raider_name || '').trim() || 'RAIDER';
+
+            if (visualLeftRaid) {
+                startRaiderRotation('left', raiderName);
+                stopRaiderRotation('right');
+                raiderRotationState.right.currentRaider = null;
+            } else {
+                startRaiderRotation('right', raiderName);
+                stopRaiderRotation('left');
+                raiderRotationState.left.currentRaider = null;
+            }
+        }
+
+        function startRaiderRotation(side, raiderName) {
+            const st = raiderRotationState[side];
+
+            // If already running with the same raider, do nothing
+            if (st.active && st.currentRaider === raiderName) return;
+
+            // If already running with a different raider, update the text & continue cycle
+            const container = document.querySelector(`#${side}-team-bg .name-rotator`);
+            if (!container) return;
+            const nameEl   = container.querySelector('.team-name-text');
+            const raiderEl = container.querySelector('.raider-name-text');
+            raiderEl.innerText = raiderName;
+
+            if (st.active && st.currentRaider !== raiderName) {
+                // Just update the stored name — cycle continues
+                st.currentRaider = raiderName;
+                return;
+            }
+
+            // Fresh start
+            if (st.timer) { clearTimeout(st.timer); st.timer = null; }
+            st.active = true;
+            st.currentRaider = raiderName;
+
+            // Reset visual state
+            nameEl.classList.remove('out');
+            raiderEl.classList.remove('show', 'out');
+
+            // First: slide team name out, raider name in
+            nameEl.classList.add('out');
+            raiderEl.classList.add('show');
+
+            let showingRaider = true;
+
+            const tick = () => {
+                if (!st.active) return;
+                if (showingRaider) {
+                    // Raider out, team name in
+                    raiderEl.classList.remove('show');
+                    raiderEl.classList.add('out');
+                    nameEl.classList.remove('out');
+                    showingRaider = false;
+                    st.timer = setTimeout(tick, 5000);
+                } else {
+                    // Team name out, raider in
+                    nameEl.classList.add('out');
+                    raiderEl.classList.remove('out');
+                    raiderEl.classList.add('show');
+                    showingRaider = true;
+                    st.timer = setTimeout(tick, 3000);
+                }
+            };
+            st.timer = setTimeout(tick, 3000); // First raider shows for 3 s
+        }
+
+        function stopRaiderRotation(side) {
+            const st = raiderRotationState[side];
+            if (st.timer) { clearTimeout(st.timer); st.timer = null; }
+            st.active = false;
+
+            const container = document.querySelector(`#${side}-team-bg .name-rotator`);
+            if (!container) return;
+            const nameEl   = container.querySelector('.team-name-text');
+            const raiderEl = container.querySelector('.raider-name-text');
+            raiderEl.classList.remove('show');
+            raiderEl.classList.remove('out');
+            nameEl.classList.remove('out');
         }
 
         // ==========================================
@@ -951,7 +1225,7 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // SIDE BANNER (used for Subs AND Fouls/Cards)
+        // SIDE BANNER
         // ==========================================
         function showSideBanner(labelText, detailText, isLeftTeam, isFoul) {
             const banner = document.getElementById('side-banner');
@@ -1005,13 +1279,13 @@ margin-right: -87px;}
                         showSideBanner(labelText, latestLog.desc || '', latestLog.isLeftTeam, true);
                     }
                     else if (type === 'ALL_OUT' || title.includes("all out")) {
-                        triggerCenterEvent("ALL OUT", "all-out", 4000);
+                        playEpicAnimation('all_out');
                     }
                     else if (type === 'SUPER_TACKLE' || title.includes("super tackle")) {
-                        triggerCenterEvent("SUPER TACKLE", "super-tackle", 3000);
+                        playEpicAnimation('super_tackle');
                     }
                     else if (title.includes("super raid") || (type === "RAID" && latestLog.points >= 3)) {
-                        triggerCenterEvent("SUPER RAID", "raid-point", 3000);
+                        playEpicAnimation('super_raid');
                     }
                 }
             } catch (e) {
@@ -1019,14 +1293,66 @@ margin-right: -87px;}
             }
         }
 
-        function triggerCenterEvent(text, styleClass, duration) {
-            const popup = document.getElementById('center-popup');
-            popup.innerText = text;
-            if (styleClass === 'all-out')      popup.style.background = 'linear-gradient(to bottom, #D32F2F, #8B0000)';
-            if (styleClass === 'super-tackle') popup.style.background = 'linear-gradient(to bottom, #FF8F00, #E65100)';
-            if (styleClass === 'raid-point')   popup.style.background = 'linear-gradient(to bottom, #1976D2, #0D47A1)';
-            popup.classList.add('show');
-            setTimeout(() => { popup.classList.remove('show'); }, duration);
+        // ==========================================
+        // FULL-SCREEN EPIC ANIMATION (Super Raid / Super Tackle / All Out)
+        //   Phase 1 (0–550ms)  : entry slam — bg fade-in, hBar scaleX, container overshoot
+        //   Phase 2 (550–1750): slow float hold — container to 1.05
+        //   Phase 3 (1750–2150): hyper-zoom exit — container to 25x + fade out
+        // ==========================================
+        let epicAnimationTimeoutIds = [];
+        let epicIsPlaying = false;
+
+        function playEpicAnimation(eventType) {
+            const overlay   = document.getElementById('epic-overlay');
+            const superText = document.getElementById('epic-super-text');
+            const eventText = document.getElementById('epic-event-text');
+            if (!overlay || !superText || !eventText) return;
+
+            // Configure text per event
+            if (eventType === 'super_tackle') {
+                superText.style.display = 'block';
+                superText.innerText = 'SUPER';
+                eventText.innerText = 'TACKLE';
+            } else if (eventType === 'super_raid') {
+                superText.style.display = 'block';
+                superText.innerText = 'SUPER';
+                eventText.innerText = 'RAID';
+            } else if (eventType === 'all_out') {
+                superText.style.display = 'none';
+                eventText.innerText = 'ALL OUT';
+            }
+
+            // Clear any pending phase timers from a previous run
+            epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
+            epicAnimationTimeoutIds = [];
+
+            // Reset all classes so animations restart
+            overlay.classList.remove('entry', 'hold', 'exit', 'visible');
+            void overlay.offsetWidth; // reflow
+
+            // Phase 1: entry slam
+            overlay.classList.add('visible', 'entry');
+            epicIsPlaying = true;
+
+            // Phase 2: hold after entry completes
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                if (!epicIsPlaying) return;
+                overlay.classList.remove('entry');
+                overlay.classList.add('hold');
+            }, 550));
+
+            // Phase 3: exit
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                if (!epicIsPlaying) return;
+                overlay.classList.remove('hold');
+                overlay.classList.add('exit');
+            }, 1750));
+
+            // Cleanup
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                overlay.classList.remove('visible', 'exit');
+                epicIsPlaying = false;
+            }, 2200));
         }
     </script>
 </body>
