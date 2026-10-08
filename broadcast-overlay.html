@@ -530,22 +530,22 @@ margin-right: -87px;}
         .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
 
         /* Entry phase */
-        .epic-overlay.entry .epic-bg { animation: epicBgFadeIn 0.35s ease-out forwards; }
-        .epic-overlay.entry .epic-vignette { animation: epicBgFadeIn 0.35s ease-out forwards; }
+        .epic-overlay.entry .epic-bg { animation: epicBgFadeIn 0.5s ease-out forwards; }
+        .epic-overlay.entry .epic-vignette { animation: epicBgFadeIn 0.5s ease-out forwards; }
         .epic-overlay.entry .epic-main-container {
-            animation: epicContainerEntry 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: epicContainerEntry 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         /* Hold phase */
         .epic-overlay.hold .epic-main-container {
-            animation: epicHold 1.2s linear forwards;
+            animation: epicHold 2.5s linear forwards;
         }
 
         /* Exit phase */
-        .epic-overlay.exit .epic-bg { animation: epicBgFadeOut 0.4s ease forwards; }
-        .epic-overlay.exit .epic-vignette { animation: epicBgFadeOut 0.4s ease forwards; }
+        .epic-overlay.exit .epic-bg { animation: epicBgFadeOut 0.6s ease forwards; }
+        .epic-overlay.exit .epic-vignette { animation: epicBgFadeOut 0.6s ease forwards; }
         .epic-overlay.exit .epic-main-container {
-            animation: epicContainerExit 0.4s cubic-bezier(0.5, 0, 0.7, 1.5) forwards;
+            animation: epicContainerExit 0.6s cubic-bezier(0.5, 0, 0.7, 1.5) forwards;
         }
 
         @keyframes epicBgFadeIn  { from { opacity: 0; } to { opacity: 1; } }
@@ -1242,9 +1242,10 @@ margin-right: -87px;}
 
         // ==========================================
         // FULL-SCREEN EPIC ANIMATION
-        //   Phase 1 (0–550ms)   : entry slam
-        //   Phase 2 (550–1750)  : slow float hold
-        //   Phase 3 (1750–2200) : hyper-zoom exit
+        //   Phase 1 (0–700ms)   : entry slam
+        //   Phase 2 (700–3200)  : slow float hold (2.5 s)
+        //   Phase 3 (3200–3800) : hyper-zoom exit
+        //   Cleanup at 3800ms
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
@@ -1277,22 +1278,25 @@ margin-right: -87px;}
             overlay.classList.add('visible', 'entry');
             epicIsPlaying = true;
 
+            // Phase 2: hold — starts after entry completes (700 ms)
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('entry');
                 overlay.classList.add('hold');
-            }, 550));
+            }, 700));
 
+            // Phase 3: exit — starts after hold completes (700 + 2500 = 3200 ms)
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('hold');
                 overlay.classList.add('exit');
-            }, 1750));
+            }, 3200));
 
+            // Cleanup — after exit completes (3200 + 600 = 3800 ms)
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.remove('visible', 'exit');
                 epicIsPlaying = false;
-            }, 2200));
+            }, 3800));
         }
     </script>
 </body>
