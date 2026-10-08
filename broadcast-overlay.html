@@ -152,8 +152,8 @@ margin-right: -87px;}
            ========================================= */
         .side-banner {
             position: absolute;
-            bottom: calc(100% + 20px);
-            background: linear-gradient(to right, #1A0033, #4A148C);
+            bottom: calc(100% + 30px);
+            background: linear-gradient(to top, #1A0033, #4A148C);
             border: 3px solid #D4AF37;
             padding: 6px 30px;
             font-size: 22px;
@@ -163,7 +163,7 @@ margin-right: -87px;}
             align-items: center;
             gap: 15px;
             opacity: 0;
-            transform: translateY(20px) scale(0.9);
+            transform: translateY(20px);
             transition: opacity 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
                         transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0px 10px 25px rgba(0,0,0,0.85);
@@ -203,7 +203,7 @@ margin-right: -87px;}
             letter-spacing: 2px;
             text-transform: uppercase;
         }
-        .side-banner .side-banner-detail { color: #00FF00; }
+        .side-banner .side-banner-detail { color: #FFFFFF; }
 
         /* =========================================
            LAYER 1: MAIN SCOREBOARD ROW
@@ -915,7 +915,7 @@ margin-right: -87px;}
 
                     // ── SUBSTITUTION ──
                     if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
-                        showSideBanner('सब्स्टीट्यूशन', latestLog.desc || '', latestLog.isLeftTeam, false);
+                        showSideBanner('Substitution', latestLog.desc || '', latestLog.isLeftTeam, false);
                     }
                     // ── CARD / FOUL ──
                     else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
