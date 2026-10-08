@@ -500,20 +500,6 @@ margin-right: -87px;}
             opacity: 1;
         }
 
-        .epic-horizontal-bar {
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            width: 90%;
-            height: 6px;
-            background: linear-gradient(90deg, transparent 0%, #FFD700 25%, #FFFFFF 50%, #FFD700 75%, transparent 100%);
-            box-shadow: 0 0 30px #FFD700, 0 0 60px #FFD700;
-            transform: scaleX(1);
-            transform-origin: center;
-            z-index: 3;
-            border-radius: 3px;
-        }
-
         .epic-main-container {
             position: relative;
             z-index: 4;
@@ -546,7 +532,6 @@ margin-right: -87px;}
         /* Entry phase */
         .epic-overlay.entry .epic-bg { animation: epicBgFadeIn 0.35s ease-out forwards; }
         .epic-overlay.entry .epic-vignette { animation: epicBgFadeIn 0.35s ease-out forwards; }
-        .epic-overlay.entry .epic-horizontal-bar { animation: epicHBar 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
         .epic-overlay.entry .epic-main-container {
             animation: epicContainerEntry 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
@@ -565,10 +550,6 @@ margin-right: -87px;}
 
         @keyframes epicBgFadeIn  { from { opacity: 0; } to { opacity: 1; } }
         @keyframes epicBgFadeOut { from { opacity: 1; } to { opacity: 0; } }
-        @keyframes epicHBar {
-            from { transform: scaleX(0); }
-            to   { transform: scaleX(1); }
-        }
         @keyframes epicContainerEntry {
             0%   { transform: scale(15); opacity: 0; }
             55%  { transform: scale(1.12); opacity: 1; }
@@ -699,7 +680,6 @@ margin-right: -87px;}
     <div id="epic-overlay" class="epic-overlay">
         <div class="epic-bg"></div>
         <div class="epic-vignette"></div>
-        <div class="epic-horizontal-bar"></div>
         <div class="epic-main-container">
             <div id="epic-super-text" class="epic-text epic-text-super">SUPER</div>
             <div id="epic-event-text" class="epic-text epic-text-event">TACKLE</div>
@@ -732,7 +712,7 @@ margin-right: -87px;}
         // ==========================================
         let previousLeftScore = -1;
         let previousRightScore = -1;
-        let previousLogId = undefined; // <-- changed from null so first-snapshot skip works
+        let previousLogId = undefined;
         let previousAllOut = false;
         let previousSuperTackle = false;
         let previousRaidPoint = false;
@@ -741,10 +721,8 @@ margin-right: -87px;}
         let lastLeftColor = null;
         let lastRightColor = null;
 
-        // Raid clock visual state (null = first snapshot)
         let previousRaidActive = null;
 
-        // Raider name rotation state
         const raiderRotationState = {
             left:  { active: false, timer: null, currentRaider: null },
             right: { active: false, timer: null, currentRaider: null }
@@ -788,14 +766,12 @@ margin-right: -87px;}
                 const data = snapshot.val();
                 if (!data) return;
 
-                // ── 1. HALF-TIME SWAP DETECTION ──
                 const halfStr = (data.half_status || '').toLowerCase();
                 isSwapped = halfStr.includes('2nd') || halfStr.includes('second') || halfStr.includes('final');
 
                 const visualLeftKey  = isSwapped ? 'right' : 'left';
                 const visualRightKey = isSwapped ? 'left'  : 'right';
 
-                // ── 2. NAMES & COLOURS ──
                 const leftName  = data[visualLeftKey  + '_name']  || "TEAM A";
                 const rightName = data[visualRightKey + '_name'] || "TEAM B";
                 const leftColor  = data[visualLeftKey  + '_color'] || "#009900";
@@ -817,7 +793,6 @@ margin-right: -87px;}
                     lastRightColor = rightColor;
                 }
 
-                // ── 3. SCORES ──
                 const leftScore  = data[visualLeftKey  + '_score'] || 0;
                 const rightScore = data[visualRightKey + '_score'] || 0;
                 updateScoreWithAnimation('left-score',  leftScore,  previousLeftScore);
@@ -825,10 +800,8 @@ margin-right: -87px;}
                 previousLeftScore  = leftScore;
                 previousRightScore = rightScore;
 
-                // ── 4. CENTER CLOCK & STATUS ──
                 applyCenterClockAndStatus(data);
 
-                // ── 5. STATE JSON ──
                 if (data.state_json) {
                     try {
                         const state = JSON.parse(data.state_json);
@@ -844,10 +817,7 @@ margin-right: -87px;}
 
                         handleRaidTimers(state, data.raid_clock, visualLeftKey, leftColor, rightColor);
                         handleDoOrDie(state, visualLeftKey, visualRightKey, data.raid_clock);
-
-                        // Raider name rotation (integrates with raid clock active detection)
                         handleRaiderNameRotation(state, data, visualLeftKey, leftColor, rightColor);
-
                         handleEventTimeline(state);
 
                     } catch (e) {
@@ -1232,7 +1202,6 @@ margin-right: -87px;}
 
                 const latestLog = logs[logs.length - 1];
 
-                // Skip very first snapshot to avoid firing on pre-existing logs
                 if (previousLogId === undefined) {
                     previousLogId = latestLog.id;
                     return;
@@ -1243,7 +1212,7 @@ margin-right: -87px;}
                     const title = (latestLog.title || '').toLowerCase();
                     const type  = latestLog.type  || '';
 
-                    // ── EPIC EVENTS FIRST (highest priority) ──
+                    // ── EPIC EVENTS FIRST ──
                     if (type === 'ALL_OUT' || title.includes("all out") || title.includes("ऑल आउट") || title.includes("ऑलआउट")) {
                         playEpicAnimation('all_out');
                     }
@@ -1286,7 +1255,6 @@ margin-right: -87px;}
             const eventText = document.getElementById('epic-event-text');
             if (!overlay || !superText || !eventText) return;
 
-            // Configure text per event
             if (eventType === 'super_tackle') {
                 superText.style.display = 'block';
                 superText.innerText = 'SUPER';
@@ -1300,33 +1268,27 @@ margin-right: -87px;}
                 eventText.innerText = 'ALL OUT';
             }
 
-            // Clear any pending phase timers from a previous run
             epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
             epicAnimationTimeoutIds = [];
 
-            // Reset all classes so animations restart
             overlay.classList.remove('entry', 'hold', 'exit', 'visible');
-            void overlay.offsetWidth; // reflow
+            void overlay.offsetWidth;
 
-            // Phase 1: entry slam
             overlay.classList.add('visible', 'entry');
             epicIsPlaying = true;
 
-            // Phase 2: hold after entry completes
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('entry');
                 overlay.classList.add('hold');
             }, 550));
 
-            // Phase 3: exit
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('hold');
                 overlay.classList.add('exit');
             }, 1750));
 
-            // Cleanup
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.remove('visible', 'exit');
                 epicIsPlaying = false;
