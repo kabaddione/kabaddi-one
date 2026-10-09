@@ -576,7 +576,6 @@ margin-right: -87px;}
             to { opacity: 1; }
         }
 
-        /* Powered-by footer */
         .fs-powered-by {
             display: inline-flex;
             align-items: center;
@@ -618,7 +617,7 @@ margin-right: -87px;}
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.35);
+            background: rgba(0,0,0,0.25);
         }
 
         #starting7-overlay .s7-content {
@@ -630,75 +629,111 @@ margin-right: -87px;}
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 20px 40px 30px;
         }
 
+        /* Formation container — matches app layout proportions */
         #starting7-overlay .s7-formation {
             position: relative;
-            width: 1000px;
-            height: 620px;
-            margin-bottom: 20px;
+            width: 1400px;
+            height: 700px;
+            margin-bottom: 0;
         }
 
+        /* Each player slot: avatar stack + name tag below */
         #starting7-overlay .s7-player {
             position: absolute;
-            width: 140px;
+            width: 175px;
             display: flex;
             flex-direction: column;
             align-items: center;
             transform: translateX(-50%);
         }
+
+        /* Full-body silhouette avatar (uses player_profile_starting.png default) */
         #starting7-overlay .s7-avatar {
-            width: 110px; height: 110px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.35);
-            border: 3px solid #E040FB;
-            overflow: hidden;
+            width: 150px;
+            height: 175px;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
-            box-shadow: 0 0 25px rgba(224,64,251,0.6),
-                        0 8px 20px rgba(0,0,0,0.8);
-            margin-bottom: 8px;
+            overflow: visible;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.75));
         }
-        #starting7-overlay .s7-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        #starting7-overlay .s7-avatar .default-icon { width: 60%; height: 60%; color: #FFF; opacity: 0.65; }
+        #starting7-overlay .s7-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: bottom center;
+        }
+
+        /* Two-row name tag: pink/magenta top, black bottom (matches app) */
         #starting7-overlay .s7-name-tag {
-            background: #FFFFFF;
-            color: #000;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.7),
+                        0 0 0 1px rgba(255,255,255,0.08);
+        }
+        #starting7-overlay .s7-name-top {
+            background: linear-gradient(to bottom, #E91E63, #C2185B);
+            color: #FFF;
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            font-size: 14px;
-            padding: 4px 12px;
-            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+            padding: 4px 8px;
             letter-spacing: 0.5px;
             white-space: nowrap;
-            max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        #starting7-overlay .s7-name-bottom {
+            background: #000;
+            color: #FFF;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
             text-align: center;
+            padding: 4px 8px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        #starting7-overlay .pos-center      { top: 0;    left: 50%; }
-        #starting7-overlay .pos-right-cover { top: 130px; left: 28%; }
-        #starting7-overlay .pos-left-cover  { top: 130px; left: 72%; }
-        #starting7-overlay .pos-right-in    { top: 260px; left: 12%; }
-        #starting7-overlay .pos-left-in     { top: 260px; left: 88%; }
-        #starting7-overlay .pos-right-corner{ top: 390px; left: 5%; }
-        #starting7-overlay .pos-left-corner { top: 390px; left: 95%; }
+        /* Position layout — matches the app's mat formation
+           Row 1 (top):    CENTER
+           Row 2:          RIGHT COVER (left)  /  LEFT COVER (right)
+           Row 3:          RIGHT IN (left)     /  LEFT IN (right)
+           Row 4 (bottom): RIGHT CORNER (left) /  LEFT CORNER (right) */
+        #starting7-overlay .pos-center      { top: 0px;    left: 50%; }
+        #starting7-overlay .pos-right-cover { top: 140px;  left: 32%; }
+        #starting7-overlay .pos-left-cover  { top: 140px;  left: 68%; }
+        #starting7-overlay .pos-right-in    { top: 290px;  left: 15%; }
+        #starting7-overlay .pos-left-in     { top: 290px;  left: 85%; }
+        #starting7-overlay .pos-right-corner{ top: 440px;  left: 5%;  }
+        #starting7-overlay .pos-left-corner { top: 440px;  left: 95%; }
 
+        /* Bottom bar */
         #starting7-overlay .s7-bottom-bar {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
+            margin-top: -60px;
+            z-index: 3;
         }
         #starting7-overlay .s7-team-name {
             font-family: 'Oswald', sans-serif;
             font-size: 68px;
             font-weight: 900;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.35);
             text-align: center;
             line-height: 0.95;
             letter-spacing: 2px;
@@ -710,7 +745,7 @@ margin-right: -87px;}
             font-family: 'Oswald', sans-serif;
             font-size: 22px;
             font-weight: 700;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.35);
             letter-spacing: 6px;
             text-transform: uppercase;
             transform: perspective(500px) rotateX(40deg);
@@ -902,7 +937,6 @@ margin-right: -87px;}
             background: transparent;
         }
 
-        /* Full-screen background layer with performance_bg.jpg */
         #player-perf-overlay .pp-bg {
             position: absolute;
             inset: 0;
@@ -910,7 +944,6 @@ margin-right: -87px;}
             background-color: #0B0B18;
             z-index: 1;
         }
-        /* Darkening + purple vignette so the card and text stay readable */
         #player-perf-overlay .pp-bg::after {
             content: '';
             position: absolute;
@@ -960,7 +993,6 @@ margin-right: -87px;}
             box-shadow: 0 30px 80px rgba(0,0,0,0.9);
         }
 
-        /* Column 1: Profile — uses dynamic team colour (set via --pp-team-color) */
         #player-perf-overlay .pp-col-profile {
             flex: 3.5;
             display: flex;
@@ -986,9 +1018,14 @@ margin-right: -87px;}
             justify-content: center;
             overflow: hidden;
             position: relative;
+            padding: 20px;
         }
-        #player-perf-overlay .pp-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        #player-perf-overlay .pp-avatar .default-icon { width: 40%; height: 40%; color: rgba(255,255,255,0.7); }
+        #player-perf-overlay .pp-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center bottom;
+        }
         #player-perf-overlay .pp-name-badge {
             background: #FFFFFF;
             color: var(--pp-team-color, #000);
@@ -1006,7 +1043,6 @@ margin-right: -87px;}
             position: relative;
         }
 
-        /* Column 2: Stats grid — PURPLE GRADIENT (matching the app) */
         #player-perf-overlay .pp-col-stats {
             flex: 4.5;
             display: grid;
@@ -1042,7 +1078,6 @@ margin-right: -87px;}
             margin-top: 4px;
         }
 
-        /* Column 3: Strike rates (white background, purple accents) */
         #player-perf-overlay .pp-col-rates {
             flex: 2;
             background: #FFFFFF;
@@ -1450,6 +1485,9 @@ margin-right: -87px;}
             right: { active: false, timer: null, currentRaider: null }
         };
 
+        // Default profile image used when a player has no uploaded photo
+        const DEFAULT_PLAYER_IMG = '/images/player_profile_starting.png';
+
         // ==========================================
         // UTILITIES
         // ==========================================
@@ -1494,10 +1532,13 @@ margin-right: -87px;}
                 .replace(/'/g, '&#39;');
         }
 
-        const DEFAULT_AVATAR_SVG = `
-            <svg class="default-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>`;
+        // Returns the imageUri if it's a valid data URL, else the default player image
+        function resolvePlayerImage(player) {
+            if (player && player.imageUri && String(player.imageUri).startsWith('data:image')) {
+                return player.imageUri;
+            }
+            return DEFAULT_PLAYER_IMG;
+        }
 
         // ==========================================
         // ENGINE
@@ -2053,11 +2094,10 @@ margin-right: -87px;}
                 const isLeft = (team !== 'right');
                 const actualKey = isLeft ? 'left' : 'right';
                 const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
-                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
                 const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
 
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
-                    renderStarting7(actualName, actualColor, rosterJson);
+                    renderStarting7(actualName, rosterJson);
                     showFsOverlay('starting7-overlay');
                     lastOverlayScreen = screen;
                     lastOverlayTeam = team;
@@ -2110,8 +2150,10 @@ margin-right: -87px;}
 
         // ==========================================
         // RENDER: STARTING 7
+        //   • Uses /images/player_profile_starting.png when player has no imageUri
+        //   • Two-row name tag (pink top / black bottom) matching the app
         // ==========================================
-        function renderStarting7(teamName, teamColor, rosterJsonStr) {
+        function renderStarting7(teamName, rosterJsonStr) {
             const nameEl = document.getElementById('s7-team-name');
             const parts = (teamName || 'TEAM NAME').trim().split(' ');
             if (parts.length >= 2) {
@@ -2119,8 +2161,6 @@ margin-right: -87px;}
             } else {
                 nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
             }
-
-            document.documentElement.style.setProperty('--s7-team-color', teamColor);
 
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
@@ -2130,15 +2170,20 @@ margin-right: -87px;}
             slots.forEach(slot => {
                 const pos = slot.getAttribute('data-pos');
                 const player = starters.find(p => (p.positionOnMat || '').toUpperCase() === pos);
-                renderS7PlayerCard(slot, player, teamColor);
+                renderS7PlayerCard(slot, player, pos);
             });
         }
 
-        function renderS7PlayerCard(slotEl, player, teamColor) {
+        function renderS7PlayerCard(slotEl, player, positionLabel) {
             if (!player) {
                 slotEl.innerHTML = `
-                    <div class="s7-avatar" style="border-color:${teamColor}; box-shadow: 0 0 25px ${teamColor}, 0 8px 20px rgba(0,0,0,0.8);">${DEFAULT_AVATAR_SVG}</div>
-                    <div class="s7-name-tag">—</div>
+                    <div class="s7-avatar">
+                        <img src="${DEFAULT_PLAYER_IMG}" alt="">
+                    </div>
+                    <div class="s7-name-tag">
+                        <div class="s7-name-top">—</div>
+                        <div class="s7-name-bottom">${escapeHtml(positionLabel || '—')}</div>
+                    </div>
                 `;
                 return;
             }
@@ -2146,17 +2191,16 @@ margin-right: -87px;}
             const jersey = player.jerseyNumber || '';
             const name = player.name || 'Player';
             const displayName = jersey ? `${name} (${jersey})` : name;
-
-            let imgHtml;
-            if (player.imageUri && player.imageUri.startsWith('data:image')) {
-                imgHtml = `<img src="${player.imageUri}" alt="">`;
-            } else {
-                imgHtml = DEFAULT_AVATAR_SVG;
-            }
+            const imgSrc = resolvePlayerImage(player);
 
             slotEl.innerHTML = `
-                <div class="s7-avatar" style="border-color:${teamColor}; box-shadow: 0 0 25px ${teamColor}, 0 8px 20px rgba(0,0,0,0.8);">${imgHtml}</div>
-                <div class="s7-name-tag" style="color:${teamColor};">${escapeHtml(displayName)}</div>
+                <div class="s7-avatar">
+                    <img src="${imgSrc}" alt="">
+                </div>
+                <div class="s7-name-tag">
+                    <div class="s7-name-top">${escapeHtml(displayName)}</div>
+                    <div class="s7-name-bottom">${escapeHtml(positionLabel)}</div>
+                </div>
             `;
         }
 
@@ -2226,6 +2270,7 @@ margin-right: -87px;}
 
         // ==========================================
         // RENDER: PLAYER PERFORMANCE
+        //   • Uses /images/player_profile_starting.png when player has no imageUri
         // ==========================================
         function renderPlayerPerformance(rosterJsonStr, playerId, teamColor) {
             const overlayEl = document.getElementById('player-perf-overlay');
@@ -2237,7 +2282,8 @@ margin-right: -87px;}
             const player = roster.find(p => String(p.id) === String(playerId)) || null;
 
             if (!player) {
-                document.getElementById('pp-avatar').innerHTML = DEFAULT_AVATAR_SVG;
+                document.getElementById('pp-avatar').innerHTML =
+                    `<img src="${DEFAULT_PLAYER_IMG}" alt="">`;
                 document.getElementById('pp-name-badge').innerText = '—';
                 ['pp-raids','pp-raid-points','pp-tackles','pp-tackle-points'].forEach(id => document.getElementById(id).innerText = '0');
                 document.getElementById('pp-on-mat').innerText = '00:00';
@@ -2253,11 +2299,8 @@ margin-right: -87px;}
             const displayName = jersey ? `${name} (${jersey})` : name;
 
             const avatarEl = document.getElementById('pp-avatar');
-            if (player.imageUri && player.imageUri.startsWith('data:image')) {
-                avatarEl.innerHTML = `<img src="${player.imageUri}" alt="">`;
-            } else {
-                avatarEl.innerHTML = DEFAULT_AVATAR_SVG;
-            }
+            const imgSrc = resolvePlayerImage(player);
+            avatarEl.innerHTML = `<img src="${imgSrc}" alt="">`;
 
             document.getElementById('pp-name-badge').innerText = displayName.toUpperCase();
 
