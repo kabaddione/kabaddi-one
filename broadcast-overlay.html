@@ -227,7 +227,6 @@ margin-right: -87px;}
             to   { box-shadow: inset 0px 20px 20px rgba(255,255,255,0.2), inset 0px -20px 20px rgba(0,0,0,0.5), inset 0 0 50px rgba(255,0,0,0.9); }
         }
 
-        /* Name / Raider name rotator */
         .name-rotator {
             position: relative;
             width: 100%;
@@ -272,9 +271,6 @@ margin-right: -87px;}
             box-shadow: inset 0px 10px 15px rgba(0,0,0,0.2);
         }
 
-        /* =========================================
-           CENTER RAID CLOCK TRIANGLE (with splash logo swap)
-           ========================================= */
         .center-wrap {
             width: 140px; height: 105px;
             clip-path: polygon(0% 0%, 100% 0%, 65% 80%, 35% 80%);
@@ -529,19 +525,14 @@ margin-right: -87px;}
         .epic-text-super { font-size: 110px; letter-spacing: 18px; }
         .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
 
-        /* Entry phase */
         .epic-overlay.entry .epic-bg { animation: epicBgFadeIn 0.5s ease-out forwards; }
         .epic-overlay.entry .epic-vignette { animation: epicBgFadeIn 0.5s ease-out forwards; }
         .epic-overlay.entry .epic-main-container {
             animation: epicContainerEntry 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-
-        /* Hold phase */
         .epic-overlay.hold .epic-main-container {
             animation: epicHold 2.5s linear forwards;
         }
-
-        /* Exit phase */
         .epic-overlay.exit .epic-bg { animation: epicBgFadeOut 0.6s ease forwards; }
         .epic-overlay.exit .epic-vignette { animation: epicBgFadeOut 0.6s ease forwards; }
         .epic-overlay.exit .epic-main-container {
@@ -562,6 +553,540 @@ margin-right: -87px;}
         @keyframes epicContainerExit {
             0%   { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(25); opacity: 0; }
+        }
+
+        /* =========================================
+           SHARED FULL-SCREEN OVERLAY SYSTEM
+           (Starting 7 / Team Stats / Player Performance)
+           ========================================= */
+        .fs-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9990;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .fs-overlay.show {
+            display: flex;
+            animation: fsFadeIn 0.35s ease-out;
+        }
+        @keyframes fsFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Powered-by footer used by all three overlays (replaces Save/Cancel) */
+        .fs-powered-by {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 24px;
+            background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9));
+            border: 2px solid rgb(253, 241, 159);
+            font-family: "Segoe UI", system-ui, sans-serif;
+            font-size: 11px;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+            color: #FFF;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15);
+            margin-top: 20px;
+        }
+        .fs-powered-by .fp-label { color: rgb(185,185,185); font-size: 12px; font-weight: 600; letter-spacing: 1.1px; }
+        .fs-powered-by .fp-icon {
+            width: 26px; height: 26px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            box-shadow: 0 0 20px rgba(255,215,0,0.4);
+        }
+        .fs-powered-by .fp-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .fs-powered-by .fp-text { color: #FFF; font-weight: 700; font-size: 16px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
+        /* =========================================
+           STARTING 7 OVERLAY
+           ========================================= */
+        #starting7-overlay { background: transparent; }
+
+        #starting7-overlay .s7-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/subs_mate.jpg') center/cover no-repeat;
+            background-color: #1A1A2E;
+            z-index: 1;
+        }
+        #starting7-overlay .s7-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+        }
+
+        #starting7-overlay .s7-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        /* Mat formation: 7 positions using absolute layout inside a fixed canvas */
+        #starting7-overlay .s7-formation {
+            position: relative;
+            width: 1000px;
+            height: 620px;
+            margin-bottom: 20px;
+        }
+
+        #starting7-overlay .s7-player {
+            position: absolute;
+            width: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateX(-50%);
+        }
+        #starting7-overlay .s7-avatar {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.35);
+            border: 3px solid #E040FB;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(224,64,251,0.6),
+                        0 8px 20px rgba(0,0,0,0.8);
+            margin-bottom: 8px;
+        }
+        #starting7-overlay .s7-avatar img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        #starting7-overlay .s7-avatar .default-icon {
+            width: 60%; height: 60%;
+            color: #FFF;
+            opacity: 0.65;
+        }
+        #starting7-overlay .s7-name-tag {
+            background: #FFFFFF;
+            color: #000;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        /* Positions — mirror Android ConstraintLayout */
+        #starting7-overlay .pos-center      { top: 0;    left: 50%; }
+        #starting7-overlay .pos-right-cover { top: 130px; left: 28%; }
+        #starting7-overlay .pos-left-cover  { top: 130px; left: 72%; }
+        #starting7-overlay .pos-right-in    { top: 260px; left: 12%; }
+        #starting7-overlay .pos-left-in     { top: 260px; left: 88%; }
+        #starting7-overlay .pos-right-corner{ top: 390px; left: 5%; }
+        #starting7-overlay .pos-left-corner { top: 390px; left: 95%; }
+
+        /* Bottom bar with 3D team name */
+        #starting7-overlay .s7-bottom-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        #starting7-overlay .s7-team-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 68px;
+            font-weight: 900;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            line-height: 0.95;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transform: perspective(500px) rotateX(40deg);
+            text-shadow: 0 6px 12px rgba(0,0,0,0.8);
+        }
+        #starting7-overlay .s7-subtitle {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            transform: perspective(500px) rotateX(40deg);
+            margin-top: -6px;
+        }
+
+        /* =========================================
+           TEAM STATS OVERLAY
+           ========================================= */
+        #team-stats-overlay { background: #000; }
+
+        #team-stats-overlay .ts-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/kabaddione_bg.jpg') center/cover no-repeat;
+            z-index: 1;
+        }
+        #team-stats-overlay .ts-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.62);
+            z-index: 2;
+        }
+
+        #team-stats-overlay .ts-content {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            color: #FFF;
+        }
+
+        #team-stats-overlay .ts-main-score {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 900;
+            font-size: 72px;
+            color: #FFF;
+            text-shadow: 5px 5px 10px #000;
+            line-height: 1;
+        }
+        #team-stats-overlay .ts-match-status {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: #E040FB;
+            text-shadow: 3px 3px 5px #000;
+            margin-top: 6px;
+        }
+        #team-stats-overlay .ts-divider {
+            width: 200px;
+            height: 3px;
+            background: #E040FB;
+            margin: 8px 0 20px;
+            box-shadow: 0 0 15px rgba(224,64,251,0.9);
+        }
+
+        #team-stats-overlay .ts-row-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 12px;
+        }
+
+        #team-stats-overlay .ts-pie-col {
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+            align-items: center;
+        }
+        #team-stats-overlay .ts-pie-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #team-stats-overlay .ts-pie-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 15px;
+            color: #FFF;
+            text-align: center;
+            margin-top: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        #team-stats-overlay .ts-pie-ring {
+            position: relative;
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--pie-color, #00BCD4) 0deg var(--pie-deg, 0deg), rgba(255,255,255,0.15) var(--pie-deg, 0deg) 360deg);
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+        }
+        #team-stats-overlay .ts-pie-ring::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 50%;
+            background: #1A1A2E;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        #team-stats-overlay .ts-pie-value {
+            position: relative;
+            z-index: 2;
+            font-family: 'Teko', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFF;
+        }
+
+        /* Stats table */
+        #team-stats-overlay .ts-table {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 340px;
+        }
+        #team-stats-overlay .ts-table-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #team-stats-overlay .ts-cell {
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+        }
+        #team-stats-overlay .ts-cell-left,
+        #team-stats-overlay .ts-cell-right {
+            width: 70px;
+            font-size: 22px;
+            color: #FFF;
+            background: rgba(255,255,255,0.08);
+        }
+        #team-stats-overlay .ts-cell-left  { clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); border-left: 3px solid #E040FB; }
+        #team-stats-overlay .ts-cell-right { clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); border-right: 3px solid #E040FB; }
+        #team-stats-overlay .ts-cell-center {
+            width: 240px;
+            font-size: 17px;
+            color: #000;
+            background: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(0,0,0,0.15);
+        }
+
+        #team-stats-overlay .ts-teams-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 25px;
+        }
+        #team-stats-overlay .ts-team-label {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 700;
+            font-size: 28px;
+            color: #FFF;
+            text-shadow: 3px 3px 5px #000;
+            text-transform: uppercase;
+            max-width: 380px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #team-stats-overlay .ts-vs {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 900;
+            font-size: 44px;
+            color: #9C27B0;
+            text-shadow: 4px 4px 8px #000;
+        }
+
+        /* =========================================
+           PLAYER PERFORMANCE OVERLAY
+           ========================================= */
+        #player-perf-overlay { background: rgba(0,0,0,0.92); }
+
+        #player-perf-overlay .pp-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: #FFF;
+        }
+
+        #player-perf-overlay .pp-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFF;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+        #player-perf-overlay .pp-underline {
+            width: 220px;
+            height: 3px;
+            background: #D500F9;
+            box-shadow: 0 0 15px rgba(213,0,249,0.9);
+            margin-bottom: 10px;
+        }
+
+        #player-perf-overlay .pp-card {
+            display: flex;
+            width: 1280px;
+            height: 500px;
+            background: rgba(255,255,255,0.02);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+        }
+
+        #player-perf-overlay .pp-col-profile {
+            flex: 3.5;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #1E1E2E 0%, #0E0E1A 100%);
+        }
+        #player-perf-overlay .pp-avatar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        #player-perf-overlay .pp-avatar img {
+            width: 100%; height: 100%; object-fit: contain;
+        }
+        #player-perf-overlay .pp-avatar .default-icon {
+            width: 40%; height: 40%;
+            color: rgba(255,255,255,0.4);
+        }
+        #player-perf-overlay .pp-name-badge {
+            background: #FFFFFF;
+            color: #000;
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            padding: 14px 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #player-perf-overlay .pp-col-stats {
+            flex: 4.5;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            background: rgba(255,255,255,0.03);
+        }
+        #player-perf-overlay .pp-stat-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1.5px solid rgba(255,255,255,0.12);
+            border-bottom: 1.5px solid rgba(255,255,255,0.12);
+            padding: 10px;
+        }
+        #player-perf-overlay .pp-stat-cell:nth-child(2n) { border-right: none; }
+        #player-perf-overlay .pp-stat-cell:nth-child(n+3) { border-bottom: none; }
+        #player-perf-overlay .pp-stat-value {
+            font-family: 'Teko', sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            color: #FFF;
+            line-height: 1;
+        }
+        #player-perf-overlay .pp-stat-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 15px;
+            color: #E0E0E0;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        #player-perf-overlay .pp-col-rates {
+            flex: 2;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 12px;
+            color: #8E24AA;
+        }
+        #player-perf-overlay .pp-on-mat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #player-perf-overlay .pp-on-mat-icon {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #8E24AA;
+            margin-bottom: 4px;
+        }
+        #player-perf-overlay .pp-on-mat-time {
+            font-family: 'Teko', sans-serif;
+            font-size: 34px;
+            font-weight: 700;
+            color: #8E24AA;
+            line-height: 1;
+        }
+        #player-perf-overlay .pp-rate-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #player-perf-overlay .pp-rate-ring {
+            position: relative;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(#8E24AA 0deg var(--pie-deg, 0deg), rgba(0,0,0,0.08) var(--pie-deg, 0deg) 360deg);
+        }
+        #player-perf-overlay .pp-rate-ring::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            background: #FFFFFF;
+        }
+        #player-perf-overlay .pp-rate-value {
+            position: relative;
+            z-index: 2;
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #8E24AA;
+        }
+        #player-perf-overlay .pp-rate-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #8E24AA;
+            text-transform: uppercase;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            text-align: center;
         }
 
     </style>
@@ -686,6 +1211,184 @@ margin-right: -87px;}
         </div>
     </div>
 
+    <!-- =========================================
+         STARTING 7 FULL-SCREEN OVERLAY
+         ========================================= -->
+    <div id="starting7-overlay" class="fs-overlay">
+        <div class="s7-bg"></div>
+        <div class="s7-content">
+            <div class="s7-formation" id="s7-formation">
+                <div class="s7-player pos-center"       data-pos="CENTER"></div>
+                <div class="s7-player pos-right-cover"  data-pos="RIGHT COVER"></div>
+                <div class="s7-player pos-left-cover"   data-pos="LEFT COVER"></div>
+                <div class="s7-player pos-right-in"     data-pos="RIGHT IN"></div>
+                <div class="s7-player pos-left-in"      data-pos="LEFT IN"></div>
+                <div class="s7-player pos-right-corner" data-pos="RIGHT CORNER"></div>
+                <div class="s7-player pos-left-corner"  data-pos="LEFT CORNER"></div>
+            </div>
+            <div class="s7-bottom-bar">
+                <div class="s7-team-name" id="s7-team-name">TEAM<br>NAME</div>
+                <div class="s7-subtitle">STARTING 7</div>
+                <div class="fs-powered-by">
+                    <span class="fp-label">Powered by</span>
+                    <div class="fp-icon"><img src="/images/kabaddione_logo.png" alt=""></div>
+                    <span class="fp-text">KabaddiOne</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         TEAM STATS FULL-SCREEN OVERLAY
+         ========================================= -->
+    <div id="team-stats-overlay" class="fs-overlay">
+        <div class="ts-bg"></div>
+        <div class="ts-overlay"></div>
+        <div class="ts-content">
+            <div class="ts-main-score" id="ts-main-score">0 - 0</div>
+            <div class="ts-match-status" id="ts-match-status">1st HALF</div>
+            <div class="ts-divider"></div>
+
+            <div class="ts-row-wrap">
+                <!-- Left pie charts -->
+                <div class="ts-pie-col">
+                    <div class="ts-pie-item">
+                        <div class="ts-pie-ring" id="ts-left-raid-pie" style="--pie-color:#00BCD4;">
+                            <div class="ts-pie-value" id="ts-left-raid-val">0%</div>
+                        </div>
+                        <div class="ts-pie-label">SUCCESSFUL<br>RAID</div>
+                    </div>
+                    <div class="ts-pie-item">
+                        <div class="ts-pie-ring" id="ts-left-tackle-pie" style="--pie-color:#00BCD4;">
+                            <div class="ts-pie-value" id="ts-left-tackle-val">0%</div>
+                        </div>
+                        <div class="ts-pie-label">SUCCESSFUL<br>TACKLE</div>
+                    </div>
+                </div>
+
+                <!-- Stats table -->
+                <div class="ts-table">
+                    <div class="ts-table-row">
+                        <div class="ts-cell ts-cell-left"  id="ts-left-raid">0</div>
+                        <div class="ts-cell ts-cell-center">RAID POINTS</div>
+                        <div class="ts-cell ts-cell-right" id="ts-right-raid">0</div>
+                    </div>
+                    <div class="ts-table-row">
+                        <div class="ts-cell ts-cell-left"  id="ts-left-tackle">0</div>
+                        <div class="ts-cell ts-cell-center">TACKLE POINTS</div>
+                        <div class="ts-cell ts-cell-right" id="ts-right-tackle">0</div>
+                    </div>
+                    <div class="ts-table-row">
+                        <div class="ts-cell ts-cell-left"  id="ts-left-allout">0</div>
+                        <div class="ts-cell ts-cell-center">ALL OUT POINTS</div>
+                        <div class="ts-cell ts-cell-right" id="ts-right-allout">0</div>
+                    </div>
+                    <div class="ts-table-row">
+                        <div class="ts-cell ts-cell-left"  id="ts-left-extra">0</div>
+                        <div class="ts-cell ts-cell-center">EXTRA POINTS</div>
+                        <div class="ts-cell ts-cell-right" id="ts-right-extra">0</div>
+                    </div>
+                </div>
+
+                <!-- Right pie charts -->
+                <div class="ts-pie-col">
+                    <div class="ts-pie-item">
+                        <div class="ts-pie-ring" id="ts-right-raid-pie" style="--pie-color:#4CAF50;">
+                            <div class="ts-pie-value" id="ts-right-raid-val">0%</div>
+                        </div>
+                        <div class="ts-pie-label">SUCCESSFUL<br>RAID</div>
+                    </div>
+                    <div class="ts-pie-item">
+                        <div class="ts-pie-ring" id="ts-right-tackle-pie" style="--pie-color:#4CAF50;">
+                            <div class="ts-pie-value" id="ts-right-tackle-val">0%</div>
+                        </div>
+                        <div class="ts-pie-label">SUCCESSFUL<br>TACKLE</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ts-teams-row">
+                <div class="ts-team-label" id="ts-left-team-name">TEAM A</div>
+                <div class="ts-vs">VS</div>
+                <div class="ts-team-label" id="ts-right-team-name">TEAM B</div>
+            </div>
+
+            <div class="fs-powered-by">
+                <span class="fp-label">Powered by</span>
+                <div class="fp-icon"><img src="/images/kabaddione_logo.png" alt=""></div>
+                <span class="fp-text">KabaddiOne</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         PLAYER PERFORMANCE FULL-SCREEN OVERLAY
+         ========================================= -->
+    <div id="player-perf-overlay" class="fs-overlay">
+        <div class="pp-content">
+            <div class="pp-title">PERFORMANCE</div>
+            <div class="pp-underline"></div>
+
+            <div class="pp-card">
+                <!-- Column 1: Profile -->
+                <div class="pp-col-profile">
+                    <div class="pp-avatar" id="pp-avatar">
+                        <!-- img or default icon -->
+                    </div>
+                    <div class="pp-name-badge" id="pp-name-badge">PLAYER (1)</div>
+                </div>
+
+                <!-- Column 2: Stats grid 2x2 -->
+                <div class="pp-col-stats">
+                    <div class="pp-stat-cell">
+                        <div class="pp-stat-value" id="pp-raids">0</div>
+                        <div class="pp-stat-label">RAIDS</div>
+                    </div>
+                    <div class="pp-stat-cell">
+                        <div class="pp-stat-value" id="pp-raid-points">0</div>
+                        <div class="pp-stat-label">RAID POINTS</div>
+                    </div>
+                    <div class="pp-stat-cell">
+                        <div class="pp-stat-value" id="pp-tackles">0</div>
+                        <div class="pp-stat-label">TACKLES</div>
+                    </div>
+                    <div class="pp-stat-cell">
+                        <div class="pp-stat-value" id="pp-tackle-points">0</div>
+                        <div class="pp-stat-label">TACKLE POINTS</div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Strike rates -->
+                <div class="pp-col-rates">
+                    <div class="pp-on-mat">
+                        <div class="pp-on-mat-icon">ON MAT</div>
+                        <div class="pp-on-mat-time" id="pp-on-mat">00:00</div>
+                    </div>
+
+                    <div class="pp-rate-item">
+                        <div class="pp-rate-ring" id="pp-raid-ring" style="--pie-deg: 0deg;">
+                            <div class="pp-rate-value" id="pp-raid-rate">0%</div>
+                        </div>
+                        <div class="pp-rate-label">RAID<br>STRIKE RATE</div>
+                    </div>
+
+                    <div class="pp-rate-item">
+                        <div class="pp-rate-ring" id="pp-tackle-ring" style="--pie-deg: 0deg;">
+                            <div class="pp-rate-value" id="pp-tackle-rate">0%</div>
+                        </div>
+                        <div class="pp-rate-label">TACKLE<br>STRIKE RATE</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fs-powered-by">
+                <span class="fp-label">Powered by</span>
+                <div class="fp-icon"><img src="/images/kabaddione_logo.png" alt=""></div>
+                <span class="fp-text">KabaddiOne</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==========================================
         // FIREBASE INIT
@@ -723,6 +1426,11 @@ margin-right: -87px;}
 
         let previousRaidActive = null;
 
+        // Track last overlay screen state to avoid re-renders
+        let lastOverlayScreen = '';
+        let lastOverlayTeam = '';
+        let lastOverlayPlayerId = '';
+
         const raiderRotationState = {
             left:  { active: false, timer: null, currentRaider: null },
             right: { active: false, timer: null, currentRaider: null }
@@ -755,6 +1463,28 @@ margin-right: -87px;}
             }
             return out;
         }
+
+        function formatOnMatTime(s) {
+            if (!s || s <= 0) return '00:00';
+            const sec = parseInt(s);
+            return `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+        }
+
+        function escapeHtml(t) {
+            if (t === null || t === undefined) return '';
+            return String(t)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Default profile icon SVG string
+        const DEFAULT_AVATAR_SVG = `
+            <svg class="default-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>`;
 
         // ==========================================
         // ENGINE
@@ -802,9 +1532,10 @@ margin-right: -87px;}
 
                 applyCenterClockAndStatus(data);
 
+                let state = null;
                 if (data.state_json) {
                     try {
-                        const state = JSON.parse(data.state_json);
+                        state = JSON.parse(data.state_json);
 
                         renderDots('left-dot',
                             state[visualLeftKey  + 'OutIds'],
@@ -824,6 +1555,9 @@ margin-right: -87px;}
                         console.warn("State JSON parse error", e);
                     }
                 }
+
+                // ── Remote-controlled overlay screens ──
+                handleOverlayScreens(data, state, visualLeftKey, visualRightKey);
             });
         }
 
@@ -963,16 +1697,11 @@ margin-right: -87px;}
                 const percentage = Math.max(0, Math.min(100, (displayTime / 30) * 100));
                 barLeft.style.width  = percentage + "%";
                 barRight.style.width = percentage + "%";
-
-                barLeft.classList.remove('danger');
-                barRight.classList.remove('danger');
             } else {
                 trackLeft.classList.remove('visible');
                 trackRight.classList.remove('visible');
                 barLeft.style.width  = "100%";
                 barRight.style.width = "100%";
-                barLeft.classList.remove('danger');
-                barRight.classList.remove('danger');
             }
         }
 
@@ -1212,7 +1941,6 @@ margin-right: -87px;}
                     const title = (latestLog.title || '').toLowerCase();
                     const type  = latestLog.type  || '';
 
-                    // ── EPIC EVENTS FIRST ──
                     if (type === 'ALL_OUT' || title.includes("all out") || title.includes("ऑल आउट") || title.includes("ऑलआउट")) {
                         playEpicAnimation('all_out');
                     }
@@ -1222,11 +1950,9 @@ margin-right: -87px;}
                     else if (title.includes("super raid") || title.includes("सुपर रेड") || title.includes("सुपररेड") || (type === "RAID" && latestLog.points >= 3)) {
                         playEpicAnimation('super_raid');
                     }
-                    // ── SUBSTITUTION ──
                     else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
                         showSideBanner('Substitution', latestLog.desc || '', latestLog.isLeftTeam, false);
                     }
-                    // ── CARD / FOUL ──
                     else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
                         let labelText = 'FOUL';
                         if (title.includes('red')    || title.includes('लाल'))  labelText = '🟥 RED CARD';
@@ -1242,10 +1968,6 @@ margin-right: -87px;}
 
         // ==========================================
         // FULL-SCREEN EPIC ANIMATION
-        //   Phase 1 (0–700ms)   : entry slam
-        //   Phase 2 (700–3200)  : slow float hold (2.5 s)
-        //   Phase 3 (3200–3800) : hyper-zoom exit
-        //   Cleanup at 3800ms
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
@@ -1278,25 +2000,290 @@ margin-right: -87px;}
             overlay.classList.add('visible', 'entry');
             epicIsPlaying = true;
 
-            // Phase 2: hold — starts after entry completes (700 ms)
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('entry');
                 overlay.classList.add('hold');
             }, 700));
 
-            // Phase 3: exit — starts after hold completes (700 + 2500 = 3200 ms)
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('hold');
                 overlay.classList.add('exit');
             }, 3200));
 
-            // Cleanup — after exit completes (3200 + 600 = 3800 ms)
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.remove('visible', 'exit');
                 epicIsPlaying = false;
             }, 3800));
+        }
+
+        // ==========================================
+        // REMOTE-CONTROLLED OVERLAY SCREENS
+        //   Reads: overlay_screen / overlay_screen_team / overlay_screen_player_id
+        // ==========================================
+        function handleOverlayScreens(data, state, visualLeftKey, visualRightKey) {
+            const screen = (data.overlay_screen || '').trim();
+            const team   = (data.overlay_screen_team || '').trim();
+            const playerId = (data.overlay_screen_player_id || '').trim();
+
+            // Hide all if nothing to show
+            if (!screen) {
+                hideAllFsOverlays();
+                lastOverlayScreen = '';
+                lastOverlayTeam = '';
+                lastOverlayPlayerId = '';
+                return;
+            }
+
+            const leftName  = data[visualLeftKey  + '_name']  || 'TEAM A';
+            const rightName = data[visualRightKey + '_name'] || 'TEAM B';
+            const leftColor  = data[visualLeftKey  + '_color'] || '#009900';
+            const rightColor = data[visualRightKey + '_color'] || '#0055ff';
+
+            // ── STARTING 7 ──
+            if (screen === 'starting7') {
+                const isLeft = (team !== 'right'); // default left
+                // Determine actual team key (respect swap? No — the app sends actual team, we render as-is)
+                const actualKey = isLeft ? 'left' : 'right';
+                const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
+                const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
+
+                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
+                    renderStarting7(actualName, rosterJson);
+                    showFsOverlay('starting7-overlay');
+                    lastOverlayScreen = screen;
+                    lastOverlayTeam = team;
+                }
+                return;
+            }
+
+            // ── TEAM STATS ──
+            if (screen === 'team_stats') {
+                if (screen !== lastOverlayScreen || !document.getElementById('team-stats-overlay').classList.contains('show')) {
+                    renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName);
+                    showFsOverlay('team-stats-overlay');
+                    lastOverlayScreen = screen;
+                } else {
+                    // Live-refresh while open
+                    renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName);
+                }
+                return;
+            }
+
+            // ── PLAYER PERFORMANCE ──
+            if (screen === 'player_performance') {
+                const isLeft = (team !== 'right');
+                const actualKey = isLeft ? 'left' : 'right';
+                const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
+
+                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || playerId !== lastOverlayPlayerId || !document.getElementById('player-perf-overlay').classList.contains('show')) {
+                    renderPlayerPerformance(rosterJson, playerId);
+                    showFsOverlay('player-perf-overlay');
+                    lastOverlayScreen = screen;
+                    lastOverlayTeam = team;
+                    lastOverlayPlayerId = playerId;
+                } else {
+                    // Live-refresh while open
+                    renderPlayerPerformance(rosterJson, playerId);
+                }
+                return;
+            }
+
+            // Unknown screen value
+            hideAllFsOverlays();
+        }
+
+        function showFsOverlay(id) {
+            // Hide others first
+            document.querySelectorAll('.fs-overlay').forEach(el => {
+                if (el.id !== id) el.classList.remove('show');
+            });
+            document.getElementById(id).classList.add('show');
+        }
+
+        function hideAllFsOverlays() {
+            document.querySelectorAll('.fs-overlay').forEach(el => el.classList.remove('show'));
+        }
+
+        // ==========================================
+        // RENDER: STARTING 7
+        // ==========================================
+        function renderStarting7(teamName, rosterJsonStr) {
+            // Team name in the 3D bottom bar
+            const nameEl = document.getElementById('s7-team-name');
+            // Split team name on first space for 2 lines like the Android XML (PATNA \n PIRATES)
+            const parts = (teamName || 'TEAM NAME').trim().split(' ');
+            if (parts.length >= 2) {
+                nameEl.innerHTML = escapeHtml(parts[0]) + '<br>' + escapeHtml(parts.slice(1).join(' '));
+            } else {
+                nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
+            }
+
+            let roster = [];
+            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
+            const starters = roster.filter(p => p.isStarting7 === true);
+
+            // For each position slot, find the matching player
+            const slots = document.querySelectorAll('#starting7-overlay .s7-player');
+            slots.forEach(slot => {
+                const pos = slot.getAttribute('data-pos');
+                const player = starters.find(p => (p.positionOnMat || '').toUpperCase() === pos);
+                renderS7PlayerCard(slot, player);
+            });
+        }
+
+        function renderS7PlayerCard(slotEl, player) {
+            if (!player) {
+                slotEl.innerHTML = `
+                    <div class="s7-avatar">${DEFAULT_AVATAR_SVG}</div>
+                    <div class="s7-name-tag">—</div>
+                `;
+                return;
+            }
+
+            const jersey = player.jerseyNumber || '';
+            const name = player.name || 'Player';
+            const displayName = jersey ? `${name} (${jersey})` : name;
+
+            let imgHtml;
+            if (player.imageUri && player.imageUri.startsWith('data:image')) {
+                imgHtml = `<img src="${player.imageUri}" alt="">`;
+            } else {
+                imgHtml = DEFAULT_AVATAR_SVG;
+            }
+
+            slotEl.innerHTML = `
+                <div class="s7-avatar">${imgHtml}</div>
+                <div class="s7-name-tag">${escapeHtml(displayName)}</div>
+            `;
+        }
+
+        // ==========================================
+        // RENDER: TEAM STATS
+        // ==========================================
+        function renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName) {
+            // Main score
+            const ls = data[visualLeftKey  + '_score'] || 0;
+            const rs = data[visualRightKey + '_score'] || 0;
+            document.getElementById('ts-main-score').innerText = `${ls} - ${rs}`;
+
+            // Match status
+            document.getElementById('ts-match-status').innerText =
+                (data.half_status || '1st Half').toUpperCase();
+
+            // Team names
+            document.getElementById('ts-left-team-name').innerText = leftName;
+            document.getElementById('ts-right-team-name').innerText = rightName;
+
+            // Point totals (from state_json)
+            const lRaid   = parseInt(state?.leftRaidPoints   || 0);
+            const rRaid   = parseInt(state?.rightRaidPoints  || 0);
+            const lTackle = parseInt(state?.leftTacklePoints || 0);
+            const rTackle = parseInt(state?.rightTacklePoints|| 0);
+            const lAO     = parseInt(state?.leftAllOutPoints || 0);
+            const rAO     = parseInt(state?.rightAllOutPoints|| 0);
+            const lExtra  = parseInt(state?.leftExtraPoints  || 0);
+            const rExtra  = parseInt(state?.rightExtraPoints || 0);
+
+            document.getElementById('ts-left-raid').innerText    = lRaid;
+            document.getElementById('ts-right-raid').innerText   = rRaid;
+            document.getElementById('ts-left-tackle').innerText  = lTackle;
+            document.getElementById('ts-right-tackle').innerText = rTackle;
+            document.getElementById('ts-left-allout').innerText  = lAO;
+            document.getElementById('ts-right-allout').innerText = rAO;
+            document.getElementById('ts-left-extra').innerText   = lExtra;
+            document.getElementById('ts-right-extra').innerText  = rExtra;
+
+            // Strike rates (from team_stats_*_full)
+            const lStat = data['team_stats_' + visualLeftKey  + '_full'] || {};
+            const rStat = data['team_stats_' + visualRightKey + '_full'] || {};
+
+            const lRaidRate   = parseFloat(lStat.raidStrikeRate)   || 0;
+            const rRaidRate   = parseFloat(rStat.raidStrikeRate)   || 0;
+            const lTackleRate = parseFloat(lStat.tackleStrikeRate) || 0;
+            const rTackleRate = parseFloat(rStat.tackleStrikeRate) || 0;
+
+            setPieRing('ts-left-raid-pie',   'ts-left-raid-val',   lRaidRate);
+            setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate);
+            setPieRing('ts-left-tackle-pie', 'ts-left-tackle-val', lTackleRate);
+            setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate);
+
+            // Pie chart colors — left = cyan, right = green (matching Android)
+            document.getElementById('ts-left-raid-pie').style.setProperty('--pie-color', '#00BCD4');
+            document.getElementById('ts-left-tackle-pie').style.setProperty('--pie-color', '#00BCD4');
+            document.getElementById('ts-right-raid-pie').style.setProperty('--pie-color', '#4CAF50');
+            document.getElementById('ts-right-tackle-pie').style.setProperty('--pie-color', '#4CAF50');
+        }
+
+        function setPieRing(ringId, valueId, percent) {
+            const ring = document.getElementById(ringId);
+            const val  = document.getElementById(valueId);
+            const p = Math.max(0, Math.min(100, percent));
+            const deg = (p / 100) * 360;
+            ring.style.setProperty('--pie-deg', deg + 'deg');
+            val.innerText = Math.round(p) + '%';
+        }
+
+        // ==========================================
+        // RENDER: PLAYER PERFORMANCE
+        // ==========================================
+        function renderPlayerPerformance(rosterJsonStr, playerId) {
+            let roster = [];
+            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
+            const player = roster.find(p => String(p.id) === String(playerId)) || null;
+
+            if (!player) {
+                // Blank state
+                document.getElementById('pp-avatar').innerHTML = DEFAULT_AVATAR_SVG;
+                document.getElementById('pp-name-badge').innerText = '—';
+                ['pp-raids','pp-raid-points','pp-tackles','pp-tackle-points'].forEach(id => document.getElementById(id).innerText = '0');
+                document.getElementById('pp-on-mat').innerText = '00:00';
+                document.getElementById('pp-raid-rate').innerText = '0%';
+                document.getElementById('pp-tackle-rate').innerText = '0%';
+                document.getElementById('pp-raid-ring').style.setProperty('--pie-deg', '0deg');
+                document.getElementById('pp-tackle-ring').style.setProperty('--pie-deg', '0deg');
+                return;
+            }
+
+            const jersey = player.jerseyNumber || '';
+            const name = player.name || 'Player';
+            const displayName = jersey ? `${name} (${jersey})` : name;
+
+            // Avatar
+            const avatarEl = document.getElementById('pp-avatar');
+            if (player.imageUri && player.imageUri.startsWith('data:image')) {
+                avatarEl.innerHTML = `<img src="${player.imageUri}" alt="">`;
+            } else {
+                avatarEl.innerHTML = DEFAULT_AVATAR_SVG;
+            }
+
+            document.getElementById('pp-name-badge').innerText = displayName.toUpperCase();
+
+            // Stats
+            const totalRaids = parseInt(player.totalRaids || 0);
+            const totalTackles = parseInt(player.totalTackles || 0);
+            const raidPts = parseInt(player.raidPoints || 0);
+            const tacklePts = parseInt(player.tacklePoints || 0);
+
+            document.getElementById('pp-raids').innerText = totalRaids;
+            document.getElementById('pp-raid-points').innerText = raidPts;
+            document.getElementById('pp-tackles').innerText = totalTackles;
+            document.getElementById('pp-tackle-points').innerText = tacklePts;
+
+            // On mat
+            document.getElementById('pp-on-mat').innerText = formatOnMatTime(player.onMatSeconds || 0);
+
+            // Strike rates
+            const succRaids = parseInt(player.successfulRaids || 0);
+            const succTackles = parseInt(player.successfulTackles || 0);
+            const raidStrike = totalRaids > 0 ? Math.round((succRaids / totalRaids) * 100) : 0;
+            const tackleStrike = totalTackles > 0 ? Math.round((succTackles / totalTackles) * 100) : 0;
+
+            document.getElementById('pp-raid-rate').innerText = raidStrike + '%';
+            document.getElementById('pp-tackle-rate').innerText = tackleStrike + '%';
+            document.getElementById('pp-raid-ring').style.setProperty('--pie-deg', ((raidStrike / 100) * 360) + 'deg');
+            document.getElementById('pp-tackle-ring').style.setProperty('--pie-deg', ((tackleStrike / 100) * 360) + 'deg');
         }
     </script>
 </body>
