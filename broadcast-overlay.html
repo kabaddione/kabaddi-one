@@ -557,7 +557,6 @@ margin-right: -87px;}
 
         /* =========================================
            SHARED FULL-SCREEN OVERLAY SYSTEM
-           (Starting 7 / Team Stats / Player Performance)
            ========================================= */
         .fs-overlay {
             position: fixed;
@@ -577,7 +576,7 @@ margin-right: -87px;}
             to { opacity: 1; }
         }
 
-        /* Powered-by footer used by all three overlays (replaces Save/Cancel) */
+        /* Powered-by footer */
         .fs-powered-by {
             display: inline-flex;
             align-items: center;
@@ -634,7 +633,6 @@ margin-right: -87px;}
             padding: 40px;
         }
 
-        /* Mat formation: 7 positions using absolute layout inside a fixed canvas */
         #starting7-overlay .s7-formation {
             position: relative;
             width: 1000px;
@@ -663,14 +661,8 @@ margin-right: -87px;}
                         0 8px 20px rgba(0,0,0,0.8);
             margin-bottom: 8px;
         }
-        #starting7-overlay .s7-avatar img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        #starting7-overlay .s7-avatar .default-icon {
-            width: 60%; height: 60%;
-            color: #FFF;
-            opacity: 0.65;
-        }
+        #starting7-overlay .s7-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        #starting7-overlay .s7-avatar .default-icon { width: 60%; height: 60%; color: #FFF; opacity: 0.65; }
         #starting7-overlay .s7-name-tag {
             background: #FFFFFF;
             color: #000;
@@ -688,7 +680,6 @@ margin-right: -87px;}
             text-align: center;
         }
 
-        /* Positions — mirror Android ConstraintLayout */
         #starting7-overlay .pos-center      { top: 0;    left: 50%; }
         #starting7-overlay .pos-right-cover { top: 130px; left: 28%; }
         #starting7-overlay .pos-left-cover  { top: 130px; left: 72%; }
@@ -697,7 +688,6 @@ margin-right: -87px;}
         #starting7-overlay .pos-right-corner{ top: 390px; left: 5%; }
         #starting7-overlay .pos-left-corner { top: 390px; left: 95%; }
 
-        /* Bottom bar with 3D team name */
         #starting7-overlay .s7-bottom-bar {
             display: flex;
             flex-direction: column;
@@ -819,6 +809,7 @@ margin-right: -87px;}
             justify-content: center;
             background: conic-gradient(var(--pie-color, #00BCD4) 0deg var(--pie-deg, 0deg), rgba(255,255,255,0.15) var(--pie-deg, 0deg) 360deg);
             box-shadow: 0 0 20px rgba(0,0,0,0.6);
+            transition: --pie-color 0.3s ease;
         }
         #team-stats-overlay .ts-pie-ring::before {
             content: '';
@@ -837,7 +828,6 @@ margin-right: -87px;}
             color: #FFF;
         }
 
-        /* Stats table */
         #team-stats-overlay .ts-table {
             display: flex;
             flex-direction: column;
@@ -856,6 +846,7 @@ margin-right: -87px;}
             justify-content: center;
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
+            transition: background 0.4s ease;
         }
         #team-stats-overlay .ts-cell-left,
         #team-stats-overlay .ts-cell-right {
@@ -864,8 +855,8 @@ margin-right: -87px;}
             color: #FFF;
             background: rgba(255,255,255,0.08);
         }
-        #team-stats-overlay .ts-cell-left  { clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); border-left: 3px solid #E040FB; }
-        #team-stats-overlay .ts-cell-right { clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); border-right: 3px solid #E040FB; }
+        #team-stats-overlay .ts-cell-left  { clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); }
+        #team-stats-overlay .ts-cell-right { clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); }
         #team-stats-overlay .ts-cell-center {
             width: 240px;
             font-size: 17px;
@@ -948,11 +939,25 @@ margin-right: -87px;}
             box-shadow: 0 30px 80px rgba(0,0,0,0.9);
         }
 
+        /* Column 1: Profile — uses dynamic team colour (set via --pp-team-color) */
         #player-perf-overlay .pp-col-profile {
             flex: 3.5;
             display: flex;
             flex-direction: column;
-            background: linear-gradient(180deg, #1E1E2E 0%, #0E0E1A 100%);
+            background: linear-gradient(180deg,
+                        var(--pp-team-color, #1E1E2E) 0%,
+                        var(--pp-team-color-dark, #0E0E1A) 100%);
+            position: relative;
+        }
+        /* Optional: team-colour stripe on the left edge for extra pop */
+        #player-perf-overlay .pp-col-profile::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 8px;
+            background: var(--pp-team-color, #1E1E2E);
+            box-shadow: 0 0 20px var(--pp-team-color, #1E1E2E);
+            z-index: 2;
         }
         #player-perf-overlay .pp-avatar {
             flex: 1;
@@ -962,16 +967,11 @@ margin-right: -87px;}
             overflow: hidden;
             position: relative;
         }
-        #player-perf-overlay .pp-avatar img {
-            width: 100%; height: 100%; object-fit: contain;
-        }
-        #player-perf-overlay .pp-avatar .default-icon {
-            width: 40%; height: 40%;
-            color: rgba(255,255,255,0.4);
-        }
+        #player-perf-overlay .pp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        #player-perf-overlay .pp-avatar .default-icon { width: 40%; height: 40%; color: rgba(255,255,255,0.7); }
         #player-perf-overlay .pp-name-badge {
             background: #FFFFFF;
-            color: #000;
+            color: var(--pp-team-color, #000);
             font-family: 'Oswald', sans-serif;
             font-size: 22px;
             font-weight: 700;
@@ -982,22 +982,26 @@ margin-right: -87px;}
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            z-index: 3;
+            position: relative;
         }
 
+        /* Column 2: Stats grid — PURPLE GRADIENT (matching the app) */
         #player-perf-overlay .pp-col-stats {
             flex: 4.5;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            background: rgba(255,255,255,0.03);
+            background: linear-gradient(135deg, #9C27B0 0%, #6A1B9A 45%, #4A148C 100%);
+            position: relative;
         }
         #player-perf-overlay .pp-stat-cell {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-right: 1.5px solid rgba(255,255,255,0.12);
-            border-bottom: 1.5px solid rgba(255,255,255,0.12);
+            border-right: 1.5px solid rgba(255,255,255,0.18);
+            border-bottom: 1.5px solid rgba(255,255,255,0.18);
             padding: 10px;
         }
         #player-perf-overlay .pp-stat-cell:nth-child(2n) { border-right: none; }
@@ -1012,12 +1016,13 @@ margin-right: -87px;}
         #player-perf-overlay .pp-stat-label {
             font-family: 'Oswald', sans-serif;
             font-size: 15px;
-            color: #E0E0E0;
+            color: rgba(255,255,255,0.85);
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-top: 4px;
         }
 
+        /* Column 3: Strike rates (white background, purple accents) */
         #player-perf-overlay .pp-col-rates {
             flex: 2;
             background: #FFFFFF;
@@ -1246,20 +1251,20 @@ margin-right: -87px;}
         <div class="ts-overlay"></div>
         <div class="ts-content">
             <div class="ts-main-score" id="ts-main-score">0 - 0</div>
-            <div class="ts-match-status" id="ts-match-status">1st HALF</div>
+            <div class="ts-match-status" id="ts-match-status">1ST HALF</div>
             <div class="ts-divider"></div>
 
             <div class="ts-row-wrap">
-                <!-- Left pie charts -->
+                <!-- Left pie charts (coloured with left team colour) -->
                 <div class="ts-pie-col">
                     <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-left-raid-pie" style="--pie-color:#00BCD4;">
+                        <div class="ts-pie-ring" id="ts-left-raid-pie">
                             <div class="ts-pie-value" id="ts-left-raid-val">0%</div>
                         </div>
                         <div class="ts-pie-label">SUCCESSFUL<br>RAID</div>
                     </div>
                     <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-left-tackle-pie" style="--pie-color:#00BCD4;">
+                        <div class="ts-pie-ring" id="ts-left-tackle-pie">
                             <div class="ts-pie-value" id="ts-left-tackle-val">0%</div>
                         </div>
                         <div class="ts-pie-label">SUCCESSFUL<br>TACKLE</div>
@@ -1290,16 +1295,16 @@ margin-right: -87px;}
                     </div>
                 </div>
 
-                <!-- Right pie charts -->
+                <!-- Right pie charts (coloured with right team colour) -->
                 <div class="ts-pie-col">
                     <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-right-raid-pie" style="--pie-color:#4CAF50;">
+                        <div class="ts-pie-ring" id="ts-right-raid-pie">
                             <div class="ts-pie-value" id="ts-right-raid-val">0%</div>
                         </div>
                         <div class="ts-pie-label">SUCCESSFUL<br>RAID</div>
                     </div>
                     <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-right-tackle-pie" style="--pie-color:#4CAF50;">
+                        <div class="ts-pie-ring" id="ts-right-tackle-pie">
                             <div class="ts-pie-value" id="ts-right-tackle-val">0%</div>
                         </div>
                         <div class="ts-pie-label">SUCCESSFUL<br>TACKLE</div>
@@ -1330,15 +1335,13 @@ margin-right: -87px;}
             <div class="pp-underline"></div>
 
             <div class="pp-card">
-                <!-- Column 1: Profile -->
-                <div class="pp-col-profile">
-                    <div class="pp-avatar" id="pp-avatar">
-                        <!-- img or default icon -->
-                    </div>
+                <!-- Column 1: Profile (team colour background) -->
+                <div class="pp-col-profile" id="pp-col-profile">
+                    <div class="pp-avatar" id="pp-avatar"></div>
                     <div class="pp-name-badge" id="pp-name-badge">PLAYER (1)</div>
                 </div>
 
-                <!-- Column 2: Stats grid 2x2 -->
+                <!-- Column 2: Stats grid (purple gradient) -->
                 <div class="pp-col-stats">
                     <div class="pp-stat-cell">
                         <div class="pp-stat-value" id="pp-raids">0</div>
@@ -1416,9 +1419,6 @@ margin-right: -87px;}
         let previousLeftScore = -1;
         let previousRightScore = -1;
         let previousLogId = undefined;
-        let previousAllOut = false;
-        let previousSuperTackle = false;
-        let previousRaidPoint = false;
 
         let isSwapped = false;
         let lastLeftColor = null;
@@ -1426,7 +1426,6 @@ margin-right: -87px;}
 
         let previousRaidActive = null;
 
-        // Track last overlay screen state to avoid re-renders
         let lastOverlayScreen = '';
         let lastOverlayTeam = '';
         let lastOverlayPlayerId = '';
@@ -1480,7 +1479,6 @@ margin-right: -87px;}
                 .replace(/'/g, '&#39;');
         }
 
-        // Default profile icon SVG string
         const DEFAULT_AVATAR_SVG = `
             <svg class="default-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -1556,8 +1554,7 @@ margin-right: -87px;}
                     }
                 }
 
-                // ── Remote-controlled overlay screens ──
-                handleOverlayScreens(data, state, visualLeftKey, visualRightKey);
+                handleOverlayScreens(data, state, visualLeftKey, visualRightKey, leftColor, rightColor);
             });
         }
 
@@ -2020,14 +2017,12 @@ margin-right: -87px;}
 
         // ==========================================
         // REMOTE-CONTROLLED OVERLAY SCREENS
-        //   Reads: overlay_screen / overlay_screen_team / overlay_screen_player_id
         // ==========================================
-        function handleOverlayScreens(data, state, visualLeftKey, visualRightKey) {
+        function handleOverlayScreens(data, state, visualLeftKey, visualRightKey, leftColor, rightColor) {
             const screen = (data.overlay_screen || '').trim();
             const team   = (data.overlay_screen_team || '').trim();
             const playerId = (data.overlay_screen_player_id || '').trim();
 
-            // Hide all if nothing to show
             if (!screen) {
                 hideAllFsOverlays();
                 lastOverlayScreen = '';
@@ -2038,19 +2033,16 @@ margin-right: -87px;}
 
             const leftName  = data[visualLeftKey  + '_name']  || 'TEAM A';
             const rightName = data[visualRightKey + '_name'] || 'TEAM B';
-            const leftColor  = data[visualLeftKey  + '_color'] || '#009900';
-            const rightColor = data[visualRightKey + '_color'] || '#0055ff';
 
-            // ── STARTING 7 ──
             if (screen === 'starting7') {
-                const isLeft = (team !== 'right'); // default left
-                // Determine actual team key (respect swap? No — the app sends actual team, we render as-is)
+                const isLeft = (team !== 'right');
                 const actualKey = isLeft ? 'left' : 'right';
                 const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
+                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
                 const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
 
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
-                    renderStarting7(actualName, rosterJson);
+                    renderStarting7(actualName, actualColor, rosterJson);
                     showFsOverlay('starting7-overlay');
                     lastOverlayScreen = screen;
                     lastOverlayTeam = team;
@@ -2058,44 +2050,39 @@ margin-right: -87px;}
                 return;
             }
 
-            // ── TEAM STATS ──
             if (screen === 'team_stats') {
                 if (screen !== lastOverlayScreen || !document.getElementById('team-stats-overlay').classList.contains('show')) {
-                    renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName);
+                    renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName, leftColor, rightColor);
                     showFsOverlay('team-stats-overlay');
                     lastOverlayScreen = screen;
                 } else {
-                    // Live-refresh while open
-                    renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName);
+                    renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName, leftColor, rightColor);
                 }
                 return;
             }
 
-            // ── PLAYER PERFORMANCE ──
             if (screen === 'player_performance') {
                 const isLeft = (team !== 'right');
                 const actualKey = isLeft ? 'left' : 'right';
+                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
                 const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
 
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || playerId !== lastOverlayPlayerId || !document.getElementById('player-perf-overlay').classList.contains('show')) {
-                    renderPlayerPerformance(rosterJson, playerId);
+                    renderPlayerPerformance(rosterJson, playerId, actualColor);
                     showFsOverlay('player-perf-overlay');
                     lastOverlayScreen = screen;
                     lastOverlayTeam = team;
                     lastOverlayPlayerId = playerId;
                 } else {
-                    // Live-refresh while open
-                    renderPlayerPerformance(rosterJson, playerId);
+                    renderPlayerPerformance(rosterJson, playerId, actualColor);
                 }
                 return;
             }
 
-            // Unknown screen value
             hideAllFsOverlays();
         }
 
         function showFsOverlay(id) {
-            // Hide others first
             document.querySelectorAll('.fs-overlay').forEach(el => {
                 if (el.id !== id) el.classList.remove('show');
             });
@@ -2109,10 +2096,8 @@ margin-right: -87px;}
         // ==========================================
         // RENDER: STARTING 7
         // ==========================================
-        function renderStarting7(teamName, rosterJsonStr) {
-            // Team name in the 3D bottom bar
+        function renderStarting7(teamName, teamColor, rosterJsonStr) {
             const nameEl = document.getElementById('s7-team-name');
-            // Split team name on first space for 2 lines like the Android XML (PATNA \n PIRATES)
             const parts = (teamName || 'TEAM NAME').trim().split(' ');
             if (parts.length >= 2) {
                 nameEl.innerHTML = escapeHtml(parts[0]) + '<br>' + escapeHtml(parts.slice(1).join(' '));
@@ -2120,23 +2105,25 @@ margin-right: -87px;}
                 nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
             }
 
+            // Tint avatars with team colour
+            document.documentElement.style.setProperty('--s7-team-color', teamColor);
+
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const starters = roster.filter(p => p.isStarting7 === true);
 
-            // For each position slot, find the matching player
             const slots = document.querySelectorAll('#starting7-overlay .s7-player');
             slots.forEach(slot => {
                 const pos = slot.getAttribute('data-pos');
                 const player = starters.find(p => (p.positionOnMat || '').toUpperCase() === pos);
-                renderS7PlayerCard(slot, player);
+                renderS7PlayerCard(slot, player, teamColor);
             });
         }
 
-        function renderS7PlayerCard(slotEl, player) {
+        function renderS7PlayerCard(slotEl, player, teamColor) {
             if (!player) {
                 slotEl.innerHTML = `
-                    <div class="s7-avatar">${DEFAULT_AVATAR_SVG}</div>
+                    <div class="s7-avatar" style="border-color:${teamColor}; box-shadow: 0 0 25px ${teamColor}, 0 8px 20px rgba(0,0,0,0.8);">${DEFAULT_AVATAR_SVG}</div>
                     <div class="s7-name-tag">—</div>
                 `;
                 return;
@@ -2154,29 +2141,31 @@ margin-right: -87px;}
             }
 
             slotEl.innerHTML = `
-                <div class="s7-avatar">${imgHtml}</div>
-                <div class="s7-name-tag">${escapeHtml(displayName)}</div>
+                <div class="s7-avatar" style="border-color:${teamColor}; box-shadow: 0 0 25px ${teamColor}, 0 8px 20px rgba(0,0,0,0.8);">${imgHtml}</div>
+                <div class="s7-name-tag" style="color:${teamColor};">${escapeHtml(displayName)}</div>
             `;
         }
 
         // ==========================================
         // RENDER: TEAM STATS
+        //   • Left pie charts use LEFT team colour
+        //   • Right pie charts use RIGHT team colour
+        //   • Left stat boxes use LEFT team colour
+        //   • Right stat boxes use RIGHT team colour
+        //   • Percentages use Math.floor to match the Android app
         // ==========================================
-        function renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName) {
-            // Main score
+        function renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName, leftColor, rightColor) {
             const ls = data[visualLeftKey  + '_score'] || 0;
             const rs = data[visualRightKey + '_score'] || 0;
             document.getElementById('ts-main-score').innerText = `${ls} - ${rs}`;
 
-            // Match status
             document.getElementById('ts-match-status').innerText =
                 (data.half_status || '1st Half').toUpperCase();
 
-            // Team names
             document.getElementById('ts-left-team-name').innerText = leftName;
             document.getElementById('ts-right-team-name').innerText = rightName;
 
-            // Point totals (from state_json)
+            // Point totals
             const lRaid   = parseInt(state?.leftRaidPoints   || 0);
             const rRaid   = parseInt(state?.rightRaidPoints  || 0);
             const lTackle = parseInt(state?.leftTacklePoints || 0);
@@ -2195,7 +2184,15 @@ margin-right: -87px;}
             document.getElementById('ts-left-extra').innerText   = lExtra;
             document.getElementById('ts-right-extra').innerText  = rExtra;
 
-            // Strike rates (from team_stats_*_full)
+            // Apply team colours to left/right stat boxes
+            document.querySelectorAll('#team-stats-overlay .ts-cell-left').forEach(el => {
+                el.style.background = leftColor;
+            });
+            document.querySelectorAll('#team-stats-overlay .ts-cell-right').forEach(el => {
+                el.style.background = rightColor;
+            });
+
+            // Strike rates
             const lStat = data['team_stats_' + visualLeftKey  + '_full'] || {};
             const rStat = data['team_stats_' + visualRightKey + '_full'] || {};
 
@@ -2204,37 +2201,43 @@ margin-right: -87px;}
             const lTackleRate = parseFloat(lStat.tackleStrikeRate) || 0;
             const rTackleRate = parseFloat(rStat.tackleStrikeRate) || 0;
 
-            setPieRing('ts-left-raid-pie',   'ts-left-raid-val',   lRaidRate);
-            setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate);
-            setPieRing('ts-left-tackle-pie', 'ts-left-tackle-val', lTackleRate);
-            setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate);
+            // Left pies = LEFT team colour
+            setPieRing('ts-left-raid-pie',   'ts-left-raid-val',   lRaidRate,   leftColor);
+            setPieRing('ts-left-tackle-pie', 'ts-left-tackle-val', lTackleRate, leftColor);
 
-            // Pie chart colors — left = cyan, right = green (matching Android)
-            document.getElementById('ts-left-raid-pie').style.setProperty('--pie-color', '#00BCD4');
-            document.getElementById('ts-left-tackle-pie').style.setProperty('--pie-color', '#00BCD4');
-            document.getElementById('ts-right-raid-pie').style.setProperty('--pie-color', '#4CAF50');
-            document.getElementById('ts-right-tackle-pie').style.setProperty('--pie-color', '#4CAF50');
+            // Right pies = RIGHT team colour
+            setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate,   rightColor);
+            setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate, rightColor);
         }
 
-        function setPieRing(ringId, valueId, percent) {
+        function setPieRing(ringId, valueId, percent, color) {
             const ring = document.getElementById(ringId);
             const val  = document.getElementById(valueId);
             const p = Math.max(0, Math.min(100, percent));
             const deg = (p / 100) * 360;
             ring.style.setProperty('--pie-deg', deg + 'deg');
-            val.innerText = Math.round(p) + '%';
+            if (color) ring.style.setProperty('--pie-color', color);
+            // Math.floor to match the Android app display (47.8 → 47%)
+            val.innerText = Math.floor(p) + '%';
         }
 
         // ==========================================
         // RENDER: PLAYER PERFORMANCE
+        //   • Profile column background = team's active colour
+        //   • Stats grid = purple gradient (via CSS)
+        //   • Name badge text = team colour
         // ==========================================
-        function renderPlayerPerformance(rosterJsonStr, playerId) {
+        function renderPlayerPerformance(rosterJsonStr, playerId, teamColor) {
+            // Set team colour CSS variables on the overlay root
+            const overlayEl = document.getElementById('player-perf-overlay');
+            overlayEl.style.setProperty('--pp-team-color', teamColor);
+            overlayEl.style.setProperty('--pp-team-color-dark', darkenColor(teamColor, 55));
+
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const player = roster.find(p => String(p.id) === String(playerId)) || null;
 
             if (!player) {
-                // Blank state
                 document.getElementById('pp-avatar').innerHTML = DEFAULT_AVATAR_SVG;
                 document.getElementById('pp-name-badge').innerText = '—';
                 ['pp-raids','pp-raid-points','pp-tackles','pp-tackle-points'].forEach(id => document.getElementById(id).innerText = '0');
@@ -2250,7 +2253,6 @@ margin-right: -87px;}
             const name = player.name || 'Player';
             const displayName = jersey ? `${name} (${jersey})` : name;
 
-            // Avatar
             const avatarEl = document.getElementById('pp-avatar');
             if (player.imageUri && player.imageUri.startsWith('data:image')) {
                 avatarEl.innerHTML = `<img src="${player.imageUri}" alt="">`;
@@ -2260,7 +2262,6 @@ margin-right: -87px;}
 
             document.getElementById('pp-name-badge').innerText = displayName.toUpperCase();
 
-            // Stats
             const totalRaids = parseInt(player.totalRaids || 0);
             const totalTackles = parseInt(player.totalTackles || 0);
             const raidPts = parseInt(player.raidPoints || 0);
@@ -2271,14 +2272,12 @@ margin-right: -87px;}
             document.getElementById('pp-tackles').innerText = totalTackles;
             document.getElementById('pp-tackle-points').innerText = tacklePts;
 
-            // On mat
             document.getElementById('pp-on-mat').innerText = formatOnMatTime(player.onMatSeconds || 0);
 
-            // Strike rates
             const succRaids = parseInt(player.successfulRaids || 0);
             const succTackles = parseInt(player.successfulTackles || 0);
-            const raidStrike = totalRaids > 0 ? Math.round((succRaids / totalRaids) * 100) : 0;
-            const tackleStrike = totalTackles > 0 ? Math.round((succTackles / totalTackles) * 100) : 0;
+            const raidStrike = totalRaids > 0 ? Math.floor((succRaids / totalRaids) * 100) : 0;
+            const tackleStrike = totalTackles > 0 ? Math.floor((succTackles / totalTackles) * 100) : 0;
 
             document.getElementById('pp-raid-rate').innerText = raidStrike + '%';
             document.getElementById('pp-tackle-rate').innerText = tackleStrike + '%';
