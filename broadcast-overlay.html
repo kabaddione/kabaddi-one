@@ -603,7 +603,7 @@ margin-right: -87px;}
         .fs-powered-by .fp-text { color: #FFF; font-weight: 700; font-size: 16px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
 
         /* =========================================
-           STARTING 7 OVERLAY
+           STARTING 7 OVERLAY  (background: subs_mate.jpg)
            ========================================= */
         #starting7-overlay { background: transparent; }
 
@@ -896,12 +896,33 @@ margin-right: -87px;}
         }
 
         /* =========================================
-           PLAYER PERFORMANCE OVERLAY
+           PLAYER PERFORMANCE OVERLAY  (background: performance_bg.jpg)
            ========================================= */
-        #player-perf-overlay { background: rgba(0,0,0,0.92); }
+        #player-perf-overlay {
+            background: transparent;
+        }
+
+        /* Full-screen background layer with performance_bg.jpg */
+        #player-perf-overlay .pp-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/performance_bg.jpg') center/cover no-repeat;
+            background-color: #0B0B18;
+            z-index: 1;
+        }
+        /* Darkening + purple vignette so the card and text stay readable */
+        #player-perf-overlay .pp-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%),
+                linear-gradient(180deg, rgba(20,0,40,0.35) 0%, rgba(0,0,0,0.55) 100%);
+        }
 
         #player-perf-overlay .pp-content {
             position: relative;
+            z-index: 2;
             width: 100%;
             height: 100%;
             display: flex;
@@ -949,7 +970,6 @@ margin-right: -87px;}
                         var(--pp-team-color-dark, #0E0E1A) 100%);
             position: relative;
         }
-        /* Optional: team-colour stripe on the left edge for extra pop */
         #player-perf-overlay .pp-col-profile::before {
             content: '';
             position: absolute;
@@ -1255,7 +1275,6 @@ margin-right: -87px;}
             <div class="ts-divider"></div>
 
             <div class="ts-row-wrap">
-                <!-- Left pie charts (coloured with left team colour) -->
                 <div class="ts-pie-col">
                     <div class="ts-pie-item">
                         <div class="ts-pie-ring" id="ts-left-raid-pie">
@@ -1271,7 +1290,6 @@ margin-right: -87px;}
                     </div>
                 </div>
 
-                <!-- Stats table -->
                 <div class="ts-table">
                     <div class="ts-table-row">
                         <div class="ts-cell ts-cell-left"  id="ts-left-raid">0</div>
@@ -1295,7 +1313,6 @@ margin-right: -87px;}
                     </div>
                 </div>
 
-                <!-- Right pie charts (coloured with right team colour) -->
                 <div class="ts-pie-col">
                     <div class="ts-pie-item">
                         <div class="ts-pie-ring" id="ts-right-raid-pie">
@@ -1330,18 +1347,17 @@ margin-right: -87px;}
          PLAYER PERFORMANCE FULL-SCREEN OVERLAY
          ========================================= -->
     <div id="player-perf-overlay" class="fs-overlay">
+        <div class="pp-bg"></div>
         <div class="pp-content">
             <div class="pp-title">PERFORMANCE</div>
             <div class="pp-underline"></div>
 
             <div class="pp-card">
-                <!-- Column 1: Profile (team colour background) -->
                 <div class="pp-col-profile" id="pp-col-profile">
                     <div class="pp-avatar" id="pp-avatar"></div>
                     <div class="pp-name-badge" id="pp-name-badge">PLAYER (1)</div>
                 </div>
 
-                <!-- Column 2: Stats grid (purple gradient) -->
                 <div class="pp-col-stats">
                     <div class="pp-stat-cell">
                         <div class="pp-stat-value" id="pp-raids">0</div>
@@ -1361,7 +1377,6 @@ margin-right: -87px;}
                     </div>
                 </div>
 
-                <!-- Column 3: Strike rates -->
                 <div class="pp-col-rates">
                     <div class="pp-on-mat">
                         <div class="pp-on-mat-icon">ON MAT</div>
@@ -2105,7 +2120,6 @@ margin-right: -87px;}
                 nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
             }
 
-            // Tint avatars with team colour
             document.documentElement.style.setProperty('--s7-team-color', teamColor);
 
             let roster = [];
@@ -2148,11 +2162,6 @@ margin-right: -87px;}
 
         // ==========================================
         // RENDER: TEAM STATS
-        //   • Left pie charts use LEFT team colour
-        //   • Right pie charts use RIGHT team colour
-        //   • Left stat boxes use LEFT team colour
-        //   • Right stat boxes use RIGHT team colour
-        //   • Percentages use Math.floor to match the Android app
         // ==========================================
         function renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName, leftColor, rightColor) {
             const ls = data[visualLeftKey  + '_score'] || 0;
@@ -2165,7 +2174,6 @@ margin-right: -87px;}
             document.getElementById('ts-left-team-name').innerText = leftName;
             document.getElementById('ts-right-team-name').innerText = rightName;
 
-            // Point totals
             const lRaid   = parseInt(state?.leftRaidPoints   || 0);
             const rRaid   = parseInt(state?.rightRaidPoints  || 0);
             const lTackle = parseInt(state?.leftTacklePoints || 0);
@@ -2184,7 +2192,6 @@ margin-right: -87px;}
             document.getElementById('ts-left-extra').innerText   = lExtra;
             document.getElementById('ts-right-extra').innerText  = rExtra;
 
-            // Apply team colours to left/right stat boxes
             document.querySelectorAll('#team-stats-overlay .ts-cell-left').forEach(el => {
                 el.style.background = leftColor;
             });
@@ -2192,7 +2199,6 @@ margin-right: -87px;}
                 el.style.background = rightColor;
             });
 
-            // Strike rates
             const lStat = data['team_stats_' + visualLeftKey  + '_full'] || {};
             const rStat = data['team_stats_' + visualRightKey + '_full'] || {};
 
@@ -2201,11 +2207,9 @@ margin-right: -87px;}
             const lTackleRate = parseFloat(lStat.tackleStrikeRate) || 0;
             const rTackleRate = parseFloat(rStat.tackleStrikeRate) || 0;
 
-            // Left pies = LEFT team colour
             setPieRing('ts-left-raid-pie',   'ts-left-raid-val',   lRaidRate,   leftColor);
             setPieRing('ts-left-tackle-pie', 'ts-left-tackle-val', lTackleRate, leftColor);
 
-            // Right pies = RIGHT team colour
             setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate,   rightColor);
             setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate, rightColor);
         }
@@ -2217,18 +2221,13 @@ margin-right: -87px;}
             const deg = (p / 100) * 360;
             ring.style.setProperty('--pie-deg', deg + 'deg');
             if (color) ring.style.setProperty('--pie-color', color);
-            // Math.floor to match the Android app display (47.8 → 47%)
             val.innerText = Math.floor(p) + '%';
         }
 
         // ==========================================
         // RENDER: PLAYER PERFORMANCE
-        //   • Profile column background = team's active colour
-        //   • Stats grid = purple gradient (via CSS)
-        //   • Name badge text = team colour
         // ==========================================
         function renderPlayerPerformance(rosterJsonStr, playerId, teamColor) {
-            // Set team colour CSS variables on the overlay root
             const overlayEl = document.getElementById('player-perf-overlay');
             overlayEl.style.setProperty('--pp-team-color', teamColor);
             overlayEl.style.setProperty('--pp-team-color-dark', darkenColor(teamColor, 55));
