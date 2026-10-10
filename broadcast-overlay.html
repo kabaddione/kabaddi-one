@@ -1534,6 +1534,29 @@ margin-right: -87px;}
             return DEFAULT_PLAYER_IMG;
         }
 
+        // Robust half-time swap detection
+        function detectSwapFromHalfStatus(halfStatus, data) {
+            const halfStr = (halfStatus || '').toLowerCase().trim();
+            if (!halfStr) return false;
+            // Check for common 2nd-half / final indicators
+            if (halfStr.includes('2nd')) return true;
+            if (halfStr.includes('second')) return true;
+            if (halfStr.includes('final')) return true;
+            if (halfStr.includes('full time')) return true;
+            if (halfStr.includes('match over')) return true;
+            if (halfStr.includes('3rd')) return true;
+            if (halfStr.includes('third')) return true;
+            // Support "Half 2" / "H2" patterns
+            if (/\bhalf\s*2\b/.test(halfStr)) return true;
+            // Support explicit numeric current_half / currentHalf field
+            if (data) {
+                const ch1 = parseInt(data.current_half);
+                const ch2 = parseInt(data.currentHalf);
+                if (ch1 === 2 || ch2 === 2) return true;
+            }
+            return false;
+        }
+
         // ==========================================
         // ENGINE
         // ==========================================
@@ -1544,12 +1567,13 @@ margin-right: -87px;}
                 const data = snapshot.val();
                 if (!data) return;
 
-                const halfStr = (data.half_status || '').toLowerCase();
-                isSwapped = halfStr.includes('2nd') || halfStr.includes('second') || halfStr.includes('final');
+                // ── 1. HALF-TIME SWAP DETECTION ──
+                isSwapped = detectSwapFromHalfStatus(data.half_status, data);
 
                 const visualLeftKey  = isSwapped ? 'right' : 'left';
                 const visualRightKey = isSwapped ? 'left'  : 'right';
 
+                // ── 2. NAMES & COLOURS ──
                 const leftName  = data[visualLeftKey  + '_name']  || "TEAM A";
                 const rightName = data[visualRightKey + '_name'] || "TEAM B";
                 const leftColor  = data[visualLeftKey  + '_color'] || "#009900";
@@ -1571,6 +1595,7 @@ margin-right: -87px;}
                     lastRightColor = rightColor;
                 }
 
+                // ── 3. SCORES ──
                 const leftScore  = data[visualLeftKey  + '_score'] || 0;
                 const rightScore = data[visualRightKey + '_score'] || 0;
                 updateScoreWithAnimation('left-score',  leftScore,  previousLeftScore);
@@ -1656,6 +1681,9 @@ margin-right: -87px;}
 
         // ==========================================
         // DOTS RENDERER
+        //   Now also accounts for yellow/red card suspensions:
+        //     • isDisqualified === true  → inactive (red card, whole match)
+        //     • suspensionSeconds > 0    → inactive (yellow card, temporary)
         // ==========================================
         function renderDots(dotClassName, outIdsStr, rosterJsonStr, teamColor) {
             const dots = document.getElementsByClassName(dotClassName);
@@ -1674,21 +1702,43 @@ margin-right: -87px;}
 
             if (starting7.length === 0) return;
 
+            // Build the set of "inactive" IDs:
+            //   1) Players explicitly out (tackled) — from OutIds
+            //   2) Players disqualified (red card) — from roster
+            //   3) Players currently suspended (yellow card) — from roster
             const outOrder = splitConcatenatedIds(outIdsStr || '', starting7);
             const outSet   = new Set(outOrder);
-            const alive    = starting7.filter(p => !outSet.has(p.id));
-            const outP     = outOrder.map(id => starting7.find(p => p.id === id)).filter(Boolean);
+
+            const cardInactiveIds = [];
+            starting7.forEach(p => {
+                if (outSet.has(p.id)) return; // already inactive
+                const disqualified = p.isDisqualified === true;
+                const suspended = (parseInt(p.suspensionSeconds) || 0) > 0;
+                if (disqualified || suspended) {
+                    cardInactiveIds.push(p.id);
+                    outSet.add(p.id);
+                }
+            });
+
+            const alive = starting7.filter(p => !outSet.has(p.id));
+
+            // Build the ordered inactive list:
+            //   first players who went out on the mat (in out-order),
+            //   then extra card-inactive players in roster order.
+            const outP = outOrder.map(id => starting7.find(p => p.id === id)).filter(Boolean);
+            const cardP = cardInactiveIds.map(id => starting7.find(p => p.id === id)).filter(Boolean);
+            const allInactive = [...outP, ...cardP];
 
             const isLeft = (dotClassName === 'left-dot');
             let items;
             if (isLeft) {
                 items = [
                     ...[...alive].reverse().map(p => ({ alive: true,  id: p.id })),
-                    ...outP.map(p => ({ alive: false, id: p.id }))
+                    ...allInactive.map(p => ({ alive: false, id: p.id }))
                 ];
             } else {
                 items = [
-                    ...[...outP].reverse().map(p => ({ alive: false, id: p.id })),
+                    ...[...allInactive].reverse().map(p => ({ alive: false, id: p.id })),
                     ...alive.map(p => ({ alive: true, id: p.id }))
                 ];
             }
