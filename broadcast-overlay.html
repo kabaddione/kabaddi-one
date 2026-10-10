@@ -602,7 +602,7 @@ margin-right: -87px;}
         .fs-powered-by .fp-text { color: #FFF; font-weight: 700; font-size: 16px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
 
         /* =========================================
-           STARTING 7 OVERLAY  (background: subs_mate.jpg)
+           STARTING 7 OVERLAY
            ========================================= */
         #starting7-overlay { background: transparent; }
 
@@ -665,8 +665,6 @@ margin-right: -87px;}
             object-position: bottom center;
         }
 
-        /* Two-row name tag: top row uses DYNAMIC TEAM COLOUR (via --s7-team-color),
-           bottom row is always black */
         #starting7-overlay .s7-name-tag {
             width: 100%;
             display: flex;
@@ -677,7 +675,6 @@ margin-right: -87px;}
                         0 0 0 1px rgba(255,255,255,0.08);
         }
         #starting7-overlay .s7-name-top {
-            /* Background is set inline via JS using the dynamic team colour */
             background: linear-gradient(to bottom,
                         var(--s7-team-color, #E91E63) 0%,
                         var(--s7-team-color-dark, #C2185B) 100%);
@@ -927,7 +924,7 @@ margin-right: -87px;}
         }
 
         /* =========================================
-           PLAYER PERFORMANCE OVERLAY  (background: performance_bg.jpg)
+           PLAYER PERFORMANCE OVERLAY
            ========================================= */
         #player-perf-overlay {
             background: transparent;
@@ -1464,7 +1461,6 @@ margin-right: -87px;}
         // ==========================================
         let previousLeftScore = -1;
         let previousRightScore = -1;
-        let previousLogId = undefined;
 
         let isSwapped = false;
         let lastLeftColor = null;
@@ -1475,6 +1471,10 @@ margin-right: -87px;}
         let lastOverlayScreen = '';
         let lastOverlayTeam = '';
         let lastOverlayPlayerId = '';
+
+        // Multi-log processing for event timeline
+        let seenLogKeys = new Set();
+        let initialLoadDone = false;
 
         const raiderRotationState = {
             left:  { active: false, timer: null, currentRaider: null },
@@ -1536,25 +1536,29 @@ margin-right: -87px;}
 
         // Robust half-time swap detection
         function detectSwapFromHalfStatus(halfStatus, data) {
-            const halfStr = (halfStatus || '').toLowerCase().trim();
-            if (!halfStr) return false;
-            // Check for common 2nd-half / final indicators
-            if (halfStr.includes('2nd')) return true;
-            if (halfStr.includes('second')) return true;
-            if (halfStr.includes('final')) return true;
-            if (halfStr.includes('full time')) return true;
-            if (halfStr.includes('match over')) return true;
-            if (halfStr.includes('3rd')) return true;
-            if (halfStr.includes('third')) return true;
-            // Support "Half 2" / "H2" patterns
-            if (/\bhalf\s*2\b/.test(halfStr)) return true;
-            // Support explicit numeric current_half / currentHalf field
+            const s = (halfStatus || '').toLowerCase().trim();
+            if (s) {
+                if (s.includes('2nd')) return true;
+                if (s.includes('second')) return true;
+                if (s.includes('half 2')) return true;
+                if (s.includes('half-2')) return true;
+                if (s.includes('half_2')) return true;
+                if (s.includes('h2')) return true;
+                if (s.includes('final')) return true;
+                if (s.includes('full time')) return true;
+                if (s.includes('match over')) return true;
+                if (/\b2\b/.test(s) && !s.includes('1st') && !s.includes('first')) return true;
+            }
             if (data) {
-                const ch1 = parseInt(data.current_half);
-                const ch2 = parseInt(data.currentHalf);
-                if (ch1 === 2 || ch2 === 2) return true;
+                const ch = parseInt(data.current_half || data.currentHalf || 0);
+                if (ch >= 2) return true;
             }
             return false;
+        }
+
+        // Log key for multi-log tracking
+        function getLogKey(log) {
+            return String(log.id || '') + '|' + (log.title || '') + '|' + (log.type || '');
         }
 
         // ==========================================
@@ -1595,7 +1599,7 @@ margin-right: -87px;}
                     lastRightColor = rightColor;
                 }
 
-                // ── 3. SCORES ──
+                // ── 3. SCORES (swap-aware) ──
                 const leftScore  = data[visualLeftKey  + '_score'] || 0;
                 const rightScore = data[visualRightKey + '_score'] || 0;
                 updateScoreWithAnimation('left-score',  leftScore,  previousLeftScore);
@@ -1680,10 +1684,7 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // DOTS RENDERER
-        //   Now also accounts for yellow/red card suspensions:
-        //     • isDisqualified === true  → inactive (red card, whole match)
-        //     • suspensionSeconds > 0    → inactive (yellow card, temporary)
+        // DOTS RENDERER (accounts for yellow/red cards + swap)
         // ==========================================
         function renderDots(dotClassName, outIdsStr, rosterJsonStr, teamColor) {
             const dots = document.getElementsByClassName(dotClassName);
@@ -1702,16 +1703,13 @@ margin-right: -87px;}
 
             if (starting7.length === 0) return;
 
-            // Build the set of "inactive" IDs:
-            //   1) Players explicitly out (tackled) — from OutIds
-            //   2) Players disqualified (red card) — from roster
-            //   3) Players currently suspended (yellow card) — from roster
             const outOrder = splitConcatenatedIds(outIdsStr || '', starting7);
             const outSet   = new Set(outOrder);
 
+            // Card-inactive players (red card / yellow suspension)
             const cardInactiveIds = [];
             starting7.forEach(p => {
-                if (outSet.has(p.id)) return; // already inactive
+                if (outSet.has(p.id)) return;
                 const disqualified = p.isDisqualified === true;
                 const suspended = (parseInt(p.suspensionSeconds) || 0) > 0;
                 if (disqualified || suspended) {
@@ -1722,9 +1720,6 @@ margin-right: -87px;}
 
             const alive = starting7.filter(p => !outSet.has(p.id));
 
-            // Build the ordered inactive list:
-            //   first players who went out on the mat (in out-order),
-            //   then extra card-inactive players in roster order.
             const outP = outOrder.map(id => starting7.find(p => p.id === id)).filter(Boolean);
             const cardP = cardInactiveIds.map(id => starting7.find(p => p.id === id)).filter(Boolean);
             const allInactive = [...outP, ...cardP];
@@ -2018,7 +2013,10 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // EVENT TIMELINE
+        // EVENT TIMELINE — MULTI-LOG PROCESSING
+        //   Iterates over ALL new logs (not just latest) so
+        //   yellow/red card events fire even when followed
+        //   immediately by a Technical Point log with same id.
         // ==========================================
         function handleEventTimeline(state) {
             if (!state.logsJson) return;
@@ -2026,36 +2024,41 @@ margin-right: -87px;}
                 const logs = JSON.parse(state.logsJson);
                 if (logs.length === 0) return;
 
-                const latestLog = logs[logs.length - 1];
-
-                if (previousLogId === undefined) {
-                    previousLogId = latestLog.id;
+                if (!initialLoadDone) {
+                    logs.forEach(log => seenLogKeys.add(getLogKey(log)));
+                    initialLoadDone = true;
                     return;
                 }
 
-                if (latestLog.id !== previousLogId) {
-                    previousLogId = latestLog.id;
-                    const title = (latestLog.title || '').toLowerCase();
-                    const type  = latestLog.type  || '';
+                for (const log of logs) {
+                    const key = getLogKey(log);
+                    if (seenLogKeys.has(key)) continue;
+                    seenLogKeys.add(key);
 
+                    const title = (log.title || '').toLowerCase();
+                    const type  = log.type  || '';
+
+                    // ── EPIC EVENTS ──
                     if (type === 'ALL_OUT' || title.includes("all out") || title.includes("ऑल आउट") || title.includes("ऑलआउट")) {
                         playEpicAnimation('all_out');
                     }
                     else if (type === 'SUPER_TACKLE' || title.includes("super tackle") || title.includes("सुपर टैकल") || title.includes("सुपरटैकल")) {
                         playEpicAnimation('super_tackle');
                     }
-                    else if (title.includes("super raid") || title.includes("सुपर रेड") || title.includes("सुपररेड") || (type === "RAID" && latestLog.points >= 3)) {
+                    else if (title.includes("super raid") || title.includes("सुपर रेड") || title.includes("सुपररेड") || (type === "RAID" && log.points >= 3)) {
                         playEpicAnimation('super_raid');
                     }
+                    // ── SUBSTITUTION ──
                     else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
-                        showSideBanner('Substitution', latestLog.desc || '', latestLog.isLeftTeam, false);
+                        showSideBanner('Substitution', log.desc || '', log.isLeftTeam, false);
                     }
+                    // ── CARDS (Green / Yellow / Red) ──
                     else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
                         let labelText = 'FOUL';
                         if (title.includes('red')    || title.includes('लाल'))  labelText = '🟥 RED CARD';
                         else if (title.includes('yellow') || title.includes('पीला')) labelText = '🟨 YELLOW CARD';
                         else if (title.includes('green')  || title.includes('हरा'))  labelText = '🟩 GREEN CARD';
-                        showSideBanner(labelText, latestLog.desc || '', latestLog.isLeftTeam, true);
+                        showSideBanner(labelText, log.desc || '', log.isLeftTeam, true);
                     }
                 }
             } catch (e) {
@@ -2195,8 +2198,6 @@ margin-right: -87px;}
 
         // ==========================================
         // RENDER: STARTING 7
-        //   • Top name row uses DYNAMIC TEAM COLOUR (via --s7-team-color)
-        //   • Uses /images/player_profile_starting.png when player has no imageUri
         // ==========================================
         function renderStarting7(teamName, teamColor, rosterJsonStr) {
             const nameEl = document.getElementById('s7-team-name');
@@ -2207,7 +2208,6 @@ margin-right: -87px;}
                 nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
             }
 
-            // Apply dynamic team colour to the overlay root
             const overlayEl = document.getElementById('starting7-overlay');
             overlayEl.style.setProperty('--s7-team-color', teamColor);
             overlayEl.style.setProperty('--s7-team-color-dark', darkenColor(teamColor, 30));
@@ -2255,7 +2255,7 @@ margin-right: -87px;}
         }
 
         // ==========================================
-        // RENDER: TEAM STATS
+        // RENDER: TEAM STATS (swap-aware)
         // ==========================================
         function renderTeamStats(data, state, visualLeftKey, visualRightKey, leftName, rightName, leftColor, rightColor) {
             const ls = data[visualLeftKey  + '_score'] || 0;
@@ -2268,14 +2268,14 @@ margin-right: -87px;}
             document.getElementById('ts-left-team-name').innerText = leftName;
             document.getElementById('ts-right-team-name').innerText = rightName;
 
-            const lRaid   = parseInt(state?.leftRaidPoints   || 0);
-            const rRaid   = parseInt(state?.rightRaidPoints  || 0);
-            const lTackle = parseInt(state?.leftTacklePoints || 0);
-            const rTackle = parseInt(state?.rightTacklePoints|| 0);
-            const lAO     = parseInt(state?.leftAllOutPoints || 0);
-            const rAO     = parseInt(state?.rightAllOutPoints|| 0);
-            const lExtra  = parseInt(state?.leftExtraPoints  || 0);
-            const rExtra  = parseInt(state?.rightExtraPoints || 0);
+            const lRaid   = parseInt(state?.[visualLeftKey  + 'RaidPoints']   || 0);
+            const rRaid   = parseInt(state?.[visualRightKey + 'RaidPoints']   || 0);
+            const lTackle = parseInt(state?.[visualLeftKey  + 'TacklePoints'] || 0);
+            const rTackle = parseInt(state?.[visualRightKey + 'TacklePoints'] || 0);
+            const lAO     = parseInt(state?.[visualLeftKey  + 'AllOutPoints'] || 0);
+            const rAO     = parseInt(state?.[visualRightKey + 'AllOutPoints'] || 0);
+            const lExtra  = parseInt(state?.[visualLeftKey  + 'ExtraPoints']  || 0);
+            const rExtra  = parseInt(state?.[visualRightKey + 'ExtraPoints']  || 0);
 
             document.getElementById('ts-left-raid').innerText    = lRaid;
             document.getElementById('ts-right-raid').innerText   = rRaid;
@@ -2303,7 +2303,6 @@ margin-right: -87px;}
 
             setPieRing('ts-left-raid-pie',   'ts-left-raid-val',   lRaidRate,   leftColor);
             setPieRing('ts-left-tackle-pie', 'ts-left-tackle-val', lTackleRate, leftColor);
-
             setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate,   rightColor);
             setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate, rightColor);
         }
