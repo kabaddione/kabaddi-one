@@ -65,6 +65,7 @@
             visibility: hidden; opacity: 0;
             border: 2px solid #D4AF37; border-bottom: none;
             transition: opacity 0.35s ease, visibility 0.35s ease, box-shadow 0.4s ease;
+            position: relative;
         }
         .raid-track.visible {
             visibility: visible; opacity: 1;
@@ -79,6 +80,57 @@
             background: var(--raid-bar-color, #00FF00);
             box-shadow: 0px 0px 15px var(--raid-bar-color, #00FF00);
             transition: width 1s linear;
+            position: relative;
+        }
+        /* Firecracker spark at the shrinking edge */
+        .raid-spark {
+            position: absolute;
+            top: -3px;
+            bottom: -3px;
+            width: 26px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .raid-track.visible .raid-spark { opacity: 1; }
+        .track-left .raid-spark {
+            left: -13px;
+            background: radial-gradient(ellipse at center,
+                        #FFFFFF 0%, #FFF3A3 15%, #FFD700 35%,
+                        rgba(255,215,0,0.7) 55%, rgba(255,215,0,0) 100%);
+            filter: blur(1.5px);
+            animation: sparkFlicker 0.14s infinite alternate;
+        }
+        .track-right .raid-spark {
+            right: -13px;
+            background: radial-gradient(ellipse at center,
+                        #FFFFFF 0%, #FFF3A3 15%, #FFD700 35%,
+                        rgba(255,215,0,0.7) 55%, rgba(255,215,0,0) 100%);
+            filter: blur(1.5px);
+            animation: sparkFlicker 0.14s infinite alternate;
+        }
+        @keyframes sparkFlicker {
+            0%   { opacity: 0.65; transform: scale(1); }
+            50%  { opacity: 1;    transform: scale(1.15); }
+            100% { opacity: 0.85; transform: scale(1.05); }
+        }
+        /* Spark particles */
+        .raid-spark::before,
+        .raid-spark::after {
+            content: '';
+            position: absolute;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            box-shadow: 0 0 8px #FFF, 0 0 12px #FFD700;
+        }
+        .track-left .raid-spark::before { top: 2px; left: 50%; animation: sparkFloat 0.5s infinite ease-out; }
+        .track-left .raid-spark::after  { bottom: 2px; left: 50%; animation: sparkFloat 0.5s infinite ease-out 0.25s; }
+        .track-right .raid-spark::before { top: 2px; right: 50%; animation: sparkFloat 0.5s infinite ease-out; }
+        .track-right .raid-spark::after  { bottom: 2px; right: 50%; animation: sparkFloat 0.5s infinite ease-out 0.25s; }
+        @keyframes sparkFloat {
+            0%   { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-8px) scale(0.3); opacity: 0; }
         }
         /* DO-OR-DIE BANNER */
         .dod-banner {
@@ -107,29 +159,147 @@
             to   { box-shadow: 0 0 40px rgba(255,0,0,1), 0 8px 20px rgba(0,0,0,0.6); }
         }
         @keyframes sirenRotate { from { transform: scale(1); } to { transform: scale(1.15); } }
-        /* SIDE BANNER */
+        /* =========================================
+           NEW SUBSTITUTION BANNER (2-phase)
+           ========================================= */
         .side-banner {
             position: absolute;
             bottom: calc(100% - 38px);
-            background: linear-gradient(to top, #1A0033, #4A148C);
-            border: 3px solid #D4AF37;
-            padding: 6px 30px; font-size: 20px;
-            color: rgb(255, 215, 3); font-weight: bold;
-            display: flex; align-items: center; gap: 15px;
-            opacity: 0; transform: translateY(20px);
+            display: flex;
+            align-items: stretch;
+            height: 55px;
+            opacity: 0;
+            transform: translateY(30px);
             transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
                         transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
             box-shadow: 0px 10px 25px rgba(0,0,0,0.85);
-            z-index: 25; white-space: nowrap;
-            height: 55px; max-width: 700px;
+            z-index: 25;
+            white-space: nowrap;
+            pointer-events: none;
         }
-        .side-banner.show { opacity: 1; transform: translateY(0) scale(1); }
-        .side-banner.pos-right { right: 305px; left: auto; clip-path: polygon(9% 0, 100% 0, 91% 100%, 0 100%); padding-left: 40px; }
-        .side-banner.pos-left { left: 305px; right: auto; clip-path: polygon(0 0, 91% 0, 100% 100%, 9% 100%); padding-right: 40px; flex-direction: row-reverse; }
-        .side-banner.foul { background: linear-gradient(to right, #4A0000, #D32F2F); border-color: #FFD700; color: #FFD700; }
-        .side-banner.foul .side-banner-detail { color: #FFFFFF; }
-        .side-banner .side-banner-label { font-family: 'Oswald', sans-serif; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-        .side-banner .side-banner-detail { color: #FFFFFF; }
+        .side-banner.pos-right {
+            right: 305px; left: auto;
+            flex-direction: row;
+        }
+        .side-banner.pos-left {
+            left: 305px; right: auto;
+            flex-direction: row-reverse;
+        }
+        .side-banner.show { opacity: 1; transform: translateY(0); }
+        .side-banner.hide { opacity: 0; transform: translateY(30px); }
+
+        /* Track holds the animated rows */
+        .sub-track {
+            position: relative;
+            width: 340px;
+            overflow: hidden;
+            background: #FFFFFF;
+            border: 3px solid #D4AF37;
+            border-right: none;
+        }
+        .pos-left .sub-track {
+            border-right: 3px solid #D4AF37;
+            border-left: none;
+        }
+        .sub-track::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #ECECEC 100%);
+            z-index: 0;
+        }
+        /* Two rows that slide up */
+        .sub-row {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 20px;
+            transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+            z-index: 1;
+            will-change: transform;
+        }
+        .sub-row-out {
+            transform: translateY(0);
+        }
+        .sub-row-in {
+            transform: translateY(100%);
+        }
+        .side-banner.phase-in .sub-row-out {
+            transform: translateY(-100%);
+        }
+        .side-banner.phase-in .sub-row-in {
+            transform: translateY(0);
+        }
+        .pos-left .sub-row {
+            flex-direction: row-reverse;
+        }
+
+        /* Arrow box (down/up) */
+        .sub-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #FFFFFF;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .sub-arrow-out {
+            background: linear-gradient(to bottom, #EF4444 0%, #B71C1C 100%);
+            box-shadow: 0 3px 10px rgba(239,68,68,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+        .sub-arrow-in {
+            background: linear-gradient(to bottom, #22C55E 0%, #15803D 100%);
+            box-shadow: 0 3px 10px rgba(34,197,94,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+        .sub-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #111111;
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            text-align: left;
+        }
+        .pos-left .sub-name { text-align: right; }
+
+        /* Static badge on the outer side (stays visible through animation) */
+        .sub-badge {
+            background: linear-gradient(to top, #1A0033, #4A148C);
+            border: 3px solid #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 26px;
+            color: #FFD700;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            font-size: 17px;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(255,215,0,0.5);
+            flex-shrink: 0;
+        }
+        .pos-right .sub-badge {
+            clip-path: polygon(9% 0, 100% 0, 91% 100%, 0 100%);
+            padding-left: 34px;
+        }
+        .pos-left .sub-badge {
+            clip-path: polygon(0 0, 91% 0, 100% 100%, 9% 100%);
+            padding-right: 34px;
+        }
+
         /* MAIN SCOREBOARD ROW */
         .main-row {
             display: flex; align-items: flex-start; justify-content: center;
@@ -256,6 +426,66 @@
             background: linear-gradient(to left, #4A0000, #D32F2F) !important;
             animation: dodBarPulse 1s infinite alternate;
         }
+
+        /* =========================================
+           MATCH END MERGED BANNER
+           ========================================= */
+        .match-end-row {
+            display: none;
+            position: relative;
+            height: 90px;
+            padding: 5px;
+            margin-top: 10px;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
+            clip-path: polygon(2% 0, 98% 0, 100% 100%, 0 100%);
+        }
+        .match-end-row.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .match-end-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 55px;
+            padding: 0 70px;
+            background: #14141F;
+            clip-path: polygon(2% 0, 98% 0, 100% 100%, 0 100%);
+            border: 4px solid var(--winner-color, #D4AF37);
+            box-shadow: inset 0 0 30px var(--winner-color-soft, rgba(212,175,55,0.35)),
+                        0 0 40px var(--winner-color-soft, rgba(212,175,55,0.55));
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        .me-team {
+            font-family: 'Mukta', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            color: #FFFFFF;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.95);
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .me-score {
+            font-family: 'Teko', sans-serif;
+            font-size: 78px;
+            font-weight: 700;
+            color: #FFD700;
+            text-shadow: 0 0 25px rgba(255,215,0,0.7);
+            letter-spacing: 4px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
         /* BOTTOM ROW */
         .bottom-row {
             display: flex; align-items: flex-start; justify-content: center;
@@ -265,6 +495,8 @@
             width: 310px; height: 38px;
             clip-path: polygon(0 0, 93% 0, 100% 100%, 7% 100%);
             padding: 4px; margin-right: 0px;
+            position: relative;
+            overflow: visible;
         }
         .dots-left-inner {
             width: 100%; height: 100%;
@@ -304,6 +536,8 @@
             width: 310px; height: 38px;
             clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
             padding: 4px; margin-left: 0px;
+            position: relative;
+            overflow: visible;
         }
         .dots-right-inner {
             width: 100%; height: 100%;
@@ -323,6 +557,40 @@
             border-color: #FFFFFF;
             box-shadow: 0 0 10px var(--dot-active-color, #00FF00), 0 0 4px #FFFFFF inset;
         }
+
+        /* =========================================
+           MARQUEE TEXT BELOW DOTS
+           ========================================= */
+        .team-marquee {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            height: 16px;
+            overflow: hidden;
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        }
+        .team-marquee-inner {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            display: inline-block;
+            white-space: nowrap;
+            font-family: 'Oswald', sans-serif;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #FFFFFF;
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.9);
+            animation: marqueeScroll 26s linear infinite;
+        }
+        @keyframes marqueeScroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(calc(-100% - 330px)); }
+        }
+
         /* CENTER EVENT POPUP */
         @keyframes pop {
             0% { transform: scale(1); }
@@ -428,9 +696,7 @@
             background: url('/images/subs_mate.jpg') center/cover no-repeat;
             background-color: #1A1A2E; z-index: 1;
         }
-        #starting7-overlay .s7-bg::after {
-            content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25);
-        }
+        #starting7-overlay .s7-bg::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
         #starting7-overlay .s7-content {
             position: relative; z-index: 2;
             width: 100%; height: 100%;
@@ -449,19 +715,14 @@
             overflow: visible; margin-bottom: 4px;
             filter: drop-shadow(0 8px 12px rgba(0,0,0,0.75));
         }
-        #starting7-overlay .s7-avatar img {
-            width: 100%; height: 100%;
-            object-fit: contain; object-position: bottom center;
-        }
+        #starting7-overlay .s7-avatar img { width: 100%; height: 100%; object-fit: contain; object-position: bottom center; }
         #starting7-overlay .s7-name-tag {
             width: 100%; display: flex; flex-direction: column;
             border-radius: 3px; overflow: hidden;
             box-shadow: 0 6px 14px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08);
         }
         #starting7-overlay .s7-name-top {
-            background: linear-gradient(to bottom,
-                        var(--s7-team-color, #E91E63) 0%,
-                        var(--s7-team-color-dark, #C2185B) 100%);
+            background: linear-gradient(to bottom, var(--s7-team-color, #E91E63) 0%, var(--s7-team-color-dark, #C2185B) 100%);
             color: #FFF; font-family: 'Oswald', sans-serif;
             font-weight: 700; font-size: 16px; text-align: center;
             padding: 4px 8px; letter-spacing: 0.5px;
@@ -511,9 +772,7 @@
             background: url('/images/kabaddione_bg.jpg') center/cover no-repeat;
             z-index: 1;
         }
-        #team-stats-overlay .ts-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.62); z-index: 2;
-        }
+        #team-stats-overlay .ts-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.62); z-index: 2; }
         #team-stats-overlay .ts-content {
             position: relative; z-index: 3;
             width: 100%; height: 100%;
@@ -532,16 +791,9 @@
             width: 200px; height: 3px; background: #E040FB;
             margin: 8px 0 20px; box-shadow: 0 0 15px rgba(224,64,251,0.9);
         }
-        #team-stats-overlay .ts-row-wrap {
-            display: flex; align-items: center; justify-content: center;
-            gap: 60px; margin-bottom: 12px;
-        }
-        #team-stats-overlay .ts-pie-col {
-            display: flex; flex-direction: column; gap: 26px; align-items: center;
-        }
-        #team-stats-overlay .ts-pie-item {
-            display: flex; flex-direction: column; align-items: center;
-        }
+        #team-stats-overlay .ts-row-wrap { display: flex; align-items: center; justify-content: center; gap: 60px; margin-bottom: 12px; }
+        #team-stats-overlay .ts-pie-col { display: flex; flex-direction: column; gap: 26px; align-items: center; }
+        #team-stats-overlay .ts-pie-item { display: flex; flex-direction: column; align-items: center; }
         #team-stats-overlay .ts-pie-label {
             font-family: 'Oswald', sans-serif; font-size: 15px; color: #FFF;
             text-align: center; margin-top: 8px; font-weight: 600; letter-spacing: 0.5px;
@@ -561,9 +813,7 @@
             position: relative; z-index: 2;
             font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700; color: #FFF;
         }
-        #team-stats-overlay .ts-table {
-            display: flex; flex-direction: column; gap: 10px; min-width: 340px;
-        }
+        #team-stats-overlay .ts-table { display: flex; flex-direction: column; gap: 10px; min-width: 340px; }
         #team-stats-overlay .ts-table-row { display: flex; align-items: center; justify-content: center; }
         #team-stats-overlay .ts-cell {
             height: 46px; display: flex; align-items: center; justify-content: center;
@@ -643,10 +893,7 @@
             flex: 1; display: flex; align-items: center; justify-content: center;
             overflow: hidden; position: relative; padding: 20px;
         }
-        #player-perf-overlay .pp-avatar img {
-            width: 100%; height: 100%;
-            object-fit: contain; object-position: center bottom;
-        }
+        #player-perf-overlay .pp-avatar img { width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
         #player-perf-overlay .pp-name-badge {
             background: #FFFFFF; color: var(--pp-team-color, #000);
             font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
@@ -727,17 +974,37 @@
             <span class="siren-icon">🚨</span>
         </div>
 
+        <!-- NEW SUBSTITUTION BANNER (2-phase animation) -->
         <div id="side-banner" class="side-banner pos-right">
-            <span id="side-banner-label" class="side-banner-label">Substitution</span>
-            <span id="side-banner-detail" class="side-banner-detail">Player Name</span>
+            <div class="sub-badge" id="sub-badge">
+                <span class="sub-badge-text">सब्सटीट्यूशन</span>
+            </div>
+            <div class="sub-track">
+                <div class="sub-row sub-row-out" id="sub-row-out">
+                    <div class="sub-arrow sub-arrow-out">↓</div>
+                    <div class="sub-name" id="sub-out-name">Player Name</div>
+                </div>
+                <div class="sub-row sub-row-in" id="sub-row-in">
+                    <div class="sub-arrow sub-arrow-in">↑</div>
+                    <div class="sub-name" id="sub-in-name">Player Name</div>
+                </div>
+            </div>
         </div>
 
-        <div class="top-raid-bars">
-            <div id="raid-track-left" class="raid-track track-left"><div id="raid-bar-left" class="raid-fill"></div></div>
-            <div id="raid-track-right" class="raid-track track-right"><div id="raid-bar-right" class="raid-fill"></div></div>
+        <div class="top-raid-bars" id="top-raid-bars">
+            <div id="raid-track-left" class="raid-track track-left">
+                <div id="raid-bar-left" class="raid-fill">
+                    <div class="raid-spark"></div>
+                </div>
+            </div>
+            <div id="raid-track-right" class="raid-track track-right">
+                <div id="raid-bar-right" class="raid-fill">
+                    <div class="raid-spark"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="main-row">
+        <div class="main-row" id="main-row">
             <div class="team-left-wrap gold-bg" id="left-team-wrap">
                 <div class="team-left-inner" id="left-team-bg">
                     <div class="name-rotator">
@@ -764,10 +1031,22 @@
             </div>
         </div>
 
+        <!-- MATCH END MERGED BANNER -->
+        <div id="match-end-row" class="match-end-row">
+            <div class="match-end-inner" id="me-inner">
+                <div class="me-team" id="me-left">TEAM A</div>
+                <div class="me-score" id="me-score">0 - 0</div>
+                <div class="me-team" id="me-right">TEAM B</div>
+            </div>
+        </div>
+
         <div class="bottom-row">
             <div class="dots-left-wrap gold-bg">
                 <div class="dots-left-inner" id="left-dots-bg">
                     <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
+                </div>
+                <div class="team-marquee">
+                    <div class="team-marquee-inner">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
                 </div>
             </div>
             <div class="center-info-wrap gold-bg">
@@ -780,6 +1059,9 @@
             <div class="dots-right-wrap gold-bg">
                 <div class="dots-right-inner" id="right-dots-bg">
                     <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
+                </div>
+                <div class="team-marquee">
+                    <div class="team-marquee-inner">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
                 </div>
             </div>
         </div>
@@ -949,10 +1231,10 @@
         // ==========================================
         let previousLeftScore = -1;
         let previousRightScore = -1;
-        let previousLogId = undefined;
 
         let lastLeftColor = null;
         let lastRightColor = null;
+        let lastMatchOver = false;
 
         let previousRaidActive = null;
 
@@ -1027,10 +1309,6 @@
 
         // ==========================================
         // ENGINE
-        //   NOTE: NO JS SWAP LOGIC.
-        //   The Android app swaps left_*/right_* fields in Firebase at
-        //   half-time. We display the data as-is — exactly like the
-        //   live scoreboard web page does.
         // ==========================================
         function initBroadcastEngine(id) {
             const matchRef = db.ref('live_matches/' + id);
@@ -1038,10 +1316,6 @@
             matchRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
-
-                // Data is displayed as-is — no side swap.
-                const visualLeftKey  = 'left';
-                const visualRightKey = 'right';
 
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
@@ -1073,19 +1347,19 @@
 
                 applyCenterClockAndStatus(data);
 
+                // Match-over detection
+                const matchOver = !!data.match_result
+                    || (data.half_status || '').toLowerCase().includes('over')
+                    || (data.half_status || '').toLowerCase().includes('full time');
+                applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
+
                 let state = null;
                 if (data.state_json) {
                     try {
                         state = JSON.parse(data.state_json);
 
-                        renderDots('left-dot',
-                            state.leftOutIds,
-                            state.leftRosterJson,
-                            leftColor);
-                        renderDots('right-dot',
-                            state.rightOutIds,
-                            state.rightRosterJson,
-                            rightColor);
+                        renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
+                        renderDots('right-dot', state.rightOutIds, state.rightRosterJson, rightColor);
 
                         handleRaidTimers(state, data.raid_clock, leftColor, rightColor);
                         handleDoOrDie(state, data.raid_clock);
@@ -1099,6 +1373,41 @@
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
             });
+        }
+
+        // ==========================================
+        // MATCH END MERGED BANNER
+        // ==========================================
+        function applyMatchEndBanner(isOver, leftName, rightName, ls, rs, leftColor, rightColor) {
+            const meRow = document.getElementById('match-end-row');
+            const mainRow = document.getElementById('main-row');
+            const topBars = document.getElementById('top-raid-bars');
+
+            if (isOver && !lastMatchOver) {
+                mainRow.style.display = 'none';
+                topBars.style.display = 'none';
+                meRow.classList.add('show');
+            } else if (!isOver && lastMatchOver) {
+                mainRow.style.display = '';
+                topBars.style.display = '';
+                meRow.classList.remove('show');
+            }
+            if (!isOver) { lastMatchOver = false; return; }
+            lastMatchOver = true;
+
+            document.getElementById('me-left').innerText  = leftName;
+            document.getElementById('me-right').innerText = rightName;
+            document.getElementById('me-score').innerText = `${ls} - ${rs}`;
+
+            let winnerColor = '#4A4A4A';       // dark grey for tie
+            let winnerSoft  = 'rgba(74,74,74,0.4)';
+            if (ls > rs)      { winnerColor = leftColor;  winnerSoft = darkenColor(leftColor, 20) + '66'; }
+            else if (rs > ls) { winnerColor = rightColor; winnerSoft = darkenColor(rightColor, 20) + '66'; }
+
+            const inner = document.getElementById('me-inner');
+            inner.style.setProperty('--winner-color', winnerColor);
+            inner.style.setProperty('--winner-color-soft', winnerSoft);
+            inner.style.borderColor = winnerColor;
         }
 
         // ==========================================
@@ -1148,7 +1457,7 @@
         }
 
         // ==========================================
-        // DOTS RENDERER (with yellow/red card support)
+        // DOTS RENDERER
         // ==========================================
         function renderDots(dotClassName, outIdsStr, rosterJsonStr, teamColor) {
             const dots = document.getElementsByClassName(dotClassName);
@@ -1170,7 +1479,6 @@
             const outOrder = splitConcatenatedIds(outIdsStr || '', starting7);
             const outSet   = new Set(outOrder);
 
-            // Card-inactive players
             const cardInactiveIds = [];
             starting7.forEach(p => {
                 if (outSet.has(p.id)) return;
@@ -1183,7 +1491,7 @@
             });
 
             const alive = starting7.filter(p => !outSet.has(p.id));
-            const outP = outOrder.map(id => starting7.find(p => p.id === id)).filter(Boolean);
+            const outP  = outOrder.map(id => starting7.find(p => p.id === id)).filter(Boolean);
             const cardP = cardInactiveIds.map(id => starting7.find(p => p.id === id)).filter(Boolean);
             const allInactive = [...outP, ...cardP];
 
@@ -1293,6 +1601,8 @@
 
         // ==========================================
         // RAIDER NAME ROTATION
+        //   Fix: Do NOT start rotation if raiderName is empty.
+        //   Only begin when a real raider name is confirmed.
         // ==========================================
         function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
@@ -1307,14 +1617,22 @@
                 return;
             }
 
+            // FIX: Do not show animation until a real raider name is set.
+            const raiderName = (data.active_raider_name || '').trim();
+            if (!raiderName) {
+                stopRaiderRotation('left');
+                stopRaiderRotation('right');
+                raiderRotationState.left.currentRaider  = null;
+                raiderRotationState.right.currentRaider = null;
+                return;
+            }
+
             let actualLeftRaid = true;
             const raw = state.currentRaidTeamIsLeft !== undefined
                 ? state.currentRaidTeamIsLeft
                 : state.currentRaidTeamsLeft;
             if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
             else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
-
-            const raiderName = (data.active_raider_name || '').trim() || 'RAIDER';
 
             if (actualLeftRaid) {
                 startRaiderRotation('left', raiderName);
@@ -1438,28 +1756,52 @@
         }
 
         // ==========================================
-        // SIDE BANNER
+        // SUBSTITUTION BANNER (2-phase animation)
         // ==========================================
-        function showSideBanner(labelText, detailText, isLeftTeam, isFoul) {
+        let subBannerTimeoutIds = [];
+        function triggerSubstitutionGraphic(descText, isLeftTeam) {
             const banner = document.getElementById('side-banner');
-            const label  = document.getElementById('side-banner-label');
-            const detail = document.getElementById('side-banner-detail');
+            const outNameEl = document.getElementById('sub-out-name');
+            const inNameEl  = document.getElementById('sub-in-name');
 
-            const visualLeft = (isLeftTeam !== false);
+            // Parse "Player (X) replaced by Player (Y)"
+            const jerseyMatches = [...String(descText || '').matchAll(/\((\d+)\)/g)].map(m => m[1]);
+            let outName = 'Player', inName = 'Player';
+            if (jerseyMatches.length >= 2) {
+                outName = 'Player ' + jerseyMatches[0];
+                inName  = 'Player ' + jerseyMatches[1];
+            } else {
+                outName = descText || 'Player';
+                inName  = descText || 'Player';
+            }
+            outNameEl.innerText = outName;
+            inNameEl.innerText  = inName;
 
-            label.innerText  = labelText;
-            detail.innerText = detailText;
+            // Clear any pending timeouts from previous subs
+            subBannerTimeoutIds.forEach(id => clearTimeout(id));
+            subBannerTimeoutIds = [];
 
-            banner.className = 'side-banner ' + (visualLeft ? 'pos-left' : 'pos-right');
-            if (isFoul) banner.classList.add('foul');
+            // Set side (mirror for left vs right)
+            banner.className = 'side-banner ' + (isLeftTeam === false ? 'pos-right' : 'pos-left');
+            void banner.offsetWidth; // reflow
 
-            void banner.offsetWidth;
+            // Phase 1: slide in showing OUT player
             banner.classList.add('show');
 
-            clearTimeout(banner._hideTimer);
-            banner._hideTimer = setTimeout(() => {
-                banner.classList.remove('show');
-            }, 5000);
+            // Phase 2 (after 2s): slide up to show IN player
+            subBannerTimeoutIds.push(setTimeout(() => {
+                banner.classList.add('phase-in');
+            }, 2000));
+
+            // Phase 3 (after 4s): slide down + fade out
+            subBannerTimeoutIds.push(setTimeout(() => {
+                banner.classList.add('hide');
+            }, 4000));
+
+            // Cleanup after animation
+            subBannerTimeoutIds.push(setTimeout(() => {
+                banner.classList.remove('show', 'hide', 'phase-in');
+            }, 4700));
         }
 
         // ==========================================
@@ -1495,14 +1837,11 @@
                         playEpicAnimation('super_raid');
                     }
                     else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
-                        showSideBanner('Substitution', log.desc || '', log.isLeftTeam, false);
+                        triggerSubstitutionGraphic(log.desc || '', log.isLeftTeam);
                     }
                     else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
-                        let labelText = 'FOUL';
-                        if (title.includes('red')    || title.includes('लाल'))  labelText = '🟥 RED CARD';
-                        else if (title.includes('yellow') || title.includes('पीला')) labelText = '🟨 YELLOW CARD';
-                        else if (title.includes('green')  || title.includes('हरा'))  labelText = '🟩 GREEN CARD';
-                        showSideBanner(labelText, log.desc || '', log.isLeftTeam, true);
+                        // Cards no longer use the side banner (that space is for subs).
+                        // (Optional: could trigger a different visual, but not required.)
                     }
                 }
             } catch (e) {
