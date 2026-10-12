@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KabaddiOne Professional Broadcast Overlay</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -82,46 +82,30 @@
             transition: width 1s linear;
             position: relative;
         }
-        /* Firecracker spark at the shrinking edge */
         .raid-spark {
-            position: absolute;
-            top: -3px;
-            bottom: -3px;
-            width: 26px;
-            pointer-events: none;
-            opacity: 0;
+            position: absolute; top: -3px; bottom: -3px; width: 26px;
+            pointer-events: none; opacity: 0;
             transition: opacity 0.25s ease;
         }
         .raid-track.visible .raid-spark { opacity: 1; }
         .track-left .raid-spark {
             left: -13px;
-            background: radial-gradient(ellipse at center,
-                        #FFFFFF 0%, #FFF3A3 15%, #FFD700 35%,
-                        rgba(255,215,0,0.7) 55%, rgba(255,215,0,0) 100%);
-            filter: blur(1.5px);
-            animation: sparkFlicker 0.14s infinite alternate;
+            background: radial-gradient(ellipse at center, #FFFFFF 0%, #FFF3A3 15%, #FFD700 35%, rgba(255,215,0,0.7) 55%, rgba(255,215,0,0) 100%);
+            filter: blur(1.5px); animation: sparkFlicker 0.14s infinite alternate;
         }
         .track-right .raid-spark {
             right: -13px;
-            background: radial-gradient(ellipse at center,
-                        #FFFFFF 0%, #FFF3A3 15%, #FFD700 35%,
-                        rgba(255,215,0,0.7) 55%, rgba(255,215,0,0) 100%);
-            filter: blur(1.5px);
-            animation: sparkFlicker 0.14s infinite alternate;
+            background: radial-gradient(ellipse at center, #FFFFFF 0%, #FFF3A3 15%, #FFD700 35%, rgba(255,215,0,0.7) 55%, rgba(255,215,0,0) 100%);
+            filter: blur(1.5px); animation: sparkFlicker 0.14s infinite alternate;
         }
         @keyframes sparkFlicker {
             0%   { opacity: 0.65; transform: scale(1); }
             50%  { opacity: 1;    transform: scale(1.15); }
             100% { opacity: 0.85; transform: scale(1.05); }
         }
-        /* Spark particles */
-        .raid-spark::before,
-        .raid-spark::after {
-            content: '';
-            position: absolute;
-            width: 4px; height: 4px;
-            border-radius: 50%;
-            background: #FFFFFF;
+        .raid-spark::before, .raid-spark::after {
+            content: ''; position: absolute; width: 4px; height: 4px;
+            border-radius: 50%; background: #FFFFFF;
             box-shadow: 0 0 8px #FFF, 0 0 12px #FFD700;
         }
         .track-left .raid-spark::before { top: 2px; left: 50%; animation: sparkFloat 0.5s infinite ease-out; }
@@ -132,7 +116,10 @@
             0%   { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-8px) scale(0.3); opacity: 0; }
         }
-        /* DO-OR-DIE BANNER */
+
+        /* =========================================
+           DO-OR-DIE BANNER (with thunder lightning)
+           ========================================= */
         .dod-banner {
             position: absolute;
             bottom: calc(100% - 37px);
@@ -149,124 +136,173 @@
             transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
                         transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none; z-index: 20;
+            overflow: hidden;
+            isolation: isolate;
         }
         .dod-banner.show { opacity: 1; transform: translateY(0) scale(1); animation: dodSiren 1s infinite alternate; }
         .dod-banner.dod-left  { left: 308px; clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%);}
         .dod-banner.dod-right { right: 308px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); }
-        .dod-banner .siren-icon { font-size: 30px; filter: drop-shadow(0 0 8px #FF0000); animation: sirenRotate 0.6s infinite alternate; display: inline-block; }
+        .dod-banner .siren-icon { font-size: 30px; filter: drop-shadow(0 0 8px #FF0000); animation: sirenRotate 0.6s infinite alternate; display: inline-block; position: relative; z-index: 4; }
+        .dod-banner > span:not(.siren-icon) { position: relative; z-index: 4; }
+
+        /* Thunder / Lightning effects (low opacity to merge with red) */
+        .dod-banner .lightning-layer {
+            position: absolute; inset: 0;
+            overflow: hidden; pointer-events: none;
+            z-index: 1; opacity: 0.55;
+        }
+        .dod-banner .lightning-layer::before,
+        .dod-banner .lightning-layer::after {
+            content: '';
+            position: absolute; top: -20%; bottom: -20%;
+            width: 3px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.95), rgba(200,220,255,0.6), transparent);
+            filter: blur(0.6px);
+            opacity: 0;
+            transform-origin: top center;
+        }
+        .dod-banner .lightning-layer::before { animation: boltFlash 4.6s infinite 0.4s; }
+        .dod-banner .lightning-layer::after  { animation: boltFlash 6.3s infinite 2.1s; }
+
+        .dod-banner.dod-left  .lightning-layer::before { left: 18%; }
+        .dod-banner.dod-left  .lightning-layer::after  { left: 72%; }
+        .dod-banner.dod-right .lightning-layer::before { left: 26%; }
+        .dod-banner.dod-right .lightning-layer::after  { left: 78%; }
+
+        .dod-banner .lightning-flash {
+            position: absolute; inset: 0;
+            background: linear-gradient(105deg,
+                        transparent 18%,
+                        rgba(255,255,255,0.7) 42%,
+                        rgba(180,220,255,0.55) 50%,
+                        transparent 78%);
+            opacity: 0;
+            animation: flashSweep 5.7s infinite 1.2s;
+            pointer-events: none;
+            z-index: 2;
+            mix-blend-mode: screen;
+        }
+        @keyframes boltFlash {
+            0%, 86%, 100% { opacity: 0; transform: scaleY(0.2); }
+            87% { opacity: 1;   transform: scaleY(1); }
+            88% { opacity: 0.15; transform: scaleY(0.9); }
+            89% { opacity: 1;   transform: scaleY(1.05); }
+            90% { opacity: 0.1; transform: scaleY(0.95); }
+            91% { opacity: 0.9; transform: scaleY(1); }
+            93% { opacity: 0;   transform: scaleY(1); }
+        }
+        @keyframes flashSweep {
+            0%, 88%, 100% { opacity: 0; transform: translateX(-25%); }
+            89% { opacity: 0.35; transform: translateX(-5%); }
+            91% { opacity: 0.75; transform: translateX(25%); }
+            93% { opacity: 0.3;  transform: translateX(55%); }
+            95% { opacity: 0;    transform: translateX(85%); }
+        }
+
         @keyframes dodSiren {
             from { box-shadow: 0 0 15px rgba(255,0,0,0.5), 0 8px 20px rgba(0,0,0,0.6); }
             to   { box-shadow: 0 0 40px rgba(255,0,0,1), 0 8px 20px rgba(0,0,0,0.6); }
         }
         @keyframes sirenRotate { from { transform: scale(1); } to { transform: scale(1.15); } }
+
         /* =========================================
-           NEW SUBSTITUTION BANNER (2-phase)
+           SUBSTITUTION BANNER (Team-coloured, eject-style)
            ========================================= */
         .side-banner {
             position: absolute;
             bottom: calc(100% - 38px);
             display: flex;
             align-items: stretch;
-            height: 55px;
+            height: 54px;
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
                         transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.85);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.85),
+                        0 0 0 2px #D4AF37,
+                        0 0 18px rgba(212,175,55,0.45);
             z-index: 25;
             white-space: nowrap;
             pointer-events: none;
+            background: var(--sub-team-color-dark, #0F1730);
+            overflow: hidden;
         }
-        .side-banner.pos-right {
-            right: 305px; left: auto;
-            flex-direction: row;
-        }
-        .side-banner.pos-left {
-            left: 305px; right: auto;
-            flex-direction: row-reverse;
-        }
+        .side-banner.pos-right { right: 305px; left: auto; flex-direction: row; }
+        .side-banner.pos-left  { left: 305px;  right: auto; flex-direction: row-reverse; }
         .side-banner.show { opacity: 1; transform: translateY(0); }
         .side-banner.hide { opacity: 0; transform: translateY(30px); }
 
-        /* Track holds the animated rows */
+        /* Track holds the animated rows (OUT -> IN) */
         .sub-track {
             position: relative;
             width: 340px;
             overflow: hidden;
-            background: #FFFFFF;
-            border: 3px solid #D4AF37;
-            border-right: none;
+            background: var(--sub-team-color, #16213E);
+            border-right: 2px solid rgba(212,175,55,0.5);
         }
         .pos-left .sub-track {
-            border-right: 3px solid #D4AF37;
-            border-left: none;
+            border-right: none;
+            border-left: 2px solid rgba(212,175,55,0.5);
         }
         .sub-track::before {
             content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #ECECEC 100%);
-            z-index: 0;
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.25) 100%);
+            z-index: 0; pointer-events: none;
         }
-        /* Two rows that slide up */
         .sub-row {
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 100%;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 0 20px;
+            display: flex; align-items: center; gap: 12px;
+            padding: 0 16px;
             transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
             z-index: 1;
             will-change: transform;
         }
-        .sub-row-out {
-            transform: translateY(0);
-        }
-        .sub-row-in {
-            transform: translateY(100%);
-        }
-        .side-banner.phase-in .sub-row-out {
-            transform: translateY(-100%);
-        }
-        .side-banner.phase-in .sub-row-in {
-            transform: translateY(0);
-        }
-        .pos-left .sub-row {
-            flex-direction: row-reverse;
-        }
+        .sub-row-out { transform: translateY(0); }
+        .sub-row-in  { transform: translateY(100%); }
+        .side-banner.phase-in .sub-row-out { transform: translateY(-100%); }
+        .side-banner.phase-in .sub-row-in  { transform: translateY(0); }
+        .pos-left .sub-row { flex-direction: row-reverse; }
 
-        /* Arrow box (down/up) */
+        /* Eject arrow (red down for OUT, green up for IN) */
         .sub-arrow {
-            width: 38px;
-            height: 38px;
-            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Segoe UI', sans-serif;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 900;
             color: #FFFFFF;
             flex-shrink: 0;
             line-height: 1;
+            position: relative;
         }
         .sub-arrow-out {
-            background: linear-gradient(to bottom, #EF4444 0%, #B71C1C 100%);
-            box-shadow: 0 3px 10px rgba(239,68,68,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+            background: linear-gradient(to bottom, #EF4444 0%, #8B0000 100%);
+            box-shadow: 0 3px 10px rgba(239,68,68,0.7),
+                        inset 0 1px 0 rgba(255,255,255,0.35),
+                        inset 0 -2px 0 rgba(0,0,0,0.35);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
         }
         .sub-arrow-in {
-            background: linear-gradient(to bottom, #22C55E 0%, #15803D 100%);
-            box-shadow: 0 3px 10px rgba(34,197,94,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+            background: linear-gradient(to bottom, #22C55E 0%, #14532D 100%);
+            box-shadow: 0 3px 10px rgba(34,197,94,0.7),
+                        inset 0 1px 0 rgba(255,255,255,0.35),
+                        inset 0 -2px 0 rgba(0,0,0,0.35);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
         }
         .sub-name {
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Mukta', 'Oswald', sans-serif;
             font-size: 22px;
             font-weight: 800;
             letter-spacing: 1px;
-            color: #111111;
-            text-transform: uppercase;
+            color: #FFFFFF;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
             overflow: hidden;
             text-overflow: ellipsis;
             flex: 1;
@@ -274,31 +310,36 @@
         }
         .pos-left .sub-name { text-align: right; }
 
-        /* Static badge on the outer side (stays visible through animation) */
+        /* Substitution badge (right section) */
         .sub-badge {
-            background: linear-gradient(to top, #1A0033, #4A148C);
-            border: 3px solid #D4AF37;
+            background: var(--sub-team-color, #16213E);
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0 26px;
             color: #FFD700;
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
-            letter-spacing: 2.5px;
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-weight: 900;
+            letter-spacing: 1px;
             font-size: 17px;
             text-transform: uppercase;
-            text-shadow: 0 0 8px rgba(255,215,0,0.5);
+            text-shadow: 0 0 10px rgba(255,215,0,0.65), 1px 1px 2px rgba(0,0,0,0.85);
             flex-shrink: 0;
+            position: relative;
         }
-        .pos-right .sub-badge {
-            clip-path: polygon(9% 0, 100% 0, 91% 100%, 0 100%);
-            padding-left: 34px;
+        .sub-badge::before {
+            content: '';
+            position: absolute;
+            top: 6px; bottom: 6px;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent);
         }
-        .pos-left .sub-badge {
-            clip-path: polygon(0 0, 91% 0, 100% 100%, 9% 100%);
-            padding-right: 34px;
-        }
+        .pos-right .sub-badge::before { left: 0; }
+        .pos-left  .sub-badge::before { right: 0; }
+        .pos-right .sub-badge { clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); padding-left: 32px; }
+        .pos-left  .sub-badge { clip-path: polygon(0 0, 92% 0, 100% 100%, 8% 100%); padding-right: 32px; }
+        .sub-badge-text { position: relative; z-index: 1; }
 
         /* MAIN SCOREBOARD ROW */
         .main-row {
@@ -428,12 +469,12 @@
         }
 
         /* =========================================
-           MATCH END MERGED BANNER
+           MATCH END MERGED BANNER (Winner-coloured)
            ========================================= */
         .match-end-row {
             display: none;
             position: relative;
-            height: 80px;
+            height: 96px;
             padding: 5px;
             margin-top: 10px;
             margin-bottom: 3px;
@@ -442,7 +483,7 @@
             transform: translateY(20px);
             transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
-            clip-path: polygon(0% 0, 100% 0, 94% 100%,6% 100%);
+            clip-path: polygon(0% 0, 100% 0, 96% 100%, 4% 100%);
         }
         .match-end-row.show {
             display: flex;
@@ -455,35 +496,36 @@
             width: 100%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 55px;
+            gap: 2px;
             padding: 0 100px;
-            background: #14141F;
-            clip-path: polygon(.5% 0, 99.5% 0, 94% 100%,6% 100%);
-            box-shadow: inset 0 0 30px var(--winner-color-soft, rgba(212,175,55,0.35)),
-                        0 0 40px var(--winner-color-soft, rgba(212,175,55,0.55));
-            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+            background: var(--winner-color, #14141F);
+            clip-path: polygon(.5% 0, 99.5% 0, 96% 100%, 4% 100%);
+            box-shadow: inset 0 0 40px rgba(255,255,255,0.10),
+                        0 0 45px var(--winner-color-soft, rgba(212,175,55,0.55));
+            transition: background 0.5s ease, box-shadow 0.5s ease;
         }
-        .me-team {
-            font-family: 'Mukta', sans-serif;
-            font-size: 42px;
-            font-weight: 800;
-            color: #FFFFFF;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.95);
-            white-space: nowrap;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .me-score {
+        .me-final-score {
             font-family: 'Teko', sans-serif;
-            font-size: 78px;
+            font-size: 46px;
             font-weight: 700;
             color: #FFD700;
-            text-shadow: 0 0 25px rgba(255,215,0,0.7);
-            letter-spacing: 4px;
-            white-space: nowrap;
+            text-shadow: 0 0 22px rgba(255,215,0,0.85), 1px 1px 4px rgba(0,0,0,0.9);
+            letter-spacing: 6px;
             line-height: 1;
+            white-space: nowrap;
+        }
+        .me-result-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.95);
+            white-space: nowrap;
         }
 
         /* BOTTOM ROW */
@@ -497,6 +539,7 @@
             padding: 4px; margin-right: 0px;
             position: relative;
             overflow: visible;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .dots-left-inner {
             width: 100%; height: 100%;
@@ -538,6 +581,7 @@
             padding: 4px; margin-left: 0px;
             position: relative;
             overflow: visible;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .dots-right-inner {
             width: 100%; height: 100%;
@@ -557,38 +601,71 @@
             border-color: #FFFFFF;
             box-shadow: 0 0 10px var(--dot-active-color, #00FF00), 0 0 4px #FFFFFF inset;
         }
+        /* Hide dot bars during match end */
+        .dots-left-wrap.result-hidden,
+        .dots-right-wrap.result-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
 
         /* =========================================
-           MARQUEE TEXT BELOW DOTS
+           MARQUEE — Separate box below the dots
            ========================================= */
-        .team-marquee {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
-            height: 16px;
-            overflow: hidden;
-            pointer-events: none;
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        .marquee-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 8px;
+            z-index: 6;
+            position: relative;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
-        .team-marquee-inner {
+        .marquee-row.result-hidden { opacity: 0; transform: translateY(20px); }
+        .marquee-box {
+            width: 310px;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(20,20,40,0.94), rgba(0,0,0,0.90));
+            border: 1.5px solid #D4AF37;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,215,0,0.15);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+        }
+        .marquee-box.marquee-right {
+            clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+        }
+        .marquee-box.marquee-left {
+            clip-path: polygon(0 0, 97% 0, 100% 100%, 3% 100%);
+        }
+        .marquee-content {
             position: absolute;
-            top: 0;
-            left: 100%;
-            display: inline-block;
+            top: 0; left: 100%;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
             white-space: nowrap;
             font-family: 'Oswald', sans-serif;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.9);
-            animation: marqueeScroll 26s linear infinite;
+            letter-spacing: 0.7px;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.95);
+            padding: 0 10px;
+            animation: marqueeScroll 22s linear infinite;
         }
+        .marquee-box.marquee-right .marquee-content { animation-delay: 0.4s; }
         @keyframes marqueeScroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(calc(-100% - 330px)); }
+            from { transform: translateX(0); }
+            to   { transform: translateX(calc(-100% - 310px)); }
+        }
+        .marquee-spacer {
+            width: 500px;
+            height: 1px;
+            flex-shrink: 0;
         }
 
         /* CENTER EVENT POPUP */
@@ -965,29 +1042,34 @@
             <span class="logo-text">KabaddiOne</span>
         </div>
 
+        <!-- DO-OR-DIE with lightning layers -->
         <div id="dod-left" class="dod-banner dod-left">
+            <div class="lightning-layer"></div>
+            <div class="lightning-flash"></div>
             <span class="siren-icon">🚨</span>
             <span>DO-OR-DIE</span>
         </div>
         <div id="dod-right" class="dod-banner dod-right">
+            <div class="lightning-layer"></div>
+            <div class="lightning-flash"></div>
             <span>DO-OR-DIE</span>
             <span class="siren-icon">🚨</span>
         </div>
 
-        <!-- NEW SUBSTITUTION BANNER (2-phase animation) -->
+        <!-- SUBSTITUTION BANNER -->
         <div id="side-banner" class="side-banner pos-right">
-            <div class="sub-badge" id="sub-badge">
-                <span class="sub-badge-text">सब्सटीट्यूशन</span>
-            </div>
             <div class="sub-track">
                 <div class="sub-row sub-row-out" id="sub-row-out">
-                    <div class="sub-arrow sub-arrow-out">↓</div>
+                    <div class="sub-arrow sub-arrow-out">▼</div>
                     <div class="sub-name" id="sub-out-name">Player Name</div>
                 </div>
                 <div class="sub-row sub-row-in" id="sub-row-in">
-                    <div class="sub-arrow sub-arrow-in">↑</div>
+                    <div class="sub-arrow sub-arrow-in">▲</div>
                     <div class="sub-name" id="sub-in-name">Player Name</div>
                 </div>
+            </div>
+            <div class="sub-badge" id="sub-badge">
+                <span class="sub-badge-text">सब्सटीट्यूशन</span>
             </div>
         </div>
 
@@ -1031,22 +1113,18 @@
             </div>
         </div>
 
-        <!-- MATCH END MERGED BANNER -->
+        <!-- MATCH END MERGED BANNER (Winner-coloured) -->
         <div id="match-end-row" class="match-end-row">
             <div class="match-end-inner" id="me-inner">
-                <div class="me-team" id="me-left">TEAM A</div>
-                <div class="me-score" id="me-score">0 - 0</div>
-                <div class="me-team" id="me-right">TEAM B</div>
+                <div class="me-final-score" id="me-score">0 - 0</div>
+                <div class="me-result-text" id="me-result-text">TEAM A BEAT TEAM B</div>
             </div>
         </div>
 
-        <div class="bottom-row">
-            <div class="dots-left-wrap gold-bg">
+        <div class="bottom-row" id="bottom-row">
+            <div class="dots-left-wrap gold-bg" id="left-dots-wrap">
                 <div class="dots-left-inner" id="left-dots-bg">
                     <div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div><div class="dot left-dot"></div>
-                </div>
-                <div class="team-marquee">
-                    <div class="team-marquee-inner">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
                 </div>
             </div>
             <div class="center-info-wrap gold-bg">
@@ -1056,13 +1134,21 @@
                     <div class="info-box info-box-right"><span id="match-id" style="color: #FFF; font-size: 15px; letter-spacing: 1.2px;">ABC123</span></div>
                 </div>
             </div>
-            <div class="dots-right-wrap gold-bg">
+            <div class="dots-right-wrap gold-bg" id="right-dots-wrap">
                 <div class="dots-right-inner" id="right-dots-bg">
                     <div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div><div class="dot right-dot"></div>
                 </div>
-                <div class="team-marquee">
-                    <div class="team-marquee-inner">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
-                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Separate marquee row below dots -->
+        <div class="marquee-row" id="marquee-row">
+            <div class="marquee-box marquee-left">
+                <div class="marquee-content">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
+            </div>
+            <div class="marquee-spacer"></div>
+            <div class="marquee-box marquee-right">
+                <div class="marquee-content">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
             </div>
         </div>
     </div>
@@ -1236,6 +1322,10 @@
         let lastRightColor = null;
         let lastMatchOver = false;
 
+        // Globals for substitution team colour
+        let currentLeftColor = '#009900';
+        let currentRightColor = '#0055ff';
+
         let previousRaidActive = null;
 
         let lastOverlayScreen = '';
@@ -1322,6 +1412,9 @@
                 const leftColor  = data.left_color  || "#009900";
                 const rightColor = data.right_color || "#0055ff";
 
+                currentLeftColor  = leftColor;
+                currentRightColor = rightColor;
+
                 document.getElementById('left-name').innerText  = leftName;
                 document.getElementById('right-name').innerText = rightName;
 
@@ -1347,7 +1440,6 @@
 
                 applyCenterClockAndStatus(data);
 
-                // Match-over detection
                 const matchOver = !!data.match_result
                     || (data.half_status || '').toLowerCase().includes('over')
                     || (data.half_status || '').toLowerCase().includes('full time');
@@ -1376,38 +1468,48 @@
         }
 
         // ==========================================
-        // MATCH END MERGED BANNER
+        // MATCH END MERGED BANNER (winner colour + "Team A beat Team B")
         // ==========================================
         function applyMatchEndBanner(isOver, leftName, rightName, ls, rs, leftColor, rightColor) {
             const meRow = document.getElementById('match-end-row');
             const mainRow = document.getElementById('main-row');
             const topBars = document.getElementById('top-raid-bars');
+            const leftDotsWrap  = document.getElementById('left-dots-wrap');
+            const rightDotsWrap = document.getElementById('right-dots-wrap');
+            const marqueeRow    = document.getElementById('marquee-row');
 
             if (isOver && !lastMatchOver) {
                 mainRow.style.display = 'none';
                 topBars.style.display = 'none';
                 meRow.classList.add('show');
+                leftDotsWrap.classList.add('result-hidden');
+                rightDotsWrap.classList.add('result-hidden');
+                marqueeRow.classList.add('result-hidden');
             } else if (!isOver && lastMatchOver) {
                 mainRow.style.display = '';
                 topBars.style.display = '';
                 meRow.classList.remove('show');
+                leftDotsWrap.classList.remove('result-hidden');
+                rightDotsWrap.classList.remove('result-hidden');
+                marqueeRow.classList.remove('result-hidden');
             }
             if (!isOver) { lastMatchOver = false; return; }
             lastMatchOver = true;
 
-            document.getElementById('me-left').innerText  = leftName;
-            document.getElementById('me-right').innerText = rightName;
-            document.getElementById('me-score').innerText = `${ls} - ${rs}`;
-
-            let winnerColor = '#4A4A4A';       // dark grey for tie
+            // Winner determination
+            let winnerColor = '#4A4A4A';
             let winnerSoft  = 'rgba(74,74,74,0.4)';
-            if (ls > rs)      { winnerColor = leftColor;  winnerSoft = darkenColor(leftColor, 20) + '66'; }
-            else if (rs > ls) { winnerColor = rightColor; winnerSoft = darkenColor(rightColor, 20) + '66'; }
+            let resultText  = `${leftName} TIED ${rightName}`;
+
+            if (ls > rs)      { winnerColor = leftColor;  winnerSoft = darkenColor(leftColor, 20) + '66'; resultText = `${leftName} BEAT ${rightName}`; }
+            else if (rs > ls) { winnerColor = rightColor; winnerSoft = darkenColor(rightColor, 20) + '66'; resultText = `${rightName} BEAT ${leftName}`; }
+
+            document.getElementById('me-score').innerText = `${ls} - ${rs}`;
+            document.getElementById('me-result-text').innerText = resultText;
 
             const inner = document.getElementById('me-inner');
             inner.style.setProperty('--winner-color', winnerColor);
             inner.style.setProperty('--winner-color-soft', winnerSoft);
-            inner.style.borderColor = winnerColor;
         }
 
         // ==========================================
@@ -1601,8 +1703,6 @@
 
         // ==========================================
         // RAIDER NAME ROTATION
-        //   Fix: Do NOT start rotation if raiderName is empty.
-        //   Only begin when a real raider name is confirmed.
         // ==========================================
         function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
@@ -1617,7 +1717,6 @@
                 return;
             }
 
-            // FIX: Do not show animation until a real raider name is set.
             const raiderName = (data.active_raider_name || '').trim();
             if (!raiderName) {
                 stopRaiderRotation('left');
@@ -1756,7 +1855,7 @@
         }
 
         // ==========================================
-        // SUBSTITUTION BANNER (2-phase animation)
+        // SUBSTITUTION BANNER (Team-coloured, eject-style)
         // ==========================================
         let subBannerTimeoutIds = [];
         function triggerSubstitutionGraphic(descText, isLeftTeam) {
@@ -1764,7 +1863,6 @@
             const outNameEl = document.getElementById('sub-out-name');
             const inNameEl  = document.getElementById('sub-in-name');
 
-            // Parse "Player (X) replaced by Player (Y)"
             const jerseyMatches = [...String(descText || '').matchAll(/\((\d+)\)/g)].map(m => m[1]);
             let outName = 'Player', inName = 'Player';
             if (jerseyMatches.length >= 2) {
@@ -1777,35 +1875,34 @@
             outNameEl.innerText = outName;
             inNameEl.innerText  = inName;
 
-            // Clear any pending timeouts from previous subs
+            // Use the ACTIVE team colour as banner background
+            const teamColor = isLeftTeam ? currentLeftColor : currentRightColor;
+            banner.style.setProperty('--sub-team-color', teamColor);
+            banner.style.setProperty('--sub-team-color-dark', darkenColor(teamColor, 60));
+
             subBannerTimeoutIds.forEach(id => clearTimeout(id));
             subBannerTimeoutIds = [];
 
-            // Set side (mirror for left vs right)
             banner.className = 'side-banner ' + (isLeftTeam === false ? 'pos-right' : 'pos-left');
-            void banner.offsetWidth; // reflow
+            void banner.offsetWidth;
 
-            // Phase 1: slide in showing OUT player
             banner.classList.add('show');
 
-            // Phase 2 (after 2s): slide up to show IN player
             subBannerTimeoutIds.push(setTimeout(() => {
                 banner.classList.add('phase-in');
             }, 2000));
 
-            // Phase 3 (after 4s): slide down + fade out
             subBannerTimeoutIds.push(setTimeout(() => {
                 banner.classList.add('hide');
             }, 4000));
 
-            // Cleanup after animation
             subBannerTimeoutIds.push(setTimeout(() => {
                 banner.classList.remove('show', 'hide', 'phase-in');
             }, 4700));
         }
 
         // ==========================================
-        // EVENT TIMELINE (multi-log processing)
+        // EVENT TIMELINE
         // ==========================================
         function handleEventTimeline(state) {
             if (!state.logsJson) return;
@@ -1838,10 +1935,6 @@
                     }
                     else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
                         triggerSubstitutionGraphic(log.desc || '', log.isLeftTeam);
-                    }
-                    else if (type === 'CARD' || title.includes("card") || title.includes("फाउल")) {
-                        // Cards no longer use the side banner (that space is for subs).
-                        // (Optional: could trigger a different visual, but not required.)
                     }
                 }
             } catch (e) {
