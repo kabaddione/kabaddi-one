@@ -126,7 +126,7 @@
             100% { transform: translateY(-8px) scale(0.3); opacity: 0; }
         }
         /* =========================================
-           DO-OR-DIE BANNER with animated lightning bolt
+           DO-OR-DIE BANNER with natural lightning
            ========================================= */
         .dod-banner {
             position: absolute;
@@ -149,8 +149,22 @@
         .dod-banner.show { opacity: 1; transform: translateY(0) scale(1); animation: dodSiren 1s infinite alternate; }
         .dod-banner.dod-left  { left: 308px; clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%);}
         .dod-banner.dod-right { right: 308px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); }
-        .dod-banner .siren-icon { font-size: 30px; filter: drop-shadow(0 0 8px #FF0000); animation: sirenRotate 0.6s infinite alternate; display: inline-block; position: relative; z-index: 2; }
-        .dod-banner .dod-text { position: relative; z-index: 2; }
+        .dod-banner .siren-icon {
+            font-size: 30px;
+            filter: drop-shadow(0 0 8px #FF0000);
+            animation: sirenRotate 0.6s infinite alternate;
+            display: inline-block;
+            position: relative; z-index: 2;
+        }
+        .dod-banner .dod-text {
+            position: relative; z-index: 2;
+            display: inline-block;
+            animation: dodTextPulse 0.6s infinite alternate;
+        }
+        @keyframes dodTextPulse {
+            from { transform: scale(1);    text-shadow: 0 0 12px rgba(255,0,0,0.9), 2px 2px 4px rgba(0,0,0,0.8); }
+            to   { transform: scale(1.08); text-shadow: 0 0 22px rgba(255,255,255,0.95), 0 0 30px rgba(255,80,80,0.9), 2px 2px 6px rgba(0,0,0,0.9); }
+        }
 
         /* Lightning bolt SVG overlay inside the DOD banner */
         .dod-lightning-container {
@@ -168,92 +182,128 @@
             height: 100%;
             display: block;
         }
-        /* Main jagged bolt path — bright blue like the reference image */
-        .dod-bolt-main {
-            fill: none;
-            stroke: #7FD8FF;
-            stroke-width: 2.4;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 4px #7FD8FF)
-                    drop-shadow(0 0 8px #35B6FF)
-                    drop-shadow(0 0 16px #0088FF);
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            animation: boltStrike 4.2s infinite ease-out;
-            opacity: 0;
-        }
-        /* Glow halo behind the main bolt */
+        /* Outer soft glow (behind the bolt) */
         .dod-bolt-glow {
             fill: none;
-            stroke: #35B6FF;
-            stroke-width: 6;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: blur(3px);
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            animation: boltStrike 4.2s infinite ease-out;
-            opacity: 0;
-        }
-        /* Secondary flicker bolt offset behind */
-        .dod-bolt-flicker {
-            fill: none;
-            stroke: #A5E7FF;
-            stroke-width: 1.2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 3px #A5E7FF);
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            animation: boltStrike 4.2s infinite ease-out 0.05s;
-            opacity: 0;
-        }
-        /* Second independent bolt on a different timing */
-        .dod-bolt-main2 {
-            fill: none;
-            stroke: #7FD8FF;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 4px #7FD8FF)
-                    drop-shadow(0 0 10px #0088FF);
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            animation: boltStrike 5.6s infinite ease-out 2.2s;
-            opacity: 0;
-        }
-        .dod-bolt-glow2 {
-            fill: none;
-            stroke: #35B6FF;
+            stroke: #1E88E5;
             stroke-width: 5;
             stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: blur(3px);
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            animation: boltStrike 5.6s infinite ease-out 2.2s;
+            stroke-linejoin: miter;
+            filter: blur(2.5px);
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: boltStrikeA 3.4s infinite ease-out;
             opacity: 0;
         }
-        /* Vertical micro-strikes */
-        .dod-bolt-strike {
+        /* Main bright core */
+        .dod-bolt-main {
             fill: none;
-            stroke: #C8EEFF;
+            stroke: #E0F7FF;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: miter;
+            filter: drop-shadow(0 0 3px #FFFFFF)
+                    drop-shadow(0 0 6px #7FD8FF)
+                    drop-shadow(0 0 12px #1E88E5);
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: boltStrikeA 3.4s infinite ease-out;
+            opacity: 0;
+        }
+        /* Thin secondary flicker */
+        .dod-bolt-flicker {
+            fill: none;
+            stroke: #7FD8FF;
+            stroke-width: 0.9;
+            stroke-linecap: round;
+            stroke-linejoin: miter;
+            filter: drop-shadow(0 0 2px #7FD8FF);
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: boltStrikeA 3.4s infinite ease-out 0.08s;
+            opacity: 0;
+        }
+        /* Branch offshoot */
+        .dod-bolt-branch {
+            fill: none;
+            stroke: #B3E5FC;
+            stroke-width: 1.1;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 3px #7FD8FF);
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: boltStrikeA 3.4s infinite ease-out 0.12s;
+            opacity: 0;
+        }
+        /* Second bolt fired on a different rhythm */
+        .dod-bolt-glow2 {
+            fill: none;
+            stroke: #1565C0;
+            stroke-width: 4.5;
+            stroke-linecap: round;
+            stroke-linejoin: miter;
+            filter: blur(2.5px);
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: boltStrikeB 5.1s infinite ease-out 1.6s;
+            opacity: 0;
+        }
+        .dod-bolt-main2 {
+            fill: none;
+            stroke: #E0F7FF;
+            stroke-width: 1.4;
+            stroke-linecap: round;
+            stroke-linejoin: miter;
+            filter: drop-shadow(0 0 3px #FFFFFF)
+                    drop-shadow(0 0 6px #7FD8FF)
+                    drop-shadow(0 0 12px #1E88E5);
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: boltStrikeB 5.1s infinite ease-out 1.6s;
+            opacity: 0;
+        }
+        .dod-bolt-branch2 {
+            fill: none;
+            stroke: #B3E5FC;
             stroke-width: 1;
             stroke-linecap: round;
-            filter: drop-shadow(0 0 3px #C8EEFF);
-            stroke-dasharray: 60;
-            stroke-dashoffset: 60;
-            animation: boltStrike 4.2s infinite ease-out 0.1s;
+            filter: drop-shadow(0 0 3px #7FD8FF);
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: boltStrikeB 5.1s infinite ease-out 1.72s;
             opacity: 0;
         }
-        @keyframes boltStrike {
-            0%   { stroke-dashoffset: 800; opacity: 0; }
-            8%   { stroke-dashoffset: 800; opacity: 0; }
-            12%  { stroke-dashoffset: 0;   opacity: 1; }
-            16%  { stroke-dashoffset: 0;   opacity: 1; }
-            20%  { stroke-dashoffset: -800; opacity: 0; }
-            100% { stroke-dashoffset: -800; opacity: 0; }
+        /* Micro arcs that flash quickly */
+        .dod-bolt-micro {
+            fill: none;
+            stroke: #FFFFFF;
+            stroke-width: 0.8;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 4px #FFFFFF);
+            stroke-dasharray: 40;
+            stroke-dashoffset: 40;
+            animation: boltStrikeA 3.4s infinite ease-out 0.15s;
+            opacity: 0;
+        }
+        @keyframes boltStrikeA {
+            0%   { stroke-dashoffset: 1200; opacity: 0; }
+            10%  { stroke-dashoffset: 1200; opacity: 0; }
+            13%  { stroke-dashoffset: 0;    opacity: 1; }
+            15%  { stroke-dashoffset: 0;    opacity: 1; }
+            17%  { stroke-dashoffset: 0;    opacity: 0.4; }
+            19%  { stroke-dashoffset: 0;    opacity: 1; }
+            23%  { stroke-dashoffset: -1200; opacity: 0; }
+            100% { stroke-dashoffset: -1200; opacity: 0; }
+        }
+        @keyframes boltStrikeB {
+            0%   { stroke-dashoffset: 1200; opacity: 0; }
+            9%   { stroke-dashoffset: 1200; opacity: 0; }
+            13%  { stroke-dashoffset: 0;    opacity: 1; }
+            16%  { stroke-dashoffset: 0;    opacity: 1; }
+            19%  { stroke-dashoffset: 0;    opacity: 0.3; }
+            22%  { stroke-dashoffset: 0;    opacity: 1; }
+            26%  { stroke-dashoffset: -1200; opacity: 0; }
+            100% { stroke-dashoffset: -1200; opacity: 0; }
         }
         @keyframes dodSiren {
             from { box-shadow: 0 0 15px rgba(255,0,0,0.5), 0 8px 20px rgba(0,0,0,0.6); }
@@ -262,7 +312,7 @@
         @keyframes sirenRotate { from { transform: scale(1); } to { transform: scale(1.15); } }
 
         /* =========================================
-           NEW SUBSTITUTION BANNER (team colour style)
+           SUBSTITUTION BANNER (2-row slide)
            ========================================= */
         .side-banner {
             position: absolute;
@@ -274,107 +324,107 @@
             transform: translateY(30px);
             transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
                         transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.9);
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.85);
             z-index: 25;
             white-space: nowrap;
             pointer-events: none;
         }
-        .side-banner.pos-right { right: 305px; left: auto; flex-direction: row; }
-        .side-banner.pos-left  { left: 305px; right: auto; flex-direction: row-reverse; }
+        .side-banner.pos-right {
+            right: 305px; left: auto;
+            flex-direction: row;
+        }
+        .side-banner.pos-left {
+            left: 305px; right: auto;
+            flex-direction: row-reverse;
+        }
         .side-banner.show { opacity: 1; transform: translateY(0); }
         .side-banner.hide { opacity: 0; transform: translateY(30px); }
 
-        /* Player section — dark team colour background */
-        .sub-main-section {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 0 26px;
-            background: var(--sub-team-color-dark, #0d2a0d);
-            border-top: 3px solid #D4AF37;
-            border-bottom: 3px solid #D4AF37;
-            border-right: none;
+        /* White gradient track with sliding rows */
+        .sub-track {
             position: relative;
+            width: 340px;
             overflow: hidden;
-            min-width: 260px;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #ECECEC 100%);
+            border: 3px solid #D4AF37;
+            border-right: none;
         }
-        .pos-left .sub-main-section {
+        .pos-left .sub-track {
             border-right: 3px solid #D4AF37;
             border-left: none;
         }
-        .pos-right .sub-main-section {
-            border-left: 3px solid #D4AF37;
-            clip-path: polygon(2% 0, 100% 0, 100% 100%, 0 100%);
-            padding-left: 32px;
-        }
-        .pos-left .sub-main-section {
-            clip-path: polygon(0 0, 98% 0, 100% 100%, 0 100%);
-            padding-right: 32px;
-            flex-direction: row-reverse;
-        }
-
-        /* Player text slider — two rows that slide vertically */
-        .sub-name-track {
-            position: relative;
-            height: 100%;
-            flex: 1;
-            min-width: 150px;
-            overflow: hidden;
-        }
-        .sub-name-row {
+        .sub-row {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0;
+            height: 100%;
             display: flex;
             align-items: center;
             gap: 14px;
+            padding: 0 20px;
             transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+            z-index: 1;
             will-change: transform;
         }
-        .pos-left .sub-name-row { flex-direction: row-reverse; }
-        .sub-name-out { transform: translateY(0); }
-        .sub-name-in  { transform: translateY(100%); }
-        .side-banner.phase-in .sub-name-out { transform: translateY(-100%); }
-        .side-banner.phase-in .sub-name-in  { transform: translateY(0); }
+        .sub-row-out { transform: translateY(0); }
+        .sub-row-in  { transform: translateY(100%); }
+        .side-banner.phase-in .sub-row-out { transform: translateY(-100%); }
+        .side-banner.phase-in .sub-row-in  { transform: translateY(0); }
+        .pos-left .sub-row { flex-direction: row-reverse; }
 
-        /* Triangle "eject" icon */
-        .sub-triangle {
-            width: 26px; height: 26px;
+        /* Arrow boxes */
+        .sub-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
-        }
-        .sub-triangle svg { width: 100%; height: 100%; display: block; }
-        .sub-triangle-out svg { fill: #FF0000; }   /* bright red for out */
-        .sub-triangle-in  svg { fill: #00FF00; }   /* bright green for in */
-
-        .sub-player-name {
-            font-family: 'Mukta', sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             font-size: 24px;
-            font-weight: 800;
+            font-weight: 900;
             color: #FFFFFF;
-            letter-spacing: 0.5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .sub-arrow-out {
+            background: linear-gradient(to bottom, #FF1A1A 0%, #B00000 100%);
+            box-shadow: 0 3px 10px rgba(255,26,26,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+            color: #FFFFFF;
+        }
+        .sub-arrow-in {
+            background: linear-gradient(to bottom, #22FF22 0%, #00A800 100%);
+            box-shadow: 0 3px 10px rgba(34,255,34,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+            color: #FFFFFF;
+        }
+        .sub-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #111111;
+            text-transform: uppercase;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex: 1;
+            text-align: left;
         }
+        .pos-left .sub-name { text-align: right; }
 
-        /* "सब्सटीट्यूशन" badge — transparent with 1px team-colour outline */
+        /* "सब्सटीट्यूशन" badge — golden gradient with black text */
         .sub-badge {
-            background: transparent;
-            border: 1px solid var(--sub-team-color, #4A148C);
+            background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
+            border: 3px solid #D4AF37;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0 26px;
-            color: var(--sub-team-color, #FFD700);
+            color: #111111;
             font-family: 'Mukta', sans-serif;
             font-weight: 800;
             letter-spacing: 1.5px;
             font-size: 20px;
             text-transform: uppercase;
-            text-shadow: 0 0 10px var(--sub-team-color, #FFD700);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.35);
             flex-shrink: 0;
         }
         .pos-right .sub-badge {
@@ -386,6 +436,7 @@
             clip-path: polygon(0 0, 91% 0, 100% 100%, 9% 100%);
             padding-right: 34px;
             border-right: none;
+            border-left: 3px solid #D4AF37;
         }
 
         /* MAIN SCOREBOARD ROW */
@@ -645,9 +696,7 @@
             box-shadow: 0 0 10px var(--dot-active-color, #00FF00), 0 0 4px #FFFFFF inset;
         }
 
-        /* =========================================
-           MARQUEE ROW — separate boxes BELOW the dots
-           ========================================= */
+        /* MARQUEE ROW */
         .marquee-row {
             display: flex;
             justify-content: center;
@@ -1064,24 +1113,29 @@
         <div id="dod-left" class="dod-banner dod-left">
             <div class="dod-lightning-container">
                 <svg class="dod-lightning-svg" viewBox="0 0 400 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Glow halo bolt 1 -->
+                    <!-- Bolt 1: primary -->
                     <path class="dod-bolt-glow"
-                          d="M -20 28 L 40 22 L 70 32 L 110 18 L 145 30 L 180 14 L 215 26 L 260 16 L 300 28 L 340 18 L 380 30 L 420 20"/>
-                    <!-- Main bright bolt 1 -->
+                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
                     <path class="dod-bolt-main"
-                          d="M -20 28 L 40 22 L 70 32 L 110 18 L 145 30 L 180 14 L 215 26 L 260 16 L 300 28 L 340 18 L 380 30 L 420 20"/>
-                    <!-- Flicker bolt 1 (offset slightly) -->
+                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
                     <path class="dod-bolt-flicker"
-                          d="M -20 30 L 42 24 L 72 34 L 112 20 L 147 32 L 182 16 L 217 28 L 262 18 L 302 30 L 342 20 L 382 32 L 422 22"/>
-                    <!-- Small vertical strikes -->
-                    <path class="dod-bolt-strike" d="M 90 22 L 96 34 L 88 42"/>
-                    <path class="dod-bolt-strike" d="M 230 20 L 236 32 L 228 40"/>
-                    <!-- Glow halo bolt 2 (second timing) -->
+                          d="M -10 28 L 32 26 L 57 32 L 80 24 L 107 30 L 130 22 L 154 29 L 182 23 L 207 30 L 234 24 L 260 31 L 287 23 L 312 30 L 342 22 L 372 29 L 412 24"/>
+                    <!-- Branches off main bolt -->
+                    <path class="dod-bolt-branch" d="M 128 20 L 122 10 L 130 4"/>
+                    <path class="dod-bolt-branch" d="M 258 29 L 268 38 L 262 46"/>
+                    <path class="dod-bolt-branch" d="M 340 20 L 348 12 L 342 4"/>
+                    <!-- Micro arcs -->
+                    <path class="dod-bolt-micro" d="M 88 24 L 94 30"/>
+                    <path class="dod-bolt-micro" d="M 214 25 L 220 31"/>
+                    <path class="dod-bolt-micro" d="M 296 24 L 302 30"/>
+
+                    <!-- Bolt 2: independent, offset rhythm -->
                     <path class="dod-bolt-glow2"
-                          d="M -20 20 L 50 30 L 90 16 L 130 28 L 170 14 L 210 26 L 250 18 L 290 30 L 330 16 L 370 28 L 420 18"/>
-                    <!-- Main bolt 2 -->
+                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
                     <path class="dod-bolt-main2"
-                          d="M -20 20 L 50 30 L 90 16 L 130 28 L 170 14 L 210 26 L 250 18 L 290 30 L 330 16 L 370 28 L 420 18"/>
+                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
+                    <path class="dod-bolt-branch2" d="M 178 28 L 188 38 L 182 46"/>
+                    <path class="dod-bolt-branch2" d="M 288 19 L 296 10 L 290 2"/>
                 </svg>
             </div>
             <span class="siren-icon">🚨</span>
@@ -1091,47 +1145,43 @@
             <div class="dod-lightning-container">
                 <svg class="dod-lightning-svg" viewBox="0 0 400 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                     <path class="dod-bolt-glow"
-                          d="M -20 28 L 40 22 L 70 32 L 110 18 L 145 30 L 180 14 L 215 26 L 260 16 L 300 28 L 340 18 L 380 30 L 420 20"/>
+                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
                     <path class="dod-bolt-main"
-                          d="M -20 28 L 40 22 L 70 32 L 110 18 L 145 30 L 180 14 L 215 26 L 260 16 L 300 28 L 340 18 L 380 30 L 420 20"/>
+                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
                     <path class="dod-bolt-flicker"
-                          d="M -20 30 L 42 24 L 72 34 L 112 20 L 147 32 L 182 16 L 217 28 L 262 18 L 302 30 L 342 20 L 382 32 L 422 22"/>
-                    <path class="dod-bolt-strike" d="M 90 22 L 96 34 L 88 42"/>
-                    <path class="dod-bolt-strike" d="M 230 20 L 236 32 L 228 40"/>
+                          d="M -10 28 L 32 26 L 57 32 L 80 24 L 107 30 L 130 22 L 154 29 L 182 23 L 207 30 L 234 24 L 260 31 L 287 23 L 312 30 L 342 22 L 372 29 L 412 24"/>
+                    <path class="dod-bolt-branch" d="M 128 20 L 122 10 L 130 4"/>
+                    <path class="dod-bolt-branch" d="M 258 29 L 268 38 L 262 46"/>
+                    <path class="dod-bolt-branch" d="M 340 20 L 348 12 L 342 4"/>
+                    <path class="dod-bolt-micro" d="M 88 24 L 94 30"/>
+                    <path class="dod-bolt-micro" d="M 214 25 L 220 31"/>
+                    <path class="dod-bolt-micro" d="M 296 24 L 302 30"/>
                     <path class="dod-bolt-glow2"
-                          d="M -20 20 L 50 30 L 90 16 L 130 28 L 170 14 L 210 26 L 250 18 L 290 30 L 330 16 L 370 28 L 420 18"/>
+                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
                     <path class="dod-bolt-main2"
-                          d="M -20 20 L 50 30 L 90 16 L 130 28 L 170 14 L 210 26 L 250 18 L 290 30 L 330 16 L 370 28 L 420 18"/>
+                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
+                    <path class="dod-bolt-branch2" d="M 178 28 L 188 38 L 182 46"/>
+                    <path class="dod-bolt-branch2" d="M 288 19 L 296 10 L 290 2"/>
                 </svg>
             </div>
             <span class="dod-text">DO-OR-DIE</span>
             <span class="siren-icon">🚨</span>
         </div>
 
-        <!-- NEW SUBSTITUTION BANNER -->
+        <!-- SUBSTITUTION BANNER (2-row slide, white gradient + golden badge) -->
         <div id="side-banner" class="side-banner pos-right">
-            <div class="sub-main-section">
-                <div class="sub-name-track">
-                    <div class="sub-name-row sub-name-out">
-                        <div class="sub-triangle sub-triangle-out">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <polygon points="12,20 22,4 2,4"/>
-                            </svg>
-                        </div>
-                        <div class="sub-player-name" id="sub-out-name">हरदीप</div>
-                    </div>
-                    <div class="sub-name-row sub-name-in">
-                        <div class="sub-triangle sub-triangle-in">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <polygon points="12,4 22,20 2,20"/>
-                            </svg>
-                        </div>
-                        <div class="sub-player-name" id="sub-in-name">संजय</div>
-                    </div>
-                </div>
-            </div>
             <div class="sub-badge">
                 <span>सब्सटीट्यूशन</span>
+            </div>
+            <div class="sub-track">
+                <div class="sub-row sub-row-out" id="sub-row-out">
+                    <div class="sub-arrow sub-arrow-out">↓</div>
+                    <div class="sub-name" id="sub-out-name">Player Name</div>
+                </div>
+                <div class="sub-row sub-row-in" id="sub-row-in">
+                    <div class="sub-arrow sub-arrow-in">↑</div>
+                    <div class="sub-name" id="sub-in-name">Player Name</div>
+                </div>
             </div>
         </div>
 
@@ -1955,12 +2005,6 @@
 
             document.getElementById('sub-out-name').innerText = outName;
             document.getElementById('sub-in-name').innerText  = inName;
-
-            const teamColor = (isLeftTeam === false)
-                ? (data && data.right_color ? data.right_color : '#0055ff')
-                : (data && data.left_color  ? data.left_color  : '#009900');
-            banner.style.setProperty('--sub-team-color', teamColor);
-            banner.style.setProperty('--sub-team-color-dark', darkenColor(teamColor, 65));
 
             subBannerTimeoutIds.forEach(id => clearTimeout(id));
             subBannerTimeoutIds = [];
