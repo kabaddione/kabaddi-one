@@ -20,13 +20,14 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // Initialize App Check with your reCAPTCHA v3 Site Key
+    // 2. 🚨 UPDATED BLOCK: Activate App Check with the Enterprise Provider
     const appCheck = firebase.appCheck();
     appCheck.activate(
-        '6Lc5luwtAAAAAEPX4KEt9lApnUtFblaUGe6jgBjR',
+        new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxpPp-XxvjgnmOvV-ZOKL5fDW'), 
         true // Automatically refresh token
     );
 
+    // 3. Your existing database setup
     const db = firebase.database();
 </script>
 
