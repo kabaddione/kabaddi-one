@@ -26,11 +26,10 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
-    <!-- Firebase App Check SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-check-compat.js"></script>
+    <!-- 🚨 UPGRADED TO VERSION 10.12.2 SO FRAUD DEFENSE WORKS -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
 <script>
     const firebaseConfig = {
@@ -39,11 +38,11 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // 2. 🚨 CORRECTED BLOCK: Typo removed!
+    // 2. 🚨 ACTIVATE APP CHECK WITH THE MODERN SDK
     const appCheck = firebase.appCheck();
     appCheck.activate(
         new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'), 
-        true
+        true // Automatically refresh token
     );
 
     // 3. Your existing database setup
