@@ -249,7 +249,7 @@
             background: var(--sub-team-color-dark, #0F1730);
             overflow: hidden;
         }
-        .side-banner.pos-right { right: 305px; left: auto; flex-direction: row; }
+        .side-banner.pos-right { right: 260px; left: auto; flex-direction: row; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); }
         .side-banner.pos-left  { left: 305px;  right: auto; flex-direction: row-reverse; }
         .side-banner.show { opacity: 1; transform: translateY(0); }
         .side-banner.hide { opacity: 0; transform: translateY(30px); }
@@ -259,8 +259,6 @@
             position: relative;
             width: 340px;
             overflow: hidden;
-            background: var(--sub-team-color, #16213E);
-            border-right: 2px solid rgba(212,175,55,0.5);
         }
         .pos-left .sub-track {
             border-right: none;
@@ -269,7 +267,6 @@
         .sub-track::before {
             content: '';
             position: absolute; inset: 0;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.25) 100%);
             z-index: 0; pointer-events: none;
         }
         .sub-row {
@@ -277,7 +274,7 @@
             top: 0; left: 0; right: 0;
             height: 100%;
             display: flex; align-items: center; gap: 12px;
-            padding: 0 16px;
+            padding: 0 36px;
             transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
             z-index: 1;
             will-change: transform;
@@ -299,13 +296,13 @@
             font-family: 'Segoe UI', sans-serif;
             font-size: 18px;
             font-weight: 900;
-            color: #FFFFFF;
+            color: ##ff0000;
             flex-shrink: 0;
             line-height: 1;
             position: relative;
         }
         .sub-arrow-out {
-            background: linear-gradient(to bottom, #EF4444 0%, #8B0000 100%);
+            background: linear-gradient(#ffffff, #d8d8d8);;
             box-shadow: 0 3px 10px rgba(239,68,68,0.7),
                         inset 0 1px 0 rgba(255,255,255,0.35),
                         inset 0 -2px 0 rgba(0,0,0,0.35);
@@ -359,7 +356,7 @@
         }
         .pos-right .sub-badge::before { left: 0; }
         .pos-left  .sub-badge::before { right: 0; }
-        .pos-right .sub-badge { clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); padding-left: 32px; }
+        .pos-right .sub-badge { clip-path: polygon(20% 0, 100% 0, 92% 100%, 0 100%); padding-left: 32px; padding-right: 32px; }
         .pos-left  .sub-badge { clip-path: polygon(0 0, 92% 0, 100% 100%, 8% 100%); padding-right: 32px; }
         .sub-badge-text { position: relative; z-index: 1; }
 
