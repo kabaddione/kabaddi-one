@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KabaddiOne Professional Broadcast Overlay</title>
+
+    <!-- 🚨 ANTI-IFRAME DEFENSE: Put this at the very top of your head tag -->
+    <script>
+        if (window.top !== window.self) {
+            try {
+                // If embedded, check if the parent website is YOUR website
+                const parentDomain = new URL(document.referrer).hostname;
+                if (!parentDomain.endsWith("kabaddione.com")) {
+                    // It's a competitor! Destroy the page.
+                    document.documentElement.innerHTML = "<h1 style='color:white; text-align:center;'>Unauthorized Access</h1>";
+                    window.top.location = "https://kabaddione.com";
+                }
+            } catch (e) {
+                // If security blocks us from checking the parent domain, destroy the page.
+                document.documentElement.innerHTML = "<h1 style='color:white; text-align:center;'>Unauthorized Access</h1>";
+                window.top.location = "https://kabaddione.com";
+            }
+        }
+    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
     
