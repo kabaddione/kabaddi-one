@@ -31,23 +31,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
-        databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    // 2. 🚨 ACTIVATE APP CHECK WITH THE MODERN SDK
-    const appCheck = firebase.appCheck();
-    appCheck.activate(
-        new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'), 
-        true // Automatically refresh token
-    );
-
-    // 3. Your existing database setup
-    const db = firebase.database();
-</script>
 
     <style>
         /* =========================================
@@ -1330,25 +1313,27 @@
     </div>
 
     <script>
-        // ==========================================
-        // FIREBASE INIT
-        // ==========================================
+        // ============================================================
+        // FIREBASE INIT & APP CHECK (UNIFIED)
+        // ============================================================
         const firebaseConfig = {
-            databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app"
+            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI", // Your Web API Key
+            authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
+            databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "kabaddi-scoreboard-e1522"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
 
+        // Activate Fraud Defense (reCAPTCHA Enterprise)
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+            new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'), 
+            true
+        );
+
+        const db = firebase.database();
         const urlParams = new URLSearchParams(window.location.search);
         const matchId = urlParams.get('match');
-
-        if (!matchId) {
-            document.getElementById('left-name').innerText = "NO MATCH ID";
-            document.getElementById('right-name').innerText = "LINK URL ERROR";
-        } else {
-            document.getElementById('match-id').innerText = matchId.toUpperCase();
-            initBroadcastEngine(matchId);
-        }
 
         // ==========================================
         // STATE
