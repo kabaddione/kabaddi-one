@@ -10,6 +10,26 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
+    <!-- Firebase App Check SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-check-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Initialize App Check with your reCAPTCHA v3 Site Key
+    const appCheck = firebase.appCheck();
+    appCheck.activate(
+        'YOUR_RECAPTCHA_V3_SITE_KEY',
+        true // Automatically refresh token
+    );
+
+    const db = firebase.database();
+</script>
+
     <style>
         /* =========================================
            OBS TRANSPARENT CANVAS RESET
