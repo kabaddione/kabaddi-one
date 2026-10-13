@@ -20,11 +20,11 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // 2. 🚨 UPDATED BLOCK: Activate App Check with the Enterprise Provider
+    // 2. 🚨 CORRECTED BLOCK: Typo removed!
     const appCheck = firebase.appCheck();
     appCheck.activate(
-        new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxpPp-XxvjgnmOvV-ZOKL5fDW'), 
-        true // Automatically refresh token
+        new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'), 
+        true
     );
 
     // 3. Your existing database setup
