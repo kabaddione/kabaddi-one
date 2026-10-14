@@ -26,6 +26,23 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <!-- 🐛 DEBUG FLAG (This was missing!) -->
+    <script>
+        window.KABADDI_DEBUG = true;
+        window.__kabaddiLog = function(tag, msg, data) {
+            if (!window.KABADDI_DEBUG) return;
+            const styles = {
+                ok:   'color:#22C55E;font-weight:bold',
+                err:  'color:#EF4444;font-weight:bold',
+                warn: 'color:#FBC02D;font-weight:bold',
+                info: 'color:#4DD0E1;font-weight:bold'
+            };
+            const c = tag === 'OK' ? styles.ok : tag === 'ERR' ? styles.err : tag === 'WARN' ? styles.warn : styles.info;
+            console.log('%c[KabaddiOne ' + tag + ']', c, msg, data !== undefined ? data : '');
+        };
+        window.__kabaddiLog('INFO', 'Debug logging enabled');
+    </script>
     
     <style>
         :root{--bg-primary:#0a0a1a;--bg-secondary:#0f0f24;--accent:#FF5E3A;--accent-glow:#FF3D10;--accent-secondary:#FFB830;--text-primary:#fff;--text-secondary:#b0b0c8;--text-muted:#7a7a95;--border-subtle:rgba(255,255,255,0.08);--nav-height:72px;--max-width:1200px;--radius-sm:12px;--radius-md:20px;--radius-lg:28px;--font-heading:'Segoe UI',system-ui,sans-serif;--font-body:'Inter','Segoe UI',system-ui,sans-serif;--transition-smooth:0.4s cubic-bezier(0.4,0,0.2,1);--left-team-color:#4CAF50;--right-team-color:#2196F3;--surface-1:#131629;--surface-2:#1a1d33;--glass-border:rgba(255,255,255,0.06);--shadow-lift:0 20px 50px rgba(0,0,0,0.5),0 4px 12px rgba(0,0,0,0.3);--shadow-soft:0 8px 24px rgba(0,0,0,0.35);--empty-raid-color:#9E9E9E}
