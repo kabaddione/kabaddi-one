@@ -5,32 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KabaddiOne Professional Broadcast Overlay</title>
 
-    <!-- 🚨 ANTI-IFRAME DEFENSE: Put this at the very top of your head tag -->
+    <!-- 🚨 ANTI-IFRAME DEFENSE -->
     <script>
         if (window.top !== window.self) {
             try {
-                // If embedded, check if the parent website is YOUR website
                 const parentDomain = new URL(document.referrer).hostname;
                 if (!parentDomain.endsWith("kabaddione.com")) {
-                    // It's a competitor! Destroy the page.
                     document.documentElement.innerHTML = "<h1 style='color:white; text-align:center;'>Unauthorized Access</h1>";
                     window.top.location = "https://kabaddione.com";
                 }
             } catch (e) {
-                // If security blocks us from checking the parent domain, destroy the page.
                 document.documentElement.innerHTML = "<h1 style='color:white; text-align:center;'>Unauthorized Access</h1>";
                 window.top.location = "https://kabaddione.com";
             }
         }
     </script>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- 🚨 UPGRADED TO VERSION 10.12.2 SO FRAUD DEFENSE WORKS -->
+
+    <!-- Firebase SDK v10.12.2 (required for ReCaptchaEnterpriseProvider) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
+    <!-- 🐛 DEBUG FLAG - Remove in production if you want -->
+    <script>
+        window.KABADDI_DEBUG = true;
+        window.__kabaddiLog = function(tag, msg, data) {
+            if (!window.KABADDI_DEBUG) return;
+            const styles = {
+                ok:   'color:#22C55E;font-weight:bold',
+                err:  'color:#EF4444;font-weight:bold',
+                warn: 'color:#FBC02D;font-weight:bold',
+                info: 'color:#4DD0E1;font-weight:bold'
+            };
+            const c = tag === 'OK' ? styles.ok : tag === 'ERR' ? styles.err : tag === 'WARN' ? styles.warn : styles.info;
+            console.log('%c[KabaddiOne ' + tag + ']', c, msg, data !== undefined ? data : '');
+        };
+        window.__kabaddiLog('INFO', 'Debug logging enabled');
+    </script>
 
     <style>
         /* =========================================
@@ -139,9 +152,7 @@
             100% { transform: translateY(-8px) scale(0.3); opacity: 0; }
         }
 
-        /* =========================================
-           DO-OR-DIE BANNER with natural lightning (SVG bolts)
-           ========================================= */
+        /* DO-OR-DIE BANNER with SVG lightning */
         .dod-banner {
             position: absolute;
             bottom: calc(100% - 37px);
@@ -179,125 +190,64 @@
             from { transform: scale(1);    text-shadow: 0 0 12px rgba(255,0,0,0.9), 2px 2px 4px rgba(0,0,0,0.8); }
             to   { transform: scale(1.08); text-shadow: 0 0 22px rgba(255,255,255,0.95), 0 0 30px rgba(255,80,80,0.9), 2px 2px 6px rgba(0,0,0,0.9); }
         }
-
-        /* Lightning bolt SVG overlay inside the DOD banner */
         .dod-lightning-container {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.9;
+            position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+            z-index: 1; opacity: 0.9;
         }
         .dod-lightning-svg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
+            position: absolute; inset: 0; width: 100%; height: 100%; display: block;
         }
-        /* Outer soft glow (behind the bolt) */
         .dod-bolt-glow {
-            fill: none;
-            stroke: #c9dae9;
-            stroke-width: 5;
-            stroke-linecap: round;
-            stroke-linejoin: miter;
+            fill: none; stroke: #c9dae9; stroke-width: 5;
+            stroke-linecap: round; stroke-linejoin: miter;
             filter: blur(2.5px);
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: boltStrikeA 3.4s infinite ease-out;
-            opacity: 0;
+            stroke-dasharray: 1200; stroke-dashoffset: 1200;
+            animation: boltStrikeA 3.4s infinite ease-out; opacity: 0;
         }
-        /* Main bright core */
         .dod-bolt-main {
-            fill: none;
-            stroke: #E0F7FF;
-            stroke-width: 1.6;
-            stroke-linecap: round;
-            stroke-linejoin: miter;
-            filter: drop-shadow(0 0 3px #FFFFFF)
-                    drop-shadow(0 0 6px #7FD8FF)
-                    drop-shadow(0 0 12px #1E88E5);
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: boltStrikeA 3.4s infinite ease-out;
-            opacity: 0;
+            fill: none; stroke: #E0F7FF; stroke-width: 1.6;
+            stroke-linecap: round; stroke-linejoin: miter;
+            filter: drop-shadow(0 0 3px #FFFFFF) drop-shadow(0 0 6px #7FD8FF) drop-shadow(0 0 12px #1E88E5);
+            stroke-dasharray: 1200; stroke-dashoffset: 1200;
+            animation: boltStrikeA 3.4s infinite ease-out; opacity: 0;
         }
-        /* Thin secondary flicker */
         .dod-bolt-flicker {
-            fill: none;
-            stroke: #dfe6e9;
-            stroke-width: 0.9;
-            stroke-linecap: round;
-            stroke-linejoin: miter;
+            fill: none; stroke: #dfe6e9; stroke-width: 0.9;
+            stroke-linecap: round; stroke-linejoin: miter;
             filter: drop-shadow(0 0 2px #7FD8FF);
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: boltStrikeA 3.4s infinite ease-out 0.08s;
-            opacity: 0;
+            stroke-dasharray: 1200; stroke-dashoffset: 1200;
+            animation: boltStrikeA 3.4s infinite ease-out 0.08s; opacity: 0;
         }
-        /* Branch offshoot */
         .dod-bolt-branch {
-            fill: none;
-            stroke: #B3E5FC;
-            stroke-width: 1.1;
-            stroke-linecap: round;
-            filter: drop-shadow(0 0 3px #7FD8FF);
-            stroke-dasharray: 300;
-            stroke-dashoffset: 300;
-            animation: boltStrikeA 3.4s infinite ease-out 0.12s;
-            opacity: 0;
+            fill: none; stroke: #B3E5FC; stroke-width: 1.1;
+            stroke-linecap: round; filter: drop-shadow(0 0 3px #7FD8FF);
+            stroke-dasharray: 300; stroke-dashoffset: 300;
+            animation: boltStrikeA 3.4s infinite ease-out 0.12s; opacity: 0;
         }
-        /* Second bolt fired on a different rhythm */
         .dod-bolt-glow2 {
-            fill: none;
-            stroke: #9cc3ee;
-            stroke-width: 4.5;
-            stroke-linecap: round;
-            stroke-linejoin: miter;
-            filter: blur(2.5px);
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: boltStrikeB 5.1s infinite ease-out 1.6s;
-            opacity: 0;
+            fill: none; stroke: #9cc3ee; stroke-width: 4.5;
+            stroke-linecap: round; stroke-linejoin: miter; filter: blur(2.5px);
+            stroke-dasharray: 1200; stroke-dashoffset: 1200;
+            animation: boltStrikeB 5.1s infinite ease-out 1.6s; opacity: 0;
         }
         .dod-bolt-main2 {
-            fill: none;
-            stroke: #E0F7FF;
-            stroke-width: 1.4;
-            stroke-linecap: round;
-            stroke-linejoin: miter;
-            filter: drop-shadow(0 0 3px #FFFFFF)
-                    drop-shadow(0 0 6px #7FD8FF)
-                    drop-shadow(0 0 12px #1E88E5);
-            stroke-dasharray: 1200;
-            stroke-dashoffset: 1200;
-            animation: boltStrikeB 5.1s infinite ease-out 1.6s;
-            opacity: 0;
+            fill: none; stroke: #E0F7FF; stroke-width: 1.4;
+            stroke-linecap: round; stroke-linejoin: miter;
+            filter: drop-shadow(0 0 3px #FFFFFF) drop-shadow(0 0 6px #7FD8FF) drop-shadow(0 0 12px #1E88E5);
+            stroke-dasharray: 1200; stroke-dashoffset: 1200;
+            animation: boltStrikeB 5.1s infinite ease-out 1.6s; opacity: 0;
         }
         .dod-bolt-branch2 {
-            fill: none;
-            stroke: #cae6f4;
-            stroke-width: 1;
-            stroke-linecap: round;
-            filter: drop-shadow(0 0 3px #7FD8FF);
-            stroke-dasharray: 300;
-            stroke-dashoffset: 300;
-            animation: boltStrikeB 5.1s infinite ease-out 1.72s;
-            opacity: 0;
+            fill: none; stroke: #cae6f4; stroke-width: 1;
+            stroke-linecap: round; filter: drop-shadow(0 0 3px #7FD8FF);
+            stroke-dasharray: 300; stroke-dashoffset: 300;
+            animation: boltStrikeB 5.1s infinite ease-out 1.72s; opacity: 0;
         }
-        /* Micro arcs that flash quickly */
         .dod-bolt-micro {
-            fill: none;
-            stroke: #FFFFFF;
-            stroke-width: 0.8;
-            stroke-linecap: round;
-            filter: drop-shadow(0 0 4px #FFFFFF);
-            stroke-dasharray: 40;
-            stroke-dashoffset: 40;
-            animation: boltStrikeA 3.4s infinite ease-out 0.15s;
-            opacity: 0;
+            fill: none; stroke: #FFFFFF; stroke-width: 0.8;
+            stroke-linecap: round; filter: drop-shadow(0 0 4px #FFFFFF);
+            stroke-dasharray: 40; stroke-dashoffset: 40;
+            animation: boltStrikeA 3.4s infinite ease-out 0.15s; opacity: 0;
         }
         @keyframes boltStrikeA {
             0%   { stroke-dashoffset: 1200; opacity: 0; }
@@ -325,130 +275,67 @@
         }
         @keyframes sirenRotate { from { transform: scale(1); } to { transform: scale(1.15); } }
 
-        /* =========================================
-           SUBSTITUTION BANNER (Team-coloured, eject-style)
-           ========================================= */
+        /* SUBSTITUTION BANNER */
         .side-banner {
-            position: absolute;
-            bottom: calc(100% - 38px);
-            display: flex;
-            align-items: stretch;
-            height: 54px;
-            opacity: 0;
-            transform: translateY(30px);
+            position: absolute; bottom: calc(100% - 38px);
+            display: flex; align-items: stretch; height: 54px;
+            opacity: 0; transform: translateY(30px);
             transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
                         transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
-            box-shadow: 0 10px 28px rgba(0,0,0,0.85),
-                        0 0 0 2px #D4AF37,
-                        0 0 18px rgba(212,175,55,0.45);
-            z-index: 25;
-            white-space: nowrap;
-            pointer-events: none;
-            background: var(--sub-team-color-dark, #0F1730);
-            overflow: hidden;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.85), 0 0 0 2px #D4AF37, 0 0 18px rgba(212,175,55,0.45);
+            z-index: 25; white-space: nowrap; pointer-events: none;
+            background: var(--sub-team-color-dark, #0F1730); overflow: hidden;
         }
         .side-banner.pos-right { right: 260px; left: auto; flex-direction: row; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); }
         .side-banner.pos-left  { left: 305px;  right: auto; flex-direction: row-reverse; }
         .side-banner.show { opacity: 1; transform: translateY(0); }
         .side-banner.hide { opacity: 0; transform: translateY(30px); }
-
-        /* Track holds the animated rows (OUT -> IN) */
-        .sub-track {
-            position: relative;
-            width: 340px;
-            overflow: hidden;
-        }
-        .pos-left .sub-track {
-            border-right: none;
-            border-left: 2px solid rgba(212,175,55,0.5);
-        }
-        .sub-track::before {
-            content: '';
-            position: absolute; inset: 0;
-            z-index: 0; pointer-events: none;
-        }
+        .sub-track { position: relative; width: 340px; overflow: hidden; }
+        .pos-left .sub-track { border-right: none; border-left: 2px solid rgba(212,175,55,0.5); }
+        .sub-track::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; }
         .sub-row {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 100%;
-            display: flex; align-items: center; gap: 12px;
-            padding: 0 36px;
+            position: absolute; top: 0; left: 0; right: 0; height: 100%;
+            display: flex; align-items: center; gap: 12px; padding: 0 36px;
             transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
-            z-index: 1;
-            will-change: transform;
+            z-index: 1; will-change: transform;
         }
         .sub-row-out { transform: translateY(0); }
         .sub-row-in  { transform: translateY(100%); }
         .side-banner.phase-in .sub-row-out { transform: translateY(-100%); }
         .side-banner.phase-in .sub-row-in  { transform: translateY(0); }
         .pos-left .sub-row { flex-direction: row-reverse; }
-
-        /* Eject arrow (red down for OUT, green up for IN) */
         .sub-arrow {
-            width: 36px;
-            height: 36px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 18px;
-            font-weight: 900;
-            color: #ff0000;
-            flex-shrink: 0;
-            line-height: 1;
-            position: relative;
+            width: 36px; height: 36px; border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: 900;
+            color: #ff0000; flex-shrink: 0; line-height: 1; position: relative;
         }
         .sub-arrow-out {
             background: linear-gradient(#ffffff, #d8d8d8);
-            box-shadow: 0 3px 10px rgba(239,68,68,0.7),
-                        inset 0 1px 0 rgba(255,255,255,0.35),
-                        inset 0 -2px 0 rgba(0,0,0,0.35);
+            box-shadow: 0 3px 10px rgba(239,68,68,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.35);
             text-shadow: 0 1px 2px rgba(0,0,0,0.6);
         }
         .sub-arrow-in {
             background: linear-gradient(to bottom, #22C55E 0%, #14532D 100%);
-            box-shadow: 0 3px 10px rgba(34,197,94,0.7),
-                        inset 0 1px 0 rgba(255,255,255,0.35),
-                        inset 0 -2px 0 rgba(0,0,0,0.35);
+            box-shadow: 0 3px 10px rgba(34,197,94,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.35);
             text-shadow: 0 1px 2px rgba(0,0,0,0.6);
         }
         .sub-name {
-            font-family: 'Mukta', 'Oswald', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-            text-align: left;
+            font-family: 'Mukta', 'Oswald', sans-serif; font-size: 22px; font-weight: 800;
+            letter-spacing: 1px; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left;
         }
         .pos-left .sub-name { text-align: right; }
-
-        /* Substitution badge (right section) */
         .sub-badge {
             background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 26px;
-            color: #000;
-            font-family: 'Mukta', 'Oswald', sans-serif;
-            font-weight: 900;
-            letter-spacing: 1px;
-            font-size: 17px;
-            text-transform: uppercase;
-            flex-shrink: 0;
-            position: relative;
+            border: none; display: flex; align-items: center; justify-content: center;
+            padding: 0 26px; color: #000;
+            font-family: 'Mukta', 'Oswald', sans-serif; font-weight: 900;
+            letter-spacing: 1px; font-size: 17px; text-transform: uppercase;
+            flex-shrink: 0; position: relative;
         }
         .sub-badge::before {
-            content: '';
-            position: absolute;
-            top: 6px; bottom: 6px;
-            width: 2px;
+            content: ''; position: absolute; top: 6px; bottom: 6px; width: 2px;
             background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent);
         }
         .pos-right .sub-badge::before { left: 0; }
@@ -584,66 +471,39 @@
             animation: dodBarPulse 1s infinite alternate;
         }
 
-        /* =========================================
-           MATCH END MERGED BANNER (Winner-coloured)
-           ========================================= */
+        /* MATCH END BANNER */
         .match-end-row {
-            display: none;
-            position: relative;
-            height: 96px;
-            padding: 5px;
-            margin-top: 10px;
-            margin-bottom: 3px;
-            z-index: 10;
-            opacity: 0;
-            transform: translateY(20px);
+            display: none; position: relative; height: 96px; padding: 5px;
+            margin-top: 10px; margin-bottom: 3px; z-index: 10;
+            opacity: 0; transform: translateY(20px);
             transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
             clip-path: polygon(0% 0, 100% 0, 96% 100%, 4% 100%);
         }
         .match-end-row.show {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            transform: translateY(0);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 1; transform: translateY(0);
         }
         .match-end-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            padding: 0 100px;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 2px; padding: 0 100px;
             background: var(--winner-color, #14141F);
             clip-path: polygon(.5% 0, 99.5% 0, 96% 100%, 4% 100%);
-            box-shadow: inset 0 0 40px rgba(255,255,255,0.10),
-                        0 0 45px var(--winner-color-soft, rgba(212,175,55,0.55));
+            box-shadow: inset 0 0 40px rgba(255,255,255,0.10), 0 0 45px var(--winner-color-soft, rgba(212,175,55,0.55));
             transition: background 0.5s ease, box-shadow 0.5s ease;
         }
         .me-final-score {
-            font-family: 'Teko', sans-serif;
-            font-size: 46px;
-            font-weight: 700;
+            font-family: 'Teko', sans-serif; font-size: 46px; font-weight: 700;
             color: #FFD700;
             text-shadow: 0 0 22px rgba(255,215,0,0.85), 1px 1px 4px rgba(0,0,0,0.9);
-            letter-spacing: 6px;
-            line-height: 1;
-            white-space: nowrap;
-            padding-top: 15px;
+            letter-spacing: 6px; line-height: 1; white-space: nowrap; padding-top: 15px;
         }
         .me-result-text {
-            font-family: 'Mukta', sans-serif;
-            font-size: 40px;
-            font-weight: 700;
-            color: #FFFFFF;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 700;
+            color: #FFFFFF; text-transform: uppercase; letter-spacing: 2px;
             text-shadow: 2px 2px 6px rgba(0,0,0,0.95);
-            white-space: nowrap;
-            margin-top: -20px;
+            white-space: nowrap; margin-top: -20px;
         }
 
         /* BOTTOM ROW */
@@ -655,8 +515,7 @@
             width: 310px; height: 38px;
             clip-path: polygon(0 0, 93% 0, 100% 100%, 7% 100%);
             padding: 4px; margin-right: 0px;
-            position: relative;
-            overflow: visible;
+            position: relative; overflow: visible;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .dots-left-inner {
@@ -677,8 +536,7 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 45px;
             color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            font-size: 15px;
-            transition: background 0.4s ease;
+            font-size: 15px; transition: background 0.4s ease;
         }
         .info-box { display: flex; align-items: center; justify-content: center; height: 26px; padding: 0 14px; white-space: nowrap; color: #FFFFFF; }
         .info-box-left  { justify-self: flex-start; }
@@ -687,8 +545,7 @@
             position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
             height: 23px; padding: 0 18px;
-            border-left: 3px solid #888; border-right: 3px solid #888;
-            z-index: 2;
+            border-left: 3px solid #888; border-right: 3px solid #888; z-index: 2;
         }
         .info-box-center .gold-text { color: #FFD700; font-family: 'Teko', sans-serif; font-size: 30px; line-height: 1; margin-top: 6px; }
         .center-info-inner.break-mode { background: linear-gradient(to bottom, #F57F17, #E65100); }
@@ -697,8 +554,7 @@
             width: 310px; height: 38px;
             clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
             padding: 4px; margin-left: 0px;
-            position: relative;
-            overflow: visible;
+            position: relative; overflow: visible;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .dots-right-inner {
@@ -719,69 +575,39 @@
             border-color: #FFFFFF;
             box-shadow: 0 0 10px var(--dot-active-color, #00FF00), 0 0 4px #FFFFFF inset;
         }
-        /* Hide dot bars during match end */
         .dots-left-wrap.result-hidden,
         .dots-right-wrap.result-hidden {
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
+            opacity: 0; transform: translateY(20px); pointer-events: none;
         }
 
-        /* =========================================
-           MARQUEE — Separate box below the dots
-           ========================================= */
+        /* MARQUEE */
         .marquee-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-top: -17px;
-            z-index: 6;
-            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; margin-top: -17px; z-index: 6; position: relative;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .marquee-row.result-hidden { opacity: 0; transform: translateY(20px); }
         .marquee-box {
-            width: 310px;
-            height: 20px;
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
+            width: 310px; height: 20px; border-radius: 3px;
+            overflow: hidden; position: relative;
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
         }
-        .marquee-box.marquee-right {
-            clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
-        }
-        .marquee-box.marquee-left {
-            clip-path: polygon(0 0, 97% 0, 100% 100%, 3% 100%);
-        }
+        .marquee-box.marquee-right { clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%); }
+        .marquee-box.marquee-left  { clip-path: polygon(0 0, 97% 0, 100% 100%, 3% 100%); }
         .marquee-content {
-            position: absolute;
-            top: 0; left: 100%;
-            height: 100%;
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap;
-            font-family: "Segoe UI", system-ui, sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.7px;
-            color: #FFF;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.95);
-            padding: 0 10px;
-            animation: marqueeScroll 22s linear infinite;
+            position: absolute; top: 0; left: 100%; height: 100%;
+            display: inline-flex; align-items: center; white-space: nowrap;
+            font-family: "Segoe UI", system-ui, sans-serif; font-size: 15px; font-weight: 600;
+            letter-spacing: 0.7px; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.95);
+            padding: 0 10px; animation: marqueeScroll 22s linear infinite;
         }
         .marquee-box.marquee-right .marquee-content { animation-delay: 0.4s; }
         @keyframes marqueeScroll {
             from { transform: translateX(0); }
             to   { transform: translateX(calc(-100% - 310px)); }
         }
-        .marquee-spacer {
-            width: 500px;
-            height: 1px;
-            flex-shrink: 0;
-        }
+        .marquee-spacer { width: 500px; height: 1px; flex-shrink: 0; }
 
         /* CENTER EVENT POPUP */
         @keyframes pop {
@@ -798,11 +624,11 @@
             font-family: 'Teko', sans-serif; font-size: 90px; font-weight: 700; letter-spacing: 6px;
             box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8);
             opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            white-space: nowrap; text-transform: uppercase;
-            z-index: 200;
+            white-space: nowrap; text-transform: uppercase; z-index: 200;
         }
         .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        /* FULL-SCREEN EPIC OVERLAY */
+
+        /* EPIC OVERLAY */
         .epic-overlay {
             position: fixed; inset: 0;
             display: flex; justify-content: center; align-items: center;
@@ -850,12 +676,13 @@
             55%  { transform: scale(1.12); opacity: 1; }
             100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes epicHold { from { transform: scale(1); } to   { transform: scale(1.05); } }
+        @keyframes epicHold { from { transform: scale(1); } to { transform: scale(1.05); } }
         @keyframes epicContainerExit {
             0%   { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(25); opacity: 0; }
         }
-        /* SHARED FULL-SCREEN OVERLAY SYSTEM */
+
+        /* FULL-SCREEN OVERLAY SYSTEM */
         .fs-overlay {
             position: fixed; inset: 0; z-index: 9990;
             display: none; justify-content: center; align-items: center; overflow: hidden;
@@ -881,6 +708,7 @@
         }
         .fs-powered-by .fp-icon img { width: 100%; height: 100%; object-fit: contain; }
         .fs-powered-by .fp-text { color: #FFF; font-weight: 700; font-size: 16px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
         /* STARTING 7 */
         #starting7-overlay { background: transparent; }
         #starting7-overlay .s7-bg {
@@ -957,6 +785,7 @@
             transform: perspective(500px) rotateX(40deg);
             margin-top: -6px;
         }
+
         /* TEAM STATS */
         #team-stats-overlay { background: #000; }
         #team-stats-overlay .ts-bg {
@@ -1036,6 +865,7 @@
             font-family: 'Segoe UI', sans-serif; font-weight: 900; font-size: 44px;
             color: #9C27B0; text-shadow: 4px 4px 8px #000;
         }
+
         /* PLAYER PERFORMANCE */
         #player-perf-overlay { background: transparent; }
         #player-perf-overlay .pp-bg {
@@ -1157,31 +987,20 @@
             <span class="logo-text">KabaddiOne</span>
         </div>
 
-        <!-- DO-OR-DIE with natural SVG lightning (from new code) -->
         <div id="dod-left" class="dod-banner dod-left">
             <div class="dod-lightning-container">
                 <svg class="dod-lightning-svg" viewBox="0 0 400 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Bolt 1: primary -->
-                    <path class="dod-bolt-glow"
-                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
-                    <path class="dod-bolt-main"
-                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
-                    <path class="dod-bolt-flicker"
-                          d="M -10 28 L 32 26 L 57 32 L 80 24 L 107 30 L 130 22 L 154 29 L 182 23 L 207 30 L 234 24 L 260 31 L 287 23 L 312 30 L 342 22 L 372 29 L 412 24"/>
-                    <!-- Branches off main bolt -->
+                    <path class="dod-bolt-glow" d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
+                    <path class="dod-bolt-main" d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
+                    <path class="dod-bolt-flicker" d="M -10 28 L 32 26 L 57 32 L 80 24 L 107 30 L 130 22 L 154 29 L 182 23 L 207 30 L 234 24 L 260 31 L 287 23 L 312 30 L 342 22 L 372 29 L 412 24"/>
                     <path class="dod-bolt-branch" d="M 128 20 L 122 10 L 130 4"/>
                     <path class="dod-bolt-branch" d="M 258 29 L 268 38 L 262 46"/>
                     <path class="dod-bolt-branch" d="M 340 20 L 348 12 L 342 4"/>
-                    <!-- Micro arcs -->
                     <path class="dod-bolt-micro" d="M 88 24 L 94 30"/>
                     <path class="dod-bolt-micro" d="M 214 25 L 220 31"/>
                     <path class="dod-bolt-micro" d="M 296 24 L 302 30"/>
-
-                    <!-- Bolt 2: independent, offset rhythm -->
-                    <path class="dod-bolt-glow2"
-                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
-                    <path class="dod-bolt-main2"
-                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
+                    <path class="dod-bolt-glow2" d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
+                    <path class="dod-bolt-main2" d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
                     <path class="dod-bolt-branch2" d="M 178 28 L 188 38 L 182 46"/>
                     <path class="dod-bolt-branch2" d="M 288 19 L 296 10 L 290 2"/>
                 </svg>
@@ -1192,22 +1011,17 @@
         <div id="dod-right" class="dod-banner dod-right">
             <div class="dod-lightning-container">
                 <svg class="dod-lightning-svg" viewBox="0 0 400 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <path class="dod-bolt-glow"
-                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
-                    <path class="dod-bolt-main"
-                          d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
-                    <path class="dod-bolt-flicker"
-                          d="M -10 28 L 32 26 L 57 32 L 80 24 L 107 30 L 130 22 L 154 29 L 182 23 L 207 30 L 234 24 L 260 31 L 287 23 L 312 30 L 342 22 L 372 29 L 412 24"/>
+                    <path class="dod-bolt-glow" d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
+                    <path class="dod-bolt-main" d="M -10 26 L 30 24 L 55 30 L 78 22 L 105 28 L 128 20 L 152 27 L 180 21 L 205 28 L 232 22 L 258 29 L 285 21 L 310 28 L 340 20 L 370 27 L 410 22"/>
+                    <path class="dod-bolt-flicker" d="M -10 28 L 32 26 L 57 32 L 80 24 L 107 30 L 130 22 L 154 29 L 182 23 L 207 30 L 234 24 L 260 31 L 287 23 L 312 30 L 342 22 L 372 29 L 412 24"/>
                     <path class="dod-bolt-branch" d="M 128 20 L 122 10 L 130 4"/>
                     <path class="dod-bolt-branch" d="M 258 29 L 268 38 L 262 46"/>
                     <path class="dod-bolt-branch" d="M 340 20 L 348 12 L 342 4"/>
                     <path class="dod-bolt-micro" d="M 88 24 L 94 30"/>
                     <path class="dod-bolt-micro" d="M 214 25 L 220 31"/>
                     <path class="dod-bolt-micro" d="M 296 24 L 302 30"/>
-                    <path class="dod-bolt-glow2"
-                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
-                    <path class="dod-bolt-main2"
-                          d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
+                    <path class="dod-bolt-glow2" d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
+                    <path class="dod-bolt-main2" d="M -10 18 L 40 28 L 72 20 L 108 29 L 145 19 L 178 28 L 212 18 L 250 27 L 288 19 L 322 28 L 358 20 L 400 26"/>
                     <path class="dod-bolt-branch2" d="M 178 28 L 188 38 L 182 46"/>
                     <path class="dod-bolt-branch2" d="M 288 19 L 296 10 L 290 2"/>
                 </svg>
@@ -1216,7 +1030,6 @@
             <span class="siren-icon">🚨</span>
         </div>
 
-        <!-- SUBSTITUTION BANNER (main code preserved) -->
         <div id="side-banner" class="side-banner pos-right">
             <div class="sub-track">
                 <div class="sub-row sub-row-out" id="sub-row-out">
@@ -1235,14 +1048,10 @@
 
         <div class="top-raid-bars" id="top-raid-bars">
             <div id="raid-track-left" class="raid-track track-left">
-                <div id="raid-bar-left" class="raid-fill">
-                    <div class="raid-spark"></div>
-                </div>
+                <div id="raid-bar-left" class="raid-fill"><div class="raid-spark"></div></div>
             </div>
             <div id="raid-track-right" class="raid-track track-right">
-                <div id="raid-bar-right" class="raid-fill">
-                    <div class="raid-spark"></div>
-                </div>
+                <div id="raid-bar-right" class="raid-fill"><div class="raid-spark"></div></div>
             </div>
         </div>
 
@@ -1273,7 +1082,6 @@
             </div>
         </div>
 
-        <!-- MATCH END MERGED BANNER (main code preserved) -->
         <div id="match-end-row" class="match-end-row">
             <div class="match-end-inner" id="me-inner">
                 <div class="me-final-score" id="me-score">0 - 0</div>
@@ -1301,7 +1109,6 @@
             </div>
         </div>
 
-        <!-- MARQUEE ROW (main code preserved) -->
         <div class="marquee-row" id="marquee-row">
             <div class="marquee-box marquee-left">
                 <div class="marquee-content">Download the KabaddiOne app from the google play store or from kabaddione.com</div>
@@ -1456,44 +1263,77 @@
         // FIREBASE INIT & APP CHECK (UNIFIED)
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI", // Your Web API Key
+            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
             authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
             databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "kabaddi-scoreboard-e1522"
         };
-        firebase.initializeApp(firebaseConfig);
 
-        // Activate Fraud Defense (reCAPTCHA Enterprise)
+        firebase.initializeApp(firebaseConfig);
+        window.__kabaddiLog('OK', '[1/5] Firebase initialized');
+
         const appCheck = firebase.appCheck();
+
+        // Optional: debug token for OBS / localhost. Add your debug token below if needed.
+        // self.FIREBASE_APPCHECK_DEBUG_TOKEN = "PASTE_DEBUG_TOKEN_HERE";
+
         appCheck.activate(
-            new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'), 
+            new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'),
             true
-        );
+        ).then(() => {
+            window.__kabaddiLog('OK', '[2/5] App Check activate() resolved');
+        }).catch(err => {
+            window.__kabaddiLog('ERR', '[2/5] App Check activate() FAILED', err);
+        });
+
+        appCheck.onTokenChanged((token) => {
+            window.__kabaddiLog('OK', '[3/5] App Check token refreshed (len=' + (token ? token.length : 0) + ')');
+        });
+
+        // Verify App Check token after 3 seconds
+        setTimeout(async () => {
+            try {
+                const result = await appCheck.getToken(false);
+                if (result && result.token) {
+                    window.__kabaddiLog('OK', '[4/5] App Check TOKEN OK (length=' + result.token.length + ')');
+                } else {
+                    window.__kabaddiLog('WARN', '[4/5] No App Check token returned', result);
+                }
+            } catch (e) {
+                window.__kabaddiLog('ERR', '[4/5] App Check getToken error', e);
+            }
+        }, 3000);
 
         const db = firebase.database();
+        window.__kabaddiLog('OK', '[5/5] Realtime Database initialized');
+
+        // RTDB connection monitor
+        db.ref('.info/connected').on('value', s => {
+            window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
+        });
+
+        // ============================================
+        // 🎯 THIS BLOCK WAS MISSING — RESTORED HERE
+        // ============================================
         const urlParams = new URLSearchParams(window.location.search);
         const matchId = urlParams.get('match');
+
+        window.__kabaddiLog('INFO', 'URL matchId =', matchId);
 
         // ==========================================
         // STATE
         // ==========================================
         let previousLeftScore = -1;
         let previousRightScore = -1;
-
         let lastLeftColor = null;
         let lastRightColor = null;
         let lastMatchOver = false;
-
-        // Globals for substitution team colour
         let currentLeftColor = '#009900';
         let currentRightColor = '#0055ff';
-
         let previousRaidActive = null;
-
         let lastOverlayScreen = '';
         let lastOverlayTeam = '';
         let lastOverlayPlayerId = '';
-
         let seenLogKeys = new Set();
         let initialLoadDone = false;
 
@@ -1501,7 +1341,6 @@
             left:  { active: false, timer: null, currentRaider: null },
             right: { active: false, timer: null, currentRaider: null }
         };
-
         const DEFAULT_PLAYER_IMG = '/images/player_profile_starting.png';
 
         // ==========================================
@@ -1541,10 +1380,8 @@
         function escapeHtml(t) {
             if (t === null || t === undefined) return '';
             return String(t)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
         }
 
@@ -1563,11 +1400,19 @@
         // ENGINE
         // ==========================================
         function initBroadcastEngine(id) {
+            window.__kabaddiLog('INFO', 'initBroadcastEngine() called with id =', id);
             const matchRef = db.ref('live_matches/' + id);
 
             matchRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (!data) return;
+                if (!data) {
+                    window.__kabaddiLog('WARN', 'Snapshot has NO data for match: ' + id);
+                    return;
+                }
+                window.__kabaddiLog('OK', '📦 Received live data snapshot', {
+                    left: data.left_name, right: data.right_name,
+                    ls: data.left_score, rs: data.right_score
+                });
 
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
@@ -1611,26 +1456,25 @@
                 if (data.state_json) {
                     try {
                         state = JSON.parse(data.state_json);
-
                         renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
                         renderDots('right-dot', state.rightOutIds, state.rightRosterJson, rightColor);
-
                         handleRaidTimers(state, data.raid_clock, leftColor, rightColor);
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
                         handleEventTimeline(state);
-
                     } catch (e) {
-                        console.warn("State JSON parse error", e);
+                        window.__kabaddiLog('ERR', 'State JSON parse error', e);
                     }
                 }
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
+            }, (error) => {
+                window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — App Check or rules blocked the read', error);
             });
         }
 
         // ==========================================
-        // MATCH END MERGED BANNER (winner colour + "Team A beat Team B")
+        // MATCH END BANNER
         // ==========================================
         function applyMatchEndBanner(isOver, leftName, rightName, ls, rs, leftColor, rightColor) {
             const meRow = document.getElementById('match-end-row');
@@ -1658,7 +1502,6 @@
             if (!isOver) { lastMatchOver = false; return; }
             lastMatchOver = true;
 
-            // Winner determination
             let winnerColor = '#4A4A4A';
             let winnerSoft  = 'rgba(74,74,74,0.4)';
             let resultText  = `${leftName} TIED ${rightName}`;
@@ -1734,16 +1577,13 @@
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const pJ = j => { const n = parseInt(j); return isNaN(n) ? 999 : n; };
-            const starting7 = roster
-                .filter(p => p.isStarting7)
-                .sort((a,b) => pJ(a.jerseyNumber) - pJ(b.jerseyNumber));
-
+            const starting7 = roster.filter(p => p.isStarting7).sort((a,b) => pJ(a.jerseyNumber) - pJ(b.jerseyNumber));
             if (starting7.length === 0) return;
 
             const outOrder = splitConcatenatedIds(outIdsStr || '', starting7);
             const outSet   = new Set(outOrder);
-
             const cardInactiveIds = [];
+
             starting7.forEach(p => {
                 if (outSet.has(p.id)) return;
                 const disqualified = p.isDisqualified === true;
@@ -1836,8 +1676,7 @@
                 const timerEl = document.getElementById('raid-timer');
                 const logoEl  = document.getElementById('splash-logo');
                 if (isRaidActive) {
-                    logoEl.classList.remove('show');
-                    logoEl.classList.remove('out');
+                    logoEl.classList.remove('show', 'out');
                     timerEl.classList.remove('out');
                 } else {
                     timerEl.classList.add('out');
@@ -1872,8 +1711,7 @@
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
             if (!raidActive) {
-                stopRaiderRotation('left');
-                stopRaiderRotation('right');
+                stopRaiderRotation('left'); stopRaiderRotation('right');
                 raiderRotationState.left.currentRaider  = null;
                 raiderRotationState.right.currentRaider = null;
                 return;
@@ -1881,8 +1719,7 @@
 
             const raiderName = (data.active_raider_name || '').trim();
             if (!raiderName) {
-                stopRaiderRotation('left');
-                stopRaiderRotation('right');
+                stopRaiderRotation('left'); stopRaiderRotation('right');
                 raiderRotationState.left.currentRaider  = null;
                 raiderRotationState.right.currentRaider = null;
                 return;
@@ -1908,7 +1745,6 @@
 
         function startRaiderRotation(side, raiderName) {
             const st = raiderRotationState[side];
-
             if (st.active && st.currentRaider === raiderName) return;
 
             const container = document.querySelector(`#${side}-team-bg .name-rotator`);
@@ -1921,19 +1757,16 @@
                 st.currentRaider = raiderName;
                 return;
             }
-
             if (st.timer) { clearTimeout(st.timer); st.timer = null; }
             st.active = true;
             st.currentRaider = raiderName;
 
             nameEl.classList.remove('out');
             raiderEl.classList.remove('show', 'out');
-
             nameEl.classList.add('out');
             raiderEl.classList.add('show');
 
             let showingRaider = true;
-
             const tick = () => {
                 if (!st.active) return;
                 if (showingRaider) {
@@ -1957,13 +1790,11 @@
             const st = raiderRotationState[side];
             if (st.timer) { clearTimeout(st.timer); st.timer = null; }
             st.active = false;
-
             const container = document.querySelector(`#${side}-team-bg .name-rotator`);
             if (!container) return;
             const nameEl   = container.querySelector('.team-name-text');
             const raiderEl = container.querySelector('.raider-name-text');
-            raiderEl.classList.remove('show');
-            raiderEl.classList.remove('out');
+            raiderEl.classList.remove('show', 'out');
             nameEl.classList.remove('out');
         }
 
@@ -2004,7 +1835,6 @@
                 leftBar.classList.remove('dod-active');
                 leftWrap.classList.remove('dod-active');
             }
-
             if (rightDOD) {
                 dodRightBanner.classList.add('show');
                 rightBar.classList.add('dod-active');
@@ -2017,7 +1847,7 @@
         }
 
         // ==========================================
-        // SUBSTITUTION BANNER (Team-coloured, eject-style)
+        // SUBSTITUTION BANNER
         // ==========================================
         let subBannerTimeoutIds = [];
         function triggerSubstitutionGraphic(descText, isLeftTeam) {
@@ -2037,7 +1867,6 @@
             outNameEl.innerText = outName;
             inNameEl.innerText  = inName;
 
-            // Use the ACTIVE team colour as banner background
             const teamColor = isLeftTeam ? currentLeftColor : currentRightColor;
             banner.style.setProperty('--sub-team-color', teamColor);
             banner.style.setProperty('--sub-team-color-dark', darkenColor(teamColor, 60));
@@ -2047,20 +1876,11 @@
 
             banner.className = 'side-banner ' + (isLeftTeam === false ? 'pos-right' : 'pos-left');
             void banner.offsetWidth;
-
             banner.classList.add('show');
 
-            subBannerTimeoutIds.push(setTimeout(() => {
-                banner.classList.add('phase-in');
-            }, 2000));
-
-            subBannerTimeoutIds.push(setTimeout(() => {
-                banner.classList.add('hide');
-            }, 4000));
-
-            subBannerTimeoutIds.push(setTimeout(() => {
-                banner.classList.remove('show', 'hide', 'phase-in');
-            }, 4700));
+            subBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('phase-in'); }, 2000));
+            subBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('hide'); }, 4000));
+            subBannerTimeoutIds.push(setTimeout(() => { banner.classList.remove('show', 'hide', 'phase-in'); }, 4700));
         }
 
         // ==========================================
@@ -2100,7 +1920,7 @@
                     }
                 }
             } catch (e) {
-                console.warn("Logs JSON parse error", e);
+                window.__kabaddiLog('WARN', 'Logs JSON parse error', e);
             }
         }
 
@@ -2134,7 +1954,6 @@
 
             overlay.classList.remove('entry', 'hold', 'exit', 'visible');
             void overlay.offsetWidth;
-
             overlay.classList.add('visible', 'entry');
             epicIsPlaying = true;
 
@@ -2143,13 +1962,11 @@
                 overlay.classList.remove('entry');
                 overlay.classList.add('hold');
             }, 700));
-
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
                 overlay.classList.remove('hold');
                 overlay.classList.add('exit');
             }, 3200));
-
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.remove('visible', 'exit');
                 epicIsPlaying = false;
@@ -2181,7 +1998,6 @@
                 const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
                 const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
                 const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
-
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
                     renderStarting7(actualName, actualColor, rosterJson);
                     showFsOverlay('starting7-overlay');
@@ -2190,7 +2006,6 @@
                 }
                 return;
             }
-
             if (screen === 'team_stats') {
                 if (screen !== lastOverlayScreen || !document.getElementById('team-stats-overlay').classList.contains('show')) {
                     renderTeamStats(data, state, leftName, rightName, leftColor, rightColor);
@@ -2201,13 +2016,11 @@
                 }
                 return;
             }
-
             if (screen === 'player_performance') {
                 const isLeft = (team !== 'right');
                 const actualKey = isLeft ? 'left' : 'right';
                 const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
                 const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
-
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || playerId !== lastOverlayPlayerId || !document.getElementById('player-perf-overlay').classList.contains('show')) {
                     renderPlayerPerformance(rosterJson, playerId, actualColor);
                     showFsOverlay('player-perf-overlay');
@@ -2219,7 +2032,6 @@
                 }
                 return;
             }
-
             hideAllFsOverlays();
         }
 
@@ -2245,7 +2057,6 @@
             } else {
                 nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
             }
-
             const overlayEl = document.getElementById('starting7-overlay');
             overlayEl.style.setProperty('--s7-team-color', teamColor);
             overlayEl.style.setProperty('--s7-team-color-dark', darkenColor(teamColor, 30));
@@ -2253,7 +2064,6 @@
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const starters = roster.filter(p => p.isStarting7 === true);
-
             const slots = document.querySelectorAll('#starting7-overlay .s7-player');
             slots.forEach(slot => {
                 const pos = slot.getAttribute('data-pos');
@@ -2269,23 +2079,19 @@
                     <div class="s7-name-tag">
                         <div class="s7-name-top">—</div>
                         <div class="s7-name-bottom">${escapeHtml(positionLabel || '—')}</div>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
-
             const jersey = player.jerseyNumber || '';
             const name = player.name || 'Player';
             const displayName = jersey ? `${name} (${jersey})` : name;
             const imgSrc = resolvePlayerImage(player);
-
             slotEl.innerHTML = `
                 <div class="s7-avatar"><img src="${imgSrc}" alt=""></div>
                 <div class="s7-name-tag">
                     <div class="s7-name-top">${escapeHtml(displayName)}</div>
                     <div class="s7-name-bottom">${escapeHtml(positionLabel)}</div>
-                </div>
-            `;
+                </div>`;
         }
 
         // ==========================================
@@ -2296,7 +2102,6 @@
             const rs = data.right_score || 0;
             document.getElementById('ts-main-score').innerText = `${ls} - ${rs}`;
             document.getElementById('ts-match-status').innerText = (data.half_status || '1st Half').toUpperCase();
-
             document.getElementById('ts-left-team-name').innerText = leftName;
             document.getElementById('ts-right-team-name').innerText = rightName;
 
@@ -2318,16 +2123,11 @@
             document.getElementById('ts-left-extra').innerText   = lExtra;
             document.getElementById('ts-right-extra').innerText  = rExtra;
 
-            document.querySelectorAll('#team-stats-overlay .ts-cell-left').forEach(el => {
-                el.style.background = leftColor;
-            });
-            document.querySelectorAll('#team-stats-overlay .ts-cell-right').forEach(el => {
-                el.style.background = rightColor;
-            });
+            document.querySelectorAll('#team-stats-overlay .ts-cell-left').forEach(el => { el.style.background = leftColor; });
+            document.querySelectorAll('#team-stats-overlay .ts-cell-right').forEach(el => { el.style.background = rightColor; });
 
             const lStat = data['team_stats_left_full']  || {};
             const rStat = data['team_stats_right_full'] || {};
-
             const lRaidRate   = parseFloat(lStat.raidStrikeRate)   || 0;
             const rRaidRate   = parseFloat(rStat.raidStrikeRate)   || 0;
             const lTackleRate = parseFloat(lStat.tackleStrikeRate) || 0;
@@ -2372,15 +2172,12 @@
                 document.getElementById('pp-tackle-ring').style.setProperty('--pie-deg', '0deg');
                 return;
             }
-
             const jersey = player.jerseyNumber || '';
             const name = player.name || 'Player';
             const displayName = jersey ? `${name} (${jersey})` : name;
-
             const avatarEl = document.getElementById('pp-avatar');
             const imgSrc = resolvePlayerImage(player);
             avatarEl.innerHTML = `<img src="${imgSrc}" alt="">`;
-
             document.getElementById('pp-name-badge').innerText = displayName.toUpperCase();
 
             const totalRaids = parseInt(player.totalRaids || 0);
@@ -2392,7 +2189,6 @@
             document.getElementById('pp-raid-points').innerText = raidPts;
             document.getElementById('pp-tackles').innerText = totalTackles;
             document.getElementById('pp-tackle-points').innerText = tacklePts;
-
             document.getElementById('pp-on-mat').innerText = formatOnMatTime(player.onMatSeconds || 0);
 
             const succRaids = parseInt(player.successfulRaids || 0);
@@ -2404,6 +2200,19 @@
             document.getElementById('pp-tackle-rate').innerText = tackleStrike + '%';
             document.getElementById('pp-raid-ring').style.setProperty('--pie-deg', ((raidStrike / 100) * 360) + 'deg');
             document.getElementById('pp-tackle-ring').style.setProperty('--pie-deg', ((tackleStrike / 100) * 360) + 'deg');
+        }
+
+        // ============================================================
+        // 🎯 THE MISSING BLOCK — NOW RESTORED — CALLS THE ENGINE
+        // ============================================================
+        if (!matchId) {
+            window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
+            document.getElementById('left-name').innerText = "NO MATCH ID";
+            document.getElementById('right-name').innerText = "LINK URL ERROR";
+        } else {
+            document.getElementById('match-id').innerText = matchId.toUpperCase();
+            window.__kabaddiLog('OK', '✅ Calling initBroadcastEngine("' + matchId + '")');
+            initBroadcastEngine(matchId);
         }
     </script>
 </body>
