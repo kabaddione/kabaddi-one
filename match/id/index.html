@@ -1136,53 +1136,285 @@ function drawGraph(){
 window.addEventListener('resize',()=>{ if(document.getElementById('tab-graph').classList.contains('active')) requestAnimationFrame(()=>drawGraph()); });
 
 // ============================================================
-// FIREBASE INIT & SECURE AUTH
-// ============================================================
-const firebaseConfig = {
-    apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
-    authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
-    databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "kabaddi-scoreboard-e1522"
-};
+        // FIREBASE INIT & SECURE AUTH (Corrected for index.html IDs)
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
+            authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
+            databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "kabaddi-scoreboard-e1522"
+        };
 
-firebase.initializeApp(firebaseConfig);
-window.__kabaddiLog('OK', '[1/5] Firebase initialized');
+        firebase.initializeApp(firebaseConfig);
+        window.__kabaddiLog('OK', '[1/5] Firebase initialized');
 
-const db = firebase.database();
-const urlParams = new URLSearchParams(window.location.search);
-const matchId = urlParams.get('match');
-window.__kabaddiLog('INFO', 'URL matchId =', matchId);
+        const db = firebase.database();
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('match');
+        window.__kabaddiLog('INFO', 'URL matchId =', matchId);
 
-// RTDB connection monitor
-db.ref('.info/connected').on('value', s => {
-    window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
-});
+        // RTDB connection monitor
+        db.ref('.info/connected').on('value', s => {
+            window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
+        });
 
-// ============================================================
-// 🎯 SILENTLY AUTHENTICATE & CALL THE ENGINE
-// ============================================================
-firebase.auth().signInAnonymously()
-    .then(() => {
-        window.__kabaddiLog('OK', '[2/5] Anonymous Auth Successful!');
-        startBroadcastEngine();
-    })
-    .catch((error) => {
-        window.__kabaddiLog('ERR', '❌ Secure Connection Auth Failed', error);
-        document.getElementById('left-name').innerText = "AUTH ERROR";
-        document.getElementById('right-name').innerText = "SECURE DB BLOCKED";
-    });
+        // 🚨 SILENTLY AUTHENTICATE THE VIEWER
+        firebase.auth().signInAnonymously()
+            .then(() => {
+                window.__kabaddiLog('OK', '[2/5] Anonymous Auth Successful!');
+                startLiveScoreboardEngine();
+            })
+            .catch((error) => {
+                window.__kabaddiLog('ERR', '❌ Secure Connection Auth Failed', error);
+                const matchDateEl = document.getElementById('uiMatchDate');
+                if(matchDateEl) {
+                    matchDateEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Secure Auth Failed. Check API Key Domains.';
+                    matchDateEl.style.color = "#FF3B30";
+                }
+            });
 
-function startBroadcastEngine() {
-    if (!matchId) {
-        window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
-        document.getElementById('left-name').innerText = "NO MATCH ID";
-        document.getElementById('right-name').innerText = "LINK URL ERROR";
-    } else {
-        document.getElementById('match-id').innerText = matchId.toUpperCase();
-        window.__kabaddiLog('OK', '✅ Calling initBroadcastEngine("' + matchId + '")');
-        initBroadcastEngine(matchId);
-    }
-}
+        function startLiveScoreboardEngine() {
+            if (!matchId) {
+                window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
+                const matchDateEl = document.getElementById('uiMatchDate');
+                if (matchDateEl) {
+                    matchDateEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
+                    matchDateEl.style.color = "#FF3B30";
+                }
+            } else {
+                const uiMatchIdEl = document.getElementById('uiMatchId');
+                if (uiMatchIdEl) uiMatchIdEl.innerHTML = '<i class="fa-solid fa-hashtag"></i> ' + matchId.toUpperCase();
+                
+                const dtMatchIdEl = document.getElementById('dtMatchId');
+                if (dtMatchIdEl) dtMatchIdEl.innerText = matchId.toUpperCase();
+
+                window.__kabaddiLog('OK', '✅ Calling setupViewerPresence()');
+                setupViewerPresence();
+
+                db.ref('live_matches/' + matchId).on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (!data) { 
+                        const matchDateEl = document.getElementById('uiMatchDate');
+                        if (matchDateEl) matchDateEl.innerText = "Match Offline or Ended."; 
+                        return; 
+                    }
+                    window.latestMatchData = data;
+
+                    const ts = data.last_updated || Date.now();
+                    const dateStr = new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const timeStr = new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    updateLastUpdated(ts);
+
+                    if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
+                        document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch" style="color:#FBC02D;"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
+                        document.getElementById('uiMatchDate').style.color = "#FBC02D";
+                    } else {
+                        document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${dateStr} · Live Kabaddi Arena`;
+                        document.getElementById('uiMatchDate').style.color = "#8C8E9F";
+                    }
+                    document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
+
+                    if (data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
+
+                    const liveBadge = document.getElementById('uiLiveBadge');
+                    const halfStatusRaw = data.half_status || '';
+                    const halfStatusLower = halfStatusRaw.toLowerCase();
+                    const matchOverFlag = halfStatusLower.includes('over')
+                        || halfStatusLower.includes('full time')
+                        || halfStatusLower.includes('match over')
+                        || (data.match_result && data.match_result.length > 0)
+                        || (data.main_clock === '00:00' && halfStatusLower.length > 0);
+                    
+                    const breakTitleLower = (data.break_clock_title || '').toLowerCase();
+                    const breakTimeStr = data.break_clock_time || '';
+                    const inBreak = breakTitleLower.length > 0 && breakTimeStr && breakTimeStr !== '00:00';
+                    
+                    if (matchOverFlag) { liveBadge.className = 'badge-live badge-final'; liveBadge.textContent = 'Final'; }
+                    else if (inBreak) { liveBadge.className = 'badge-live badge-break'; liveBadge.textContent = 'Break'; }
+                    else { liveBadge.className = 'badge-live'; liveBadge.textContent = 'Live'; }
+
+                    let raidIsIdle = true;
+                    if (data.raid_clock) {
+                        const rc = document.getElementById('uiRaidClock');
+                        const rCont = document.getElementById('uiRaidTimerContainer');
+                        if (rc) rc.innerText = data.raid_clock;
+                        const ti = parseInt(data.raid_clock) || 30;
+                        const deg = (ti / 30) * 360;
+                        const color = ti <= 10 ? "#FF3B30" : "#FBC02D";
+                        if (rCont) rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
+                        raidIsIdle = ti >= 30;
+                    }
+
+                    if (halfStatusRaw) {
+                        const halfEl = document.getElementById('uiHalf');
+                        if (halfEl) halfEl.innerHTML = `<i class="fa-solid fa-clock"></i> ${halfStatusRaw}`;
+                    }
+
+                    if (data.left_name && data.right_name) {
+                        document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
+                        document.getElementById('togLeft').innerText = data.left_name;
+                        document.getElementById('togRight').innerText = data.right_name;
+                    }
+                    if (data.left_name) {
+                        ['uiLeftName', 'stLeftName', 'stPerfLeftName', 'grLeftName', 'stLeftStrikeTeam'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.innerText = data.left_name;
+                        });
+                        ['stLeftLogo', 'stPerfLeftLogo', 'grLeftLogo'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.innerText = getInitials(data.left_name);
+                        });
+                    }
+                    if (data.right_name) {
+                        ['uiRightName', 'stRightName', 'stPerfRightName', 'grRightName', 'stRightStrikeTeam'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.innerText = data.right_name;
+                        });
+                        ['stRightLogo', 'stPerfRightLogo', 'grRightLogo'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.innerText = getInitials(data.right_name);
+                        });
+                    }
+                    if (data.left_score !== undefined) {
+                        const scoreEl = document.getElementById('uiLeftScore');
+                        if (scoreEl) scoreEl.innerText = data.left_score;
+                    }
+                    if (data.right_score !== undefined) {
+                        const scoreEl = document.getElementById('uiRightScore');
+                        if (scoreEl) scoreEl.innerText = data.right_score;
+                    }
+
+                    const leftColor = data.left_color || "#4CAF50";
+                    const rightColor = data.right_color || "#2196F3";
+                    window.leftTeamColorForGraph = leftColor;
+                    window.rightTeamColorForGraph = rightColor;
+                    document.documentElement.style.setProperty('--left-team-color', leftColor);
+                    document.documentElement.style.setProperty('--right-team-color', rightColor);
+
+                    if (data.match_duration_mins) {
+                        document.getElementById('dtDuration').innerText = data.match_duration_mins + " Minutes";
+                        window.totalMatchMinutes = data.match_duration_mins * 2;
+                        let halfMins = data.match_duration_mins;
+                        let currentHalfNum = halfStatusRaw.includes("1st") ? 1 : 2;
+                        if (halfStatusRaw.includes("Match Over")) currentHalfNum = 2;
+                        let minsLeft = halfMins;
+                        if (data.main_clock && data.main_clock.includes(":")) {
+                            const p = data.main_clock.split(":"); minsLeft = parseInt(p[0]) + (parseInt(p[1]) / 60);
+                        }
+                        const elapsed = halfMins - minsLeft;
+                        window.currentAbsoluteMatchMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
+                        window.currentAbsoluteMatchMinute = Math.max(0, Math.min(window.totalMatchMinutes, window.currentAbsoluteMatchMinute));
+                    }
+
+                    if (data.break_duration_mins) document.getElementById('dtBreak').innerText = data.break_duration_mins + " Minutes";
+                    if (data.players_per_side) document.getElementById('dtPlayers').innerText = data.players_per_side + " Players";
+                    if (data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs + " Seconds";
+                    if (data.max_subs) document.getElementById('dtSubs').innerText = data.max_subs;
+                    if (data.max_timeouts) document.getElementById('dtTimeouts').innerText = data.max_timeouts;
+
+                    window.teamStatsLeft = data.team_stats_left || null;
+                    window.teamStatsRight = data.team_stats_right || null;
+
+                    if (data.state_json) {
+                        try {
+                            const state = JSON.parse(data.state_json);
+                            window.latestGlobalState = state;
+
+                            document.getElementById('uiLeftEmptyRaidCount').innerText = state.leftEmptyRaids || 0;
+                            document.getElementById('uiRightEmptyRaidCount').innerText = state.rightEmptyRaids || 0;
+                            document.getElementById('uiLeftFouls').innerText = state.leftFouls || 0;
+                            document.getElementById('uiRightFouls').innerText = state.rightFouls || 0;
+                            document.getElementById('uiLeftTimeouts').innerText = state.leftTimeouts || 0;
+                            document.getElementById('uiRightTimeouts').innerText = state.rightTimeouts || 0;
+                            document.getElementById('uiLeftSubs').innerText = state.leftSubs || 0;
+                            document.getElementById('uiRightSubs').innerText = state.rightSubs || 0;
+
+                            const banner = document.getElementById('uiActiveRaider');
+                            if (matchOverFlag) {
+                                const result = (data.match_result && data.match_result.trim())
+                                    ? data.match_result.trim()
+                                    : (num(data.left_score) === num(data.right_score) ? 'Match Tied'
+                                        : (num(data.left_score) > num(data.right_score)
+                                            ? (data.left_name || 'Left Team') + ' won'
+                                            : (data.right_name || 'Right Team') + ' won'));
+                                banner.classList.remove('idle');
+                                banner.classList.add('match-over');
+                                banner.innerHTML = `<i class="fa-solid fa-flag-checkered"></i> <span>${result}</span>`;
+                            } else if (raidIsIdle || !data.active_raider_name || data.active_raider_name === "") {
+                                banner.classList.remove('match-over');
+                                banner.classList.add('idle');
+                                banner.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Waiting for raid to start...';
+                            } else {
+                                banner.classList.remove('match-over', 'idle');
+                                let isLeftRaid;
+                                const raw = state.currentRaidTeamsLeft !== undefined ? state.currentRaidTeamsLeft : state.currentRaidTeamIsLeft;
+                                if (raw === true || raw === 1 || raw === '1' || raw === 'true') isLeftRaid = true;
+                                else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
+                                else if (data.active_raider_team === 'left') isLeftRaid = true;
+                                else if (data.active_raider_team === 'right') isLeftRaid = false;
+                                else {
+                                    const arid = String(data.active_raider_id || '');
+                                    if (arid.startsWith('left_')) isLeftRaid = true;
+                                    else if (arid.startsWith('right_')) isLeftRaid = false;
+                                    else isLeftRaid = true;
+                                }
+                                const c = isLeftRaid ? leftColor : rightColor;
+                                banner.innerHTML = `<i class="fa-solid fa-person-running" style="color:${c};"></i> <span style="color:${c};">${data.active_raider_name}</span> is on raid`;
+                            }
+
+                            let lR = [], rR = [];
+                            try { lR = JSON.parse(state.leftRosterJson || '[]'); } catch (e) { }
+                            try { rR = JSON.parse(state.rightRosterJson || '[]'); } catch (e) { }
+                            window.leftRoster = lR;
+                            window.rightRoster = rR;
+
+                            renderMatDots(state, lR, rR, leftColor, rightColor);
+
+                            if (state.logsJson) {
+                                let logs = [];
+                                try { logs = JSON.parse(state.logsJson); } catch (e) { console.error(e); }
+                                window.matchLogsForGraph = logs;
+                                window.halfStatsCache = computeHalfStats();
+
+                                if (logs.length > 0) {
+                                    const latest = logs[logs.length - 1];
+                                    if (window.lastSeenLogId !== undefined && latest.id !== window.lastSeenLogId) showEventFlash(latest);
+                                    window.lastSeenLogId = latest.id;
+                                }
+                                if (document.getElementById('tab-graph').classList.contains('active')) drawGraph();
+
+                                let logHtml = "";
+                                for (let i = logs.length - 1; i >= 0; i--) {
+                                    const log = logs[i];
+                                    const iconPath = getLogIconPath(log.title);
+                                    let iconBg;
+                                    if (log.isLeftTeam === true) iconBg = leftColor;
+                                    else if (log.isLeftTeam === false) iconBg = rightColor;
+                                    else iconBg = '#37474F';
+                                    let badgeHtml = '';
+                                    if (log.points && log.points > 0) {
+                                        const bc = log.isLeftTeam === true ? leftColor : (log.isLeftTeam === false ? rightColor : '#8C8E9F');
+                                        badgeHtml = `<div class="log-points-badge" style="background:${bc}33; color:${bc};">+${log.points}</div>`;
+                                    }
+                                    const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i, '') : '';
+                                    logHtml += `<div class="log-row">
+                                      <div class="log-icon-circle" style="--icon-bg: ${iconBg};"><img src="${iconPath}" alt="" onerror="this.onerror=null; this.src='/images/default_event.png';"></div>
+                                      <div class="log-body"><div class="log-title">${log.title || 'Event'}</div><div class="log-desc">${log.desc || ''}</div></div>
+                                      <div class="log-side">${badgeHtml}<div class="log-meta-line"><span class="log-time-tag">${log.timeStr || ''}</span>${scoreStr ? `<span class="log-score-tag">${scoreStr}</span>` : ''}</div></div>
+                                    </div>`;
+                                }
+                                document.getElementById('uiTimelineLogs').innerHTML = logHtml || '<div class="empty-state"><i class="fa-solid fa-comment-dots"></i>No events recorded yet.</div>';
+                            }
+
+                            renderStats();
+                            renderLineups(state);
+                        } catch (e) {
+                            window.__kabaddiLog('ERR', 'State JSON parse error', e);
+                        }
+                    }
+                });
+            }
+        }
 </script>
 </body>
 </html>
