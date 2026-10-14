@@ -1277,14 +1277,13 @@
         // Optional: debug token for OBS / localhost. Add your debug token below if needed.
         // self.FIREBASE_APPCHECK_DEBUG_TOKEN = "PASTE_DEBUG_TOKEN_HERE";
 
-        appCheck.activate(
-            new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW'),
-            true
-        ).then(() => {
-            window.__kabaddiLog('OK', '[2/5] App Check activate() resolved');
-        }).catch(err => {
-            window.__kabaddiLog('ERR', '[2/5] App Check activate() FAILED', err);
-        });
+        try {
+    const acProvider = new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW');
+    appCheck.activate(acProvider, true);
+    window.__kabaddiLog('OK', '[2/5] App Check activate() called');
+} catch (err) {
+    window.__kabaddiLog('ERR', '[2/5] App Check activate() threw synchronously', err);
+}
 
         appCheck.onTokenChanged((token) => {
             window.__kabaddiLog('OK', '[3/5] App Check token refreshed (len=' + (token ? token.length : 0) + ')');
