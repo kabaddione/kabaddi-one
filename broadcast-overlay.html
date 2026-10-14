@@ -23,12 +23,12 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK v10.12.2 (required for ReCaptchaEnterpriseProvider) -->
+    <!-- 🚨 FIREBASE SDKs: App Check Removed, Auth Added! -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
-    <!-- 🐛 DEBUG FLAG - Remove in production if you want -->
+    <!-- 🐛 DEBUG FLAG -->
     <script>
         window.KABADDI_DEBUG = true;
         window.__kabaddiLog = function(tag, msg, data) {
@@ -1135,7 +1135,7 @@
         <div class="s7-bg"></div>
         <div class="s7-content">
             <div class="s7-formation" id="s7-formation">
-                <div class="s7-player pos-center"       data-pos="CENTER"></div>
+                <div class="s7-player pos-center"        data-pos="CENTER"></div>
                 <div class="s7-player pos-right-cover"  data-pos="RIGHT COVER"></div>
                 <div class="s7-player pos-left-cover"   data-pos="LEFT COVER"></div>
                 <div class="s7-player pos-right-in"     data-pos="RIGHT IN"></div>
@@ -1260,64 +1260,37 @@
 
     <script>
         // ============================================================
-        // FIREBASE INIT & APP CHECK (UNIFIED)
+        // SECURE FIREBASE INIT & ANONYMOUS AUTHENTICATION
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
+            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI", // Web API Key
             authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
             databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "kabaddi-scoreboard-e1522"
         };
-
         firebase.initializeApp(firebaseConfig);
-        window.__kabaddiLog('OK', '[1/5] Firebase initialized');
-
-        const appCheck = firebase.appCheck();
-
-        // Optional: debug token for OBS / localhost. Add your debug token below if needed.
-        // self.FIREBASE_APPCHECK_DEBUG_TOKEN = "PASTE_DEBUG_TOKEN_HERE";
-
-        try {
-    const acProvider = new firebase.appCheck.ReCaptchaEnterpriseProvider('6LfxdOwtAAAAAL_BxPp-XxvjgnmOvV-ZOKL5fDW');
-    appCheck.activate(acProvider, true);
-    window.__kabaddiLog('OK', '[2/5] App Check activate() called');
-} catch (err) {
-    window.__kabaddiLog('ERR', '[2/5] App Check activate() threw synchronously', err);
-}
-
-        appCheck.onTokenChanged((token) => {
-            window.__kabaddiLog('OK', '[3/5] App Check token refreshed (len=' + (token ? token.length : 0) + ')');
-        });
-
-        // Verify App Check token after 3 seconds
-        setTimeout(async () => {
-            try {
-                const result = await appCheck.getToken(false);
-                if (result && result.token) {
-                    window.__kabaddiLog('OK', '[4/5] App Check TOKEN OK (length=' + result.token.length + ')');
-                } else {
-                    window.__kabaddiLog('WARN', '[4/5] No App Check token returned', result);
-                }
-            } catch (e) {
-                window.__kabaddiLog('ERR', '[4/5] App Check getToken error', e);
-            }
-        }, 3000);
-
         const db = firebase.database();
-        window.__kabaddiLog('OK', '[5/5] Realtime Database initialized');
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('match');
+
+        window.__kabaddiLog('INFO', 'URL matchId =', matchId);
 
         // RTDB connection monitor
         db.ref('.info/connected').on('value', s => {
             window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
         });
 
-        // ============================================
-        // 🎯 THIS BLOCK WAS MISSING — RESTORED HERE
-        // ============================================
-        const urlParams = new URLSearchParams(window.location.search);
-        const matchId = urlParams.get('match');
-
-        window.__kabaddiLog('INFO', 'URL matchId =', matchId);
+        // 🚨 SILENTLY AUTHENTICATE THE VIEWER BEFORE READING THE DATABASE
+        firebase.auth().signInAnonymously()
+            .then(() => {
+                window.__kabaddiLog('OK', '✅ Anonymous Auth Successful!');
+                startBroadcastEngine();
+            })
+            .catch((error) => {
+                window.__kabaddiLog('ERR', '❌ Secure Connection Auth Failed', error);
+                document.getElementById('left-name').innerText = "AUTH ERROR";
+                document.getElementById('right-name').innerText = "SECURE DB BLOCKED";
+            });
 
         // ==========================================
         // STATE
@@ -1398,8 +1371,19 @@
         // ==========================================
         // ENGINE
         // ==========================================
+        function startBroadcastEngine() {
+            if (!matchId) {
+                window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
+                document.getElementById('left-name').innerText = "NO MATCH ID";
+                document.getElementById('right-name').innerText = "LINK URL ERROR";
+            } else {
+                document.getElementById('match-id').innerText = matchId.toUpperCase();
+                window.__kabaddiLog('OK', '✅ Calling initBroadcastEngine("' + matchId + '")');
+                initBroadcastEngine(matchId);
+            }
+        }
+
         function initBroadcastEngine(id) {
-            window.__kabaddiLog('INFO', 'initBroadcastEngine() called with id =', id);
             const matchRef = db.ref('live_matches/' + id);
 
             matchRef.on('value', (snapshot) => {
@@ -1408,11 +1392,7 @@
                     window.__kabaddiLog('WARN', 'Snapshot has NO data for match: ' + id);
                     return;
                 }
-                window.__kabaddiLog('OK', '📦 Received live data snapshot', {
-                    left: data.left_name, right: data.right_name,
-                    ls: data.left_score, rs: data.right_score
-                });
-
+                
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
                 const leftColor  = data.left_color  || "#009900";
@@ -1462,13 +1442,13 @@
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
                         handleEventTimeline(state);
                     } catch (e) {
-                        window.__kabaddiLog('ERR', 'State JSON parse error', e);
+                        window.__kabaddiLog('WARN', 'State JSON parse error', e);
                     }
                 }
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
             }, (error) => {
-                window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — App Check or rules blocked the read', error);
+                window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — Auth blocked the read', error);
             });
         }
 
@@ -2199,19 +2179,6 @@
             document.getElementById('pp-tackle-rate').innerText = tackleStrike + '%';
             document.getElementById('pp-raid-ring').style.setProperty('--pie-deg', ((raidStrike / 100) * 360) + 'deg');
             document.getElementById('pp-tackle-ring').style.setProperty('--pie-deg', ((tackleStrike / 100) * 360) + 'deg');
-        }
-
-        // ============================================================
-        // 🎯 THE MISSING BLOCK — NOW RESTORED — CALLS THE ENGINE
-        // ============================================================
-        if (!matchId) {
-            window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
-            document.getElementById('left-name').innerText = "NO MATCH ID";
-            document.getElementById('right-name').innerText = "LINK URL ERROR";
-        } else {
-            document.getElementById('match-id').innerText = matchId.toUpperCase();
-            window.__kabaddiLog('OK', '✅ Calling initBroadcastEngine("' + matchId + '")');
-            initBroadcastEngine(matchId);
         }
     </script>
 </body>
