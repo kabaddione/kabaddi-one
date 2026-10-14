@@ -1136,7 +1136,7 @@ function drawGraph(){
 window.addEventListener('resize',()=>{ if(document.getElementById('tab-graph').classList.contains('active')) requestAnimationFrame(()=>drawGraph()); });
 
 // ============================================================
-        // FIREBASE INIT & SECURE AUTH (Corrected for index.html IDs)
+        // FIREBASE INIT & SECURE AUTH (Corrected with Viewer Functions)
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
@@ -1158,7 +1158,60 @@ window.addEventListener('resize',()=>{ if(document.getElementById('tab-graph').c
             window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
         });
 
+        // ==========================================
+        // RESTORED VIEWER & TIMESTAMP FUNCTIONS
+        // ==========================================
+        function setupViewerPresence(){
+            if(!matchId) return;
+            const viewerEl = document.getElementById('uiViewerCount'); if(!viewerEl) return;
+            try {
+                let clientId = null;
+                try {
+                    clientId = localStorage.getItem('kabaddione_client_id');
+                    if(!clientId){
+                        clientId = 'v_'+Math.random().toString(36).slice(2,11)+'_'+Date.now();
+                        localStorage.setItem('kabaddione_client_id', clientId);
+                    }
+                } catch(e){ clientId = 'v_'+Math.random().toString(36).slice(2,11)+'_'+Date.now(); }
+                
+                const viewersRef = db.ref('viewers/'+matchId);
+                const myRef = viewersRef.child(clientId);
+                const HB = 20000, STALE = 55000;
+                let hbTimer = null;
+                
+                const beat = () => { myRef.set({lastSeen:Date.now()}).catch(()=>{}); };
+                db.ref('.info/connected').on('value', snap => {
+                    if(snap.val() === true){
+                        myRef.onDisconnect().remove().then(()=>{ 
+                            beat(); 
+                            if(hbTimer) clearInterval(hbTimer); 
+                            hbTimer = setInterval(beat, HB); 
+                        }).catch(()=>{ viewerEl.innerText='1 watching'; });
+                    }
+                });
+                viewersRef.on('value', snap => {
+                    const now = Date.now(); let count = 0;
+                    snap.forEach(child => { 
+                        const v = child.val(); 
+                        if(v && typeof v.lastSeen==='number' && (now - v.lastSeen) < STALE) count++; 
+                    });
+                    viewerEl.innerText = Math.max(1,count)+' watching';
+                }, ()=>{ viewerEl.innerText='1 watching'; });
+                window.addEventListener('beforeunload', ()=>{ if(hbTimer) clearInterval(hbTimer); myRef.remove().catch(()=>{}); });
+            } catch(e){ viewerEl.innerText='1 watching'; }
+        }
+
+        function updateLastUpdated(ts){
+            const el = document.getElementById('uiLastUpdated'); if(!el) return;
+            const d = new Date(ts||Date.now());
+            const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+            const timeStr = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+            el.innerText = 'Updated '+dateStr+' · '+timeStr;
+        }
+
+        // ==========================================
         // 🚨 SILENTLY AUTHENTICATE THE VIEWER
+        // ==========================================
         firebase.auth().signInAnonymously()
             .then(() => {
                 window.__kabaddiLog('OK', '[2/5] Anonymous Auth Successful!');
@@ -1201,18 +1254,23 @@ window.addEventListener('resize',()=>{ if(document.getElementById('tab-graph').c
                     window.latestMatchData = data;
 
                     const ts = data.last_updated || Date.now();
-                    const dateStr = new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const timeStr = new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                     updateLastUpdated(ts);
 
                     if (data.break_clock_title && data.break_clock_time && data.break_clock_time !== "") {
                         document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch" style="color:#FBC02D;"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
                         document.getElementById('uiMatchDate').style.color = "#FBC02D";
                     } else {
+                        const dateStr = new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${dateStr} · Live Kabaddi Arena`;
                         document.getElementById('uiMatchDate').style.color = "#8C8E9F";
                     }
-                    document.getElementById('dtDate').innerText = dateStr + ", " + timeStr;
+                    
+                    const dtDateEl = document.getElementById('dtDate');
+                    if (dtDateEl) {
+                        const dateStr = new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                        const timeStr = new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        dtDateEl.innerText = dateStr + ", " + timeStr;
+                    }
 
                     if (data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
 
@@ -1412,6 +1470,8 @@ window.addEventListener('resize',()=>{ if(document.getElementById('tab-graph').c
                             window.__kabaddiLog('ERR', 'State JSON parse error', e);
                         }
                     }
+                }, (error) => {
+                    window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR', error);
                 });
             }
         }
