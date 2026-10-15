@@ -866,7 +866,7 @@
             color: #9C27B0; text-shadow: 4px 4px 8px #000;
         }
 
-        /* PLAYER PERFORMANCE — EXTENDED BROADCAST GRAPHIC */
+        /* PLAYER PERFORMANCE — COMPACT, BROADCAST-READY INFORMATION HIERARCHY */
         #player-perf-overlay { background: transparent; }
         #player-perf-overlay .pp-bg {
             position: absolute; inset: 0;
@@ -875,243 +875,265 @@
         }
         #player-perf-overlay .pp-bg::after {
             content: ''; position: absolute; inset: 0;
-            background:
-                radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.28) 100%),
-                linear-gradient(180deg, rgba(10,0,25,0.35) 0%, rgba(0,0,0,0.72) 100%);
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.32) 100%),
+                        linear-gradient(180deg, rgba(10,0,25,0.35) 0%, rgba(0,0,0,0.74) 100%);
         }
         #player-perf-overlay .pp-content {
-            position: relative; z-index: 2;
-            width: 100%; height: 100%;
+            position: relative; z-index: 2; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 9px; padding: 26px 50px 22px; color: #FFF;
+            gap: 8px; padding: 22px 38px 18px; color: #FFF;
         }
         #player-perf-overlay .pp-title {
-            font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 700;
-            color: #FFF; letter-spacing: 5px; text-transform: uppercase; line-height: 1.05;
+            font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 700;
+            color: #FFF; letter-spacing: 4.5px; text-transform: uppercase; line-height: 1.05;
             text-shadow: 0 4px 18px rgba(0,0,0,0.7);
         }
         #player-perf-overlay .pp-underline {
-            width: 220px; height: 3px; flex: 0 0 3px;
+            width: 190px; height: 3px; flex: 0 0 3px;
             background: linear-gradient(90deg, transparent, #D500F9 18%, #FF4FD8 82%, transparent);
-            box-shadow: 0 0 18px rgba(213,0,249,0.8); margin-bottom: 5px;
+            box-shadow: 0 0 16px rgba(213,0,249,0.8); margin-bottom: 3px;
         }
         #player-perf-overlay .pp-card {
-            display: flex; width: 1480px; height: 650px; flex: 0 0 650px;
-            background: rgba(12,10,25,0.92);
-            border: 2px solid rgba(255,255,255,0.18); border-radius: 16px;
-            overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.85), 0 0 45px rgba(116,40,180,0.18);
+            display: flex; width: 1500px; height: 450px; flex: 0 0 450px;
+            background: rgba(12,10,25,0.94); border: 1.5px solid rgba(255,255,255,0.20);
+            border-radius: 15px; overflow: hidden;
+            box-shadow: 0 28px 70px rgba(0,0,0,0.78), 0 0 38px rgba(116,40,180,0.20);
             isolation: isolate;
         }
         #player-perf-overlay .pp-col-profile {
-            flex: 0 0 286px; min-width: 0;
-            display: flex; flex-direction: column;
-            background: linear-gradient(160deg, var(--pp-team-color, #1E1E2E) 0%, var(--pp-team-color-dark, #0E0E1A) 100%);
-            position: relative; border-right: 1px solid rgba(255,255,255,0.15); overflow: hidden;
+            flex: 0 0 250px; min-width: 0; display: flex; flex-direction: column;
+            background: linear-gradient(155deg, var(--pp-team-color, #1E1E2E) 0%, var(--pp-team-color-dark, #0E0E1A) 100%);
+            position: relative; border-right: 1px solid rgba(255,255,255,0.16); overflow: hidden;
         }
         #player-perf-overlay .pp-col-profile::before {
-            content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 7px;
-            background: var(--pp-team-color, #1E1E2E);
-            box-shadow: 0 0 24px var(--pp-team-color, #1E1E2E); z-index: 3;
+            content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 6px;
+            background: var(--pp-team-color, #8E24AA); box-shadow: 0 0 22px var(--pp-team-color, #8E24AA); z-index: 3;
         }
         #player-perf-overlay .pp-col-profile::after {
-            content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%;
-            top: 90px; left: 2px; background: rgba(255,255,255,0.07); filter: blur(2px); pointer-events: none;
+            content: ''; position: absolute; width: 260px; height: 260px; border-radius: 50%;
+            top: 64px; left: -22px; background: rgba(255,255,255,0.065); filter: blur(2px); pointer-events: none;
         }
         #player-perf-overlay .pp-profile-kicker {
-            position: relative; z-index: 2; margin: 22px 18px 0 22px;
-            font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700;
-            color: rgba(255,255,255,0.72); letter-spacing: 2px; text-transform: uppercase;
+            position: relative; z-index: 2; margin: 18px 14px 0 20px;
+            font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
+            color: rgba(255,255,255,0.74); letter-spacing: 2px; text-transform: uppercase;
         }
         #player-perf-overlay .pp-avatar {
             flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
-            overflow: hidden; position: relative; padding: 12px 8px 0 16px; z-index: 1;
+            overflow: hidden; position: relative; padding: 7px 8px 0 14px; z-index: 1;
         }
         #player-perf-overlay .pp-avatar img {
             width: 100%; height: 100%; object-fit: contain; object-position: center bottom;
-            filter: drop-shadow(0 10px 16px rgba(0,0,0,0.55));
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
         }
         #player-perf-overlay .pp-name-badge {
-            margin: 0 14px 0 20px; background: #FFFFFF; color: var(--pp-team-color, #000);
-            font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 700;
-            text-align: center; padding: 13px 9px 10px; text-transform: uppercase; letter-spacing: 0.8px;
+            margin: 0 12px 0 18px; background: #FFF; color: var(--pp-team-color, #000);
+            font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
+            text-align: center; padding: 11px 8px 9px; text-transform: uppercase; letter-spacing: .6px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 3; position: relative;
-            border-radius: 7px 7px 0 0; box-shadow: 0 -5px 18px rgba(0,0,0,0.18);
+            border-radius: 6px 6px 0 0; box-shadow: 0 -5px 18px rgba(0,0,0,0.18);
         }
         #player-perf-overlay .pp-position-badge {
-            margin: 0 14px 18px 20px; padding: 7px 8px; text-align: center;
-            background: rgba(0,0,0,0.66); border: 1px solid rgba(255,255,255,0.15); border-top: 0;
-            color: rgba(255,255,255,0.88); font-family: 'Oswald', sans-serif; font-size: 11px;
-            font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 7px 7px;
+            margin: 0 12px 14px 18px; padding: 6px 8px; text-align: center;
+            background: rgba(0,0,0,0.62); border: 1px solid rgba(255,255,255,0.16); border-top: 0;
+            color: rgba(255,255,255,0.88); font-family: 'Oswald', sans-serif; font-size: 10px;
+            font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0 0 6px 6px;
             position: relative; z-index: 3;
         }
         #player-perf-overlay .pp-col-stats {
-            flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 13px;
-            padding: 20px 18px 18px;
+            flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px;
+            justify-content: center; padding: 12px 15px;
             background: linear-gradient(135deg, #70208F 0%, #5C1689 48%, #351264 100%);
             position: relative; overflow: hidden;
         }
         #player-perf-overlay .pp-col-stats::before {
             content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-            background: radial-gradient(ellipse at top left, rgba(255,255,255,0.15), transparent 42%),
-                        linear-gradient(135deg, rgba(213,0,249,0.12), transparent 58%);
+            background: radial-gradient(ellipse at top left, rgba(255,255,255,0.13), transparent 42%),
+                        linear-gradient(135deg, rgba(213,0,249,0.10), transparent 58%);
         }
-        #player-perf-overlay .pp-main-header, #player-perf-overlay .pp-summary-grid,
+        #player-perf-overlay .pp-main-header,
+        #player-perf-overlay .pp-summary-grid,
         #player-perf-overlay .pp-detail-grid { position: relative; z-index: 1; }
-        #player-perf-overlay .pp-main-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        #player-perf-overlay .pp-main-header {
+            height: 31px; flex: 0 0 31px; display: flex; align-items: center;
+            justify-content: space-between; gap: 10px;
+        }
         #player-perf-overlay .pp-section-kicker {
-            font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
-            letter-spacing: 2px; color: rgba(255,255,255,0.62); text-transform: uppercase; margin-bottom: 2px;
+            font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+            letter-spacing: 1.8px; color: rgba(255,255,255,0.64); text-transform: uppercase; margin-bottom: 1px;
         }
         #player-perf-overlay .pp-section-title {
-            font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 700;
-            letter-spacing: 1.3px; color: #FFF; text-transform: uppercase; line-height: 1.15;
+            font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
+            letter-spacing: 1.1px; color: #FFF; text-transform: uppercase; line-height: 1.05;
         }
         #player-perf-overlay .pp-team-pill {
-            max-width: 300px; padding: 7px 12px; border-radius: 100px;
-            border: 1px solid rgba(255,255,255,0.22); background: rgba(0,0,0,0.19);
-            color: #FFF; font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 300px; padding: 6px 11px; border-radius: 100px;
+            border: 1px solid rgba(255,255,255,0.22); background: rgba(0,0,0,0.18);
+            color: #FFF; font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
+            letter-spacing: .9px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
         }
         #player-perf-overlay .pp-summary-grid {
-            display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; flex: 0 0 auto;
+            display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px;
+            height: 67px; flex: 0 0 67px;
         }
         #player-perf-overlay .pp-summary-card {
-            min-width: 0; height: 91px; padding: 10px 7px 8px; position: relative; overflow: hidden;
+            min-width: 0; height: 67px; padding: 6px 5px 5px; position: relative; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(145deg, rgba(17,7,36,0.36), rgba(20,5,38,0.22));
-            border: 1px solid rgba(255,255,255,0.16); border-radius: 11px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 5px 12px rgba(0,0,0,0.08);
+            background: linear-gradient(145deg, rgba(17,7,36,0.38), rgba(20,5,38,0.22));
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 9px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 10px rgba(0,0,0,0.08);
+        }
+        #player-perf-overlay .pp-summary-card:first-child {
+            background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(20,5,38,0.20));
+            border-color: rgba(255,255,255,0.28);
         }
         #player-perf-overlay .pp-summary-card::before {
-            content: ''; position: absolute; top: 0; left: 18%; right: 18%; height: 3px;
-            background: var(--pp-team-color, #D500F9); box-shadow: 0 0 12px var(--pp-team-color, #D500F9);
+            content: ''; position: absolute; top: 0; left: 17%; right: 17%; height: 3px;
+            background: var(--pp-team-color, #D500F9); box-shadow: 0 0 10px var(--pp-team-color, #D500F9);
         }
         #player-perf-overlay .pp-summary-value {
-            font-family: 'Teko', sans-serif; font-size: 42px; font-weight: 700; line-height: 0.95;
+            font-family: 'Teko', sans-serif; font-size: 36px; font-weight: 700; line-height: .9;
             color: #FFF; text-shadow: 0 2px 12px rgba(0,0,0,0.18); font-variant-numeric: tabular-nums;
         }
         #player-perf-overlay .pp-summary-label {
-            margin-top: 6px; font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
-            letter-spacing: 1px; color: rgba(255,255,255,0.77); text-transform: uppercase; white-space: nowrap;
+            margin-top: 4px; font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+            letter-spacing: .75px; color: rgba(255,255,255,0.78); text-transform: uppercase; white-space: nowrap;
         }
         #player-perf-overlay .pp-detail-grid {
-            display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px;
-            flex: 1 1 auto; min-height: 0;
+            display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px;
+            height: 245px; flex: 0 0 245px; min-height: 0;
         }
         #player-perf-overlay .pp-detail-card {
-            display: flex; flex-direction: column; min-width: 0; min-height: 0; gap: 8px;
-            padding: 13px 12px 11px; border-radius: 13px;
-            background: rgba(13,5,31,0.31); border: 1px solid rgba(255,255,255,0.13);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+            display: flex; flex-direction: column; min-width: 0; min-height: 0; gap: 6px;
+            padding: 9px 10px 8px; border-radius: 11px;
+            background: rgba(13,5,31,0.34); border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
         }
-        #player-perf-overlay .pp-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+        #player-perf-overlay .pp-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; height: 24px; flex: 0 0 24px; }
         #player-perf-overlay .pp-detail-title {
-            display: flex; align-items: center; gap: 7px; min-width: 0;
-            font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
-            letter-spacing: 1px; color: #FFF; text-transform: uppercase; white-space: nowrap;
+            display: flex; align-items: center; gap: 6px; min-width: 0;
+            font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
+            letter-spacing: .8px; color: #FFF; text-transform: uppercase; white-space: nowrap;
         }
         #player-perf-overlay .pp-detail-mark {
-            width: 7px; height: 7px; border-radius: 50%; background: var(--pp-team-color, #D500F9);
-            box-shadow: 0 0 9px var(--pp-team-color, #D500F9); flex-shrink: 0;
+            width: 6px; height: 6px; border-radius: 50%; background: var(--pp-team-color, #D500F9);
+            box-shadow: 0 0 8px var(--pp-team-color, #D500F9); flex-shrink: 0;
         }
         #player-perf-overlay .pp-total-pill {
-            flex-shrink: 0; padding: 5px 8px; border-radius: 6px;
+            flex-shrink: 0; padding: 4px 7px; border-radius: 6px;
             background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.92); font-family: 'Oswald', sans-serif; font-size: 10px;
-            font-weight: 700; letter-spacing: 0.5px; white-space: nowrap;
+            color: rgba(255,255,255,0.76); font-family: 'Oswald', sans-serif; font-size: 9px;
+            font-weight: 700; letter-spacing: .3px; white-space: nowrap;
         }
-        #player-perf-overlay .pp-total-pill strong { color: #FFF; font-size: 14px; margin-left: 4px; }
+        #player-perf-overlay .pp-total-pill strong { color: #FFF; font-size: 13px; margin-left: 3px; }
         #player-perf-overlay .pp-donut-row {
-            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px;
-            align-items: start; justify-items: center; padding: 3px 0 0;
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px;
+            align-items: start; justify-items: center; padding: 0; height: 82px; flex: 0 0 82px;
         }
-        #player-perf-overlay .pp-donut-item { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+        #player-perf-overlay .pp-donut-item { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
         #player-perf-overlay .pp-donut-ring {
-            position: relative; width: 64px; height: 64px; border-radius: 50%;
+            position: relative; width: 53px; height: 53px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            background: conic-gradient(var(--pp-ring-color, #22C55E) 0deg var(--pp-deg, 0deg), rgba(255,255,255,0.09) var(--pp-deg, 0deg) 360deg);
-            box-shadow: 0 0 13px rgba(0,0,0,0.22); flex-shrink: 0;
+            background: conic-gradient(var(--pp-ring-color, #22C55E) 0deg var(--pp-deg, 0deg), rgba(255,255,255,0.10) var(--pp-deg, 0deg) 360deg);
+            box-shadow: 0 0 10px rgba(0,0,0,0.18); flex-shrink: 0;
         }
         #player-perf-overlay .pp-donut-ring::before {
-            content: ''; position: absolute; inset: 7px; border-radius: 50%;
+            content: ''; position: absolute; inset: 5px; border-radius: 50%;
             background: #27113D; border: 1px solid rgba(255,255,255,0.07);
         }
         #player-perf-overlay .pp-donut-count {
             position: relative; z-index: 2; font-family: 'Teko', sans-serif;
-            font-size: 27px; font-weight: 700; line-height: 1; color: #FFF; font-variant-numeric: tabular-nums;
+            font-size: 23px; font-weight: 700; line-height: 1; color: #FFF; font-variant-numeric: tabular-nums;
         }
         #player-perf-overlay .pp-donut-caption {
+            font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700;
+            color: rgba(255,255,255,0.76); text-transform: uppercase; letter-spacing: .35px;
+            text-align: center; white-space: nowrap; line-height: 1.05;
+        }
+        #player-perf-overlay .pp-donut-pct {
             font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
-            color: rgba(255,255,255,0.72); text-transform: uppercase; letter-spacing: 0.55px;
-            text-align: center; white-space: nowrap;
+            color: var(--pp-ring-color, #FFF); line-height: 1;
         }
-        #player-perf-overlay .pp-sequence-box {
-            margin-top: auto; padding: 8px 9px 7px; border-radius: 9px;
-            background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.07); min-height: 70px;
+        #player-perf-overlay .pp-mixbar {
+            width: 100%; height: 7px; flex: 0 0 7px; display: flex; overflow: hidden;
+            border-radius: 100px; background: rgba(255,255,255,0.10); gap: 2px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.22);
         }
-        #player-perf-overlay .pp-sequence-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-bottom: 7px; }
-        #player-perf-overlay .pp-sequence-label {
-            font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
-            color: rgba(255,255,255,0.61); letter-spacing: 1.1px; text-transform: uppercase; white-space: nowrap;
-        }
-        #player-perf-overlay .pp-sequence-legend { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        #player-perf-overlay .pp-legend-item { display: inline-flex; align-items: center; gap: 3px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.60); }
-        #player-perf-overlay .pp-legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-        #player-perf-overlay .pp-sequence-dots { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; max-height: 31px; overflow: hidden; }
-        #player-perf-overlay .pp-seq-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 10px; box-shadow: 0 0 7px currentColor; }
+        #player-perf-overlay .pp-mix-segment { display: block; min-width: 0; height: 100%; flex: 0 0 0%; border-radius: 100px; transition: flex-basis .35s ease; }
         #player-perf-overlay .pp-raid-success { background: #22C55E; color: #22C55E; }
         #player-perf-overlay .pp-raid-unsuccess { background: #B12BD1; color: #B12BD1; }
         #player-perf-overlay .pp-raid-empty { background: #9E9E9E; color: #9E9E9E; }
         #player-perf-overlay .pp-tackle-success { background: #4DD0E1; color: #4DD0E1; }
         #player-perf-overlay .pp-tackle-unsuccess { background: #536DFE; color: #536DFE; }
         #player-perf-overlay .pp-tackle-super { background: #FF4C9B; color: #FF4C9B; }
-        #player-perf-overlay .pp-sequence-empty { font-family: 'Segoe UI', sans-serif; font-size: 10px; color: rgba(255,255,255,0.38); letter-spacing: 0.2px; }
+        #player-perf-overlay .pp-sequence-box {
+            margin-top: 0; padding: 8px 9px 7px; border-radius: 8px;
+            background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.075);
+            min-height: 88px; flex: 1 1 auto; min-width: 0;
+        }
+        #player-perf-overlay .pp-sequence-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-bottom: 7px; }
+        #player-perf-overlay .pp-sequence-label {
+            font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+            color: rgba(255,255,255,0.67); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
+        }
+        #player-perf-overlay .pp-sequence-legend { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        #player-perf-overlay .pp-legend-item { display: inline-flex; align-items: center; gap: 3px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.66); }
+        #player-perf-overlay .pp-legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        #player-perf-overlay .pp-sequence-dots { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; max-height: 38px; overflow: hidden; }
+        #player-perf-overlay .pp-seq-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 10px; box-shadow: 0 0 6px currentColor; }
+        #player-perf-overlay .pp-sequence-empty { font-family: 'Segoe UI', sans-serif; font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: .1px; }
         #player-perf-overlay .pp-col-rates {
-            flex: 0 0 205px; min-width: 0; background: linear-gradient(180deg, #FFFFFF 0%, #F4F2F8 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 23px 12px 24px; color: #8E24AA; position: relative;
+            flex: 0 0 180px; min-width: 0; background: linear-gradient(180deg, #FFFFFF 0%, #F4F2F8 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+            padding: 14px 10px; color: #8E24AA; position: relative;
         }
         #player-perf-overlay .pp-col-rates::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
             background: linear-gradient(90deg, var(--pp-team-color, #8E24AA), #D500F9);
+        }
+        #player-perf-overlay .pp-rates-kicker {
+            font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+            color: #8A7C94; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: -7px;
         }
         #player-perf-overlay .pp-on-mat { display: flex; flex-direction: column; align-items: center; width: 100%; }
         #player-perf-overlay .pp-on-mat-icon {
-            font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
-            letter-spacing: 1.5px; text-transform: uppercase; color: #82758E; margin-bottom: 1px;
+            font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+            letter-spacing: 1.3px; text-transform: uppercase; color: #82758E; margin-bottom: 0;
         }
         #player-perf-overlay .pp-on-mat-time {
-            font-family: 'Teko', sans-serif; font-size: 39px; font-weight: 700;
-            color: #8E24AA; line-height: 1.05; font-variant-numeric: tabular-nums;
-            text-shadow: 0 2px 0 rgba(142,36,170,0.06);
+            font-family: 'Teko', sans-serif; font-size: 34px; font-weight: 700;
+            color: #8E24AA; line-height: 1.0; font-variant-numeric: tabular-nums;
         }
         #player-perf-overlay .pp-rate-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         #player-perf-overlay .pp-rate-ring {
-            position: relative; width: 84px; height: 84px; border-radius: 50%;
+            position: relative; width: 67px; height: 67px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             background: conic-gradient(var(--pp-team-color, #8E24AA) 0deg var(--pie-deg, 0deg), rgba(0,0,0,0.08) var(--pie-deg, 0deg) 360deg);
             box-shadow: 0 4px 12px rgba(30,10,50,0.10);
         }
         #player-perf-overlay .pp-rate-ring::before {
-            content: ''; position: absolute; inset: 7px; border-radius: 50%; background: #FFF;
+            content: ''; position: absolute; inset: 6px; border-radius: 50%; background: #FFF;
             border: 1px solid rgba(0,0,0,0.045);
         }
         #player-perf-overlay .pp-rate-value {
             position: relative; z-index: 2; font-family: 'Oswald', sans-serif;
-            font-size: 18px; font-weight: 700; color: #8E24AA; font-variant-numeric: tabular-nums;
+            font-size: 16px; font-weight: 700; color: #8E24AA; font-variant-numeric: tabular-nums;
         }
         #player-perf-overlay .pp-rate-label {
-            font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
-            color: #8E24AA; text-transform: uppercase; margin-top: 4px;
-            letter-spacing: 1.1px; text-align: center; line-height: 1.2;
+            font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+            color: #8E24AA; text-transform: uppercase; margin-top: 3px;
+            letter-spacing: .85px; text-align: center; line-height: 1.15;
         }
+        #player-perf-overlay .fs-powered-by { margin-top: 10px; padding: 6px 20px; }
+        #player-perf-overlay .fs-powered-by .fp-icon { width: 23px; height: 23px; }
+        #player-perf-overlay .fs-powered-by .fp-text { font-size: 15px; }
         @media (max-height: 850px) {
-            #player-perf-overlay .pp-content { transform: scale(0.88); }
+            #player-perf-overlay .pp-content { transform: scale(.88); }
         }
-        @media (max-width: 1500px) {
-            #player-perf-overlay .pp-content { transform: scale(0.82); }
+        @media (max-width: 1536px) {
+            #player-perf-overlay .pp-content { transform: scale(.82); }
         }
 
     </style>
@@ -1385,7 +1407,7 @@
                         <div class="pp-summary-card"><div class="pp-summary-value" id="pp-tackle-points">0</div><div class="pp-summary-label">TACKLE PTS</div></div>
                     </div>
                     <div class="pp-detail-grid">
-                        <div class="pp-detail-card">
+                        <div class="pp-detail-card pp-raid-card">
                             <div class="pp-detail-head">
                                 <div class="pp-detail-title"><span class="pp-detail-mark"></span>RAID PERFORMANCE</div>
                                 <div class="pp-total-pill">TOTAL RAIDS <strong id="pp-total-raids">0</strong></div>
@@ -1393,30 +1415,35 @@
                             <div class="pp-donut-row">
                                 <div class="pp-donut-item">
                                     <div class="pp-donut-ring" id="pp-raid-success-ring" style="--pp-ring-color:#22C55E;--pp-deg:0deg"><div class="pp-donut-count" id="pp-raid-success">0</div></div>
-                                    <div class="pp-donut-caption">SUCCESSFUL</div>
+                                    <div class="pp-donut-caption">SUCCESSFUL</div><div class="pp-donut-pct" id="pp-raid-success-pct">0%</div>
                                 </div>
                                 <div class="pp-donut-item">
                                     <div class="pp-donut-ring" id="pp-raid-unsuccess-ring" style="--pp-ring-color:#B12BD1;--pp-deg:0deg"><div class="pp-donut-count" id="pp-raid-unsuccess">0</div></div>
-                                    <div class="pp-donut-caption">UNSUCCESSFUL</div>
+                                    <div class="pp-donut-caption">UNSUCCESSFUL</div><div class="pp-donut-pct" id="pp-raid-unsuccess-pct">0%</div>
                                 </div>
                                 <div class="pp-donut-item">
                                     <div class="pp-donut-ring" id="pp-raid-empty-ring" style="--pp-ring-color:#9E9E9E;--pp-deg:0deg"><div class="pp-donut-count" id="pp-raid-empty">0</div></div>
-                                    <div class="pp-donut-caption">EMPTY</div>
+                                    <div class="pp-donut-caption">EMPTY</div><div class="pp-donut-pct" id="pp-raid-empty-pct">0%</div>
                                 </div>
+                            </div>
+                            <div class="pp-mixbar" aria-label="Raid outcome distribution">
+                                <span class="pp-mix-segment pp-raid-success" id="pp-raid-mix-success"></span>
+                                <span class="pp-mix-segment pp-raid-unsuccess" id="pp-raid-mix-unsuccess"></span>
+                                <span class="pp-mix-segment pp-raid-empty" id="pp-raid-mix-empty"></span>
                             </div>
                             <div class="pp-sequence-box">
                                 <div class="pp-sequence-head">
                                     <div class="pp-sequence-label">RAID SEQUENCE</div>
                                     <div class="pp-sequence-legend">
-                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-raid-success"></i>S</span>
-                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-raid-unsuccess"></i>U</span>
-                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-raid-empty"></i>E</span>
+                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-raid-success"></i>SUCCESS</span>
+                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-raid-unsuccess"></i>UNSUCCESS</span>
+                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-raid-empty"></i>EMPTY</span>
                                     </div>
                                 </div>
                                 <div class="pp-sequence-dots" id="pp-raid-sequence"><span class="pp-sequence-empty">No raid history yet</span></div>
                             </div>
                         </div>
-                        <div class="pp-detail-card">
+                        <div class="pp-detail-card pp-tackle-card">
                             <div class="pp-detail-head">
                                 <div class="pp-detail-title"><span class="pp-detail-mark"></span>TACKLE PERFORMANCE</div>
                                 <div class="pp-total-pill">TOTAL TACKLES <strong id="pp-total-tackles">0</strong></div>
@@ -1424,24 +1451,29 @@
                             <div class="pp-donut-row">
                                 <div class="pp-donut-item">
                                     <div class="pp-donut-ring" id="pp-tackle-success-ring" style="--pp-ring-color:#4DD0E1;--pp-deg:0deg"><div class="pp-donut-count" id="pp-tackle-success">0</div></div>
-                                    <div class="pp-donut-caption">SUCCESSFUL</div>
+                                    <div class="pp-donut-caption">SUCCESSFUL</div><div class="pp-donut-pct" id="pp-tackle-success-pct">0%</div>
                                 </div>
                                 <div class="pp-donut-item">
                                     <div class="pp-donut-ring" id="pp-tackle-unsuccess-ring" style="--pp-ring-color:#536DFE;--pp-deg:0deg"><div class="pp-donut-count" id="pp-tackle-unsuccess">0</div></div>
-                                    <div class="pp-donut-caption">UNSUCCESSFUL</div>
+                                    <div class="pp-donut-caption">UNSUCCESSFUL</div><div class="pp-donut-pct" id="pp-tackle-unsuccess-pct">0%</div>
                                 </div>
                                 <div class="pp-donut-item">
                                     <div class="pp-donut-ring" id="pp-tackle-super-ring" style="--pp-ring-color:#FF4C9B;--pp-deg:0deg"><div class="pp-donut-count" id="pp-tackle-super">0</div></div>
-                                    <div class="pp-donut-caption">SUPER</div>
+                                    <div class="pp-donut-caption">SUPER</div><div class="pp-donut-pct" id="pp-tackle-super-pct">0%</div>
                                 </div>
+                            </div>
+                            <div class="pp-mixbar" aria-label="Tackle outcome distribution">
+                                <span class="pp-mix-segment pp-tackle-success" id="pp-tackle-mix-success"></span>
+                                <span class="pp-mix-segment pp-tackle-unsuccess" id="pp-tackle-mix-unsuccess"></span>
+                                <span class="pp-mix-segment pp-tackle-super" id="pp-tackle-mix-super"></span>
                             </div>
                             <div class="pp-sequence-box">
                                 <div class="pp-sequence-head">
                                     <div class="pp-sequence-label">TACKLE SEQUENCE</div>
                                     <div class="pp-sequence-legend">
-                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-tackle-success"></i>S</span>
-                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-tackle-unsuccess"></i>U</span>
-                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-tackle-super"></i>ST</span>
+                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-tackle-success"></i>SUCCESS</span>
+                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-tackle-unsuccess"></i>UNSUCCESS</span>
+                                        <span class="pp-legend-item"><i class="pp-legend-dot pp-tackle-super"></i>SUPER</span>
                                     </div>
                                 </div>
                                 <div class="pp-sequence-dots" id="pp-tackle-sequence"><span class="pp-sequence-empty">No tackle history yet</span></div>
@@ -1450,6 +1482,7 @@
                     </div>
                 </div>
                 <div class="pp-col-rates">
+                    <div class="pp-rates-kicker">PERFORMANCE RATES</div>
                     <div class="pp-on-mat">
                         <div class="pp-on-mat-icon">ON MAT TIME</div>
                         <div class="pp-on-mat-time" id="pp-on-mat">00:00</div>
@@ -2366,6 +2399,27 @@
             ring.style.setProperty('--pp-deg', ((percent / 100) * 360) + 'deg');
         }
 
+        function ppSetPercent(id, count, total) {
+            const totalValue = ppNumber(total);
+            const percent = totalValue > 0 ? Math.round((ppNumber(count) / totalValue) * 100) : 0;
+            ppSetText(id, Math.max(0, Math.min(100, percent)) + '%');
+        }
+
+        function ppSetMixBar(prefix, values, denominator) {
+            const safeValues = values.map(ppNumber);
+            const sum = safeValues.reduce((result, value) => result + value, 0);
+            const requestedTotal = ppNumber(denominator);
+            const total = Math.max(sum, requestedTotal);
+            const suffixes = prefix === 'pp-raid' ? ['success', 'unsuccess', 'empty'] : ['success', 'unsuccess', 'super'];
+            suffixes.forEach((suffix, index) => {
+                const segment = document.getElementById(prefix + '-mix-' + suffix);
+                if (!segment) return;
+                const width = total > 0 ? (safeValues[index] / total) * 100 : 0;
+                segment.style.flexBasis = width + '%';
+                segment.style.opacity = width > 0 ? '1' : '0.2';
+            });
+        }
+
         function ppParseRaidSequence(player) {
             const sequenceText = String(player && player.raidSequence || '').trim().toUpperCase();
             if (!sequenceText) return [];
@@ -2425,6 +2479,10 @@
                 'pp-total-raids', 'pp-total-tackles', 'pp-raid-success', 'pp-raid-unsuccess', 'pp-raid-empty',
                 'pp-tackle-success', 'pp-tackle-unsuccess', 'pp-tackle-super'
             ].forEach(id => ppSetText(id, '0'));
+            ['pp-raid-success-pct', 'pp-raid-unsuccess-pct', 'pp-raid-empty-pct',
+             'pp-tackle-success-pct', 'pp-tackle-unsuccess-pct', 'pp-tackle-super-pct'].forEach(id => ppSetText(id, '0%'));
+            ppSetMixBar('pp-raid', [0, 0, 0]);
+            ppSetMixBar('pp-tackle', [0, 0, 0]);
             ppSetText('pp-on-mat', '00:00');
             ppSetText('pp-raid-rate', '0%');
             ppSetText('pp-tackle-rate', '0%');
@@ -2474,10 +2532,12 @@
             const unsuccRaids = ppNumber(player.unsuccessfulRaids);
             const emptyRaids = ppNumber(player.emptyRaids);
             const totalRaids = ppNumber(player.totalRaids) || (succRaids + unsuccRaids + emptyRaids);
-            const succTack = ppNumber(player.successfulTackles);
+            const rawSuccTack = ppNumber(player.successfulTackles);
             const unsuccTack = ppNumber(player.unsuccessfulTackles);
             const superTack = ppNumber(player.superTackles);
-            const totalTack = ppNumber(player.totalTackles) || (succTack + unsuccTack);
+            // Treat super tackles as their own outcome category in the display so the mix bar is not double-counted.
+            const succTack = Math.max(0, rawSuccTack - superTack);
+            const totalTack = ppNumber(player.totalTackles) || (succTack + superTack + unsuccTack);
 
             ppSetText('pp-total-points', totalPts);
             ppSetText('pp-raid-points', raidPts);
@@ -2501,8 +2561,18 @@
             ppSetDonut('pp-tackle-unsuccess-ring', unsuccTack, totalTack);
             ppSetDonut('pp-tackle-super-ring', superTack, totalTack);
 
+            ppSetPercent('pp-raid-success-pct', succRaids, totalRaids);
+            ppSetPercent('pp-raid-unsuccess-pct', unsuccRaids, totalRaids);
+            ppSetPercent('pp-raid-empty-pct', emptyRaids, totalRaids);
+            ppSetPercent('pp-tackle-success-pct', succTack, totalTack);
+            ppSetPercent('pp-tackle-unsuccess-pct', unsuccTack, totalTack);
+            ppSetPercent('pp-tackle-super-pct', superTack, totalTack);
+            ppSetMixBar('pp-raid', [succRaids, unsuccRaids, emptyRaids], totalRaids);
+            ppSetMixBar('pp-tackle', [succTack, unsuccTack, superTack], totalTack);
+
             const raidStrike = totalRaids > 0 ? Math.floor((succRaids / totalRaids) * 100) : 0;
-            const tackleStrike = totalTack > 0 ? Math.floor((succTack / totalTack) * 100) : 0;
+            // Overall tackle strike rate includes super tackles, which are successful defensive events.
+            const tackleStrike = totalTack > 0 ? Math.floor((rawSuccTack / totalTack) * 100) : 0;
             ppSetText('pp-raid-rate', raidStrike + '%');
             ppSetText('pp-tackle-rate', tackleStrike + '%');
             document.getElementById('pp-raid-ring').style.setProperty('--pie-deg', ((raidStrike / 100) * 360) + 'deg');
@@ -2511,9 +2581,9 @@
             // Raid sequence: S = success, U = unsuccessful, E = empty — same convention as the Live Scoreboard.
             ppRenderSequence('pp-raid-sequence', ppParseRaidSequence(player), 'raid');
 
-            // Live Scoreboard derives tackle sequence from these player counts; keep that same order here.
+            // Keep tackle categories mutually exclusive in the sequence: regular success, super tackle, unsuccessful.
             const tackleSequence = [];
-            for (let i = 0; i < Math.max(0, succTack - superTack); i++) tackleSequence.push('S');
+            for (let i = 0; i < succTack; i++) tackleSequence.push('S');
             for (let i = 0; i < superTack; i++) tackleSequence.push('ST');
             for (let i = 0; i < unsuccTack; i++) tackleSequence.push('U');
             ppRenderSequence('pp-tackle-sequence', tackleSequence, 'tackle');
