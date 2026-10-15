@@ -410,7 +410,7 @@
             box-shadow: 0 0 15px rgba(255, 94, 58, 0.8); margin-bottom: 15px;
         }
         #player-perf-overlay .pp-card {
-            display: flex; width: 1400px; height: 560px; /* Reduced height to eliminate empty gaps */
+            display: flex; width: 1400px; height: 560px;
             background: rgba(15, 12, 28, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
             overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(116,40,180,0.2);
@@ -484,7 +484,7 @@
         
         /* POINTS SUMMARY GRID */
         #player-perf-overlay .pp-summary-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; /* Reduced to 4 columns to space out properly */
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
         }
         #player-perf-overlay .pp-summary-card {
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
@@ -625,7 +625,9 @@
             color: #555; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; line-height: 1.3;
         }
 
-        /* LAST 5 MINUTES BANNER */
+        /* =========================================
+           LAST 5 MINUTES BANNER
+           ========================================= */
         .l5-banner {
             display: flex; align-items: center; justify-content: center;
             gap: 18px; height: 42px; padding: 0 30px; margin-bottom: 5px;
@@ -637,25 +639,27 @@
             position: relative; z-index: 5;
         }
         .l5-banner.show { opacity: 1; transform: translateY(0); }
-        .l5-text { 
-            font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; 
-            color: rgba(255,255,255,0.85); letter-spacing: 2px; 
+        .l5-text {
+            font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+            color: rgba(255,255,255,0.85); letter-spacing: 2px;
         }
-        .l5-pts { 
-            font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700; 
-            line-height: 1; text-shadow: 0 2px 6px rgba(0,0,0,0.8); 
+        .l5-pts {
+            font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700;
+            line-height: 1; text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
     </style>
 </head>
 <body>
 
     <div class="broadcast-stage">
+
         <!-- 🚨 NEW: LAST 5 MINUTES BANNER -->
         <div id="l5-banner" class="l5-banner">
             <div class="l5-pts" id="l5-left-pts">0</div>
             <div class="l5-text">LAST 5 MINUTES</div>
             <div class="l5-pts" id="l5-right-pts">0</div>
         </div>
+
         <div class="logo-bar">
             <span class="logo-powered">Powered by</span>
             <div class="logo-icon"><img src="/images/kabaddione_logo.png" alt="KabaddiOne Logo"></div>
@@ -1074,6 +1078,8 @@
         let lastOverlayPlayerId = '';
         let seenLogKeys = new Set();
         let initialLoadDone = false;
+
+        // 🚨 LAST 5 MINUTES STATE
         let lastL5TriggerBucket = 0;
         window.pendingLeftScore = undefined;
         window.pendingRightScore = undefined;
@@ -1084,82 +1090,6 @@
         };
         const DEFAULT_PLAYER_IMG = '/images/player_profile_starting.png';
 
-        
-        // ==========================================
-        // LAST 5 MINUTES ENGINE
-        // ==========================================
-        function handleLast5MinutesUpdate(data) {
-            if (!data || !data.match_duration_mins || !data.state_json) return;
-            
-            const halfMins = parseInt(data.match_duration_mins);
-            const halfStatus = (data.half_status || '').toLowerCase();
-            let currentHalfNum = halfStatus.includes("1st") ? 1 : 2;
-            if (halfStatus.includes("over") || halfStatus.includes("full time")) currentHalfNum = 2;
-            
-            let minsLeft = halfMins;
-            if (data.main_clock && data.main_clock.includes(":")) {
-                const p = data.main_clock.split(":");
-                minsLeft = parseInt(p[0]) + (parseInt(p[1]) / 60);
-            }
-            const elapsed = halfMins - minsLeft;
-            const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
-            
-            // Check if we crossed a 5-minute threshold
-            const bucket = Math.floor(absMinute / 5);
-            if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
-                lastL5TriggerBucket = bucket;
-                
-                let logs = [];
-                try {
-                    const state = JSON.parse(data.state_json);
-                    if (state.logsJson) logs = JSON.parse(state.logsJson);
-                } catch(e) { return; }
-                
-                showLast5MinBanner(absMinute, data.left_score || 0, data.right_score || 0, halfMins, logs);
-            }
-        }
-
-        function showLast5MinBanner(absMinute, lScore, rScore, halfMins, logs) {
-            const targetMin = absMinute - 5;
-            let pastL = 0, pastR = 0;
-
-            if (targetMin > 0 && logs.length > 0) {
-                const sorted = [...logs].sort((a,b) => parseInt(a.id) - parseInt(b.id));
-                for (const log of sorted) {
-                    const timeStr = log.timeStr || '';
-                    const is2nd = timeStr.toLowerCase().includes('2nd') || timeStr.toLowerCase().includes('second');
-                    const mMatch = timeStr.match(/(\d+)\s*'/);
-                    const minInHalf = mMatch ? parseInt(mMatch[1]) : 0;
-                    const logAbsMinute = is2nd ? (halfMins + minInHalf) : minInHalf;
-
-                    if (logAbsMinute > targetMin) break;
-
-                    if (log.scoreStr) {
-                        const parts = log.scoreStr.replace(/Score:\s*/i,'').trim().split('-').map(s=>parseInt(s.trim()));
-                        if(parts.length === 2 && !isNaN(parts[0])) { pastL = parts[0]; pastR = parts[1]; }
-                    }
-                }
-            }
-            
-            const diffL = Math.max(0, lScore - pastL);
-            const diffR = Math.max(0, rScore - pastR);
-            
-            const banner = document.getElementById('l5-banner');
-            const pL = document.getElementById('l5-left-pts');
-            const pR = document.getElementById('l5-right-pts');
-            
-            if (banner && pL && pR) {
-                pL.innerText = diffL;
-                pR.innerText = diffR;
-                pL.style.color = window.leftTeamColorForGraph || '#00FF00';
-                pR.style.color = window.rightTeamColorForGraph || '#0055ff';
-                
-                banner.classList.add('show');
-                setTimeout(() => { banner.classList.remove('show'); }, 10000); // Hide after 10 sec
-            }
-        }
-        
-        
         // ==========================================
         // UTILITIES
         // ==========================================
@@ -1303,6 +1233,91 @@
         }
 
         // ==========================================
+        // 🚨 LAST 5 MINUTES ENGINE
+        // ==========================================
+        function handleLast5MinutesUpdate(data, existingState) {
+            if (!data || !data.match_duration_mins) return;
+
+            let state = existingState;
+            if (!state && data.state_json) {
+                try { state = JSON.parse(data.state_json); } catch (e) { return; }
+            }
+            if (!state || !state.logsJson) return;
+
+            const halfMins = parseInt(data.match_duration_mins) || 20;
+            const halfStatus = (data.half_status || '').toLowerCase();
+            let currentHalfNum = halfStatus.includes("1st") ? 1 : 2;
+            if (halfStatus.includes("over") || halfStatus.includes("full time")) currentHalfNum = 2;
+
+            let minsLeft = halfMins;
+            if (data.main_clock && data.main_clock.includes(":")) {
+                const p = data.main_clock.split(":");
+                minsLeft = (parseInt(p[0]) || 0) + ((parseInt(p[1]) || 0) / 60);
+            }
+            const elapsed = halfMins - minsLeft;
+            const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
+
+            const bucket = Math.floor(absMinute / 5);
+            if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
+                lastL5TriggerBucket = bucket;
+                let logs = [];
+                try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
+                showLast5MinBanner(
+                    absMinute,
+                    parseInt(data.left_score)  || 0,
+                    parseInt(data.right_score) || 0,
+                    halfMins,
+                    logs,
+                    data.left_color,
+                    data.right_color
+                );
+            }
+        }
+
+        function showLast5MinBanner(absMinute, currentL, currentR, halfMins, logs, leftColor, rightColor) {
+            const targetMin = absMinute - 5;
+            let pastL = 0, pastR = 0;
+
+            if (targetMin > 0 && logs && logs.length > 0) {
+                const sorted = [...logs].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                for (const log of sorted) {
+                    const timeStr = log.timeStr || '';
+                    const is2nd = timeStr.toLowerCase().includes('2nd') || timeStr.toLowerCase().includes('second');
+                    const mMatch = timeStr.match(/(\d+)\s*'/);
+                    const minInHalf = mMatch ? parseInt(mMatch[1]) : 0;
+                    const logAbsMinute = is2nd ? (halfMins + minInHalf) : minInHalf;
+
+                    if (logAbsMinute > targetMin) break;
+
+                    if (log.scoreStr) {
+                        const parts = log.scoreStr.replace(/Score:\s*/i, '').trim().split('-').map(s => parseInt(s.trim()));
+                        if (parts.length === 2 && !isNaN(parts[0])) {
+                            pastL = parts[0];
+                            pastR = parts[1];
+                        }
+                    }
+                }
+            }
+
+            const diffL = Math.max(0, currentL - pastL);
+            const diffR = Math.max(0, currentR - pastR);
+
+            const banner = document.getElementById('l5-banner');
+            const pL = document.getElementById('l5-left-pts');
+            const pR = document.getElementById('l5-right-pts');
+
+            if (banner && pL && pR) {
+                pL.innerText = diffL;
+                pR.innerText = diffR;
+                pL.style.color = leftColor || currentLeftColor || '#00FF00';
+                pR.style.color = rightColor || currentRightColor || '#0055ff';
+
+                banner.classList.add('show');
+                setTimeout(() => { banner.classList.remove('show'); }, 10000);
+            }
+        }
+
+        // ==========================================
         // ENGINE
         // ==========================================
         function startBroadcastEngine() {
@@ -1317,67 +1332,74 @@
             }
         }
 
+        // ==========================================
+        // 🚨 INIT — Reordered so Epic Animation triggers BEFORE score update
+        // ==========================================
         function initBroadcastEngine(id) {
             const matchRef = db.ref('live_matches/' + id);
 
             matchRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (!data) return;
+                if (!data) {
+                    window.__kabaddiLog('WARN', 'Snapshot has NO data for match: ' + id);
+                    return;
+                }
 
                 const leftColor  = data.left_color  || "#009900";
                 const rightColor = data.right_color || "#0055ff";
-                
-                window.leftTeamColorForGraph = leftColor;
-                window.rightTeamColorForGraph = rightColor;
-                document.documentElement.style.setProperty('--left-team-color', leftColor);
-                document.documentElement.style.setProperty('--right-team-color', rightColor);
 
-                // 1. Process Event Timeline FIRST (This triggers epicIsPlaying = true)
+                currentLeftColor  = leftColor;
+                currentRightColor = rightColor;
+
+                // ---- 1. EVENT TIMELINE FIRST — triggers epicIsPlaying = true BEFORE scores ----
                 let state = null;
                 if (data.state_json) {
                     try {
                         state = JSON.parse(data.state_json);
-                        handleEventTimeline(state);
-                        
-                        let lR = [], rR = [];
-                        try { lR = JSON.parse(state.leftRosterJson || '[]'); } catch (e) { }
-                        try { rR = JSON.parse(state.rightRosterJson || '[]'); } catch (e) { }
-                        
-                        renderMatDots(state, lR, rR, leftColor, rightColor);
+
+                        renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
+                        renderDots('right-dot', state.rightOutIds, state.rightRosterJson, rightColor);
                         handleRaidTimers(state, data.raid_clock, leftColor, rightColor);
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
+
+                        // 🚨 Fire epic animations BEFORE score update
+                        handleEventTimeline(state);
                     } catch (e) {
                         window.__kabaddiLog('WARN', 'State JSON parse error', e);
                     }
                 }
 
-                // 2. Set UI Colors & Names
+                // ---- 2. UI Names & Colors ----
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
+
                 document.getElementById('left-name').innerText  = leftName;
                 document.getElementById('right-name').innerText = rightName;
 
                 if (lastLeftColor !== leftColor) {
-                    document.getElementById('left-team-bg').style.background = `linear-gradient(to right, ${darkenColor(leftColor, 60)}, ${leftColor})`;
+                    document.getElementById('left-team-bg').style.background =
+                        `linear-gradient(to right, ${darkenColor(leftColor, 60)}, ${leftColor})`;
                     document.getElementById('left-dots-bg').style.background = darkenColor(leftColor, 80);
                     lastLeftColor = leftColor;
                 }
                 if (lastRightColor !== rightColor) {
-                    document.getElementById('right-team-bg').style.background = `linear-gradient(to left, ${darkenColor(rightColor, 60)}, ${rightColor})`;
+                    document.getElementById('right-team-bg').style.background =
+                        `linear-gradient(to left, ${darkenColor(rightColor, 60)}, ${rightColor})`;
                     document.getElementById('right-dots-bg').style.background = darkenColor(rightColor, 80);
                     lastRightColor = rightColor;
                 }
 
-                // 3. Handle Auto "Last 5 Mins" Pop-up
-                handleLast5MinutesUpdate(data);
+                // ---- 3. LAST 5 MINUTES BANNER ----
+                handleLast5MinutesUpdate(data, state);
 
-                // 4. Handle Score Updates (QUEUE THEM IF ANIMATION IS PLAYING)
+                // ---- 4. SCORES (with epic hold) ----
                 const leftScore  = data.left_score  || 0;
                 const rightScore = data.right_score || 0;
 
                 if (epicIsPlaying) {
-                    window.pendingLeftScore = leftScore;
+                    // 🚨 Queue score updates while animation plays
+                    window.pendingLeftScore  = leftScore;
                     window.pendingRightScore = rightScore;
                 } else {
                     updateScoreWithAnimation('left-score',  leftScore,  previousLeftScore);
@@ -1386,14 +1408,18 @@
                     previousRightScore = rightScore;
                 }
 
-                // 5. Center Clock and Screens
+                // ---- 5. CLOCK, MATCH-END, OVERLAY SCREENS ----
                 applyCenterClockAndStatus(data);
-                const matchOver = !!data.match_result || (data.half_status || '').toLowerCase().includes('over') || (data.half_status || '').toLowerCase().includes('full time');
+
+                const matchOver = !!data.match_result
+                    || (data.half_status || '').toLowerCase().includes('over')
+                    || (data.half_status || '').toLowerCase().includes('full time');
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
+
                 handleOverlayScreens(data, state, leftColor, rightColor);
 
             }, (error) => {
-                window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR', error);
+                window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — Auth blocked the read', error);
             });
         }
 
@@ -1849,7 +1875,7 @@
         }
 
         // ==========================================
-        // EPIC ANIMATION
+        // 🚨 EPIC ANIMATION — with Score Hold & Flush
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
@@ -1879,7 +1905,7 @@
             overlay.classList.remove('entry', 'hold', 'exit', 'visible');
             void overlay.offsetWidth;
             overlay.classList.add('visible', 'entry');
-            epicIsPlaying = true; // 🚨 Blocks scores from updating
+            epicIsPlaying = true; // 🚨 BLOCKS SCORE UPDATES
 
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
@@ -1891,12 +1917,12 @@
                 overlay.classList.remove('hold');
                 overlay.classList.add('exit');
             }, 3200));
-            
+
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.remove('visible', 'exit');
-                epicIsPlaying = false; 
+                epicIsPlaying = false;
 
-                // 🚨 ANIMATION FINISHED: Update the scores instantly!
+                // 🚨 FLUSH HELD SCORES THE MOMENT ANIMATION ENDS
                 if (window.pendingLeftScore !== undefined) {
                     updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
                     previousLeftScore = window.pendingLeftScore;
