@@ -10,6 +10,73 @@
     <meta name="description" content="Watch live kabaddi matches on KabaddiOne - real-time scores, commentary, player stats, lineup, and match analytics.">
     <meta name="theme-color" content="#0a0a1a">
     <title>Live Match | KabaddiOne</title>
+
+    <!-- 🚨 ANTI-IFRAME DEFENSE: allow only KabaddiOne-owned parent pages -->
+    <script>
+      (function protectAgainstUnauthorizedEmbedding() {
+        'use strict';
+
+        const ALLOWED_DOMAIN = 'kabaddione.com';
+
+        function isAllowedHost(hostname) {
+          const host = String(hostname || '').toLowerCase().replace(/\.$/, '');
+          return host === ALLOWED_DOMAIN || host.endsWith('.' + ALLOWED_DOMAIN);
+        }
+
+        function denyEmbedding() {
+          try {
+            document.open();
+            document.write(
+              '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+              '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+              '<title>Unauthorized Access | KabaddiOne</title></head>' +
+              '<body style="margin:0;min-height:100vh;display:grid;place-items:center;' +
+              'background:#0a0a1a;color:#fff;font:700 20px system-ui,sans-serif;' +
+              'text-align:center;padding:24px;box-sizing:border-box">' +
+              '<main><h1>Unauthorized Access</h1>' +
+              '<p>This live match page may only be embedded on kabaddione.com.</p></main>' +
+              '</body></html>'
+            );
+            document.close();
+          } catch (error) {
+            // Continue to attempt the top-level redirect even if rendering the block page fails.
+          }
+
+          try {
+            window.top.location.replace('https://kabaddione.com/');
+          } catch (error) {
+            try { window.location.replace('https://kabaddione.com/'); } catch (_) {}
+          }
+        }
+
+        if (window.top === window.self) return; // Directly opened page: allowed.
+
+        const ancestorHosts = [];
+        try {
+          if (document.referrer) {
+            ancestorHosts.push(new URL(document.referrer).hostname);
+          }
+        } catch (error) {
+          // An unavailable/invalid referrer is handled by the fallback below.
+        }
+
+        // Chromium-based browsers expose the origin of every ancestor in this list.
+        try {
+          const origins = window.location.ancestorOrigins;
+          if (origins && origins.length) {
+            for (let i = 0; i < origins.length; i++) {
+              try { ancestorHosts.push(new URL(origins[i]).hostname); } catch (_) {}
+            }
+          }
+        } catch (error) {
+          // ancestorOrigins is not implemented in every browser.
+        }
+
+        // Fail closed if embedded but no trustworthy parent origin can be determined.
+        const allAncestorsAllowed = ancestorHosts.length > 0 && ancestorHosts.every(isAllowedHost);
+        if (!allAncestorsAllowed) denyEmbedding();
+      })();
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
     <script>
@@ -22,6 +89,24 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <!-- 🐛 KABADDIONE DIAGNOSTIC LOGGING (same switch style as broadcast-overlay) -->
+    <script>
+      window.KABADDI_DEBUG = true;
+      window.__kabaddiLog = function(tag, message, data) {
+        if (!window.KABADDI_DEBUG) return;
+        const styles = {
+          OK: 'color:#22C55E;font-weight:bold',
+          ERR: 'color:#EF4444;font-weight:bold',
+          WARN: 'color:#FBC02D;font-weight:bold',
+          INFO: 'color:#4DD0E1;font-weight:bold'
+        };
+        const key = String(tag || 'INFO').toUpperCase();
+        console.log('%c[KabaddiOne ' + key + ']', styles[key] || styles.INFO,
+          message, data !== undefined ? data : '');
+      };
+      window.__kabaddiLog('INFO', 'Diagnostic logging enabled');
+    </script>
     <style>
         :root{--bg-primary:#0a0a1a;--bg-secondary:#0f0f24;--accent:#FF5E3A;--accent-glow:#FF3D10;--accent-secondary:#FFB830;--text-primary:#fff;--text-secondary:#b0b0c8;--text-muted:#7a7a95;--border-subtle:rgba(255,255,255,0.08);--nav-height:72px;--max-width:1200px;--radius-sm:12px;--radius-md:20px;--radius-lg:28px;--font-heading:'Segoe UI',system-ui,sans-serif;--font-body:'Inter','Segoe UI',system-ui,sans-serif;--transition-smooth:0.4s cubic-bezier(0.4,0,0.2,1);--left-team-color:#4CAF50;--right-team-color:#2196F3;--surface-1:#131629;--surface-2:#1a1d33;--glass-border:rgba(255,255,255,0.06);--shadow-lift:0 20px 50px rgba(0,0,0,0.5),0 4px 12px rgba(0,0,0,0.3);--shadow-soft:0 8px 24px rgba(0,0,0,0.35);--empty-raid-color:#9E9E9E}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1315,9 +1400,9 @@ const matchId = (urlParams.get('match') || '').trim();
 
 // Connection indicator for diagnostics; this does not start a database read.
 db.ref('.info/connected').on('value', (snapshot) => {
-  console.info('[KabaddiOne] Realtime Database connected:', snapshot.val() === true);
+  window.__kabaddiLog(snapshot.val() === true ? 'OK' : 'WARN', 'Realtime Database connected:', snapshot.val() === true);
 }, (error) => {
-  console.error('[KabaddiOne] Could not monitor Firebase connection:', error);
+  window.__kabaddiLog('ERR', 'Could not monitor Firebase connection:', error);
 });
 
 function setupViewerPresence(){
@@ -1564,11 +1649,11 @@ function startLiveScoreboard(){
         renderStats();
         renderLineups(state);
       } catch(e){
-        console.error("[KabaddiOne] Failed to parse or render state_json:", e);
+        window.__kabaddiLog('ERR', 'Failed to parse or render state_json:', e);
       }
     }
   }, (error) => {
-    console.error('[KabaddiOne] Failed to read live_matches/' + matchId + ':', error);
+    window.__kabaddiLog('ERR', 'Failed to read live_matches/' + matchId + ':', error);
     const status = document.getElementById('uiMatchDate');
     status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Unable to load this match. Check database access and match ID.';
     status.style.color = '#FF3B30';
@@ -1579,7 +1664,7 @@ function startLiveScoreboard(){
 // then attach the live match and viewer-presence listeners.
 auth.signInAnonymously()
   .then(() => {
-    console.info('[KabaddiOne] Anonymous Firebase authentication successful.');
+    window.__kabaddiLog('OK', 'Anonymous Firebase authentication successful.');
     startLiveScoreboard();
   })
   .catch((error) => {
