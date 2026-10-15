@@ -190,35 +190,129 @@
         @keyframes dodSiren { from { box-shadow: 0 0 15px rgba(255,0,0,0.5), 0 8px 20px rgba(0,0,0,0.6); } to { box-shadow: 0 0 40px rgba(255,0,0,1), 0 8px 20px rgba(0,0,0,0.6); } }
         @keyframes sirenRotate { from { transform: scale(1); } to { transform: scale(1.15); } }
 
-        /* SUBSTITUTION BANNER */
+        /* =========================================
+           SUBSTITUTION BANNER (Team-coloured, eject-style)
+           ========================================= */
         .side-banner {
-            position: absolute; bottom: calc(100% - 38px); display: flex; align-items: stretch; height: 54px;
-            opacity: 0; transform: translateY(30px);
-            transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
-            box-shadow: 0 10px 28px rgba(0,0,0,0.85), 0 0 0 2px #D4AF37, 0 0 18px rgba(212,175,55,0.45);
-            z-index: 25; white-space: nowrap; pointer-events: none;
-            background: var(--sub-team-color-dark, #0F1730); overflow: hidden;
+            position: absolute;
+            bottom: calc(100% - 38px);
+            display: flex;
+            align-items: stretch;
+            height: 54px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+                        transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.85),
+                        0 0 0 2px #D4AF37,
+                        0 0 18px rgba(212,175,55,0.45);
+            z-index: 25;
+            white-space: nowrap;
+            pointer-events: none;
+            background: var(--sub-team-color-dark, #0F1730);
+            overflow: hidden;
         }
         .side-banner.pos-right { right: 260px; left: auto; flex-direction: row; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); }
         .side-banner.pos-left  { left: 305px;  right: auto; flex-direction: row-reverse; }
         .side-banner.show { opacity: 1; transform: translateY(0); }
         .side-banner.hide { opacity: 0; transform: translateY(30px); }
-        .sub-track { position: relative; width: 340px; overflow: hidden; }
-        .pos-left .sub-track { border-right: none; border-left: 2px solid rgba(212,175,55,0.5); }
-        .sub-track::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-        .sub-row { position: absolute; top: 0; left: 0; right: 0; height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 36px; transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1); z-index: 1; will-change: transform; }
+
+        .sub-track {
+            position: relative;
+            width: 340px;
+            overflow: hidden;
+        }
+        .pos-left .sub-track {
+            border-right: none;
+            border-left: 2px solid rgba(212,175,55,0.5);
+        }
+        .sub-track::before {
+            content: '';
+            position: absolute; inset: 0;
+            z-index: 0; pointer-events: none;
+        }
+        .sub-row {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 100%;
+            display: flex; align-items: center; gap: 12px;
+            padding: 0 36px;
+            transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+            z-index: 1;
+            will-change: transform;
+        }
         .sub-row-out { transform: translateY(0); }
         .sub-row-in  { transform: translateY(100%); }
         .side-banner.phase-in .sub-row-out { transform: translateY(-100%); }
         .side-banner.phase-in .sub-row-in  { transform: translateY(0); }
         .pos-left .sub-row { flex-direction: row-reverse; }
-        .sub-arrow { width: 36px; height: 36px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: 900; color: #ff0000; flex-shrink: 0; line-height: 1; position: relative; }
-        .sub-arrow-out { background: linear-gradient(#ffffff, #d8d8d8); box-shadow: 0 3px 10px rgba(239,68,68,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.35); text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
-        .sub-arrow-in { background: linear-gradient(to bottom, #22C55E 0%, #14532D 100%); box-shadow: 0 3px 10px rgba(34,197,94,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.35); text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
-        .sub-name { font-family: 'Mukta', 'Oswald', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left; }
+
+        .sub-arrow {
+            width: 36px;
+            height: 36px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            color: #ff0000;
+            flex-shrink: 0;
+            line-height: 1;
+            position: relative;
+        }
+        .sub-arrow-out {
+            background: linear-gradient(#ffffff, #d8d8d8);
+            box-shadow: 0 3px 10px rgba(239,68,68,0.7),
+                        inset 0 1px 0 rgba(255,255,255,0.35),
+                        inset 0 -2px 0 rgba(0,0,0,0.35);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+        }
+        .sub-arrow-in {
+            background: linear-gradient(to bottom, #22C55E 0%, #14532D 100%);
+            box-shadow: 0 3px 10px rgba(34,197,94,0.7),
+                        inset 0 1px 0 rgba(255,255,255,0.35),
+                        inset 0 -2px 0 rgba(0,0,0,0.35);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+        }
+        .sub-name {
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #FFFFFF;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            text-align: left;
+        }
         .pos-left .sub-name { text-align: right; }
-        .sub-badge { background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); border: none; display: flex; align-items: center; justify-content: center; padding: 0 26px; color: #000; font-family: 'Mukta', 'Oswald', sans-serif; font-weight: 900; letter-spacing: 1px; font-size: 17px; text-transform: uppercase; flex-shrink: 0; position: relative; }
-        .sub-badge::before { content: ''; position: absolute; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent); }
+
+        .sub-badge {
+            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 26px;
+            color: #000;
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-weight: 900;
+            letter-spacing: 1px;
+            font-size: 17px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .sub-badge::before {
+            content: '';
+            position: absolute;
+            top: 6px; bottom: 6px;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent);
+        }
         .pos-right .sub-badge::before { left: 0; }
         .pos-left  .sub-badge::before { right: 0; }
         .pos-right .sub-badge { clip-path: polygon(17% 0, 100% 0, 92% 100%, 0 100%); padding-left: 32px; padding-right: 32px; }
@@ -415,8 +509,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
             overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(116,40,180,0.2);
         }
-        
-        /* LEFT COLUMN: PLAYER PROFILE */
         #player-perf-overlay .pp-col-profile {
             flex: 0 0 320px; display: flex; flex-direction: column;
             background: linear-gradient(160deg, var(--pp-team-color, #1E1E2E) 0%, var(--pp-team-color-dark, #0E0E1A) 100%);
@@ -454,8 +546,6 @@
             color: var(--pp-team-color, #555); font-family: 'Oswald', sans-serif; font-size: 13px;
             font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;
         }
-
-        /* MIDDLE COLUMN: STATS */
         #player-perf-overlay .pp-col-stats {
             flex: 1; display: flex; flex-direction: column; gap: 20px;
             padding: 30px 40px;
@@ -481,8 +571,6 @@
             letter-spacing: 1.5px; text-transform: uppercase;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        
-        /* POINTS SUMMARY GRID */
         #player-perf-overlay .pp-summary-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
         }
@@ -504,8 +592,6 @@
             margin-top: 8px; font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700;
             letter-spacing: 1.5px; color: #8C8E9F; text-transform: uppercase;
         }
-
-        /* DETAILED STATS (RAID & TACKLE) */
         #player-perf-overlay .pp-detail-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1;
         }
@@ -532,8 +618,6 @@
             letter-spacing: 1px; text-transform: uppercase;
         }
         #player-perf-overlay .pp-total-pill strong { color: #FFF; font-size: 16px; margin-left: 6px; }
-        
-        /* DONUTS */
         #player-perf-overlay .pp-donut-row {
             display: flex; justify-content: space-around; align-items: flex-end; flex: 1;
         }
@@ -558,8 +642,6 @@
             font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700;
             color: #8C8E9F; text-transform: uppercase; letter-spacing: 1px; text-align: center;
         }
-        
-        /* SEQUENCE BOXES */
         #player-perf-overlay .pp-sequence-box {
             margin-top: 25px; padding: 12px 15px; border-radius: 10px;
             background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.03);
@@ -585,8 +667,6 @@
         #player-perf-overlay .pp-tackle-unsuccess { background: #536DFE; color: #536DFE; }
         #player-perf-overlay .pp-tackle-super { background: #FFB830; color: #FFB830; }
         #player-perf-overlay .pp-sequence-empty { font-family: 'Oswald', sans-serif; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* RIGHT COLUMN: RATES & ON MAT */
         #player-perf-overlay .pp-col-rates {
             flex: 0 0 240px; background: #FFFFFF;
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;
@@ -647,13 +727,76 @@
             font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700;
             line-height: 1; text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
+
+        /* =========================================
+           CARD / FOUL BANNER
+           ========================================= */
+        .card-banner {
+            position: fixed; top: 40px; left: 50%;
+            transform: translateX(-50%) translateY(-40px);
+            display: flex; align-items: center; justify-content: flex-start;
+            gap: 18px; min-height: 72px; padding: 12px 32px;
+            background: linear-gradient(to bottom, rgba(20,20,40,0.98), rgba(5,5,15,0.95));
+            border: 3px solid #FBC02D; border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.08);
+            opacity: 0; pointer-events: none; z-index: 9998;
+            transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: 'Oswald', sans-serif;
+            min-width: 380px; max-width: 720px;
+        }
+        .card-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .card-banner.yellow { border-color: #FBC02D; box-shadow: 0 15px 40px rgba(251,192,45,0.55), 0 0 30px rgba(251,192,45,0.35), inset 0 2px 5px rgba(255,255,255,0.08); }
+        .card-banner.red    { border-color: #EF4444; box-shadow: 0 15px 40px rgba(239,68,68,0.60), 0 0 30px rgba(239,68,68,0.40),  inset 0 2px 5px rgba(255,255,255,0.08); }
+        .card-banner.green  { border-color: #22C55E; box-shadow: 0 15px 40px rgba(34,197,94,0.60), 0 0 30px rgba(34,197,94,0.40),  inset 0 2px 5px rgba(255,255,255,0.08); }
+        .card-symbol {
+            width: 40px; height: 56px; border-radius: 4px;
+            background: linear-gradient(135deg, #FFEB3B, #F57F17);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6), inset 0 -3px 8px rgba(0,0,0,0.3),
+                        inset 0 3px 6px rgba(255,255,255,0.3);
+            flex-shrink: 0; position: relative;
+            animation: cardSymbolPulse 1.2s ease-in-out infinite;
+        }
+        .card-symbol::before {
+            content: ''; position: absolute; inset: 4px;
+            border-radius: 2px; border: 1px dashed rgba(0,0,0,0.28);
+        }
+        .card-banner.red    .card-symbol { background: linear-gradient(135deg, #EF4444, #7F1D1D); }
+        .card-banner.yellow .card-symbol { background: linear-gradient(135deg, #FFEB3B, #F57F17); }
+        .card-banner.green  .card-symbol { background: linear-gradient(135deg, #4ADE80, #15803D); }
+        @keyframes cardSymbolPulse {
+            0%, 100% { transform: scale(1); }
+            50%      { transform: scale(1.08); }
+        }
+        .card-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .card-type {
+            font-size: 24px; font-weight: 800; color: #FFFFFF;
+            letter-spacing: 3px; text-transform: uppercase;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+            line-height: 1; white-space: nowrap;
+        }
+        .card-player {
+            font-family: 'Mukta', sans-serif; font-size: 16px; font-weight: 700;
+            letter-spacing: 1px; line-height: 1.2;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
 
+    <!-- 🚨 CARD / FOUL BANNER (FIXED POSITION — outside stage) -->
+    <div id="card-banner" class="card-banner">
+        <div class="card-symbol"></div>
+        <div class="card-info">
+            <div class="card-type" id="card-type">YELLOW CARD</div>
+            <div class="card-player" id="card-player">Player Name</div>
+        </div>
+    </div>
+
     <div class="broadcast-stage">
 
-        <!-- 🚨 NEW: LAST 5 MINUTES BANNER -->
+        <!-- 🚨 LAST 5 MINUTES BANNER -->
         <div id="l5-banner" class="l5-banner">
             <div class="l5-pts" id="l5-left-pts">0</div>
             <div class="l5-text">LAST 5 MINUTES</div>
@@ -709,6 +852,7 @@
             <span class="siren-icon">🚨</span>
         </div>
 
+        <!-- SUBSTITUTION BANNER (Team-coloured, eject-style) -->
         <div id="side-banner" class="side-banner pos-right">
             <div class="sub-track">
                 <div class="sub-row sub-row-out" id="sub-row-out">
@@ -898,15 +1042,12 @@
         </div>
     </div>
 
-    <!-- 🚨 REDESIGNED PLAYER PERFORMANCE OVERLAY -->
     <div id="player-perf-overlay" class="fs-overlay">
         <div class="pp-bg"></div>
         <div class="pp-content">
             <div class="pp-title">PLAYER SPOTLIGHT</div>
             <div class="pp-underline"></div>
             <div class="pp-card">
-                
-                <!-- LEFT COLUMN: AVATAR & NAME -->
                 <div class="pp-col-profile" id="pp-col-profile">
                     <div class="pp-profile-kicker" id="pp-team-label">TEAM</div>
                     <div class="pp-avatar" id="pp-avatar"></div>
@@ -915,8 +1056,6 @@
                         <div class="pp-position-badge" id="pp-position-badge">STARTING 7</div>
                     </div>
                 </div>
-
-                <!-- MIDDLE COLUMN: STATS & DONUTS -->
                 <div class="pp-col-stats">
                     <div class="pp-main-header">
                         <div>
@@ -925,17 +1064,13 @@
                         </div>
                         <div class="pp-team-pill">Total Points <strong id="pp-total-points">0</strong></div>
                     </div>
-                    
                     <div class="pp-summary-grid">
                         <div class="pp-summary-card"><div class="pp-summary-value" id="pp-raid-points">0</div><div class="pp-summary-label">RAID PTS</div></div>
                         <div class="pp-summary-card"><div class="pp-summary-value" id="pp-touch-points">0</div><div class="pp-summary-label">TOUCH</div></div>
                         <div class="pp-summary-card"><div class="pp-summary-value" id="pp-bonus-points">0</div><div class="pp-summary-label">BONUS</div></div>
                         <div class="pp-summary-card"><div class="pp-summary-value" id="pp-tackle-points">0</div><div class="pp-summary-label">TACKLE PTS</div></div>
                     </div>
-                    
                     <div class="pp-detail-grid">
-                        
-                        <!-- RAID PERFORMANCE -->
                         <div class="pp-detail-card">
                             <div class="pp-detail-head">
                                 <div class="pp-detail-title"><span class="pp-detail-mark"></span>RAID PERFORMANCE</div>
@@ -967,8 +1102,6 @@
                                 <div class="pp-sequence-dots" id="pp-raid-sequence"><span class="pp-sequence-empty">No raid history</span></div>
                             </div>
                         </div>
-
-                        <!-- TACKLE PERFORMANCE -->
                         <div class="pp-detail-card">
                             <div class="pp-detail-head">
                                 <div class="pp-detail-title"><span class="pp-detail-mark"></span>TACKLE PERFORMANCE</div>
@@ -1000,11 +1133,8 @@
                                 <div class="pp-sequence-dots" id="pp-tackle-sequence"><span class="pp-sequence-empty">No tackle history</span></div>
                             </div>
                         </div>
-
                     </div>
                 </div>
-
-                <!-- RIGHT COLUMN: RATES -->
                 <div class="pp-col-rates">
                     <div class="pp-on-mat">
                         <div class="pp-on-mat-icon">ON MAT TIME</div>
@@ -1030,10 +1160,10 @@
 
     <script>
         // ============================================================
-        // SECURE FIREBASE INIT & ANONYMOUS AUTHENTICATION
+        // FIREBASE INIT & AUTH
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI", // Web API Key
+            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
             authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
             databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "kabaddi-scoreboard-e1522"
@@ -1045,12 +1175,10 @@
 
         window.__kabaddiLog('INFO', 'URL matchId =', matchId);
 
-        // RTDB connection monitor
         db.ref('.info/connected').on('value', s => {
             window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
         });
 
-        // 🚨 SILENTLY AUTHENTICATE THE VIEWER BEFORE READING THE DATABASE
         firebase.auth().signInAnonymously()
             .then(() => {
                 window.__kabaddiLog('OK', '✅ Anonymous Auth Successful!');
@@ -1130,14 +1258,12 @@
                 container.appendChild(empty);
                 return;
             }
-
             const classMap = type === 'raid'
                 ? { S: 'pp-raid-success', U: 'pp-raid-unsuccess', E: 'pp-raid-empty' }
                 : { S: 'pp-tackle-success', U: 'pp-tackle-unsuccess', ST: 'pp-tackle-super' };
             const titleMap = type === 'raid'
                 ? { S: 'Successful raid', U: 'Unsuccessful raid', E: 'Empty raid' }
                 : { S: 'Successful tackle', U: 'Unsuccessful tackle', ST: 'Super tackle' };
-
             codes.forEach(code => {
                 const dot = document.createElement('span');
                 dot.className = 'pp-seq-dot ' + (classMap[code] || '');
@@ -1332,9 +1458,6 @@
             }
         }
 
-        // ==========================================
-        // 🚨 INIT — Reordered so Epic Animation triggers BEFORE score update
-        // ==========================================
         function initBroadcastEngine(id) {
             const matchRef = db.ref('live_matches/' + id);
 
@@ -1351,7 +1474,7 @@
                 currentLeftColor  = leftColor;
                 currentRightColor = rightColor;
 
-                // ---- 1. EVENT TIMELINE FIRST — triggers epicIsPlaying = true BEFORE scores ----
+                // ---- 1. EVENT TIMELINE FIRST (triggers epicIsPlaying + banners) ----
                 let state = null;
                 if (data.state_json) {
                     try {
@@ -1363,7 +1486,6 @@
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
 
-                        // 🚨 Fire epic animations BEFORE score update
                         handleEventTimeline(state);
                     } catch (e) {
                         window.__kabaddiLog('WARN', 'State JSON parse error', e);
@@ -1398,7 +1520,6 @@
                 const rightScore = data.right_score || 0;
 
                 if (epicIsPlaying) {
-                    // 🚨 Queue score updates while animation plays
                     window.pendingLeftScore  = leftScore;
                     window.pendingRightScore = rightScore;
                 } else {
@@ -1797,7 +1918,7 @@
         }
 
         // ==========================================
-        // SUBSTITUTION BANNER
+        // SUBSTITUTION BANNER (Team-coloured, eject-style)
         // ==========================================
         let subBannerTimeoutIds = [];
         function triggerSubstitutionGraphic(descText, isLeftTeam) {
@@ -1831,6 +1952,91 @@
             subBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('phase-in'); }, 2000));
             subBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('hide'); }, 4000));
             subBannerTimeoutIds.push(setTimeout(() => { banner.classList.remove('show', 'hide', 'phase-in'); }, 4700));
+        }
+
+        // ==========================================
+        // 🚨 CARD / FOUL BANNER ENGINE
+        // ==========================================
+        let cardBannerTimeoutIds = [];
+
+        function isCardEvent(log) {
+            if (!log) return false;
+            const titleLc  = (log.title || '').toLowerCase();
+            const typeUc   = (log.type  || '').toUpperCase();
+            const descLc   = (log.desc  || '').toLowerCase();
+            const combined = titleLc + ' ' + typeUc.toLowerCase() + ' ' + descLc;
+
+            if (combined.includes('card')) return true;
+            if (combined.includes('कार्ड')) return true;
+            if (combined.includes('येलो') || combined.includes('पीला')) return true;
+            if (combined.includes('रेड')) return true;
+            if (combined.includes('ग्रीन')) return true;
+
+            if (typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') return true;
+            if (typeUc === 'CARD' || typeUc === 'FOUL_CARD' || typeUc === 'WARNING') return true;
+
+            return false;
+        }
+
+        function detectCardColor(log) {
+            const titleLc  = (log.title || '').toLowerCase();
+            const typeUc   = (log.type  || '').toUpperCase();
+            const descLc   = (log.desc  || '').toLowerCase();
+            const combined = titleLc + ' ' + typeUc.toLowerCase() + ' ' + descLc;
+
+            if (combined.includes('red')    || combined.includes('रेड'))   return 'red';
+            if (combined.includes('green')  || combined.includes('ग्रीन')) return 'green';
+            if (combined.includes('yellow') || combined.includes('येलो') || combined.includes('पीला')) return 'yellow';
+            return 'yellow';
+        }
+
+        function triggerCardBanner(log) {
+            const banner   = document.getElementById('card-banner');
+            const typeEl   = document.getElementById('card-type');
+            const playerEl = document.getElementById('card-player');
+            if (!banner || !typeEl || !playerEl) return;
+
+            const cardColor = detectCardColor(log);
+
+            let typeText = 'YELLOW CARD';
+            if (cardColor === 'red')        typeText = 'RED CARD';
+            else if (cardColor === 'green') typeText = 'GREEN CARD';
+
+            let teamTag = '';
+            if (log.isLeftTeam === true)        teamTag = ' · LEFT TEAM';
+            else if (log.isLeftTeam === false)  teamTag = ' · RIGHT TEAM';
+
+            let playerText = String(log.desc || '').trim();
+            playerText = playerText
+                .replace(/yellow\s*card/ig, '')
+                .replace(/red\s*card/ig, '')
+                .replace(/green\s*card/ig, '')
+                .replace(/येलो\s*कार्ड/g, '')
+                .replace(/रेड\s*कार्ड/g, '')
+                .replace(/ग्रीन\s*कार्ड/g, '')
+                .replace(/कार्ड/g, '')
+                .replace(/^[\s\-–—:|·]+|[\s\-–—:|·]+$/g, '');
+            if (!playerText) playerText = 'Foul Committed';
+
+            typeEl.innerText   = typeText + teamTag;
+            playerEl.innerText = playerText;
+
+            const teamColor = log.isLeftTeam === true  ? currentLeftColor
+                            : log.isLeftTeam === false ? currentRightColor
+                            : '#FFFFFF';
+            typeEl.style.color   = '#FFFFFF';
+            playerEl.style.color = teamColor;
+
+            cardBannerTimeoutIds.forEach(id => clearTimeout(id));
+            cardBannerTimeoutIds = [];
+
+            banner.className = 'card-banner ' + cardColor;
+            void banner.offsetWidth;
+            banner.classList.add('show');
+
+            cardBannerTimeoutIds.push(setTimeout(() => {
+                banner.classList.remove('show');
+            }, 4500));
         }
 
         // ==========================================
@@ -1868,6 +2074,9 @@
                     else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
                         triggerSubstitutionGraphic(log.desc || '', log.isLeftTeam);
                     }
+                    else if (isCardEvent(log)) {
+                        triggerCardBanner(log);
+                    }
                 }
             } catch (e) {
                 window.__kabaddiLog('WARN', 'Logs JSON parse error', e);
@@ -1875,7 +2084,7 @@
         }
 
         // ==========================================
-        // 🚨 EPIC ANIMATION — with Score Hold & Flush
+        // EPIC ANIMATION — with Score Hold & Flush
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
@@ -1905,7 +2114,7 @@
             overlay.classList.remove('entry', 'hold', 'exit', 'visible');
             void overlay.offsetWidth;
             overlay.classList.add('visible', 'entry');
-            epicIsPlaying = true; // 🚨 BLOCKS SCORE UPDATES
+            epicIsPlaying = true;
 
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 if (!epicIsPlaying) return;
