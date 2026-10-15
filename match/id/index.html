@@ -19,8 +19,9 @@
       gtag('config', 'G-YRYC0NEP1H');
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
         :root{--bg-primary:#0a0a1a;--bg-secondary:#0f0f24;--accent:#FF5E3A;--accent-glow:#FF3D10;--accent-secondary:#FFB830;--text-primary:#fff;--text-secondary:#b0b0c8;--text-muted:#7a7a95;--border-subtle:rgba(255,255,255,0.08);--nav-height:72px;--max-width:1200px;--radius-sm:12px;--radius-md:20px;--radius-lg:28px;--font-heading:'Segoe UI',system-ui,sans-serif;--font-body:'Inter','Segoe UI',system-ui,sans-serif;--transition-smooth:0.4s cubic-bezier(0.4,0,0.2,1);--left-team-color:#4CAF50;--right-team-color:#2196F3;--surface-1:#131629;--surface-2:#1a1d33;--glass-border:rgba(255,255,255,0.06);--shadow-lift:0 20px 50px rgba(0,0,0,0.5),0 4px 12px rgba(0,0,0,0.3);--shadow-soft:0 8px 24px rgba(0,0,0,0.35);--empty-raid-color:#9E9E9E}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1294,16 +1295,30 @@ const graphObserver = new IntersectionObserver((entries)=>{
 // ============================================================
 // FIREBASE
 // ============================================================
+// Keep this configuration identical to the working broadcast overlay.
+// All Firebase services must point to the same project.
 const firebaseConfig = {
-  apiKey:"AIzaSyBciKNutpVo_zYXCLuVOIUb4VmoPaE7zHM",
-  authDomain:"kabaddi-scoreboard.firebaseapp.com",
-  databaseURL:"https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"kabaddi-scoreboard"
+  apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
+  authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
+  databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kabaddi-scoreboard-e1522"
 };
-firebase.initializeApp(firebaseConfig);
+
+// Prevent duplicate initialization if another page script initializes this project.
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.database();
+const auth = firebase.auth();
 const urlParams = new URLSearchParams(window.location.search);
-const matchId = urlParams.get('match');
+const matchId = (urlParams.get('match') || '').trim();
+
+// Connection indicator for diagnostics; this does not start a database read.
+db.ref('.info/connected').on('value', (snapshot) => {
+  console.info('[KabaddiOne] Realtime Database connected:', snapshot.val() === true);
+}, (error) => {
+  console.error('[KabaddiOne] Could not monitor Firebase connection:', error);
+});
 
 function setupViewerPresence(){
   if(!matchId) return;
@@ -1324,9 +1339,9 @@ function setupViewerPresence(){
     const beat = () => { myRef.set({lastSeen:Date.now()}).catch(()=>{}); };
     db.ref('.info/connected').on('value', snap => {
       if(snap.val() === true){
-        myRef.onDisconnect().remove().then(()=>{ beat(); if(hbTimer) clearInterval(hbTimer); hbTimer = setInterval(beat, HB); }).catch(()=>{ viewerEl.innerText='1 watching'; });
+        myRef.onDisconnect().remove().then(()=>{ beat(); if(hbTimer) clearInterval(hbTimer); hbTimer = setInterval(beat, HB); }).catch((error)=>{ console.warn('[KabaddiOne] Viewer presence unavailable:', error); viewerEl.innerText='1 watching'; });
       }
-    });
+    }, (error)=>{ console.warn('[KabaddiOne] Viewer connection listener failed:', error); });
     viewersRef.on('value', snap => {
       const now = Date.now(); let count = 0;
       snap.forEach(child => { const v = child.val(); if(v && typeof v.lastSeen==='number' && (now - v.lastSeen) < STALE) count++; });
@@ -1344,14 +1359,21 @@ function updateLastUpdated(ts){
   el.innerText = 'Updated '+dateStr+' · '+timeStr;
 }
 
-if(!matchId){
-  document.getElementById('uiMatchDate').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
-  document.getElementById('uiMatchDate').style.color = "#FF3B30";
-} else {
+function startLiveScoreboard(){
+  const statusEl = document.getElementById('uiMatchDate');
+  if (!matchId || /[.#$\[\]\/]/.test(matchId)) {
+    statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
+    statusEl.style.color = "#FF3B30";
+    return;
+  }
+
   document.getElementById('uiMatchId').innerHTML = '<i class="fa-solid fa-hashtag"></i> '+matchId.toUpperCase();
   document.getElementById('dtMatchId').innerText = matchId.toUpperCase();
   setupViewerPresence();
+  statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to live match...';
+  statusEl.style.color = "#8C8E9F";
 
+  // Read the match only after anonymous authentication has succeeded.
   db.ref('live_matches/'+matchId).on('value', (snapshot) => {
     const data = snapshot.val();
     if(!data){ document.getElementById('uiMatchDate').innerText = "Match Offline or Ended."; return; }
@@ -1541,10 +1563,33 @@ if(!matchId){
 
         renderStats();
         renderLineups(state);
-      } catch(e){ console.error("Failed to parse state_json", e); }
+      } catch(e){
+        console.error("[KabaddiOne] Failed to parse or render state_json:", e);
+      }
     }
+  }, (error) => {
+    console.error('[KabaddiOne] Failed to read live_matches/' + matchId + ':', error);
+    const status = document.getElementById('uiMatchDate');
+    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Unable to load this match. Check database access and match ID.';
+    status.style.color = '#FF3B30';
   });
 }
+
+// Same authentication sequence as the working broadcast overlay: authenticate first,
+// then attach the live match and viewer-presence listeners.
+auth.signInAnonymously()
+  .then(() => {
+    console.info('[KabaddiOne] Anonymous Firebase authentication successful.');
+    startLiveScoreboard();
+  })
+  .catch((error) => {
+    console.error('[KabaddiOne] Firebase anonymous authentication failed:', error);
+    const status = document.getElementById('uiMatchDate');
+    if (status) {
+      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Secure connection failed. Please try again later.';
+      status.style.color = '#FF3B30';
+    }
+  });
 
 document.addEventListener('DOMContentLoaded', () => {
   switchLineupTeam('left');
