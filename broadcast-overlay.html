@@ -1463,14 +1463,37 @@
         // ==========================================
         function startBroadcastEngine() {
             if (!matchId) {
-                window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
-                document.getElementById('left-name').innerText = "NO MATCH ID";
-                document.getElementById('right-name').innerText = "LINK URL ERROR";
-            } else {
-                document.getElementById('match-id').innerText = matchId.toUpperCase();
-                window.__kabaddiLog('OK', '✅ Calling initBroadcastEngine("' + matchId + '")');
-                initBroadcastEngine(matchId);
+                document.documentElement.innerHTML = "<h1 style='color:white; text-align:center; font-family:sans-serif; margin-top:50px;'>🛑 ERROR: NO MATCH ID PROVIDED</h1>";
+                return;
             }
+
+            const urlCode = urlParams.get('code') || '';
+            const matchRef = db.ref('live_matches/' + matchId);
+
+            // 🚨 SECURE GATEWAY: Fetch data ONCE to verify the password before attaching live listeners
+            matchRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                
+                if (!data) {
+                    document.documentElement.innerHTML = "<h1 style='color:white; text-align:center; font-family:sans-serif; margin-top:50px;'>🛑 MATCH NOT FOUND OR HAS ENDED</h1>";
+                    return;
+                }
+
+                // Verify the 6-digit security code
+                if (data.security_code && data.security_code !== urlCode) {
+                    window.__kabaddiLog('ERR', 'Security Code mismatch!');
+                    document.documentElement.innerHTML = "<h1 style='color:red; text-align:center; font-family:sans-serif; margin-top:50px;'>🛑 UNAUTHORIZED: INVALID SECURITY CODE</h1>";
+                    return;
+                }
+
+                window.__kabaddiLog('OK', '✅ Security Check Passed! Initializing Live Stream...');
+                
+                // If verified, proceed to start the continuous live engine!
+                initBroadcastEngine(matchId);
+
+            }).catch((error) => {
+                document.documentElement.innerHTML = "<h1 style='color:white; text-align:center; font-family:sans-serif; margin-top:50px;'>DATABASE CONNECTION ERROR</h1>";
+            });
         }
 
         function initBroadcastEngine(id) {
