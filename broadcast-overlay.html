@@ -742,13 +742,6 @@
             line-height: 1; text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
 
-        .l5-pts .l5-left-pts{
-            clip-path: polygon(0% 0,100% 0, 100% 100%, 50% 100%); margin-left: -112px; padding: 10px 20px 10px 130px; color: white; background: green;
-        }
-        .l5-pts .l5-right-pts{
-            clip-path: polygon(0 0,100% 0, 100% 100%, 0 100%); padding: 10px 130px 10px 20px; margin-right: -112px; color: white; background: red;
-        }
-
         /* =========================================
            CARD / FOUL BANNER
            ========================================= */
@@ -819,9 +812,9 @@
 
         <!-- 🚨 LAST 5 MINUTES BANNER -->
         <div id="l5-banner" class="l5-banner">
-            <div class="l5-pts l5-left-pts" id="l5-left-pts">0</div>
+            <div class="l5-pts" id="l5-left-pts" style="clip-path: polygon(0% 0,100% 0, 100% 100%, 50% 100%); margin-left: -112px; padding: 10px 20px 10px 130px; color: white; background: green;">0</div>
             <div class="l5-text">LAST 5 MINUTES</div>
-            <div class="l5-pts l5-right-pts" id="l5-right-pts">0</div>
+            <div class="l5-pts" id="l5-right-pts" style="clip-path: polygon(0 0,100% 0, 100% 100%, 0 100%); padding: 10px 130px 10px 20px; margin-right: -112px; color: white; background: red;">0</div>
         </div>
 
         <div class="logo-bar">
