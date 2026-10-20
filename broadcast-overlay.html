@@ -320,7 +320,7 @@
             justify-content: center;
             gap: 0;
             color: #FFF;
-            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0)
+            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
             box-shadow: inset 0px 20px 20px rgba(255,255,255,0.15), inset 0px -20px 20px rgba(0,0,0,0.4);
         }
         .suspension-timer.suspension-left .suspension-timer-inner {
@@ -1154,45 +1154,84 @@
         // ==========================================
         // 🚨 LAST 5 MINUTES ENGINE
         // ==========================================
-        function handleLast5MinutesUpdate(data, existingState) {
-            if (!data || !data.match_duration_mins) return;
+        // 🚨 Track last clock + half to prevent spurious triggers when paused
+let lastProcessedL5Clock = null;
+let lastKnownHalfNum = 1;
 
-            let state = existingState;
-            if (!state && data.state_json) {
-                try { state = JSON.parse(data.state_json); } catch (e) { return; }
-            }
-            if (!state || !state.logsJson) return;
+function handleLast5MinutesUpdate(data, existingState) {
+    if (!data || !data.match_duration_mins) return;
 
-            const halfMins = parseInt(data.match_duration_mins) || 20;
-            const halfStatus = (data.half_status || '').toLowerCase();
-            let currentHalfNum = halfStatus.includes("1st") ? 1 : 2;
-            if (halfStatus.includes("over") || halfStatus.includes("full time")) currentHalfNum = 2;
+    // ---- GUARD 1: Skip during breaks ----
+    const breakTitle = (data.break_clock_title || '').trim();
+    const breakTime  = (data.break_clock_time  || '').trim();
+    if (breakTitle.length > 0 && breakTime.length > 0 && breakTime !== '00:00') return;
 
-            let minsLeft = halfMins;
-            if (data.main_clock && data.main_clock.includes(":")) {
-                const p = data.main_clock.split(":");
-                minsLeft = (parseInt(p[0]) || 0) + ((parseInt(p[1]) || 0) / 60);
-            }
-            const elapsed = halfMins - minsLeft;
-            const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
+    // ---- GUARD 2: Skip if main_clock hasn't advanced ----
+    const currentClock = (data.main_clock || '').trim();
+    if (!currentClock || !currentClock.includes(':')) return;
+    if (currentClock === lastProcessedL5Clock) return;
 
-            const bucket = Math.floor(absMinute / 5);
-            if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
-                lastL5TriggerBucket = bucket;
-                let logs = [];
-                try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
-                showLast5MinBanner(
-                    absMinute,
-                    parseInt(data.left_score)  || 0,
-                    parseInt(data.right_score) || 0,
-                    halfMins,
-                    logs,
-                    data.left_color,
-                    data.right_color
-                );
-            }
+    // ---- GUARD 3: Reject suspicious clock jumps (going UP mid-half) ----
+    if (lastProcessedL5Clock) {
+        const [lm, ls] = lastProcessedL5Clock.split(':').map(x => parseInt(x) || 0);
+        const [cm, cs] = currentClock.split(':').map(x => parseInt(x) || 0);
+        const lastSecs = lm * 60 + ls;
+        const currSecs = cm * 60 + cs;
+        if (currSecs > lastSecs + 2) {
+            // Clock went UP — bad data / reset value. Update tracker and skip.
+            lastProcessedL5Clock = currentClock;
+            return;
+        }
+    }
+    lastProcessedL5Clock = currentClock;
+
+    let state = existingState;
+    if (!state && data.state_json) {
+        try { state = JSON.parse(data.state_json); } catch (e) { return; }
+    }
+    if (!state || !state.logsJson) return;
+
+    const halfMins = parseInt(data.match_duration_mins) || 20;
+    const halfStatus = (data.half_status || '').toLowerCase();
+
+    // ---- GUARD 4: Robust half detection (never default blindly to 2) ----
+    let currentHalfNum;
+    if (halfStatus.includes('1st') || halfStatus.includes('first')) currentHalfNum = 1;
+    else if (halfStatus.includes('2nd') || halfStatus.includes('second')) currentHalfNum = 2;
+    else if (halfStatus.includes('over') || halfStatus.includes('full')) currentHalfNum = 2;
+    else currentHalfNum = lastKnownHalfNum;   // fallback to last valid value
+    lastKnownHalfNum = currentHalfNum;
+
+    let minsLeft = halfMins;
+    if (data.main_clock && data.main_clock.includes(':')) {
+        const p = data.main_clock.split(':');
+        minsLeft = (parseInt(p[0]) || 0) + ((parseInt(p[1]) || 0) / 60);
+    }
+    const elapsed  = halfMins - minsLeft;
+    const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
+
+    const bucket = Math.floor(absMinute / 5);
+    if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
+        // ---- GUARD 5: Prevent big bucket jumps caused by data glitches ----
+        if (bucket > lastL5TriggerBucket + 1) {
+            lastL5TriggerBucket = bucket;
+            return;
         }
 
+        lastL5TriggerBucket = bucket;
+        let logs = [];
+        try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
+        showLast5MinBanner(
+            absMinute,
+            parseInt(data.left_score)  || 0,
+            parseInt(data.right_score) || 0,
+            halfMins,
+            logs,
+            data.left_color,
+            data.right_color
+        );
+    }
+}
         function showLast5MinBanner(absMinute, currentL, currentR, halfMins, logs, leftColor, rightColor) {
             const targetMin = absMinute - 5;
             let pastL = 0, pastR = 0;
@@ -1274,8 +1313,8 @@
                     // Apply team gradient to the inner box
                     const inner = lTimer.querySelector('.suspension-timer-inner');
                     if (inner) {
-                        inner.style.background = `linear-gradient(to bottom, ${darkenColor(currentLeftColor, 30)}, ${darkenColor(currentLeftColor, 70)})`;
-                    }
+    inner.style.background = 'linear-gradient(to bottom, #FFFFFF, #D0D0D0)';
+}
                     lTimer.classList.add('show');
                 } else {
                     lTimer.classList.remove('show');
@@ -1292,8 +1331,8 @@
                         `#${rSusp.jerseyNumber || ''} ${rSusp.name || 'Player'}`.trim();
                     const inner = rTimer.querySelector('.suspension-timer-inner');
                     if (inner) {
-                        inner.style.background = `linear-gradient(to bottom, ${darkenColor(currentRightColor, 30)}, ${darkenColor(currentRightColor, 70)})`;
-                    }
+    inner.style.background = 'linear-gradient(to bottom, #FFFFFF, #D0D0D0)';
+}
                     rTimer.classList.add('show');
                 } else {
                     rTimer.classList.remove('show');
@@ -1834,36 +1873,45 @@
         let cardBannerTimeoutIds = [];
 
         function isCardEvent(log) {
-            if (!log) return false;
-            const titleLc  = (log.title || '').toLowerCase();
-            const typeUc   = (log.type  || '').toUpperCase();
-            const descLc   = (log.desc  || '').toLowerCase();
-            const combined = titleLc + ' ' + typeUc.toLowerCase() + ' ' + descLc;
+    if (!log) return false;
+    const typeUc  = (log.type  || '').toUpperCase();
+    const titleLc = (log.title || '').toLowerCase();
 
-            if (combined.includes('card')) return true;
-            if (combined.includes('कार्ड')) return true;
-            if (combined.includes('येलो') || combined.includes('पीला')) return true;
-            if (combined.includes('रेड')) return true;
-            if (combined.includes('ग्रीन')) return true;
+    // ✅ Primary: only accept actual CARD types
+    if (typeUc === 'CARD' || typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') {
+        return true;
+    }
 
-            if (typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') return true;
-            if (typeUc === 'CARD' || typeUc === 'FOUL_CARD' || typeUc === 'WARNING') return true;
+    // ✅ Fallback: title must contain a SPECIFIC card keyword (not "card" alone)
+    // ⚠️ DO NOT check desc — "Penalty awarded for Yellow Card" has isLeftTeam:false
+    //    and would otherwise override the real card banner onto the wrong side.
+    if (/(yellow|red|green)\s*card/i.test(titleLc)) return true;
+    if (titleLc.includes('येलो') || titleLc.includes('रेड') || titleLc.includes('ग्रीन')) return true;
 
-            return false;
-        }
+    // Explicitly reject penalty/technical/extra logs
+    if (typeUc === 'EXTRA' || typeUc === 'TECHNICAL' || titleLc.includes('penalty') || titleLc.includes('technical')) {
+        return false;
+    }
 
-        function detectCardColor(log) {
-            const titleLc  = (log.title || '').toLowerCase();
-            const typeUc   = (log.type  || '').toUpperCase();
-            const descLc   = (log.desc  || '').toLowerCase();
-            const combined = titleLc + ' ' + typeUc.toLowerCase() + ' ' + descLc;
+    return false;
+}
 
-            if (combined.includes('red')    || combined.includes('रेड'))   return 'red';
-            if (combined.includes('green')  || combined.includes('ग्रीन')) return 'green';
-            if (combined.includes('yellow') || combined.includes('येलो') || combined.includes('पीला')) return 'yellow';
-            return 'yellow';
-        }
+function detectCardColor(log) {
+    const titleLc = (log.title || '').toLowerCase();
+    const typeUc  = (log.type  || '').toUpperCase();
+    const descLc  = (log.desc  || '').toLowerCase();
 
+    // Prioritize authoritative fields (title + type)
+    const priority = titleLc + ' ' + typeUc.toLowerCase();
+    if (priority.includes('red')    || priority.includes('रेड'))   return 'red';
+    if (priority.includes('green')  || priority.includes('ग्रीन')) return 'green';
+    if (priority.includes('yellow') || priority.includes('येलो') || priority.includes('पीला')) return 'yellow';
+
+    // Fallback to description only if title/type had no answer
+    if (descLc.includes('red')    || descLc.includes('रेड'))   return 'red';
+    if (descLc.includes('green')  || descLc.includes('ग्रीन')) return 'green';
+    return 'yellow';
+}
         function triggerCardBanner(log) {
             const banner     = document.getElementById('card-side-banner');
             const playerEl   = document.getElementById('card-side-player-name');
