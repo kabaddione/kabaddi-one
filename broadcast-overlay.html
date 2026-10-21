@@ -8,7 +8,6 @@
     <link rel="shortcut icon" href="/favicon.png" type="image/png">
     <title>KabaddiOne Professional Broadcast Overlay</title>
 
-    <!-- 🚨 ANTI-IFRAME DEFENSE -->
     <script>
         if (window.top !== window.self) {
             try {
@@ -24,12 +23,9 @@
         }
     </script>
 
-        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
-
-    <!-- ✅ Font Awesome (fixes location icon) -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- ✅ SEO META TAGS -->
     <meta name="description" content="KabaddiOne Professional Broadcast Overlay — real-time live kabaddi scoreboard for OBS streaming. Features raid timers, bonus & super tackle alerts, player performance graphics, team stats, substitution banners, and full match analytics.">
     <meta name="keywords" content="kabaddi overlay, live kabaddi broadcast, OBS kabaddi scoreboard, kabaddi one, kabaddi live streaming, kabaddi scoreboard, live kabaddi score, broadcast overlay, KabaddiOne">
     <meta name="author" content="KabaddiOne">
@@ -37,7 +33,6 @@
     <meta name="theme-color" content="#0a0a1a">
     <link rel="canonical" href="https://kabaddione.com/broadcast-overlay.html">
 
-    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
     <meta property="og:title" content="KabaddiOne Professional Broadcast Overlay">
     <meta property="og:description" content="Real-time kabaddi broadcast overlay with live scoreboard, raid timers, bonus & super tackle alerts, player stats, and team performance — built for OBS streaming.">
     <meta property="og:type" content="website">
@@ -45,7 +40,6 @@
     <meta property="og:image" content="https://kabaddione.com/images/kabaddione_logo.png">
     <meta property="og:site_name" content="KabaddiOne">
 
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="KabaddiOne Professional Broadcast Overlay">
     <meta name="twitter:description" content="Real-time kabaddi broadcast overlay for OBS streaming — scoreboard, raid timers, bonus & super tackle alerts, player performance stats.">
@@ -66,22 +60,17 @@
     </script>
 
     <style>
-        /* =========================================
-           OBS TRANSPARENT CANVAS RESET
-           ========================================= */
         * { box-sizing: border-box; user-select: none; }
         body, html { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent !important; overflow: hidden; font-family: 'Oswald', sans-serif; }
         .broadcast-stage { position: absolute; bottom: 60px; left: 0; width: 1920px; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); }
         .gold-bg { background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%); }
 
-        /* LOGO BAR */
         .logo-bar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 30px; background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9)); border: 2px solid rgb(253, 241, 159); margin-bottom: -13px; font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; z-index: 6; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%); }
         .logo-bar .logo-powered { color: rgb(185, 185, 185); font-size: 14px; letter-spacing: 1.1px; font-weight: 600; }
         .logo-bar .logo-icon { width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 20px rgba(255,215,0,0.4); animation: logoPulse 3s ease-in-out infinite; }
         .logo-bar .logo-text { color: #FFF; font-weight: 700; font-size: 20px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
         .logo-bar .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* TOP RAID BARS */
         .top-raid-bars { display: flex; justify-content: space-between; width: 1080px; margin-bottom: -3px; z-index: 5; }
         .raid-track { width: 418px; height: 14px; background: rgba(0,0,0,0.8); display: flex; overflow: hidden; visibility: hidden; opacity: 0; border: 2px solid #D4AF37; border-bottom: none; transition: opacity 0.35s ease, visibility 0.35s ease, box-shadow 0.4s ease; position: relative; }
         .raid-track.visible { visibility: visible; opacity: 1; box-shadow: 0 0 14px var(--raid-bar-color, #00FF00), 0 0 6px var(--raid-bar-color, #00FF00), inset 0 0 8px rgba(0,0,0,0.6); }
@@ -100,7 +89,6 @@
         .track-right .raid-spark::after { bottom: 2px; right: 50%; animation: sparkFloat 0.5s infinite ease-out 0.25s; }
         @keyframes sparkFloat { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-8px) scale(0.3);opacity:0} }
 
-        /* DO-OR-DIE */
         .dod-banner { position: absolute; bottom: calc(100% - 84px); display: flex; align-items: center; justify-content: center; gap: 12px; padding: 3px 40px; font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 3px; color: #FFFFFF; background: linear-gradient(to bottom, #D32F2F, #8B0000); border-radius: 6px; text-shadow: 0 0 12px rgba(255,0,0,0.9), 2px 2px 4px rgba(0,0,0,0.8); box-shadow: 0 0 25px rgba(255, 0, 0, 0.7), 0 8px 20px rgba(0,0,0,0.6); opacity: 0; transform: translateY(15px) scale(0.9); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; z-index: 20; overflow: hidden; }
         .dod-banner.show { opacity: 1; transform: translateY(0) scale(1); animation: dodSiren 1s infinite alternate; }
         .dod-banner.dod-left { left: 308px; clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%); }
@@ -123,171 +111,88 @@
         @keyframes dodSiren { from{box-shadow:0 0 15px rgba(255,0,0,.5),0 8px 20px rgba(0,0,0,.6)} to{box-shadow:0 0 40px rgba(255,0,0,1),0 8px 20px rgba(0,0,0,.6)} }
         @keyframes sirenRotate { from{transform:scale(1)} to{transform:scale(1.15)} }
 
-        /* =========================================
-           SUBSTITUTION BANNER — Team-gradient background
-           ========================================= */
-        .side-banner {
-            position: absolute;
-            bottom: calc(100% - 78px);
-            display: flex;
-            align-items: stretch;
-            height: 54px;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
-                        transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
-            filter: drop-shadow(0 10px 14px rgba(0,0,0,0.85))
-                    drop-shadow(0 0 6px rgba(212,175,55,0.75))
-                    drop-shadow(0 0 14px rgba(212,175,55,0.45));
-            z-index: 25;
-            white-space: nowrap;
-            pointer-events: none;
-            background: var(--sub-team-color-dark, #0F1730);
-            overflow: hidden;
-            isolation: isolate;
-        }
-        .side-banner.pos-right {
-            right: 210px; left: auto; flex-direction: row;
-            clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
-            -webkit-clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
-        }
-        .side-banner.pos-left {
-            left: 210px; right: auto; flex-direction: row-reverse;
-            clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%);
-            -webkit-clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%);
-        }
+        .side-banner { position: absolute; bottom: calc(100% - 78px); display: flex; align-items: stretch; height: 54px; opacity: 0; transform: translateY(30px); transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1); filter: drop-shadow(0 10px 14px rgba(0,0,0,0.85)) drop-shadow(0 0 6px rgba(212,175,55,0.75)) drop-shadow(0 0 14px rgba(212,175,55,0.45)); z-index: 25; white-space: nowrap; pointer-events: none; background: var(--sub-team-color-dark, #0F1730); overflow: hidden; isolation: isolate; }
+        .side-banner.pos-right { right: 210px; left: auto; flex-direction: row; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); -webkit-clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); }
+        .side-banner.pos-left { left: 210px; right: auto; flex-direction: row-reverse; clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); -webkit-clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); }
         .side-banner.show { opacity: 1; transform: translateY(0); }
         .side-banner.hide { opacity: 0; transform: translateY(30px); }
 
         .sub-track { position: relative; width: 340px; overflow: hidden; }
-        .sub-row {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 100%;
-            display: flex; align-items: center; gap: 12px;
-            padding: 0 36px;
-            transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
-            z-index: 1;
-            will-change: transform;
-        }
+        .sub-row { position: absolute; top: 0; left: 0; right: 0; height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 36px; transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1); z-index: 1; will-change: transform; }
         .sub-row-out { transform: translateY(0); }
         .sub-row-in  { transform: translateY(100%); }
         .side-banner.phase-in .sub-row-out { transform: translateY(-100%); }
         .side-banner.phase-in .sub-row-in  { transform: translateY(0); }
         .pos-left .sub-row { flex-direction: row-reverse; }
 
-        .sub-arrow {
-            width: 36px; height: 36px; border-radius: 5px;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: 900;
-            color: #ff0000; flex-shrink: 0; line-height: 1; position: relative;
-        }
-        .sub-arrow-out {
-            background: linear-gradient(#ffffff, #d8d8d8);
-            box-shadow: 0 3px 10px rgba(239,68,68,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.35);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-        }
-        .sub-arrow-in {
-            background: linear-gradient(to bottom, #4ADE80 0%, #16A34A 100%);
-            color: #FFFFFF;
-            box-shadow: 0 3px 12px rgba(34,197,94,0.9), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -2px 0 rgba(0,0,0,0.35);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
-        }
-        .sub-name {
-            font-family: 'Mukta', 'Oswald', sans-serif; font-size: 22px; font-weight: 800;
-            letter-spacing: 1px; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-            overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left;
-        }
+        .sub-arrow { width: 36px; height: 36px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: 900; color: #ff0000; flex-shrink: 0; line-height: 1; position: relative; }
+        .sub-arrow-out { background: linear-gradient(#ffffff, #d8d8d8); box-shadow: 0 3px 10px rgba(239,68,68,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.35); text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
+        .sub-arrow-in { background: linear-gradient(to bottom, #4ADE80 0%, #16A34A 100%); color: #FFFFFF; box-shadow: 0 3px 12px rgba(34,197,94,0.9), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -2px 0 rgba(0,0,0,0.35); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
+        .sub-name { font-family: 'Mukta', 'Oswald', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left; }
         .pos-left .sub-name { text-align: right; }
 
-        .sub-badge {
-            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
-            border: none; display: flex; align-items: center; justify-content: center;
-            padding: 0 26px; color: #000;
-            font-family: 'Mukta', 'Oswald', sans-serif; font-weight: 900;
-            letter-spacing: 1px; font-size: 17px; text-transform: uppercase;
-            flex-shrink: 0; position: relative;
-        }
-        .sub-badge::before {
-            content: ''; position: absolute; top: 6px; bottom: 6px; width: 2px;
-            background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent);
-        }
+        .sub-badge { background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); border: none; display: flex; align-items: center; justify-content: center; padding: 0 26px; color: #000; font-family: 'Mukta', 'Oswald', sans-serif; font-weight: 900; letter-spacing: 1px; font-size: 17px; text-transform: uppercase; flex-shrink: 0; position: relative; }
+        .sub-badge::before { content: ''; position: absolute; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent); }
         .pos-right .sub-badge::before { left: 0; }
         .pos-left  .sub-badge::before { right: 0; }
         .pos-right .sub-badge { clip-path: polygon(17% 0, 100% 0, 92% 100%, 0 100%); padding-left: 32px; padding-right: 32px; }
         .pos-left  .sub-badge { clip-path: polygon(0 0, 80% 0, 100% 100%, 17% 100%); padding-right: 32px; padding-left: 32px; }
         .sub-badge-text { position: relative; z-index: 1; }
 
-        /* =========================================
-           CARD SIDE BANNER — Same style as substitution
-           ========================================= */
-        .card-side-banner {
-            /* inherits all .side-banner styles */
-        }
-        /* Card banner gets same positioning but with a smaller stack offset to avoid overlap with subs */
+        .card-side-banner { }
         .card-side-banner.pos-left  { left: 210px; }
         .card-side-banner.pos-right { right: 210px; }
 
-        .card-track {
-            position: relative;
-            width: 340px;
-            overflow: hidden;
-        }
-        .card-row {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 100%;
-            display: flex; align-items: center; gap: 12px;
-            padding: 0 36px;
-            z-index: 1;
-        }
+        .card-track { position: relative; width: 340px; overflow: hidden; }
+        .card-row { position: absolute; top: 0; left: 0; right: 0; height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 36px; z-index: 1; }
         .pos-left .card-row { flex-direction: row-reverse; }
-        .card-side-banner .sub-name {
-            font-family: 'Mukta', 'Oswald', sans-serif;
-            font-size: 22px; font-weight: 800;
-            letter-spacing: 1px; color: #FFFFFF;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-            overflow: hidden; text-overflow: ellipsis;
-            flex: 1; text-align: left;
-        }
+        .card-side-banner .sub-name { font-family: 'Mukta', 'Oswald', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left; }
         .card-side-banner.pos-left .sub-name { text-align: right; }
 
-        /* Card color variants for the badge */
-        .card-side-banner.yellow .sub-badge {
-            background: linear-gradient(to bottom, #FFEB3B, #F57F17);
-            color: #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
-        }
-        .card-side-banner.red .sub-badge {
-            background: linear-gradient(to bottom, #EF4444, #7F1D1D);
-            color: #FFF;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
-        }
-        .card-side-banner.green .sub-badge {
-            background: linear-gradient(to bottom, #4ADE80, #15803D);
-            color: #FFF;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-        }
+        .card-side-banner.yellow .sub-badge { background: linear-gradient(to bottom, #FFEB3B, #F57F17); color: #000; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); }
+        .card-side-banner.red .sub-badge { background: linear-gradient(to bottom, #EF4444, #7F1D1D); color: #FFF; box-shadow: inset 0 0 20px rgba(0,0,0,0.4); }
+        .card-side-banner.green .sub-badge { background: linear-gradient(to bottom, #4ADE80, #15803D); color: #FFF; box-shadow: inset 0 0 20px rgba(0,0,0,0.3); }
 
-        /* MAIN SCOREBOARD ROW */
-        .main-row {
-            display: flex; align-items: flex-start; justify-content: center;
-            z-index: 10; height: 85px;
-            width: 100%;             /* full 1920 so absolute timers can use 50% */
-            position: relative;      /* anchor for suspension timers */
-        }
+        .main-row { display: flex; align-items: flex-start; justify-content: center; z-index: 10; height: 85px; width: 100%; position: relative; }
         .team-left-wrap { width: 460px; height: 80px; clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%); padding: 4px; padding-right: 5px; z-index: 1; transition: filter 0.4s ease; }
         .team-left-wrap.dod-active { filter: drop-shadow(0 0 20px #FF0000) drop-shadow(0 0 40px #FF0000); }
         .team-left-inner { width: 100%; height: 100%; clip-path: polygon(1% 0, 90% 0, 99.5% 100%, 10% 100%); display: flex; align-items: center; justify-content: center; color: white; font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 800; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); box-shadow: inset 0px 20px 20px rgba(255,255,255,0.2), inset 0px -20px 20px rgba(0,0,0,0.5); transition: background 0.5s ease, box-shadow 0.5s ease; position: relative; }
         .team-left-inner.dod-active { background: linear-gradient(to right, #4A0000, #D32F2F) !important; animation: dodBarPulse 1s infinite alternate; }
         @keyframes dodBarPulse { from{box-shadow:inset 0px 20px 20px rgba(255,255,255,.2),inset 0px -20px 20px rgba(0,0,0,.5),inset 0 0 20px rgba(255,0,0,.4)} to{box-shadow:inset 0px 20px 20px rgba(255,255,255,.2),inset 0px -20px 20px rgba(0,0,0,.5),inset 0 0 50px rgba(255,0,0,.9)} }
         .name-rotator { position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .team-name-text, .raider-name-text { position: absolute; width: 100%; text-align: center; transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease; will-change: transform, opacity; }
+
+        /* 🚨 Team/Raider name animation — 3 states each */
+        .team-name-text, .raider-name-text {
+            position: absolute; width: 100%; text-align: center;
+            transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            will-change: transform, opacity;
+        }
+        /* TEAM: base = center visible */
         .team-name-text { transform: translateY(0); opacity: 1; }
         .team-name-text.out { transform: translateY(-130%); opacity: 0; }
-        .raider-name-text { transform: translateY(130%); opacity: 0; color: #FFF; text-shadow: 2px 2px 6px rgba(0,0,0,0.95); font-weight: 900; }
+        /* SNAP-BELOW state (used briefly before sliding up) */
+        .team-name-text.below {
+            transform: translateY(130%);
+            opacity: 0;
+            transition: none;
+        }
+        /* RAIDER: base = below hidden */
+        .raider-name-text {
+            transform: translateY(130%); opacity: 0; color: #FFF;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.95); font-weight: 900;
+        }
         .raider-name-text.show { transform: translateY(0); opacity: 1; }
         .raider-name-text.out { transform: translateY(-130%); opacity: 0; }
+        /* SNAP-BELOW state (used briefly before sliding up) */
+        .raider-name-text.below {
+            transform: translateY(130%);
+            opacity: 0;
+            transition: none;
+            color: #FFF;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.95);
+            font-weight: 900;
+        }
+
         .score-left-wrap { width: 180px; height: 80px; clip-path: polygon(0 0, 72% 0, 100% 100%, 26% 100%); margin-left: -40px; z-index: 2; padding: 5px; }
         .score-left-inner { width: 100%; height: 100%; background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); clip-path: polygon(2% 0, 71% 0, 98% 100%, 26% 100%); display: flex; align-items: center; justify-content: center; color: black; font-family: 'Teko', sans-serif; font-size: 75px; font-weight: 700; padding-left: 15px; padding-top: 10px; box-shadow: inset 0px 10px 15px rgba(0,0,0,0.2); }
         .center-wrap { width: 140px; height: 100px; clip-path: polygon(0% 0%, 100% 0%, 65% 80%, 35% 80%); margin: 0 -45px; z-index: 3; padding: 5px; }
@@ -304,92 +209,22 @@
         .team-right-inner { width: 100%; height: 100%; clip-path: polygon(10% 0, 99.2% 0, 90% 100%, .5% 100%); display: flex; align-items: center; justify-content: center; color: white; font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 800; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); box-shadow: inset 0px 20px 20px rgba(255,255,255,0.2), inset 0px -20px 20px rgba(0,0,0,0.5); transition: background 0.5s ease, box-shadow 0.5s ease; }
         .team-right-inner.dod-active { background: linear-gradient(to left, #4A0000, #D32F2F) !important; animation: dodBarPulse 1s infinite alternate; }
 
-        /* =========================================
-           🚨 SUSPENSION TIMER — polygon + slide-in
-           ========================================= */
-        .suspension-timer {
-            position: absolute;
-            top: 0;
-            width: 180px;
-            height: 65px;
-            padding: 5px;
-            z-index: 0;                 /* behind team-wrap (z-index: 1) */
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        opacity 0.35s ease;
-            background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%);
-            will-change: transform, opacity;
-        }
-        .suspension-timer.suspension-left {
-            left: calc(50% - 761px);
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 24% 100%);
-            -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 24% 100%);
-            margin-top: 6px;
-            transform: translateX(100%);   /* start hidden behind team-wrap */
-        }
-        .suspension-timer.suspension-right {
-            right: calc(50% - 761px);
-            clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%);
-            -webkit-clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%);
-            margin-top: 6px;
-            transform: translateX(-100%);  /* start hidden behind team-wrap */
-        }
-        .suspension-timer.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .suspension-timer-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0;
-            color: #FFF;
-            background: linear-gradient(to bottom, #FFFFFF, #D0D0D0);
-            box-shadow: inset 0px 20px 20px rgba(255,255,255,0.15), inset 0px -20px 20px rgba(0,0,0,0.4);
-        }
-        .suspension-timer.suspension-left .suspension-timer-inner {
-            clip-path: polygon(2% 0, 100% 0, 98% 100%, 23.5% 100%);
-            -webkit-clip-path: polygon(2% 0, 100% 0, 98% 100%, 23.5% 100%);
-        }
-        .suspension-timer.suspension-right .suspension-timer-inner {
-            clip-path: polygon(0 0, 96.5% 0, 76% 100%, 0% 100%);
-            -webkit-clip-path: polygon(0 0, 96.5% 0, 76% 100%, 0% 100%);
-        }
-        .suspension-time {
-            font-family: 'Teko', sans-serif;
-            font-size: 44px;
-            font-weight: 700;
-            line-height: 1;
-            color: #000;
-            font-variant-numeric: tabular-nums;
-        }
-        .suspension-player {
-            font-family: 'Mukta', sans-serif;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: #000;
-            text-transform: uppercase;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding: 0 8px;
-            margin-top: -10px;
-        }
+        .suspension-timer { position: absolute; top: 0; width: 180px; height: 65px; padding: 5px; z-index: 0; opacity: 0; pointer-events: none; transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease; background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%); will-change: transform, opacity; }
+        .suspension-timer.suspension-left { left: calc(50% - 761px); clip-path: polygon(0 0, 100% 0, 100% 100%, 24% 100%); -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 24% 100%); margin-top: 6px; transform: translateX(100%); }
+        .suspension-timer.suspension-right { right: calc(50% - 761px); clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%); -webkit-clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%); margin-top: 6px; transform: translateX(-100%); }
+        .suspension-timer.show { opacity: 1; transform: translateX(0); }
+        .suspension-timer-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; color: #FFF; background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); box-shadow: inset 0px 20px 20px rgba(255,255,255,0.15), inset 0px -20px 20px rgba(0,0,0,0.4); }
+        .suspension-timer.suspension-left .suspension-timer-inner { clip-path: polygon(2% 0, 100% 0, 98% 100%, 23.5% 100%); -webkit-clip-path: polygon(2% 0, 100% 0, 98% 100%, 23.5% 100%); }
+        .suspension-timer.suspension-right .suspension-timer-inner { clip-path: polygon(0 0, 96.5% 0, 76% 100%, 0% 100%); -webkit-clip-path: polygon(0 0, 96.5% 0, 76% 100%, 0% 100%); }
+        .suspension-time { font-family: 'Teko', sans-serif; font-size: 44px; font-weight: 700; line-height: 1; color: #000; font-variant-numeric: tabular-nums; }
+        .suspension-player { font-family: 'Mukta', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: #000; text-transform: uppercase; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; margin-top: -10px; }
 
-        /* MATCH END */
         .match-end-row { display: none; position: relative; height: 96px; padding: 5px; margin-top: 10px; margin-bottom: 3px; z-index: 10; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%); clip-path: polygon(0% 0, 100% 0, 96% 100%, 4% 100%); }
         .match-end-row.show { display: flex; justify-content: center; align-items: center; opacity: 1; transform: translateY(0); }
         .match-end-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 0 100px; background: var(--winner-color, #14141F); clip-path: polygon(.5% 0, 99.5% 0, 96% 100%, 4% 100%); box-shadow: inset 0 0 40px rgba(255,255,255,0.10), 0 0 45px var(--winner-color-soft, rgba(212,175,55,0.55)); transition: background 0.5s ease, box-shadow 0.5s ease; }
         .me-final-score { font-family: 'Teko', sans-serif; font-size: 46px; font-weight: 700; color: #FFD700; text-shadow: 0 0 22px rgba(255,215,0,0.85), 1px 1px 4px rgba(0,0,0,0.9); letter-spacing: 6px; line-height: 1; white-space: nowrap; padding-top: 15px; }
         .me-result-text { font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 700; color: #FFFFFF; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 6px rgba(0,0,0,0.95); white-space: nowrap; margin-top: -20px; }
 
-        /* BOTTOM ROW */
         .bottom-row { display: flex; align-items: flex-start; justify-content: center; width: 100%; margin-top: -12px; z-index: 0; }
         .dots-left-wrap { width: 310px; height: 38px; clip-path: polygon(0 0, 93% 0, 100% 100%, 7% 100%); padding: 4px; margin-right: 0px; position: relative; overflow: visible; transition: opacity 0.4s ease, transform 0.4s ease; }
         .dots-left-inner { width: 100%; height: 100%; clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); display: flex; align-items: center; justify-content: flex-end; padding-right: 45px; gap: 10px; padding-top: 5px; }
@@ -408,7 +243,6 @@
         .dot.active { background: var(--dot-active-color, #00FF00); border-color: #FFFFFF; box-shadow: 0 0 10px var(--dot-active-color, #00FF00), 0 0 4px #FFFFFF inset; }
         .dots-left-wrap.result-hidden, .dots-right-wrap.result-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
 
-        /* MARQUEE */
         .marquee-row { display: flex; justify-content: center; align-items: center; width: 100%; margin-top: -17px; z-index: 6; position: relative; transition: opacity 0.4s ease, transform 0.4s ease; }
         .marquee-row.result-hidden { opacity: 0; transform: translateY(20px); }
         .marquee-box { width: 310px; height: 20px; border-radius: 3px; overflow: hidden; position: relative; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%); }
@@ -419,13 +253,11 @@
         @keyframes marqueeScroll { from{transform:translateX(0)} to{transform:translateX(calc(-100% - 310px))} }
         .marquee-spacer { width: 500px; height: 1px; flex-shrink: 0; }
 
-        /* CENTER POPUP */
         @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.2);color:#FFD700;text-shadow:0px 0px 20px #FFD700} 100%{transform:scale(1)} }
         .score-pop { animation: pop 0.6s ease-in-out; }
         .center-popup { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5); background: linear-gradient(to bottom, #D32F2F, #8B0000); border: 5px solid #FFD700; border-radius: 15px; padding: 20px 100px; color: white; font-family: 'Teko', sans-serif; font-size: 90px; font-weight: 700; letter-spacing: 6px; box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); white-space: nowrap; text-transform: uppercase; z-index: 200; }
         .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-        /* EPIC OVERLAY */
         .epic-overlay { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; visibility: hidden; pointer-events: none; overflow: hidden; }
         .epic-overlay.visible { visibility: visible; }
         .epic-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; opacity: 1; z-index: 1; }
@@ -447,7 +279,6 @@
         @keyframes epicHold { from{transform:scale(1)} to{transform:scale(1.05)} }
         @keyframes epicContainerExit { 0%{transform:scale(1.05);opacity:1} 100%{transform:scale(25);opacity:0} }
 
-        /* FS OVERLAYS */
         .fs-overlay { position: fixed; inset: 0; z-index: 9990; display: none; justify-content: center; align-items: center; overflow: hidden; }
         .fs-overlay.show { display: flex; animation: fsFadeIn 0.35s ease-out; }
         @keyframes fsFadeIn { from{opacity:0} to{opacity:1} }
@@ -457,7 +288,6 @@
         .fs-powered-by .fp-icon img { width: 100%; height: 100%; object-fit: contain; }
         .fs-powered-by .fp-text { color: #FFF; font-weight: 700; font-size: 16px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
 
-        /* STARTING 7 */
         #starting7-overlay { background: transparent; }
         #starting7-overlay .s7-bg { position: absolute; inset: 0; background: url('/images/subs_mate.jpg') center/cover no-repeat; background-color: #1A1A2E; z-index: 1; }
         #starting7-overlay .s7-bg::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
@@ -480,7 +310,6 @@
         #starting7-overlay .s7-team-name { font-family: 'Oswald', sans-serif; font-size: 68px; font-weight: 900; color: rgba(255,255,255,0.35); text-align: center; line-height: 0.95; letter-spacing: 2px; text-transform: uppercase; transform: perspective(500px) rotateX(40deg); text-shadow: 0 6px 12px rgba(0,0,0,0.8); }
         #starting7-overlay .s7-subtitle { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.35); letter-spacing: 6px; text-transform: uppercase; transform: perspective(500px) rotateX(40deg); margin-top: -6px; }
 
-        /* TEAM STATS */
         #team-stats-overlay { background: #000; }
         #team-stats-overlay .ts-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; z-index: 1; }
         #team-stats-overlay .ts-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.62); z-index: 2; }
@@ -506,7 +335,6 @@
         #team-stats-overlay .ts-team-label { font-family: 'Segoe UI', sans-serif; font-weight: 700; font-size: 28px; color: #FFF; text-shadow: 3px 3px 5px #000; text-transform: uppercase; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #team-stats-overlay .ts-vs { font-family: 'Segoe UI', sans-serif; font-weight: 900; font-size: 44px; color: #9C27B0; text-shadow: 4px 4px 8px #000; }
 
-        /* PLAYER PERFORMANCE */
         #player-perf-overlay { background: transparent; }
         #player-perf-overlay .pp-bg { position: absolute; inset: 0; background: url('/images/performance_bg.jpg') center/cover no-repeat; background-color: #0B0B18; z-index: 1; }
         #player-perf-overlay .pp-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(15,10,35,0.65) 0%, rgba(5,5,15,0.95) 100%); }
@@ -571,7 +399,6 @@
         #player-perf-overlay .pp-rate-value { position: relative; z-index: 2; font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 800; color: #110A20; font-variant-numeric: tabular-nums; }
         #player-perf-overlay .pp-rate-label { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; line-height: 1.3; }
 
-        /* L5 BANNER */
         .l5-banner {
             display: flex; align-items: center; justify-content: center;
             gap: 18px; height: 42px; padding: 0 30px; margin-bottom: 5px;
@@ -584,21 +411,10 @@
             clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%);
         }
         .l5-banner.show { opacity: 1; transform: translateY(0); }
-        .l5-text {
-            font-family: 'Mukta', sans-serif; font-size: 17px; font-weight: 700;
-            color: #000; letter-spacing: 1px;
-        }
-        .l5-pts {
-            font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700;
-            line-height: 1; color: #FFF;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-        }
+        .l5-text { font-family: 'Mukta', sans-serif; font-size: 17px; font-weight: 700; color: #000; letter-spacing: 1px; }
+        .l5-pts { font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; color: #FFF; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
 
-                /* =========================================
-           🚨 RAID EVENT POPUP — full-width sliding banner
-           (replaces the old center-popup)
-           ========================================= */
-                .raid-event-popup {
+        .raid-event-popup {
             position: absolute;
             bottom: calc(100% + 50px);
             left: calc(50% - 625px);
@@ -619,7 +435,6 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-        /* 🚨 Lifts up 55px when L5 banner is on screen */
         .raid-event-popup.l5-active {
             translate: 0 -55px;
         }
@@ -656,11 +471,11 @@
             border-color: #D1C4E9;
         }
 
-         .rep-marquee {
+        .rep-marquee {
             flex: 1;
             position: relative;
             overflow: hidden;
-            /* No border, no background, no mask — just a clean clipping container */
+            /* No border, no background — clean clipping container */
         }
         .rep-marquee-content {
             position: absolute;
@@ -677,7 +492,7 @@
             color: #FFF;
             text-shadow: 0 2px 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.75);
             will-change: transform;
-            /* No CSS animation — JS-driven for bulletproof positioning */
+            /* JS-driven animation */
         }
     </style>
 </head>
@@ -685,7 +500,6 @@
 
     <div class="broadcast-stage">
 
-        <!-- LAST 5 MINUTES BANNER -->
         <div id="l5-banner" class="l5-banner">
             <div class="l5-pts" id="l5-left-pts" style="clip-path: polygon(0% 0,100% 0, 100% 100%, 50% 100%); margin-left: -112px; padding: 10px 20px 10px 130px;">0</div>
             <div class="l5-text">LAST 5 MINUTES</div>
@@ -741,7 +555,6 @@
             <span class="siren-icon">🚨</span>
         </div>
 
-        <!-- SUBSTITUTION BANNER -->
         <div id="side-banner" class="side-banner pos-right">
             <div class="sub-track">
                 <div class="sub-row sub-row-out" id="sub-row-out">
@@ -758,7 +571,6 @@
             </div>
         </div>
 
-        <!-- 🚨 FOUL CARD BANNER (side-banner style) -->
         <div id="card-side-banner" class="side-banner card-side-banner pos-right">
             <div class="card-track">
                 <div class="card-row">
@@ -781,15 +593,13 @@
 
         <div class="main-row" id="main-row">
 
-            <!-- 🚨 RAID EVENT POPUP — Bonus / Super Tackle alert (upgraded center-popup) -->
             <div id="center-popup" class="raid-event-popup">
                 <div class="rep-label bonus" id="rep-label">BONUS IS ON</div>
                 <div class="rep-marquee">
-                    <div class="rep-marquee-content" id="rep-marquee-content">⭐ Bonus is on...</div>
+                    <div class="rep-marquee-content" id="rep-marquee-content">A Bonus Point is awarded when a raider crosses the bonus line with one foot in the air while 6+ defenders are active.</div>
                 </div>
             </div>
 
-            <!-- 🚨 LEFT SUSPENSION TIMER -->
             <div id="left-suspension-timer" class="suspension-timer suspension-left">
                 <div class="suspension-timer-inner">
                     <div class="suspension-time" id="left-suspension-time">120</div>
@@ -822,7 +632,6 @@
                 </div>
             </div>
 
-            <!-- 🚨 RIGHT SUSPENSION TIMER -->
             <div id="right-suspension-timer" class="suspension-timer suspension-right">
                 <div class="suspension-timer-inner">
                     <div class="suspension-time" id="right-suspension-time">120</div>
@@ -1131,10 +940,9 @@
         let lastOverlayPlayerId = '';
         let seenLogKeys = new Set();
         let initialLoadDone = false;
-                // 🚨 Marquee RAF state
+
         let marqueeRafId = null;
 
-        // 🚨 L5 state
         let lastL5TriggerBucket = 0;
         window.pendingLeftScore = undefined;
         window.pendingRightScore = undefined;
@@ -1276,84 +1084,76 @@
         // ==========================================
         // 🚨 LAST 5 MINUTES ENGINE
         // ==========================================
-        // 🚨 Track last clock + half to prevent spurious triggers when paused
-let lastProcessedL5Clock = null;
-let lastKnownHalfNum = 1;
+        let lastProcessedL5Clock = null;
+        let lastKnownHalfNum = 1;
 
-function handleLast5MinutesUpdate(data, existingState) {
-    if (!data || !data.match_duration_mins) return;
+        function handleLast5MinutesUpdate(data, existingState) {
+            if (!data || !data.match_duration_mins) return;
 
-    // ---- GUARD 1: Skip during breaks ----
-    const breakTitle = (data.break_clock_title || '').trim();
-    const breakTime  = (data.break_clock_time  || '').trim();
-    if (breakTitle.length > 0 && breakTime.length > 0 && breakTime !== '00:00') return;
+            const breakTitle = (data.break_clock_title || '').trim();
+            const breakTime  = (data.break_clock_time  || '').trim();
+            if (breakTitle.length > 0 && breakTime.length > 0 && breakTime !== '00:00') return;
 
-    // ---- GUARD 2: Skip if main_clock hasn't advanced ----
-    const currentClock = (data.main_clock || '').trim();
-    if (!currentClock || !currentClock.includes(':')) return;
-    if (currentClock === lastProcessedL5Clock) return;
+            const currentClock = (data.main_clock || '').trim();
+            if (!currentClock || !currentClock.includes(':')) return;
+            if (currentClock === lastProcessedL5Clock) return;
 
-    // ---- GUARD 3: Reject suspicious clock jumps (going UP mid-half) ----
-    if (lastProcessedL5Clock) {
-        const [lm, ls] = lastProcessedL5Clock.split(':').map(x => parseInt(x) || 0);
-        const [cm, cs] = currentClock.split(':').map(x => parseInt(x) || 0);
-        const lastSecs = lm * 60 + ls;
-        const currSecs = cm * 60 + cs;
-        if (currSecs > lastSecs + 2) {
-            // Clock went UP — bad data / reset value. Update tracker and skip.
+            if (lastProcessedL5Clock) {
+                const [lm, ls] = lastProcessedL5Clock.split(':').map(x => parseInt(x) || 0);
+                const [cm, cs] = currentClock.split(':').map(x => parseInt(x) || 0);
+                const lastSecs = lm * 60 + ls;
+                const currSecs = cm * 60 + cs;
+                if (currSecs > lastSecs + 2) {
+                    lastProcessedL5Clock = currentClock;
+                    return;
+                }
+            }
             lastProcessedL5Clock = currentClock;
-            return;
+
+            let state = existingState;
+            if (!state && data.state_json) {
+                try { state = JSON.parse(data.state_json); } catch (e) { return; }
+            }
+            if (!state || !state.logsJson) return;
+
+            const halfMins = parseInt(data.match_duration_mins) || 20;
+            const halfStatus = (data.half_status || '').toLowerCase();
+
+            let currentHalfNum;
+            if (halfStatus.includes('1st') || halfStatus.includes('first')) currentHalfNum = 1;
+            else if (halfStatus.includes('2nd') || halfStatus.includes('second')) currentHalfNum = 2;
+            else if (halfStatus.includes('over') || halfStatus.includes('full')) currentHalfNum = 2;
+            else currentHalfNum = lastKnownHalfNum;
+            lastKnownHalfNum = currentHalfNum;
+
+            let minsLeft = halfMins;
+            if (data.main_clock && data.main_clock.includes(':')) {
+                const p = data.main_clock.split(':');
+                minsLeft = (parseInt(p[0]) || 0) + ((parseInt(p[1]) || 0) / 60);
+            }
+            const elapsed  = halfMins - minsLeft;
+            const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
+
+            const bucket = Math.floor(absMinute / 5);
+            if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
+                if (bucket > lastL5TriggerBucket + 1) {
+                    lastL5TriggerBucket = bucket;
+                    return;
+                }
+                lastL5TriggerBucket = bucket;
+                let logs = [];
+                try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
+                showLast5MinBanner(
+                    absMinute,
+                    parseInt(data.left_score)  || 0,
+                    parseInt(data.right_score) || 0,
+                    halfMins,
+                    logs,
+                    data.left_color,
+                    data.right_color
+                );
+            }
         }
-    }
-    lastProcessedL5Clock = currentClock;
-
-    let state = existingState;
-    if (!state && data.state_json) {
-        try { state = JSON.parse(data.state_json); } catch (e) { return; }
-    }
-    if (!state || !state.logsJson) return;
-
-    const halfMins = parseInt(data.match_duration_mins) || 20;
-    const halfStatus = (data.half_status || '').toLowerCase();
-
-    // ---- GUARD 4: Robust half detection (never default blindly to 2) ----
-    let currentHalfNum;
-    if (halfStatus.includes('1st') || halfStatus.includes('first')) currentHalfNum = 1;
-    else if (halfStatus.includes('2nd') || halfStatus.includes('second')) currentHalfNum = 2;
-    else if (halfStatus.includes('over') || halfStatus.includes('full')) currentHalfNum = 2;
-    else currentHalfNum = lastKnownHalfNum;   // fallback to last valid value
-    lastKnownHalfNum = currentHalfNum;
-
-    let minsLeft = halfMins;
-    if (data.main_clock && data.main_clock.includes(':')) {
-        const p = data.main_clock.split(':');
-        minsLeft = (parseInt(p[0]) || 0) + ((parseInt(p[1]) || 0) / 60);
-    }
-    const elapsed  = halfMins - minsLeft;
-    const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
-
-    const bucket = Math.floor(absMinute / 5);
-    if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
-        // ---- GUARD 5: Prevent big bucket jumps caused by data glitches ----
-        if (bucket > lastL5TriggerBucket + 1) {
-            lastL5TriggerBucket = bucket;
-            return;
-        }
-
-        lastL5TriggerBucket = bucket;
-        let logs = [];
-        try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
-        showLast5MinBanner(
-            absMinute,
-            parseInt(data.left_score)  || 0,
-            parseInt(data.right_score) || 0,
-            halfMins,
-            logs,
-            data.left_color,
-            data.right_color
-        );
-    }
-}
         function showLast5MinBanner(absMinute, currentL, currentR, halfMins, logs, leftColor, rightColor) {
             const targetMin = absMinute - 5;
             let pastL = 0, pastR = 0;
@@ -1366,9 +1166,7 @@ function handleLast5MinutesUpdate(data, existingState) {
                     const mMatch = timeStr.match(/(\d+)\s*'/);
                     const minInHalf = mMatch ? parseInt(mMatch[1]) : 0;
                     const logAbsMinute = is2nd ? (halfMins + minInHalf) : minInHalf;
-
                     if (logAbsMinute > targetMin) break;
-
                     if (log.scoreStr) {
                         const parts = log.scoreStr.replace(/Score:\s*/i, '').trim().split('-').map(s => parseInt(s.trim()));
                         if (parts.length === 2 && !isNaN(parts[0])) {
@@ -1390,7 +1188,6 @@ function handleLast5MinutesUpdate(data, existingState) {
                 pL.innerText = diffL;
                 pR.innerText = diffR;
 
-                // 🚨 TEAM-GRADIENT BACKGROUND — same logic as team name box
                 const lc = leftColor || currentLeftColor || '#228B22';
                 const rc = rightColor || currentRightColor || '#FF62BB';
                 pL.style.background = `linear-gradient(to right, ${darkenColor(lc, 60)}, ${lc})`;
@@ -1400,7 +1197,6 @@ function handleLast5MinutesUpdate(data, existingState) {
 
                 banner.classList.add('show');
 
-                // 🚨 Lift the raid event popup so it doesn't overlap L5
                 const raidPopup = document.getElementById('center-popup');
                 if (raidPopup) raidPopup.classList.add('l5-active');
 
@@ -1422,7 +1218,6 @@ function handleLast5MinutesUpdate(data, existingState) {
                 try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e) {}
             }
 
-            // Prefer suspended_players array when available
             let lSusp = null, rSusp = null;
             if (data && Array.isArray(data.suspended_players) && data.suspended_players.length) {
                 const l = data.suspended_players.find(p => p.team === 'left');
@@ -1433,7 +1228,6 @@ function handleLast5MinutesUpdate(data, existingState) {
             if (!lSusp) lSusp = leftRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
             if (!rSusp) rSusp = rightRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
 
-            // LEFT
             const lTimer = document.getElementById('left-suspension-timer');
             if (lTimer) {
                 if (lSusp) {
@@ -1441,18 +1235,12 @@ function handleLast5MinutesUpdate(data, existingState) {
                     document.getElementById('left-suspension-time').textContent = secs;
                     document.getElementById('left-suspension-player').textContent =
                         `#${lSusp.jerseyNumber || ''} ${lSusp.name || 'Player'}`.trim();
-                    // Apply team gradient to the inner box
-                    const inner = lTimer.querySelector('.suspension-timer-inner');
-                    if (inner) {
-    inner.style.background = 'linear-gradient(to bottom, #FFFFFF, #D0D0D0)';
-}
                     lTimer.classList.add('show');
                 } else {
                     lTimer.classList.remove('show');
                 }
             }
 
-            // RIGHT
             const rTimer = document.getElementById('right-suspension-timer');
             if (rTimer) {
                 if (rSusp) {
@@ -1460,10 +1248,6 @@ function handleLast5MinutesUpdate(data, existingState) {
                     document.getElementById('right-suspension-time').textContent = secs;
                     document.getElementById('right-suspension-player').textContent =
                         `#${rSusp.jerseyNumber || ''} ${rSusp.name || 'Player'}`.trim();
-                    const inner = rTimer.querySelector('.suspension-timer-inner');
-                    if (inner) {
-    inner.style.background = 'linear-gradient(to bottom, #FFFFFF, #D0D0D0)';
-}
                     rTimer.classList.add('show');
                 } else {
                     rTimer.classList.remove('show');
@@ -1471,7 +1255,7 @@ function handleLast5MinutesUpdate(data, existingState) {
             }
         }
 
-                // ==========================================
+        // ==========================================
         // 🚨 RAID EVENT POPUP (Bonus / Super Tackle alert)
         // ==========================================
         function countAlivePlayers(rosterJsonStr, outIdsStr) {
@@ -1490,23 +1274,24 @@ function handleLast5MinutesUpdate(data, existingState) {
             return Math.max(0, starting7.length - inactive);
         }
 
-                function startMarqueeAnimation() {
+        // 🚨 JS-driven marquee — uses actual measured widths to prevent mid-path clipping
+        function startMarqueeAnimation() {
             const el = document.getElementById('rep-marquee-content');
             if (!el || !el.parentElement) return;
 
             if (marqueeRafId) { cancelAnimationFrame(marqueeRafId); marqueeRafId = null; }
 
-            // Reset cleanly
+            // Reset to start position (left: 100% puts it off-screen right)
             el.style.transform = 'translateX(0)';
-            void el.offsetWidth; // force reflow for fresh measurements
+            void el.offsetWidth; // force reflow
 
             const container = el.parentElement;
             const textWidth = el.scrollWidth;
             const containerWidth = container.clientWidth;
             const totalDistance = textWidth + containerWidth;
-            if (totalDistance <= 0) return;
+            if (totalDistance <= 0 || textWidth <= 0) return;
 
-            const speed = 130; // pixels / second
+            const speed = 130; // px/sec
             const duration = (totalDistance / speed) * 1000;
             let startTime = null;
 
@@ -1524,7 +1309,6 @@ function handleLast5MinutesUpdate(data, existingState) {
             if (marqueeRafId) { cancelAnimationFrame(marqueeRafId); marqueeRafId = null; }
         }
 
-        // Restart marquee when user returns to the tab (fixes the tab-switch quirk)
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) return;
             const popup = document.getElementById('center-popup');
@@ -1542,8 +1326,12 @@ function handleLast5MinutesUpdate(data, existingState) {
                 || (!isNaN(raidClock) && raidClock > 0 && raidClock < 30);
 
             if (!raidActive) {
-                popup.classList.remove('show');
-                stopMarqueeAnimation();
+                if (popup.classList.contains('show')) {
+                    popup.classList.remove('show');
+                    stopMarqueeAnimation();
+                }
+                const mq = document.getElementById('rep-marquee-content');
+                if (mq) mq.dataset.state = '';
                 return;
             }
 
@@ -1552,9 +1340,8 @@ function handleLast5MinutesUpdate(data, existingState) {
                 ? state.currentRaidTeamIsLeft
                 : state.currentRaidTeamsLeft;
             if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
-            else if (raw === false || raw === 0 ||
+            else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
 
-            // Defending team's alive count
             const defenderCount = isLeftRaid
                 ? countAlivePlayers(state.rightRosterJson, state.rightOutIds)
                 : countAlivePlayers(state.leftRosterJson, state.leftOutIds);
@@ -1563,35 +1350,51 @@ function handleLast5MinutesUpdate(data, existingState) {
             const marqueeEl = document.getElementById('rep-marquee-content');
             if (!labelEl || !marqueeEl) return;
 
-                        if (defenderCount >= 6) {
-                // 🟡 BONUS IS ON (6 or 7 defenders on mat)
-                if (labelEl.className !== 'rep-label bonus') {
-                    labelEl.className = 'rep-label bonus';
-                    labelEl.innerText = 'BONUS IS ON';
-                }
-                const msg = 'A Bonus Point is awarded when a raider crosses the bonus line with one foot in the air while 6+ defenders are active.';
-                const stateKey = 'bonus-' + defenderCount;
-                if (marqueeEl.dataset.state !== stateKey) {
-                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
-                    marqueeEl.dataset.state = stateKey;
-                }
-                popup.classList.add('show');
+            let type = null, newStateKey = '', labelClass = '', labelText = '', msg = '';
+
+            if (defenderCount >= 6) {
+                type = 'bonus';
+                newStateKey = 'bonus-' + defenderCount;
+                labelClass = 'rep-label bonus';
+                labelText = 'BONUS IS ON';
+                msg = 'A Bonus Point is awarded when a raider crosses the bonus line with one foot in the air while 6+ defenders are active.';
             } else if (defenderCount <= 3) {
-                // 🟣 SUPER TACKLE IS ON (3 or fewer defenders on mat)
-                if (labelEl.className !== 'rep-label super-tackle') {
-                    labelEl.className = 'rep-label super-tackle';
-                    labelEl.innerText = 'SUPER TACKLE IS ON';
+                type = 'super';
+                newStateKey = 'super-' + defenderCount;
+                labelClass = 'rep-label super-tackle';
+                labelText = 'SUPER TACKLE IS ON';
+                msg = 'If 3 or less defenders remain on the mat, a super tackle gives the team 2 points.';
+            }
+
+            if (!type) {
+                if (popup.classList.contains('show')) {
+                    popup.classList.remove('show');
+                    stopMarqueeAnimation();
                 }
-                const msg = 'If 3 or less defenders remain on the mat, a super tackle gives the team 2 points.';
-                const stateKey = 'super-' + defenderCount;
-                if (marqueeEl.dataset.state !== stateKey) {
-                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
-                    marqueeEl.dataset.state = stateKey;
-                }
+                marqueeEl.dataset.state = '';
+                return;
+            }
+
+            let needsRestart = false;
+
+            if (labelEl.className !== labelClass) {
+                labelEl.className = labelClass;
+                labelEl.innerText = labelText;
+            }
+
+            if (marqueeEl.dataset.state !== newStateKey) {
+                marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
+                marqueeEl.dataset.state = newStateKey;
+                needsRestart = true;
+            }
+
+            if (!popup.classList.contains('show')) {
                 popup.classList.add('show');
-            } else {
-                // 4 or 5 defenders — normal raid, no alert
-                popup.classList.remove('show');
+                needsRestart = true;
+            }
+
+            if (needsRestart) {
+                startMarqueeAnimation();
             }
         }
 
@@ -1626,7 +1429,6 @@ function handleLast5MinutesUpdate(data, existingState) {
                 currentLeftColor  = leftColor;
                 currentRightColor = rightColor;
 
-                // ---- 1. STATE + EVENT TIMELINE FIRST ----
                 let state = null;
                 if (data.state_json) {
                     try {
@@ -1638,7 +1440,7 @@ function handleLast5MinutesUpdate(data, existingState) {
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
 
-                        updateRaidEventPopup(state, data);   // 🚨 NEW: Bonus / Super Tackle alert
+                        updateRaidEventPopup(state, data);
 
                         handleEventTimeline(state);
                     } catch (e) {
@@ -1646,7 +1448,6 @@ function handleLast5MinutesUpdate(data, existingState) {
                     }
                 }
 
-                // ---- 2. UI NAMES & COLORS ----
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
 
@@ -1666,13 +1467,9 @@ function handleLast5MinutesUpdate(data, existingState) {
                     lastRightColor = rightColor;
                 }
 
-                // ---- 3. L5 BANNER ----
                 handleLast5MinutesUpdate(data, state);
-
-                // ---- 3b. 🚨 SUSPENSION TIMERS (auto slide in / out) ----
                 updateSuspensionTimers(data, state);
 
-                // ---- 4. SCORES (with epic hold) ----
                 const leftScore  = data.left_score  || 0;
                 const rightScore = data.right_score || 0;
 
@@ -1686,7 +1483,6 @@ function handleLast5MinutesUpdate(data, existingState) {
                     previousRightScore = rightScore;
                 }
 
-                // ---- 5. CLOCK, MATCH-END, OVERLAYS ----
                 applyCenterClockAndStatus(data);
 
                 const matchOver = !!data.match_result
@@ -1938,7 +1734,7 @@ function handleLast5MinutesUpdate(data, existingState) {
         }
 
         // ==========================================
-        // RAIDER NAME ROTATION
+        // 🚨 RAIDER NAME ROTATION — smooth slide from BELOW
         // ==========================================
         function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
@@ -1978,6 +1774,20 @@ function handleLast5MinutesUpdate(data, existingState) {
             }
         }
 
+        // Helper: snap element to "below center" with no transition
+        function snapBelow(el) {
+            el.classList.remove('out', 'show');
+            el.classList.add('below');
+            void el.offsetWidth;   // force reflow to register the below state
+            el.classList.remove('below');
+        }
+
+        // Helper: snap element to "above center" (out state) with no transition
+        function snapAbove(el) {
+            el.classList.remove('show', 'below');
+            el.classList.add('out');
+        }
+
         function startRaiderRotation(side, raiderName) {
             const st = raiderRotationState[side];
             if (st.active && st.currentRaider === raiderName) return;
@@ -1996,24 +1806,33 @@ function handleLast5MinutesUpdate(data, existingState) {
             st.active = true;
             st.currentRaider = raiderName;
 
-            nameEl.classList.remove('out');
-            raiderEl.classList.remove('show', 'out');
-            nameEl.classList.add('out');
-            raiderEl.classList.add('show');
+            // === INITIAL TRANSITION: team slides up, raider slides up from below ===
+            nameEl.classList.add('out');         // team slides up out
+            snapBelow(raiderEl);                 // snap raider to below (no visual jump — it's already below)
+            raiderEl.classList.add('show');      // raider slides up from below to center
 
             let showingRaider = true;
+
             const tick = () => {
                 if (!st.active) return;
+
                 if (showingRaider) {
+                    // === SWITCH TO TEAM: raider slides up out, team slides up from below ===
                     raiderEl.classList.remove('show');
-                    raiderEl.classList.add('out');
-                    nameEl.classList.remove('out');
+                    raiderEl.classList.add('out');   // raider slides up out
+
+                    snapBelow(nameEl);               // snap team to below (no visual transition)
+                    // (team slides up smoothly to center by removing 'below')
+
                     showingRaider = false;
                     st.timer = setTimeout(tick, 5000);
                 } else {
-                    nameEl.classList.add('out');
-                    raiderEl.classList.remove('out');
-                    raiderEl.classList.add('show');
+                    // === SWITCH TO RAIDER: team slides up out, raider slides up from below ===
+                    nameEl.classList.add('out');     // team slides up out
+
+                    snapBelow(raiderEl);             // snap raider to below
+                    raiderEl.classList.add('show');  // raider slides up to center
+
                     showingRaider = true;
                     st.timer = setTimeout(tick, 3000);
                 }
@@ -2029,8 +1848,8 @@ function handleLast5MinutesUpdate(data, existingState) {
             if (!container) return;
             const nameEl   = container.querySelector('.team-name-text');
             const raiderEl = container.querySelector('.raider-name-text');
-            raiderEl.classList.remove('show', 'out');
-            nameEl.classList.remove('out');
+            raiderEl.classList.remove('show', 'out', 'below');
+            nameEl.classList.remove('out', 'below');
         }
 
         // ==========================================
@@ -2082,7 +1901,7 @@ function handleLast5MinutesUpdate(data, existingState) {
         }
 
         // ==========================================
-        // SUBSTITUTION BANNER (Team-gradient background)
+        // SUBSTITUTION BANNER
         // ==========================================
         let subBannerTimeoutIds = [];
         function triggerSubstitutionGraphic(descText, isLeftTeam) {
@@ -2102,8 +1921,7 @@ function handleLast5MinutesUpdate(data, existingState) {
             outNameEl.innerText = outName;
             inNameEl.innerText  = inName;
 
-            // 🚨 Team-gradient background (same logic as team name box)
-            const isLeft = isLeftTeam !== false; // treat undefined as left
+            const isLeft = isLeftTeam !== false;
             const teamColor = isLeft ? currentLeftColor : currentRightColor;
             const darkColor = darkenColor(teamColor, 60);
             banner.style.background = isLeft
@@ -2125,50 +1943,41 @@ function handleLast5MinutesUpdate(data, existingState) {
         }
 
         // ==========================================
-        // 🚨 FOUL CARD SIDE BANNER
+        // FOUL CARD SIDE BANNER
         // ==========================================
         let cardBannerTimeoutIds = [];
 
         function isCardEvent(log) {
-    if (!log) return false;
-    const typeUc  = (log.type  || '').toUpperCase();
-    const titleLc = (log.title || '').toLowerCase();
+            if (!log) return false;
+            const typeUc  = (log.type  || '').toUpperCase();
+            const titleLc = (log.title || '').toLowerCase();
 
-    // ✅ Primary: only accept actual CARD types
-    if (typeUc === 'CARD' || typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') {
-        return true;
-    }
+            if (typeUc === 'CARD' || typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') {
+                return true;
+            }
+            if (/(yellow|red|green)\s*card/i.test(titleLc)) return true;
+            if (titleLc.includes('येलो') || titleLc.includes('रेड') || titleLc.includes('ग्रीन')) return true;
+            if (typeUc === 'EXTRA' || typeUc === 'TECHNICAL' || titleLc.includes('penalty') || titleLc.includes('technical')) {
+                return false;
+            }
+            return false;
+        }
 
-    // ✅ Fallback: title must contain a SPECIFIC card keyword (not "card" alone)
-    // ⚠️ DO NOT check desc — "Penalty awarded for Yellow Card" has isLeftTeam:false
-    //    and would otherwise override the real card banner onto the wrong side.
-    if (/(yellow|red|green)\s*card/i.test(titleLc)) return true;
-    if (titleLc.includes('येलो') || titleLc.includes('रेड') || titleLc.includes('ग्रीन')) return true;
+        function detectCardColor(log) {
+            const titleLc = (log.title || '').toLowerCase();
+            const typeUc  = (log.type  || '').toUpperCase();
+            const descLc  = (log.desc  || '').toLowerCase();
 
-    // Explicitly reject penalty/technical/extra logs
-    if (typeUc === 'EXTRA' || typeUc === 'TECHNICAL' || titleLc.includes('penalty') || titleLc.includes('technical')) {
-        return false;
-    }
+            const priority = titleLc + ' ' + typeUc.toLowerCase();
+            if (priority.includes('red')    || priority.includes('रेड'))   return 'red';
+            if (priority.includes('green')  || priority.includes('ग्रीन')) return 'green';
+            if (priority.includes('yellow') || priority.includes('येलो') || priority.includes('पीला')) return 'yellow';
 
-    return false;
-}
+            if (descLc.includes('red')    || descLc.includes('रेड'))   return 'red';
+            if (descLc.includes('green')  || descLc.includes('ग्रीन')) return 'green';
+            return 'yellow';
+        }
 
-function detectCardColor(log) {
-    const titleLc = (log.title || '').toLowerCase();
-    const typeUc  = (log.type  || '').toUpperCase();
-    const descLc  = (log.desc  || '').toLowerCase();
-
-    // Prioritize authoritative fields (title + type)
-    const priority = titleLc + ' ' + typeUc.toLowerCase();
-    if (priority.includes('red')    || priority.includes('रेड'))   return 'red';
-    if (priority.includes('green')  || priority.includes('ग्रीन')) return 'green';
-    if (priority.includes('yellow') || priority.includes('येलो') || priority.includes('पीला')) return 'yellow';
-
-    // Fallback to description only if title/type had no answer
-    if (descLc.includes('red')    || descLc.includes('रेड'))   return 'red';
-    if (descLc.includes('green')  || descLc.includes('ग्रीन')) return 'green';
-    return 'yellow';
-}
         function triggerCardBanner(log) {
             const banner     = document.getElementById('card-side-banner');
             const playerEl   = document.getElementById('card-side-player-name');
@@ -2185,7 +1994,6 @@ function detectCardColor(log) {
             if (cardColor === 'red')        typeText = 'RED CARD';
             else if (cardColor === 'green') typeText = 'GREEN CARD';
 
-            // Clean description to just player name
             let playerText = String(log.desc || '').trim();
             playerText = playerText
                 .replace(/yellow\s*card/ig, '')
@@ -2201,7 +2009,6 @@ function detectCardColor(log) {
             playerEl.innerText = playerText;
             badgeText.innerText = typeText;
 
-            // 🚨 Team-gradient background (same logic as team name box)
             const teamColor = isLeft ? currentLeftColor : currentRightColor;
             const darkColor = darkenColor(teamColor, 60);
             banner.style.background = isLeft
@@ -2211,7 +2018,6 @@ function detectCardColor(log) {
             cardBannerTimeoutIds.forEach(id => clearTimeout(id));
             cardBannerTimeoutIds = [];
 
-            // Set position class + card color class
             banner.className = 'side-banner card-side-banner ' + (isLeft ? 'pos-left' : 'pos-right') + ' ' + cardColor;
             void banner.offsetWidth;
             banner.classList.add('show');
@@ -2588,7 +2394,6 @@ function detectCardColor(log) {
             for (let i = 0; i < unsuccTack; i++) tackleSequence.push('U');
             ppRenderSequence('pp-tackle-sequence', tackleSequence, 'tackle');
         }
-
     </script>
 </body>
 </html>
