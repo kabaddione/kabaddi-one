@@ -656,19 +656,16 @@
             border-color: #D1C4E9;
         }
 
-                .rep-marquee {
+         .rep-marquee {
             flex: 1;
             position: relative;
             overflow: hidden;
-            border: 2px solid rgba(255,215,0,0.55);
-            border-left: none;
-            clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
-            -webkit-clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
+            /* No border, no background, no mask — just a clean clipping container */
         }
         .rep-marquee-content {
             position: absolute;
             top: 0;
-            left: 0;
+            left: 100%;
             height: 100%;
             display: inline-flex;
             align-items: center;
@@ -678,14 +675,9 @@
             font-weight: 800;
             letter-spacing: 1.8px;
             color: #FFF;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.95);
-            padding-left: 100%;
-            animation: repMarqueeScroll 30s linear infinite;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.75);
             will-change: transform;
-        }
-        @keyframes repMarqueeScroll {
-            from { transform: translateX(0); }
-            to   { transform: translateX(-100%); }
+            /* No CSS animation — JS-driven for bulletproof positioning */
         }
     </style>
 </head>
@@ -1139,6 +1131,8 @@
         let lastOverlayPlayerId = '';
         let seenLogKeys = new Set();
         let initialLoadDone = false;
+                // 🚨 Marquee RAF state
+        let marqueeRafId = null;
 
         // 🚨 L5 state
         let lastL5TriggerBucket = 0;
@@ -1496,6 +1490,49 @@ function handleLast5MinutesUpdate(data, existingState) {
             return Math.max(0, starting7.length - inactive);
         }
 
+                function startMarqueeAnimation() {
+            const el = document.getElementById('rep-marquee-content');
+            if (!el || !el.parentElement) return;
+
+            if (marqueeRafId) { cancelAnimationFrame(marqueeRafId); marqueeRafId = null; }
+
+            // Reset cleanly
+            el.style.transform = 'translateX(0)';
+            void el.offsetWidth; // force reflow for fresh measurements
+
+            const container = el.parentElement;
+            const textWidth = el.scrollWidth;
+            const containerWidth = container.clientWidth;
+            const totalDistance = textWidth + containerWidth;
+            if (totalDistance <= 0) return;
+
+            const speed = 130; // pixels / second
+            const duration = (totalDistance / speed) * 1000;
+            let startTime = null;
+
+            function animate(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = (elapsed % duration) / duration;
+                el.style.transform = `translateX(${-progress * totalDistance}px)`;
+                marqueeRafId = requestAnimationFrame(animate);
+            }
+            marqueeRafId = requestAnimationFrame(animate);
+        }
+
+        function stopMarqueeAnimation() {
+            if (marqueeRafId) { cancelAnimationFrame(marqueeRafId); marqueeRafId = null; }
+        }
+
+        // Restart marquee when user returns to the tab (fixes the tab-switch quirk)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) return;
+            const popup = document.getElementById('center-popup');
+            if (popup && popup.classList.contains('show')) {
+                startMarqueeAnimation();
+            }
+        });
+
         function updateRaidEventPopup(state, data) {
             const popup = document.getElementById('center-popup');
             if (!popup) return;
@@ -1504,19 +1541,18 @@ function handleLast5MinutesUpdate(data, existingState) {
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(raidClock) && raidClock > 0 && raidClock < 30);
 
-            // Hide when raid is not active
             if (!raidActive) {
                 popup.classList.remove('show');
+                stopMarqueeAnimation();
                 return;
             }
 
-            // Which team is raiding?
             let isLeftRaid = true;
             const raw = state.currentRaidTeamIsLeft !== undefined
                 ? state.currentRaidTeamIsLeft
                 : state.currentRaidTeamsLeft;
             if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
-            else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
+            else if (raw === false || raw === 0 ||
 
             // Defending team's alive count
             const defenderCount = isLeftRaid
