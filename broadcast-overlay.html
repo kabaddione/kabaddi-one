@@ -600,10 +600,10 @@
            ========================================= */
         .raid-event-popup {
             position: absolute;
-            bottom: calc(100% + 6px);
+            bottom: calc(100% + 50px);
             left: calc(50% - 625px);
             width: 1250px;
-            height: 52px;
+            height: 42px;
             display: flex;
             align-items: stretch;
             gap: 0;
@@ -612,7 +612,6 @@
             transform: translateY(30px) scale(0.98);
             transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none;
-            filter: drop-shadow(0 10px 22px rgba(0,0,0,0.75));
         }
         .raid-event-popup.show {
             opacity: 1;
@@ -655,8 +654,6 @@
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(to bottom, rgba(20,20,40,0.98), rgba(0,0,0,0.92));
-            border: 2px solid rgba(255,215,0,0.55);
             border-left: none;
             clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
             -webkit-clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
@@ -675,7 +672,7 @@
             font-size: 20px;
             font-weight: 800;
             letter-spacing: 1.8px;
-            color: #FFD700;
+            color: #FFF;
             text-shadow: 0 2px 5px rgba(0,0,0,0.95);
             animation: repMarqueeScroll 22s linear infinite;
             will-change: transform;
@@ -1729,7 +1726,7 @@ function handleLast5MinutesUpdate(data, existingState) {
             }
 
             if (data.match_location) {
-                locEl.innerHTML = `<span style="font-size:12px; color:#A0A0A0; margin-right:4px;"><i class="fa-solid fa-location-dot"></i></span> ${escapeHtml(data.match_location.toUpperCase())}`;
+                locEl.innerHTML = `<span style="font-size:15px; color:#FFF; margin-right:4px;"><i class="fa-solid fa-location-dot"></i></span> ${escapeHtml(data.match_location.toUpperCase())}`;
             } else {
                 locEl.innerText = "";
             }
