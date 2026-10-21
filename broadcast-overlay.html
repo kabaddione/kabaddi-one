@@ -598,7 +598,7 @@
            🚨 RAID EVENT POPUP — full-width sliding banner
            (replaces the old center-popup)
            ========================================= */
-        .raid-event-popup {
+                .raid-event-popup {
             position: absolute;
             bottom: calc(100% + 50px);
             left: calc(50% - 625px);
@@ -610,12 +610,18 @@
             z-index: 22;
             opacity: 0;
             transform: translateY(30px) scale(0.98);
-            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: opacity 0.4s ease,
+                        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none;
         }
         .raid-event-popup.show {
             opacity: 1;
             transform: translateY(0) scale(1);
+        }
+        /* 🚨 Lifts up 55px when L5 banner is on screen */
+        .raid-event-popup.l5-active {
+            translate: 0 -55px;
         }
 
         .rep-label {
@@ -650,20 +656,19 @@
             border-color: #D1C4E9;
         }
 
-        .rep-marquee {
+                .rep-marquee {
             flex: 1;
             position: relative;
             overflow: hidden;
+            border: 2px solid rgba(255,215,0,0.55);
             border-left: none;
             clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
             -webkit-clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
         }
         .rep-marquee-content {
             position: absolute;
             top: 0;
-            left: 100%;
+            left: 0;
             height: 100%;
             display: inline-flex;
             align-items: center;
@@ -674,12 +679,13 @@
             letter-spacing: 1.8px;
             color: #FFF;
             text-shadow: 0 2px 5px rgba(0,0,0,0.95);
-            animation: repMarqueeScroll 22s linear infinite;
+            padding-left: 100%;
+            animation: repMarqueeScroll 30s linear infinite;
             will-change: transform;
         }
         @keyframes repMarqueeScroll {
             from { transform: translateX(0); }
-            to   { transform: translateX(calc(-100% - 970px)); }
+            to   { transform: translateX(-100%); }
         }
     </style>
 </head>
@@ -1399,7 +1405,16 @@ function handleLast5MinutesUpdate(data, existingState) {
                 pR.style.color = '#FFFFFF';
 
                 banner.classList.add('show');
-                setTimeout(() => { banner.classList.remove('show'); }, 10000);
+
+                // 🚨 Lift the raid event popup so it doesn't overlap L5
+                const raidPopup = document.getElementById('center-popup');
+                if (raidPopup) raidPopup.classList.add('l5-active');
+
+                setTimeout(() => {
+                    banner.classList.remove('show');
+                    const rp = document.getElementById('center-popup');
+                    if (rp) rp.classList.remove('l5-active');
+                }, 10000);
             }
         }
 
@@ -1512,16 +1527,16 @@ function handleLast5MinutesUpdate(data, existingState) {
             const marqueeEl = document.getElementById('rep-marquee-content');
             if (!labelEl || !marqueeEl) return;
 
-            if (defenderCount >= 6) {
+                        if (defenderCount >= 6) {
                 // 🟡 BONUS IS ON (6 or 7 defenders on mat)
                 if (labelEl.className !== 'rep-label bonus') {
                     labelEl.className = 'rep-label bonus';
                     labelEl.innerText = 'BONUS IS ON';
                 }
-                const msg = '⭐ BONUS IS ON — Raider can claim a bonus point! Defenders: ' + defenderCount + ' on mat';
+                const msg = 'A Bonus Point is awarded when a raider crosses the bonus line with one foot in the air while 6+ defenders are active.';
                 const stateKey = 'bonus-' + defenderCount;
                 if (marqueeEl.dataset.state !== stateKey) {
-                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg;
+                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
                     marqueeEl.dataset.state = stateKey;
                 }
                 popup.classList.add('show');
@@ -1531,10 +1546,10 @@ function handleLast5MinutesUpdate(data, existingState) {
                     labelEl.className = 'rep-label super-tackle';
                     labelEl.innerText = 'SUPER TACKLE IS ON';
                 }
-                const msg = '🔥 SUPER TACKLE IS ON — If defenders tackle, they get 2 points! Defenders: ' + defenderCount + ' on mat';
+                const msg = 'If 3 or less defenders remain on the mat, a super tackle gives the team 2 points.';
                 const stateKey = 'super-' + defenderCount;
                 if (marqueeEl.dataset.state !== stateKey) {
-                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg;
+                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
                     marqueeEl.dataset.state = stateKey;
                 }
                 popup.classList.add('show');
