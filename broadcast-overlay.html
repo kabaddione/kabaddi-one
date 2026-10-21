@@ -24,7 +24,32 @@
         }
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <!-- ✅ Font Awesome (fixes location icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- ✅ SEO META TAGS -->
+    <meta name="description" content="KabaddiOne Professional Broadcast Overlay — real-time live kabaddi scoreboard for OBS streaming. Features raid timers, bonus & super tackle alerts, player performance graphics, team stats, substitution banners, and full match analytics.">
+    <meta name="keywords" content="kabaddi overlay, live kabaddi broadcast, OBS kabaddi scoreboard, kabaddi one, kabaddi live streaming, kabaddi scoreboard, live kabaddi score, broadcast overlay, KabaddiOne">
+    <meta name="author" content="KabaddiOne">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="canonical" href="https://kabaddione.com/broadcast-overlay.html">
+
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+    <meta property="og:title" content="KabaddiOne Professional Broadcast Overlay">
+    <meta property="og:description" content="Real-time kabaddi broadcast overlay with live scoreboard, raid timers, bonus & super tackle alerts, player stats, and team performance — built for OBS streaming.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kabaddione.com/broadcast-overlay.html">
+    <meta property="og:image" content="https://kabaddione.com/images/kabaddione_logo.png">
+    <meta property="og:site_name" content="KabaddiOne">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="KabaddiOne Professional Broadcast Overlay">
+    <meta name="twitter:description" content="Real-time kabaddi broadcast overlay for OBS streaming — scoreboard, raid timers, bonus & super tackle alerts, player performance stats.">
+    <meta name="twitter:image" content="https://kabaddione.com/images/kabaddione_logo.png">
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -568,6 +593,97 @@
             line-height: 1; color: #FFF;
             text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
+
+                /* =========================================
+           🚨 RAID EVENT POPUP — full-width sliding banner
+           (replaces the old center-popup)
+           ========================================= */
+        .raid-event-popup {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: calc(50% - 625px);
+            width: 1250px;
+            height: 52px;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            z-index: 22;
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            filter: drop-shadow(0 10px 22px rgba(0,0,0,0.75));
+        }
+        .raid-event-popup.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .rep-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 28px;
+            min-width: 280px;
+            flex-shrink: 0;
+            border: 2px solid #FFD700;
+            color: #FFF;
+            font-family: 'Teko', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.95);
+            z-index: 2;
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+            -webkit-clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+            background: linear-gradient(to bottom, #D32F2F, #8B0000);
+            transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+        }
+        .rep-label.bonus {
+            background: linear-gradient(to bottom, #FFD54F, #F57F17);
+            border-color: #FFF59D;
+            color: #000;
+            text-shadow: 0 1px 3px rgba(255,255,255,0.5);
+        }
+        .rep-label.super-tackle {
+            background: linear-gradient(to bottom, #9575CD, #311B92);
+            border-color: #D1C4E9;
+        }
+
+        .rep-marquee {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, rgba(20,20,40,0.98), rgba(0,0,0,0.92));
+            border: 2px solid rgba(255,215,0,0.55);
+            border-left: none;
+            clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
+            -webkit-clip-path: polygon(0 0, 100% 0, 99% 100%, 0 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+        }
+        .rep-marquee-content {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            color: #FFD700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.95);
+            animation: repMarqueeScroll 22s linear infinite;
+            will-change: transform;
+        }
+        @keyframes repMarqueeScroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(calc(-100% - 970px)); }
+        }
     </style>
 </head>
 <body>
@@ -670,6 +786,14 @@
 
         <div class="main-row" id="main-row">
 
+            <!-- 🚨 RAID EVENT POPUP — Bonus / Super Tackle alert (upgraded center-popup) -->
+            <div id="center-popup" class="raid-event-popup">
+                <div class="rep-label bonus" id="rep-label">BONUS IS ON</div>
+                <div class="rep-marquee">
+                    <div class="rep-marquee-content" id="rep-marquee-content">⭐ Bonus is on...</div>
+                </div>
+            </div>
+
             <!-- 🚨 LEFT SUSPENSION TIMER -->
             <div id="left-suspension-timer" class="suspension-timer suspension-left">
                 <div class="suspension-timer-inner">
@@ -750,8 +874,6 @@
             </div>
         </div>
     </div>
-
-    <div id="center-popup" class="center-popup">EVENT</div>
 
     <div id="epic-overlay" class="epic-overlay">
         <div class="epic-bg"></div>
@@ -1343,6 +1465,88 @@ function handleLast5MinutesUpdate(data, existingState) {
             }
         }
 
+                // ==========================================
+        // 🚨 RAID EVENT POPUP (Bonus / Super Tackle alert)
+        // ==========================================
+        function countAlivePlayers(rosterJsonStr, outIdsStr) {
+            let roster = [];
+            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { return 0; }
+            const starting7 = roster.filter(p => p.isStarting7 === true);
+            if (starting7.length === 0) return 0;
+            const outOrder = splitConcatenatedIds(outIdsStr || '', starting7);
+            const outSet   = new Set(outOrder);
+            let inactive = 0;
+            starting7.forEach(p => {
+                if (outSet.has(p.id)) { inactive++; return; }
+                if (p.isDisqualified === true) { inactive++; return; }
+                if ((parseInt(p.suspensionSeconds) || 0) > 0) { inactive++; return; }
+            });
+            return Math.max(0, starting7.length - inactive);
+        }
+
+        function updateRaidEventPopup(state, data) {
+            const popup = document.getElementById('center-popup');
+            if (!popup) return;
+
+            const raidClock = parseInt(data.raid_clock);
+            const raidActive = state.raidTimerRunning === true
+                || (!isNaN(raidClock) && raidClock > 0 && raidClock < 30);
+
+            // Hide when raid is not active
+            if (!raidActive) {
+                popup.classList.remove('show');
+                return;
+            }
+
+            // Which team is raiding?
+            let isLeftRaid = true;
+            const raw = state.currentRaidTeamIsLeft !== undefined
+                ? state.currentRaidTeamIsLeft
+                : state.currentRaidTeamsLeft;
+            if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
+            else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
+
+            // Defending team's alive count
+            const defenderCount = isLeftRaid
+                ? countAlivePlayers(state.rightRosterJson, state.rightOutIds)
+                : countAlivePlayers(state.leftRosterJson, state.leftOutIds);
+
+            const labelEl   = document.getElementById('rep-label');
+            const marqueeEl = document.getElementById('rep-marquee-content');
+            if (!labelEl || !marqueeEl) return;
+
+            if (defenderCount >= 6) {
+                // 🟡 BONUS IS ON (6 or 7 defenders on mat)
+                if (labelEl.className !== 'rep-label bonus') {
+                    labelEl.className = 'rep-label bonus';
+                    labelEl.innerText = 'BONUS IS ON';
+                }
+                const msg = '⭐ BONUS IS ON — Raider can claim a bonus point! Defenders: ' + defenderCount + ' on mat';
+                const stateKey = 'bonus-' + defenderCount;
+                if (marqueeEl.dataset.state !== stateKey) {
+                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg;
+                    marqueeEl.dataset.state = stateKey;
+                }
+                popup.classList.add('show');
+            } else if (defenderCount <= 3) {
+                // 🟣 SUPER TACKLE IS ON (3 or fewer defenders on mat)
+                if (labelEl.className !== 'rep-label super-tackle') {
+                    labelEl.className = 'rep-label super-tackle';
+                    labelEl.innerText = 'SUPER TACKLE IS ON';
+                }
+                const msg = '🔥 SUPER TACKLE IS ON — If defenders tackle, they get 2 points! Defenders: ' + defenderCount + ' on mat';
+                const stateKey = 'super-' + defenderCount;
+                if (marqueeEl.dataset.state !== stateKey) {
+                    marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg;
+                    marqueeEl.dataset.state = stateKey;
+                }
+                popup.classList.add('show');
+            } else {
+                // 4 or 5 defenders — normal raid, no alert
+                popup.classList.remove('show');
+            }
+        }
+
         // ==========================================
         // ENGINE
         // ==========================================
@@ -1385,6 +1589,8 @@ function handleLast5MinutesUpdate(data, existingState) {
                         handleRaidTimers(state, data.raid_clock, leftColor, rightColor);
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
+
+                        updateRaidEventPopup(state, data);   // 🚨 NEW: Bonus / Super Tackle alert
 
                         handleEventTimeline(state);
                     } catch (e) {
