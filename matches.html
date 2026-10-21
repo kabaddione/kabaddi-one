@@ -95,9 +95,6 @@
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
 
-        /* =========================================
-           BACKGROUND ORBS
-           ========================================= */
         .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
         .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .12; animation: orbFloat 18s ease-in-out infinite; }
         .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
@@ -110,9 +107,6 @@
             75% { transform: translate3d(-50px,-30px,0) scale(1.1); }
         }
 
-        /* =========================================
-           NAV
-           ========================================= */
         .nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: var(--nav-height); background: rgba(10,10,26,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); transition: var(--transition-smooth); }
         .nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; height: 100%; gap: 12px; }
         .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.4rem; color: #fff; letter-spacing: -0.5px; z-index: 1001; flex-shrink: 0; }
@@ -137,9 +131,6 @@
             .hamburger { display: flex; }
         }
 
-        /* =========================================
-           PAGE LAYOUT
-           ========================================= */
         .page-wrapper {
             padding: calc(var(--nav-height) + 32px) 24px 80px;
             max-width: var(--max-width);
@@ -150,9 +141,6 @@
             flex: 1;
         }
 
-        /* =========================================
-           HERO
-           ========================================= */
         .page-hero { text-align: center; margin-bottom: 36px; }
         .page-hero .badge {
             display: inline-flex; align-items: center; gap: 6px;
@@ -181,9 +169,6 @@
         @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
         .hero-stat strong { color: #fff; font-size: 14px; }
 
-        /* =========================================
-           SLEEK CONTROLS (Search + Collapsible Filters)
-           ========================================= */
         .controls-wrapper { max-width: 800px; margin: 0 auto 32px; position: relative; z-index: 10; }
         .search-main-bar {
             display: flex; align-items: center; background: var(--surface-1);
@@ -220,7 +205,6 @@
         }
         .filter-toggle-btn.active .filter-indicator { opacity: 1; transform: scale(1); }
 
-        /* Expanding Panel */
         .filter-panel {
             max-height: 0; overflow: hidden; opacity: 0;
             transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
@@ -251,9 +235,6 @@
         .reset-filters:hover { background: rgba(255,94,58,0.2); }
         .reset-filters.visible { display: inline-flex; align-items: center; gap: 4px; }
 
-        /* =========================================
-           MATCHES GRID
-           ========================================= */
         .matches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
         @media (max-width: 480px) { .matches-grid { grid-template-columns: 1fr; gap: 16px; } }
 
@@ -301,9 +282,6 @@
         .view-hint { position: absolute; bottom: 10px; right: 16px; font-size: 11px; font-weight: 800; color: var(--accent); opacity: 0; transform: translateX(-6px); transition: all 0.35s ease; pointer-events: none; display: inline-flex; align-items: center; gap: 4px; }
         .match-card:hover .view-hint { opacity: 1; transform: translateX(0); }
 
-        /* =========================================
-           LOADING, EMPTY & ERROR STATES
-           ========================================= */
         .loading-state { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
         @media (max-width: 480px) { .loading-state { grid-template-columns: 1fr; } }
         .skeleton-card { background: var(--surface-1); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 18px; min-height: 200px; }
@@ -320,9 +298,6 @@
         .empty-state button, .error-state button { padding: 10px 22px; border-radius: 100px; border: none; background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; font-family: var(--font-body); box-shadow: 0 6px 20px rgba(255,94,58,0.35); transition: var(--transition-smooth); }
         .empty-state button:hover, .error-state button:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255,94,58,0.5); }
 
-        /* =========================================
-           FOOTER
-           ========================================= */
         .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; position: relative; z-index: 1; margin-top: auto; }
         .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; }
         .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: #fff; font-family: var(--font-heading); }
@@ -346,7 +321,6 @@
 
     <div class="bg-orbs" aria-hidden="true"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
 
-    <!-- NAV -->
     <nav class="nav" id="navbar" aria-label="Main navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo" aria-label="KabaddiOne Home">
@@ -366,10 +340,8 @@
         </div>
     </nav>
 
-    <!-- MAIN -->
     <div class="page-wrapper">
 
-        <!-- HERO -->
         <header class="page-hero">
             <span class="badge"><i class="fa-solid fa-bolt"></i> Live Match Tracker</span>
             <h1>All Kabaddi Matches</h1>
@@ -382,7 +354,6 @@
             </div>
         </header>
 
-        <!-- SLEEK SEARCH + COLLAPSIBLE FILTERS -->
         <div class="controls-wrapper">
             <div class="search-main-bar">
                 <i class="fa-solid fa-search search-icon" aria-hidden="true"></i>
@@ -397,7 +368,6 @@
                 </button>
             </div>
 
-            <!-- Collapsible Filter Panel -->
             <div class="filter-panel" id="filterPanel">
                 <div class="filter-panel-inner">
                     <div class="filter-group">
@@ -426,17 +396,14 @@
             </div>
         </div>
 
-        <!-- LOADING -->
         <div class="loading-state" id="loadingState" aria-hidden="true">
             <div class="skeleton-card"><div class="skeleton-line sm" style="width:40%"></div><div class="skeleton-line lg"></div><div class="skeleton-line" style="width:70%"></div></div>
             <div class="skeleton-card"><div class="skeleton-line sm" style="width:40%"></div><div class="skeleton-line lg"></div><div class="skeleton-line" style="width:70%"></div></div>
             <div class="skeleton-card"><div class="skeleton-line sm" style="width:40%"></div><div class="skeleton-line lg"></div><div class="skeleton-line" style="width:70%"></div></div>
         </div>
 
-        <!-- MATCHES -->
         <main class="matches-grid" id="matchesGrid" aria-live="polite"></main>
 
-        <!-- EMPTY -->
         <div class="empty-state" id="emptyState" style="display:none;">
             <i class="fa-solid fa-ghost"></i>
             <h3>No matches found</h3>
@@ -444,7 +411,6 @@
             <button type="button" id="emptyResetBtn">Clear all filters</button>
         </div>
 
-        <!-- ERROR -->
         <div class="error-state" id="errorState" style="display:none;">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <h3>Couldn't load matches</h3>
@@ -454,7 +420,6 @@
 
     </div>
 
-    <!-- FOOTER -->
     <footer class="footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-logo">
@@ -482,14 +447,8 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
     <script>
-        // ============================================================
-        // CONFIG — Update this if your live viewer page has a different path
-        // ============================================================
         const LIVE_MATCH_PAGE = '/live.html?match=';
 
-        // ============================================================
-        // FIREBASE INITIALIZATION (Copied exactly from working live page)
-        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
             authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
@@ -497,21 +456,16 @@
             projectId: "kabaddi-scoreboard-e1522"
         };
 
-        // Prevent duplicate initialization
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // Connection monitor
         db.ref('.info/connected').on('value', (snapshot) => {
             window.__kabaddiLog(snapshot.val() === true ? 'OK' : 'WARN', 'Realtime Database connected:', snapshot.val() === true);
         });
 
-        // ============================================================
-        // STATE
-        // ============================================================
         const state = {
             matches: [],
             filterText: '',
@@ -521,9 +475,6 @@
             error: null
         };
 
-        // ============================================================
-        // DOM
-        // ============================================================
         const gridEl         = document.getElementById('matchesGrid');
         const loadingEl      = document.getElementById('loadingState');
         const emptyEl        = document.getElementById('emptyState');
@@ -545,9 +496,6 @@
         const statDone       = document.getElementById('statDone');
         const statTotal      = document.getElementById('statTotal');
 
-        // ============================================================
-        // UTILITIES
-        // ============================================================
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             return String(str)
@@ -612,9 +560,6 @@
             return true;
         }
 
-        // ============================================================
-        // RENDER
-        // ============================================================
         function renderCard(m) {
             const d = m.data || {};
             const ls = parseInt(d.left_score)  || 0;
@@ -753,9 +698,6 @@
             });
         }
 
-        // ============================================================
-        // INTERACTIONS
-        // ============================================================
         filterToggleBtn.addEventListener('click', () => {
             const expanded = filterPanel.classList.toggle('expanded');
             filterToggleBtn.setAttribute('aria-expanded', expanded);
@@ -809,9 +751,6 @@
         resetFiltersBtn.addEventListener('click', clearAllFilters);
         emptyResetBtn.addEventListener('click', clearAllFilters);
 
-        // ============================================================
-        // FIREBASE AUTH & DATA FETCHING (Exact same pattern as live page)
-        // ============================================================
         function startMatchesListener() {
             window.__kabaddiLog('INFO', 'Attaching listener to live_matches...');
             
@@ -831,7 +770,7 @@
             }, (error) => {
                 window.__kabaddiLog('ERR', 'Permission denied or failed to read live_matches:', error);
                 state.loading = false;
-                state.error = 'Could not load matches: ' + (error.message || 'Unknown error') + '. Please check your Firebase Database Rules.';
+                state.error = 'Could not load matches. Please check your Firebase Database Rules. (Error: ' + error.code + ')';
                 render();
             });
         }
@@ -849,7 +788,6 @@
                 render();
             });
 
-        // Auto-update time-ago strings every 60s
         setInterval(() => {
             document.querySelectorAll('.time-ago').forEach(el => {
                 const ts = Number(el.dataset.ts);
@@ -857,9 +795,6 @@
             });
         }, 60000);
 
-        // ============================================================
-        // NAVIGATION & UTILS
-        // ============================================================
         (function() {
             const navbar     = document.getElementById('navbar');
             const hamburger  = document.getElementById('hamburger');
