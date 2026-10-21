@@ -447,8 +447,14 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
     <script>
-        const LIVE_MATCH_PAGE = '/live.html?match=';
+        // ============================================================
+        // ⚠️ CONFIG — UPDATED TO MATCH YOUR ACTUAL URL STRUCTURE
+        // ============================================================
+        const LIVE_MATCH_PAGE = '/match/id/index.html?match=';
 
+        // ============================================================
+        // FIREBASE INITIALIZATION
+        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
             authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
@@ -466,6 +472,9 @@
             window.__kabaddiLog(snapshot.val() === true ? 'OK' : 'WARN', 'Realtime Database connected:', snapshot.val() === true);
         });
 
+        // ============================================================
+        // STATE
+        // ============================================================
         const state = {
             matches: [],
             filterText: '',
@@ -475,6 +484,9 @@
             error: null
         };
 
+        // ============================================================
+        // DOM
+        // ============================================================
         const gridEl         = document.getElementById('matchesGrid');
         const loadingEl      = document.getElementById('loadingState');
         const emptyEl        = document.getElementById('emptyState');
@@ -496,6 +508,9 @@
         const statDone       = document.getElementById('statDone');
         const statTotal      = document.getElementById('statTotal');
 
+        // ============================================================
+        // UTILITIES
+        // ============================================================
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             return String(str)
@@ -560,6 +575,9 @@
             return true;
         }
 
+        // ============================================================
+        // RENDER
+        // ============================================================
         function renderCard(m) {
             const d = m.data || {};
             const ls = parseInt(d.left_score)  || 0;
@@ -689,6 +707,7 @@
                     const id = card.dataset.matchId;
                     if (!id) return;
                     card.classList.add('clicking');
+                    // 🚨 REDIRECTS TO /match/id/index.html?match=XXXX
                     setTimeout(() => { window.location.href = LIVE_MATCH_PAGE + encodeURIComponent(id); }, 150);
                 };
                 card.addEventListener('click', open);
@@ -698,6 +717,9 @@
             });
         }
 
+        // ============================================================
+        // INTERACTIONS
+        // ============================================================
         filterToggleBtn.addEventListener('click', () => {
             const expanded = filterPanel.classList.toggle('expanded');
             filterToggleBtn.setAttribute('aria-expanded', expanded);
@@ -751,12 +773,19 @@
         resetFiltersBtn.addEventListener('click', clearAllFilters);
         emptyResetBtn.addEventListener('click', clearAllFilters);
 
+        // ============================================================
+        // FIREBASE AUTH & DATA FETCHING
+        // ============================================================
         function startMatchesListener() {
             window.__kabaddiLog('INFO', 'Attaching listener to live_matches...');
             
             db.ref('live_matches').on('value', (snapshot) => {
                 const data = snapshot.val();
-                window.__kabaddiLog('OK', 'Successfully loaded matches data', data);
+                
+                // 🚨 SECURITY FIX: Do NOT log the full `data` object to the console. 
+                // This prevents people from inspecting the full state_json in dev tools.
+                const matchCount = data ? Object.keys(data).length : 0;
+                window.__kabaddiLog('OK', `Successfully loaded matches data (${matchCount} matches found).`);
                 
                 const matchesObj = data || {};
                 state.matches = Object.entries(matchesObj).map(([id, value]) => ({
@@ -795,6 +824,9 @@
             });
         }, 60000);
 
+        // ============================================================
+        // NAVIGATION & UTILS
+        // ============================================================
         (function() {
             const navbar     = document.getElementById('navbar');
             const hamburger  = document.getElementById('hamburger');
