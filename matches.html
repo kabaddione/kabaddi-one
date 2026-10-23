@@ -777,14 +777,36 @@
         // FIREBASE AUTH & DATA FETCHING
         // ============================================================
         function startMatchesListener() {
-            // 🚨 BANDWIDTH FIX: We now listen to 'matches_summary' instead of 'live_matches'. 
-            // This only downloads a tiny amount of data per match, saving your Firebase limits.
             window.__kabaddiLog('INFO', 'Attaching listener to matches_summary...');
             
             db.ref('matches_summary').on('value', (snapshot) => {
                 const data = snapshot.val();
                 
-                // 🚨 SECURITY FIX: Do NOT log the full `data` object to the console. 
+                // 🚨 ==========================================
+                // 🚨 THE WEB JANITOR (100% FREE AUTO-DELETE)
+                // ==========================================
+                const sevenDaysInMillis = 7 * 24 * 60 * 60 * 1000;
+                const currentTime = Date.now();
+                
+                if (data) {
+                    Object.keys(data).forEach(matchId => {
+                        const matchData = data[matchId];
+                        const ageInMillis = currentTime - (Number(matchData.last_updated) || 0);
+                        
+                        if (ageInMillis > sevenDaysInMillis) {
+                            window.__kabaddiLog('WARN', '🧹 Web Janitor deleting 7-day old match:', matchId);
+                            // Delete the lightweight summary
+                            db.ref('matches_summary/' + matchId).remove();
+                            // Delete the massive 50KB heavy payload to save database space!
+                            db.ref('live_matches/' + matchId).remove();
+                            
+                            // Delete from the local website data so it doesn't render on the screen
+                            delete data[matchId]; 
+                        }
+                    });
+                }
+                // ==========================================
+
                 const matchCount = data ? Object.keys(data).length : 0;
                 window.__kabaddiLog('OK', `Successfully loaded matches summary (${matchCount} matches found).`);
                 
