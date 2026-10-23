@@ -35,7 +35,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
     <script>
-        // 🐛 DIAGNOSTIC LOGGING (Copied from your working live page)
+        // 🐛 DIAGNOSTIC LOGGING
         window.KABADDI_DEBUG = true;
         window.__kabaddiLog = function(tag, message, data) {
             if (!window.KABADDI_DEBUG) return;
@@ -448,7 +448,7 @@
 
     <script>
         // ============================================================
-        // ⚠️ CONFIG — UPDATED TO MATCH YOUR ACTUAL URL STRUCTURE
+        // ⚠️ CONFIG — URL TO YOUR LIVE MATCH PAGE
         // ============================================================
         const LIVE_MATCH_PAGE = '/match/id/index.html?match=';
 
@@ -777,15 +777,16 @@
         // FIREBASE AUTH & DATA FETCHING
         // ============================================================
         function startMatchesListener() {
-            window.__kabaddiLog('INFO', 'Attaching listener to live_matches...');
+            // 🚨 BANDWIDTH FIX: We now listen to 'matches_summary' instead of 'live_matches'. 
+            // This only downloads a tiny amount of data per match, saving your Firebase limits.
+            window.__kabaddiLog('INFO', 'Attaching listener to matches_summary...');
             
-            db.ref('live_matches').on('value', (snapshot) => {
+            db.ref('matches_summary').on('value', (snapshot) => {
                 const data = snapshot.val();
                 
                 // 🚨 SECURITY FIX: Do NOT log the full `data` object to the console. 
-                // This prevents people from inspecting the full state_json in dev tools.
                 const matchCount = data ? Object.keys(data).length : 0;
-                window.__kabaddiLog('OK', `Successfully loaded matches data (${matchCount} matches found).`);
+                window.__kabaddiLog('OK', `Successfully loaded matches summary (${matchCount} matches found).`);
                 
                 const matchesObj = data || {};
                 state.matches = Object.entries(matchesObj).map(([id, value]) => ({
@@ -797,7 +798,7 @@
                 state.error = null;
                 render();
             }, (error) => {
-                window.__kabaddiLog('ERR', 'Permission denied or failed to read live_matches:', error);
+                window.__kabaddiLog('ERR', 'Permission denied or failed to read matches_summary:', error);
                 state.loading = false;
                 state.error = 'Could not load matches. Please check your Firebase Database Rules. (Error: ' + error.code + ')';
                 render();
