@@ -9,7 +9,7 @@
     <meta name="title" content="KabaddiOne Live Match Broadcast">
     <meta name="description" content="Watch live kabaddi matches on KabaddiOne - real-time scores, commentary, player stats, lineup, and match analytics.">
     <meta name="theme-color" content="#0a0a1a">
-    <title>Live Match | KabaddiOne</title>
+    <title>KabaddiOne Live Match Broadcast</title>
 
     <!-- 🚨 ANTI-IFRAME DEFENSE: allow only KabaddiOne-owned parent pages -->
     <script>
@@ -548,6 +548,30 @@ window.teamStatsRight = null;
 window.leftRoster = [];
 window.rightRoster = [];
 
+
+// ============================================================
+// IMMEDIATE GUARD: redirect if no ?match= is present
+// (runs before Firebase auth, so it's instant)
+// ============================================================
+(function fastMatchGuard(){
+  const params = new URLSearchParams(window.location.search);
+  const mid = (params.get('match') || '').trim();
+
+  // Valid match IDs must be non-empty and contain no Firebase-illegal chars
+  if (!mid || /[.#$\[\]\/]/.test(mid)) {
+    const url = 'https://kabaddione.com/matches.html';
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.replace(url);
+        return;
+      }
+    } catch (e) { /* cross-origin parent — fall back below */ }
+    window.location.replace(url);
+    return; // stop further execution on this page
+  }
+})();
+
+        
 // ============================================================
 // FALLBACK: invalid / dead match links are sent to the
 // all-matches hub so the user can pick another live match.
@@ -572,7 +596,7 @@ function goToAllMatches(reason){
     } catch (e) { /* cross-origin parent — fall back to this frame */ }
     try { window.location.replace(url); }
     catch (e) { window.location.href = url; }
-  }, 1800);
+  }, 300);
 }
 
 // ============================================================
