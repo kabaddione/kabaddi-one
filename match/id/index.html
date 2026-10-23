@@ -3,6 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 🛡️ Cache-busting: ensure browsers always fetch the latest redirect logic -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- 🚨 FAST MATCH GUARD: runs before ANY other script / stylesheet.
+         Detects Google's encrypted /goto, old /url?q=, missing match, or illegal
+         match IDs and instantly bounces the visitor to the all-matches hub. -->
+    <script>
+      (function () {
+        'use strict';
+
+        var params = new URLSearchParams(window.location.search);
+        var matchId = (params.get('match') || '').trim();
+
+        // Detect: missing match, empty match, illegal chars, OR Google redirect tokens
+        var isInvalid = !matchId
+          || /[.#$\[\]\/]/.test(matchId)
+          || params.has('url')      // Google /goto?url=CAES...
+          || params.has('q')        // legacy google /url?q=...
+          || params.has('sa')       // Google tracking param present
+          || params.has('ved')      // Google tracking param present
+          || params.has('usg');     // Google usg token present
+
+        if (isInvalid) {
+          // Halt any further parsing/loading so Firebase / ads never start
+          try { window.stop(); } catch (e) {}
+
+          var dest = 'https://kabaddione.com/matches.html';
+          try {
+            if (window.top && window.top !== window.self) {
+              window.top.location.replace(dest);
+            } else {
+              window.location.replace(dest);
+            }
+          } catch (e) {
+            window.location.href = dest;
+          }
+        }
+      })();
+    </script>
+
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
     <link rel="shortcut icon" href="/favicon.png" type="image/png">
@@ -10,6 +53,9 @@
     <meta name="description" content="Watch live kabaddi matches on KabaddiOne - real-time scores, commentary, player stats, lineup, and match analytics.">
     <meta name="theme-color" content="#0a0a1a">
     <title>Live Match | KabaddiOne</title>
+
+    <!-- 🚨 ADSTERRA POPUNDER CODE -->
+    <script data-cfasync="false" src="https://capitalhospitals.org/1/590e46694d2e0e2ffaaf4da30db67888"></script>
 
     <!-- 🚨 ANTI-IFRAME DEFENSE: allow only KabaddiOne-owned parent pages -->
     <script>
@@ -34,18 +80,18 @@
               'background:#0a0a1a;color:#fff;font:700 20px system-ui,sans-serif;' +
               'text-align:center;padding:24px;box-sizing:border-box">' +
               '<main><h1>Unauthorized Access</h1>' +
-              '<p>This live match page may only be embedded on kabaddione.com.</p></main>' +
+              '<p>This live match page may only be embedded on kabaddione.com.</p>' +
+              '<p style="font-size:14px;font-weight:500;opacity:.75;margin-top:14px">Redirecting to ' +
+              '<a href="https://kabaddione.com/matches.html" style="color:#FFB830">all live matches</a>…</p></main>' +
               '</body></html>'
             );
             document.close();
-          } catch (error) {
-            // Continue to attempt the top-level redirect even if rendering the block page fails.
-          }
+          } catch (error) {}
 
           try {
-            window.top.location.replace('https://kabaddione.com/');
+            window.top.location.replace('https://kabaddione.com/matches.html');
           } catch (error) {
-            try { window.location.replace('https://kabaddione.com/'); } catch (_) {}
+            try { window.location.replace('https://kabaddione.com/matches.html'); } catch (_) {}
           }
         }
 
@@ -56,11 +102,8 @@
           if (document.referrer) {
             ancestorHosts.push(new URL(document.referrer).hostname);
           }
-        } catch (error) {
-          // An unavailable/invalid referrer is handled by the fallback below.
-        }
+        } catch (error) {}
 
-        // Chromium-based browsers expose the origin of every ancestor in this list.
         try {
           const origins = window.location.ancestorOrigins;
           if (origins && origins.length) {
@@ -68,15 +111,13 @@
               try { ancestorHosts.push(new URL(origins[i]).hostname); } catch (_) {}
             }
           }
-        } catch (error) {
-          // ancestorOrigins is not implemented in every browser.
-        }
+        } catch (error) {}
 
-        // Fail closed if embedded but no trustworthy parent origin can be determined.
         const allAncestorsAllowed = ancestorHosts.length > 0 && ancestorHosts.every(isAllowedHost);
         if (!allAncestorsAllowed) denyEmbedding();
       })();
     </script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
     <script>
@@ -85,12 +126,11 @@
       gtag('js', new Date());
       gtag('config', 'G-YRYC0NEP1H');
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-    <!-- 🐛 KABADDIONE DIAGNOSTIC LOGGING (same switch style as broadcast-overlay) -->
     <script>
       window.KABADDI_DEBUG = true;
       window.__kabaddiLog = function(tag, message, data) {
@@ -365,14 +405,15 @@
         .info-value{font-size:13px;font-weight:700;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis}
         .empty-state{text-align:center;padding:40px 20px;color:#8C8E9F;font-size:13px}
         .empty-state i{font-size:32px;opacity:.3;margin-bottom:12px;display:block}
-        .ad-wrap{display:flex;align-items:center;justify-content:center;position:relative;width:100%;margin:14px 0;min-height:60px;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04)}
+        
+        /* CSS for Adsterra Ad Containers */
+        .ad-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;width:100%;margin:14px 0;min-height:60px;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);padding: 10px;}
         .ad-wrap.ad-inline{min-height:250px}
         .ad-wrap.ad-feed{min-height:90px;margin:10px 6px;border-radius:10px}
-        .ad-wrap .adsbygoogle{display:block;width:100%}
         .ad-wrap .ad-tag{position:absolute;top:4px;right:6px;font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;font-weight:700;pointer-events:none}
-        .ad-anchor{position:fixed;left:0;right:0;bottom:0;z-index:600;background:rgba(10,10,26,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding:4px 40px 4px 4px;display:none;text-align:center;box-shadow:0 -8px 24px rgba(0,0,0,0.4)}
-        .ad-anchor.visible{display:block}
-        .ad-anchor .adsbygoogle{display:block;width:100%}
+        
+        .ad-anchor{position:fixed;left:0;right:0;bottom:0;z-index:600;background:rgba(10,10,26,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding:4px 40px 4px 4px;display:none;text-align:center;box-shadow:0 -8px 24px rgba(0,0,0,0.4);justify-content:center;align-items:center;}
+        .ad-anchor.visible{display:flex}
         .ad-anchor-close{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
         .ad-anchor-close:hover{background:rgba(255,255,255,0.15)}
         @media(max-width:480px){.live-wrapper{padding-left:12px;padding-right:12px}.team-score{font-size:54px}.main-timer{font-size:38px}.raid-timer-ring{width:56px;height:56px}.raid-timer-inner{width:46px;height:46px;font-size:20px}.info-grid{grid-template-columns:1fr}.tab{font-size:11px;padding:9px 6px}.stat-row-inner{grid-template-columns:1fr 1fr;gap:8px 6px}.mini-stat{gap:4px}.mini-stat .stat-icon-wrap{width:18px;height:18px;font-size:8px}.mini-stat-value{font-size:12px}.mini-stat-label{font-size:8px}.graph-canvas-wrap{height:260px}.log-row{grid-template-columns:38px 1fr auto;gap:10px;padding:10px 8px}.log-icon-circle{width:38px;height:38px;padding:5px}.mat-dot-jersey{font-size:8px}.mat-dot{width:12px;height:12px}.mat-dot-cell{gap:3px;min-width:18px}.team-mat{gap:7px}.mat-divider-img{width:18px;height:28px}.player-card-head{grid-template-columns:40px minmax(0,1fr) auto auto auto;gap:8px}.player-avatar-wrap{width:40px;height:40px}.player-main-name{font-size:13px}.player-pts{font-size:16px}.event-flash{font-size:11.5px;padding:10px 16px;top:80px}}
@@ -392,10 +433,22 @@
         </div>
     </nav>
     <div class="live-wrapper">
+        
+        <!-- ADSTERRA TOP BANNER (728x90) -->
         <div class="ad-wrap ad-top">
             <span class="ad-tag">Ad</span>
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1111111111" data-ad-format="auto" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"></ins>
+            <script>
+              atOptions = {
+                'key' : '903b38737f7bb6abc38908c243a26442',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+              };
+            </script>
+            <script src="https://czernik.org/22/903b38737f7bb6abc38908c243a26442"></script>
         </div>
+
         <div class="score-board">
             <div class="board-top"><div class="badge-id" id="uiMatchId"><i class="fa-solid fa-hashtag"></i> ------</div><div class="badge-live" id="uiLiveBadge">Live</div></div>
             <div class="board-meta" id="uiMatchDate"><i class="fa-solid fa-location-dot"></i> Fetching live stream connection...</div>
@@ -408,10 +461,22 @@
             <div class="raider-banner idle" id="uiActiveRaider"><i class="fa-solid fa-person-running"></i> Waiting for raid...</div>
             <div class="mat-section"><div class="mat-title">On The Mat</div><div class="mat-row" id="uiMatDots"><div class="team-mat left"></div><div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt=""></div><div class="team-mat right"></div></div></div>
         </div>
+
+        <!-- ADSTERRA INLINE BANNER (300x250) -->
         <div class="ad-wrap ad-inline">
             <span class="ad-tag">Ad</span>
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="2222222222" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>
+              atOptions = {
+                'key' : 'd8b8abf5cb37482c24026bf0b0694e9d',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+              };
+            </script>
+            <script src="https://czernik.org/22/d8b8abf5cb37482c24026bf0b0694e9d"></script>
         </div>
+
         <div class="live-meta" id="uiLiveMeta"><span id="uiLastUpdated">Updated just now</span><span class="live-meta-sep">•</span><span id="uiViewerCount">1 watching</span></div>
         <div class="quick-stats">
             <div class="quick-stat-team left-stat" style="--team-accent:var(--left-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/card.png" data-fa="fa-solid fa-hand"></span></div><span class="mini-stat-value" id="uiLeftFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/timeout.png" data-fa="fa-solid fa-stopwatch"></span></div><span class="mini-stat-value" id="uiLeftTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/substitution.png" data-fa="fa-solid fa-right-left"></span></div><span class="mini-stat-value" id="uiLeftSubs">0</span><span class="mini-stat-label">Subs</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/empty.png" data-fa="fa-regular fa-circle-xmark"></span></div><span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div></div></div>
@@ -440,10 +505,14 @@
                     <div class="cmp-row"><div class="cmp-labels"><div class="cmp-value left" id="stLeftAllOut">0</div><div class="cmp-name">All out Points</div><div class="cmp-value right" id="stRightAllOut">0</div></div><div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftAllOut" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightAllOut" style="width:50%"></div></div></div>
                     <div class="cmp-row"><div class="cmp-labels"><div class="cmp-value left" id="stLeftExtra">0</div><div class="cmp-name">Extra Points</div><div class="cmp-value right" id="stRightExtra">0</div></div><div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftExtra" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightExtra" style="width:50%"></div></div></div>
                 </div>
+                
+                <!-- ADSTERRA FEED BANNER (Native) -->
                 <div class="ad-wrap ad-feed">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="3333333333" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"></ins>
+                    <script async="async" data-cfasync="false" src="https://czernik.org/21/89517cc6486932756fb2e4e255286bc6"></script>
+                    <div id="container-89517cc6486932756fb2e4e255286bc6"></div>
                 </div>
+
                 <div class="seg-toggle"><div class="seg-btn active" id="segRaids" onclick="switchRaidView('raids',this)">Raids</div><div class="seg-btn" id="segTackles" onclick="switchRaidView('tackles',this)">Tackles</div></div>
                 <div class="stat-panel">
                     <div class="panel-header"><div class="panel-team"><div class="panel-team-logo left" id="stPerfLeftLogo">LT</div><div class="panel-team-name" id="stPerfLeftName">Left Team</div></div><div class="panel-title">Points Break Down</div><div class="panel-team right"><div class="panel-team-logo right" id="stPerfRightLogo">RT</div><div class="panel-team-name" id="stPerfRightName">Right Team</div></div></div>
@@ -462,10 +531,22 @@
             <div class="lineup-panel">
                 <div class="team-toggle"><div class="team-toggle-btn active-left" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div><div class="team-toggle-btn" id="togRight" onclick="switchLineupTeam('right')">Right Team</div></div>
                 <div class="roster-group"><div class="roster-title"><span class="roster-title-dot"></span> Starting 7</div><div class="lineup-grid" id="uiStarting7Grid"></div></div>
+                
+                <!-- ADSTERRA BANNER (300x250) -->
                 <div class="ad-wrap ad-feed">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="4444444444" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                    <script>
+                      atOptions = {
+                        'key' : 'd8b8abf5cb37482c24026bf0b0694e9d',
+                        'format' : 'iframe',
+                        'height' : 250,
+                        'width' : 300,
+                        'params' : {}
+                      };
+                    </script>
+                    <script src="https://czernik.org/22/d8b8abf5cb37482c24026bf0b0694e9d"></script>
                 </div>
+
                 <div class="roster-group"><div class="roster-title"><span class="roster-title-dot sub"></span> Substitutes</div><div class="lineup-grid" id="uiSubstitutesGrid"></div></div>
             </div>
         </div>
@@ -480,10 +561,14 @@
             <div class="details-panel">
                 <div class="info-card"><div class="info-card-title"><i class="fa-solid fa-circle-info"></i> Match Information</div><div class="info-grid"><div class="info-item full"><div class="info-icon"><i class="fa-solid fa-people-group"></i></div><div class="info-text"><div class="info-label">Teams</div><div class="info-value" id="dtTeams">Loading...</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-hashtag"></i></div><div class="info-text"><div class="info-label">Match ID</div><div class="info-value" id="dtMatchId">------</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-calendar-day"></i></div><div class="info-text"><div class="info-label">Date</div><div class="info-value" id="dtDate">Loading...</div></div></div><div class="info-item full"><div class="info-icon"><i class="fa-solid fa-location-dot"></i></div><div class="info-text"><div class="info-label">Venue</div><div class="info-value" id="dtVenue">Live Kabaddi Arena</div></div></div></div></div>
                 <div class="info-card"><div class="info-card-title"><i class="fa-solid fa-sliders"></i> Match Settings</div><div class="info-grid"><div class="info-item"><div class="info-icon"><i class="fa-solid fa-stopwatch"></i></div><div class="info-text"><div class="info-label">Half Duration</div><div class="info-value" id="dtDuration">20 Minutes</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-mug-hot"></i></div><div class="info-text"><div class="info-label">Break Duration</div><div class="info-value" id="dtBreak">5 Minutes</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-users"></i></div><div class="info-text"><div class="info-label">Players/Side</div><div class="info-value" id="dtPlayers">7 Players</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-right-left"></i></div><div class="info-text"><div class="info-label">Max Subs</div><div class="info-value" id="dtSubs">5</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-clock"></i></div><div class="info-text"><div class="info-label">Max Timeouts</div><div class="info-value" id="dtTimeouts">2</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-hourglass-half"></i></div><div class="info-text"><div class="info-label">Timeout Duration</div><div class="info-value" id="dtTimeoutDur">60 Seconds</div></div></div></div></div>
+                
+                <!-- ADSTERRA BANNER (Native) -->
                 <div class="ad-wrap ad-inline">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="5555555555" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                    <script async="async" data-cfasync="false" src="https://czernik.org/21/89517cc6486932756fb2e4e255286bc6"></script>
+                    <div id="container-89517cc6486932756fb2e4e255286bc6"></div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -496,10 +581,25 @@
         </div>
     </footer>
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
+
+    <!-- ADSTERRA STICKY BOTTOM BANNER (320x50) -->
     <div class="ad-anchor" id="adAnchor">
         <button class="ad-anchor-close" id="adAnchorClose" aria-label="Close ad">✕</button>
-        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="6666666666" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+          atOptions = {
+            'key' : '2554d3858262cd1fa0804f4e811ccfde',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://czernik.org/22/2554d3858262cd1fa0804f4e811ccfde"></script>
     </div>
+
+    <!-- ADSTERRA SOCIAL BAR -->
+    <script data-cfasync="false" src="https://czernik.org/14/805e4e049cc5d1e75a447bba8be0022f"></script>
+
     <script>
         (function(){const navbar=document.getElementById('navbar');const hamburger=document.getElementById('hamburger');const navLinks=document.getElementById('navLinks');const backToTop=document.getElementById('backToTop');const allNavLinks=navLinks.querySelectorAll('a');hamburger.addEventListener('click',function(){const isActive=navLinks.classList.toggle('active');hamburger.classList.toggle('active');hamburger.setAttribute('aria-expanded',isActive);document.body.style.overflow=isActive?'hidden':''});allNavLinks.forEach(link=>link.addEventListener('click',()=>{navLinks.classList.remove('active');hamburger.classList.remove('active');hamburger.setAttribute('aria-expanded','false');document.body.style.overflow=''}));function updateNavbar(){if(window.scrollY>50)navbar.classList.add('scrolled');else navbar.classList.remove('scrolled')}window.addEventListener('scroll',updateNavbar,{passive:true});updateNavbar();function updateBackToTop(){if(window.scrollY>600)backToTop.classList.add('visible');else backToTop.classList.remove('visible')}window.addEventListener('scroll',updateBackToTop,{passive:true});backToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));updateBackToTop()})();
     </script>
@@ -507,7 +607,7 @@
 // ============================================================
 // BUILD MARKER
 // ============================================================
-window.KABADDI_BUILD = 'v5';
+window.KABADDI_BUILD = 'v10';
 function updateBuildMarker(){
   let el = document.getElementById('kbBuildMarker');
   if(!el){
@@ -545,6 +645,34 @@ window.leftRoster = [];
 window.rightRoster = [];
 
 // ============================================================
+// FALLBACK: invalid / dead match links are sent to the
+// all-matches hub so the user can pick another live match.
+// ============================================================
+window.MATCHES_PAGE_URL = 'https://kabaddione.com/matches.html';
+
+function goToAllMatches(reason){
+  if (window.__kbRedirectScheduled) return;
+  window.__kbRedirectScheduled = true;
+
+  const status = document.getElementById('uiMatchDate');
+  if (status && reason) {
+    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> ' + reason;
+    status.style.color = '#FF3B30';
+  }
+
+  // Fast redirect — 100ms is enough to paint the message briefly.
+  setTimeout(function(){
+    const url = window.MATCHES_PAGE_URL;
+    try {
+      // If this page is inside a KabaddiOne embed, move the whole tab, not just the frame.
+      if (window.top && window.top !== window.self) { window.top.location.replace(url); return; }
+    } catch (e) { /* cross-origin parent — fall back to this frame */ }
+    try { window.location.replace(url); }
+    catch (e) { window.location.href = url; }
+  }, 100);
+}
+
+// ============================================================
 // UI TOGGLES
 // ============================================================
 function togglePlayerExpand(el, pid){
@@ -560,10 +688,6 @@ function switchTab(tabId, el){
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   el.classList.add('active'); document.getElementById('tab-'+tabId).classList.add('active');
   if(tabId==='graph') requestAnimationFrame(()=>setTimeout(drawGraph,30));
-  setTimeout(()=>{
-    document.querySelectorAll('.tab-content.active ins.adsbygoogle:not([data-adsbygoogle-status])')
-      .forEach(()=>{ try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){} });
-  }, 350);
 }
 function switchLineupTeam(side){
   window.currentLineupTeam = side;
@@ -885,10 +1009,7 @@ function mergeHalves(h1, h2){
 }
 
 // ============================================================
-// ★ BUILD v5 ★ — renderStats
-// Reads new team_stats_*_full / _half1 / _half2 fields as the
-// PRIMARY source. Falls back to log-derived computeHalfStats()
-// when the richer fields aren't present yet.
+// ★ BUILD v10 ★ — renderStats
 // ============================================================
 function renderStats(){
   const state = window.latestGlobalState;
@@ -898,9 +1019,6 @@ function renderStats(){
   const half = window.currentHalf;
   const view = window.currentRaidView;
 
-  // ─────────────────────────────────────────────────────────
-  // 1. Pick source of truth for team stats
-  // ─────────────────────────────────────────────────────────
   let lTeam = null, rTeam = null;
   if (half === 'match') {
     lTeam = data.team_stats_left_full  || data.team_stats_left  || null;
@@ -914,17 +1032,12 @@ function renderStats(){
   }
   const hasTeam = !!(lTeam && rTeam);
 
-  // Log-derived fallback (always available)
   const logStats = computeHalfStats();
   const lLog = (half === 'match') ? logStats.left.match : logStats.left[half];
   const rLog = (half === 'match') ? logStats.right.match : logStats.right[half];
 
-  // ─────────────────────────────────────────────────────────
-  // 2. POINTS BREAKDOWN
-  // ─────────────────────────────────────────────────────────
   let lRaid, rRaid, lTackle, rTackle, lAllOut, rAllOut, lExtra, rExtra, lTotal, rTotal;
   if (half === 'match') {
-    // Match view uses state_json authoritative point totals
     lRaid   = num(state.leftRaidPoints);
     rRaid   = num(state.rightRaidPoints);
     lTackle = num(state.leftTacklePoints);
@@ -936,7 +1049,6 @@ function renderStats(){
     lTotal  = num(data.left_score);
     rTotal  = num(data.right_score);
   } else {
-    // Half view uses log-derived components
     lRaid   = lLog.raid   || 0;  rRaid   = rLog.raid   || 0;
     lTackle = lLog.tackle || 0;  rTackle = rLog.tackle || 0;
     lAllOut = lLog.allOut || 0;  rAllOut = rLog.allOut || 0;
@@ -971,9 +1083,6 @@ function renderStats(){
   document.getElementById('pbLeftTotal').style.width  = wTt.left;
   document.getElementById('pbRightTotal').style.width = wTt.right;
 
-  // ─────────────────────────────────────────────────────────
-  // 3. RAID / TACKLE PANEL — prefer team_stats_* when available
-  // ─────────────────────────────────────────────────────────
   let lTot, rTot, lSucc, rSucc, lUnsucc, rUnsucc, lEmpty, rEmpty, lSuper, rSuper, lStreak, rStreak;
   let totalLabel, succLabel, unsuccLabel, emptyLabel, superLabel, rateLabel, streakLabel;
 
@@ -992,7 +1101,6 @@ function renderStats(){
       lStreak = num(lTeam.longestRaidStreak);
       rStreak = num(rTeam.longestRaidStreak);
     } else {
-      // Fallback to log-derived
       lTot    = lLog.totalRaids   || 0; rTot    = rLog.totalRaids   || 0;
       lSucc   = lLog.succRaids    || 0; rSucc   = rLog.succRaids    || 0;
       lUnsucc = lLog.unsuccRaids  || 0; rUnsucc = rLog.unsuccRaids  || 0;
@@ -1380,8 +1488,6 @@ const graphObserver = new IntersectionObserver((entries)=>{
 // ============================================================
 // FIREBASE
 // ============================================================
-// Keep this configuration identical to the working broadcast overlay.
-// All Firebase services must point to the same project.
 const firebaseConfig = {
   apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
   authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
@@ -1389,7 +1495,6 @@ const firebaseConfig = {
   projectId: "kabaddi-scoreboard-e1522"
 };
 
-// Prevent duplicate initialization if another page script initializes this project.
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -1398,7 +1503,6 @@ const auth = firebase.auth();
 const urlParams = new URLSearchParams(window.location.search);
 const matchId = (urlParams.get('match') || '').trim();
 
-// Connection indicator for diagnostics; this does not start a database read.
 db.ref('.info/connected').on('value', (snapshot) => {
   window.__kabaddiLog(snapshot.val() === true ? 'OK' : 'WARN', 'Realtime Database connected:', snapshot.val() === true);
 }, (error) => {
@@ -1445,223 +1549,260 @@ function updateLastUpdated(ts){
 }
 
 function startLiveScoreboard(){
-  const statusEl = document.getElementById('uiMatchDate');
-  if (!matchId || /[.#$\[\]\/]/.test(matchId)) {
-    statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
-    statusEl.style.color = "#FF3B30";
-    return;
-  }
-
-  document.getElementById('uiMatchId').innerHTML = '<i class="fa-solid fa-hashtag"></i> '+matchId.toUpperCase();
-  document.getElementById('dtMatchId').innerText = matchId.toUpperCase();
-  setupViewerPresence();
-  statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to live match...';
-  statusEl.style.color = "#8C8E9F";
-
-  // Read the match only after anonymous authentication has succeeded.
-  db.ref('live_matches/'+matchId).on('value', (snapshot) => {
-    const data = snapshot.val();
-    if(!data){ document.getElementById('uiMatchDate').innerText = "Match Offline or Ended."; return; }
-    window.latestMatchData = data;
-
-    const ts = data.last_updated || Date.now();
-    const dateStr = new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    const timeStr = new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-    updateLastUpdated(ts);
-
-    if(data.break_clock_title && data.break_clock_time && data.break_clock_time !== ""){
-      document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch" style="color:#FBC02D;"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
-      document.getElementById('uiMatchDate').style.color = "#FBC02D";
-    } else {
-      document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${dateStr} · Live Kabaddi Arena`;
-      document.getElementById('uiMatchDate').style.color = "#8C8E9F";
-    }
-    document.getElementById('dtDate').innerText = dateStr+", "+timeStr;
-
-    if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
-
-    const liveBadge = document.getElementById('uiLiveBadge');
-    const halfStatusRaw = data.half_status || '';
-    const halfStatusLower = halfStatusRaw.toLowerCase();
-    const matchOverFlag = halfStatusLower.includes('over')
-      || halfStatusLower.includes('full time')
-      || halfStatusLower.includes('match over')
-      || (data.match_result && data.match_result.length > 0)
-      || (data.main_clock === '00:00' && halfStatusLower.length > 0);
-    const breakTitleLower = (data.break_clock_title||'').toLowerCase();
-    const breakTimeStr = data.break_clock_time||'';
-    const inBreak = breakTitleLower.length>0 && breakTimeStr && breakTimeStr !== '00:00';
-    if(matchOverFlag){ liveBadge.className='badge-live badge-final'; liveBadge.textContent='Final'; }
-    else if(inBreak){ liveBadge.className='badge-live badge-break'; liveBadge.textContent='Break'; }
-    else { liveBadge.className='badge-live'; liveBadge.textContent='Live'; }
-
-    let raidIsIdle = true;
-    if(data.raid_clock){
-      const rc = document.getElementById('uiRaidClock');
-      const rCont = document.getElementById('uiRaidTimerContainer');
-      rc.innerText = data.raid_clock;
-      const ti = parseInt(data.raid_clock) || 30;
-      const deg = (ti/30)*360;
-      const color = ti<=10 ? "#FF3B30" : "#FBC02D";
-      rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
-      raidIsIdle = ti >= 30;
+    const statusEl = document.getElementById('uiMatchDate');
+    if (!matchId || /[.#$\[\]\/]/.test(matchId)) {
+        goToAllMatches('Invalid or missing Match ID. Redirecting to all live matches...');
+        return;
     }
 
-    if(halfStatusRaw) document.getElementById('uiHalf').innerHTML = `<i class="fa-solid fa-clock"></i> ${halfStatusRaw}`;
+    document.getElementById('uiMatchId').innerHTML = '<i class="fa-solid fa-hashtag"></i> '+matchId.toUpperCase();
+    document.getElementById('dtMatchId').innerText = matchId.toUpperCase();
+    setupViewerPresence();
+    statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to live match...';
+    statusEl.style.color = "#8C8E9F";
 
-    if(data.left_name && data.right_name){
-      document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
-      document.getElementById('togLeft').innerText = data.left_name;
-      document.getElementById('togRight').innerText = data.right_name;
-    }
-    if(data.left_name){
-      ['uiLeftName','stLeftName','stPerfLeftName','grLeftName','stLeftStrikeTeam'].forEach(id=>document.getElementById(id).innerText=data.left_name);
-      ['stLeftLogo','stPerfLeftLogo','grLeftLogo'].forEach(id=>document.getElementById(id).innerText=getInitials(data.left_name));
-    }
-    if(data.right_name){
-      ['uiRightName','stRightName','stPerfRightName','grRightName','stRightStrikeTeam'].forEach(id=>document.getElementById(id).innerText=data.right_name);
-      ['stRightLogo','stPerfRightLogo','grRightLogo'].forEach(id=>document.getElementById(id).innerText=getInitials(data.right_name));
-    }
-    if(data.left_score !== undefined)  document.getElementById('uiLeftScore').innerText  = data.left_score;
-    if(data.right_score !== undefined) document.getElementById('uiRightScore').innerText = data.right_score;
+    const matchRef = db.ref('live_matches/' + matchId);
 
-    const leftColor  = data.left_color  || "#4CAF50";
-    const rightColor = data.right_color || "#2196F3";
-    window.leftTeamColorForGraph  = leftColor;
-    window.rightTeamColorForGraph = rightColor;
-    document.documentElement.style.setProperty('--left-team-color', leftColor);
-    document.documentElement.style.setProperty('--right-team-color', rightColor);
+    // ==========================================
+    // 1. CHEAP LISTENERS: These update every second (Clocks & Scores)
+    // ==========================================
+    
+    // Main Clock
+    matchRef.child('main_clock').on('value', (s) => {
+        if(s.val()) document.getElementById('uiMainClock').innerText = s.val();
+    });
 
-    if(data.match_duration_mins){
-      document.getElementById('dtDuration').innerText = data.match_duration_mins+" Minutes";
-      window.totalMatchMinutes = data.match_duration_mins * 2;
-      let halfMins = data.match_duration_mins;
-      let currentHalfNum = halfStatusRaw.includes("1st") ? 1 : 2;
-      if(halfStatusRaw.includes("Match Over")) currentHalfNum = 2;
-      let minsLeft = halfMins;
-      if(data.main_clock && data.main_clock.includes(":")){
-        const p = data.main_clock.split(":"); minsLeft = parseInt(p[0]) + (parseInt(p[1])/60);
-      }
-      const elapsed = halfMins - minsLeft;
-      window.currentAbsoluteMatchMinute = (currentHalfNum===1) ? elapsed : (halfMins + elapsed);
-      window.currentAbsoluteMatchMinute = Math.max(0, Math.min(window.totalMatchMinutes, window.currentAbsoluteMatchMinute));
-    }
-    if(data.break_duration_mins)  document.getElementById('dtBreak').innerText     = data.break_duration_mins+" Minutes";
-    if(data.players_per_side)     document.getElementById('dtPlayers').innerText   = data.players_per_side+" Players";
-    if(data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs+" Seconds";
-    if(data.max_subs)             document.getElementById('dtSubs').innerText      = data.max_subs;
-    if(data.max_timeouts)         document.getElementById('dtTimeouts').innerText  = data.max_timeouts;
-
-    window.teamStatsLeft  = data.team_stats_left  || null;
-    window.teamStatsRight = data.team_stats_right || null;
-
-    if(data.state_json){
-      try {
-        const state = JSON.parse(data.state_json);
-        window.latestGlobalState = state;
-
-        document.getElementById('uiLeftEmptyRaidCount').innerText  = state.leftEmptyRaids  || 0;
-        document.getElementById('uiRightEmptyRaidCount').innerText = state.rightEmptyRaids || 0;
-        document.getElementById('uiLeftFouls').innerText     = state.leftFouls    || 0;
-        document.getElementById('uiRightFouls').innerText    = state.rightFouls   || 0;
-        document.getElementById('uiLeftTimeouts').innerText  = state.leftTimeouts || 0;
-        document.getElementById('uiRightTimeouts').innerText = state.rightTimeouts|| 0;
-        document.getElementById('uiLeftSubs').innerText      = state.leftSubs     || 0;
-        document.getElementById('uiRightSubs').innerText     = state.rightSubs    || 0;
-
-        const banner = document.getElementById('uiActiveRaider');
-        if(matchOverFlag){
-          const result = (data.match_result && data.match_result.trim())
-            ? data.match_result.trim()
-            : (num(data.left_score) === num(data.right_score) ? 'Match Tied'
-              : (num(data.left_score) > num(data.right_score)
-                ? (data.left_name||'Left Team')+' won'
-                : (data.right_name||'Right Team')+' won'));
-          banner.classList.remove('idle');
-          banner.classList.add('match-over');
-          banner.innerHTML = `<i class="fa-solid fa-flag-checkered"></i> <span>${result}</span>`;
-        } else if(raidIsIdle || !data.active_raider_name || data.active_raider_name===""){
-          banner.classList.remove('match-over');
-          banner.classList.add('idle');
-          banner.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Waiting for raid to start...';
-        } else {
-          banner.classList.remove('match-over','idle');
-          let isLeftRaid;
-          const raw = state.currentRaidTeamsLeft !== undefined ? state.currentRaidTeamsLeft : state.currentRaidTeamIsLeft;
-          if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
-          else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
-          else if (data.active_raider_team === 'left')  isLeftRaid = true;
-          else if (data.active_raider_team === 'right') isLeftRaid = false;
-          else {
-            const arid = String(data.active_raider_id || '');
-            if (arid.startsWith('left_'))  isLeftRaid = true;
-            else if (arid.startsWith('right_')) isLeftRaid = false;
-            else isLeftRaid = true;
-          }
-          const c = isLeftRaid ? leftColor : rightColor;
-          banner.innerHTML = `<i class="fa-solid fa-person-running" style="color:${c};"></i> <span style="color:${c};">${data.active_raider_name}</span> is on raid`;
-        }
-
-        let lR = [], rR = [];
-        try { lR = JSON.parse(state.leftRosterJson  || '[]'); } catch(e){}
-        try { rR = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
-        window.leftRoster  = lR;
-        window.rightRoster = rR;
-
-        renderMatDots(state, lR, rR, leftColor, rightColor);
-
-        if(state.logsJson){
-          let logs = [];
-          try { logs = JSON.parse(state.logsJson); } catch(e){ console.error(e); }
-          window.matchLogsForGraph = logs;
-          window.halfStatsCache = computeHalfStats();
-
-          if(logs.length>0){
-            const latest = logs[logs.length-1];
-            if(window.lastSeenLogId !== undefined && latest.id !== window.lastSeenLogId) showEventFlash(latest);
-            window.lastSeenLogId = latest.id;
-          }
-          if(document.getElementById('tab-graph').classList.contains('active')) drawGraph();
-
-          let logHtml = "";
-          for(let i=logs.length-1; i>=0; i--){
-            const log = logs[i];
-            const iconPath = getLogIconPath(log);
-            let iconBg;
-            if(log.isLeftTeam === true) iconBg = leftColor;
-            else if(log.isLeftTeam === false) iconBg = rightColor;
-            else iconBg = '#37474F';
-            let badgeHtml = '';
-            if(log.points && log.points > 0){
-              const bc = log.isLeftTeam === true ? leftColor : (log.isLeftTeam === false ? rightColor : '#8C8E9F');
-              badgeHtml = `<div class="log-points-badge" style="background:${bc}33; color:${bc};">+${log.points}</div>`;
+    // Raid Clock (With animated ring logic)
+    matchRef.child('raid_clock').on('value', (s) => {
+        const val = s.val();
+        if(val) {
+            const rc = document.getElementById('uiRaidClock');
+            const rCont = document.getElementById('uiRaidTimerContainer');
+            rc.innerText = val;
+            const ti = parseInt(val) || 30;
+            const deg = (ti/30)*360;
+            const color = ti<=10 ? "#FF3B30" : "#FBC02D";
+            rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
+            
+            const banner = document.getElementById('uiActiveRaider');
+            if (ti >= 30 && !banner.classList.contains('match-over')) {
+                banner.classList.remove('match-over');
+                banner.classList.add('idle');
+                banner.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Waiting for raid to start...';
             }
-            const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i,'') : '';
-            logHtml += `<div class="log-row">
-              <div class="log-icon-circle" style="--icon-bg: ${iconBg};"><img src="${iconPath}" alt="" onerror="this.onerror=null; this.src='/images/default_event.png';"></div>
-              <div class="log-body"><div class="log-title">${getEnglishTitle(log)}</div><div class="log-desc">${log.desc||''}</div></div>
-              <div class="log-side">${badgeHtml}<div class="log-meta-line"><span class="log-time-tag">${log.timeStr||''}</span>${scoreStr?`<span class="log-score-tag">${scoreStr}</span>`:''}</div></div>
-            </div>`;
-          }
-          document.getElementById('uiTimelineLogs').innerHTML = logHtml || '<div class="empty-state"><i class="fa-solid fa-comment-dots"></i>No events recorded yet.</div>';
+        }
+    });
+
+    // Scores
+    matchRef.child('left_score').on('value', s => document.getElementById('uiLeftScore').innerText = s.val() ?? 0);
+    matchRef.child('right_score').on('value', s => document.getElementById('uiRightScore').innerText = s.val() ?? 0);
+    
+    // Half Status
+    matchRef.child('half_status').on('value', (s) => {
+        const val = s.val();
+        if(val) document.getElementById('uiHalf').innerHTML = `<i class="fa-solid fa-clock"></i> ${val}`;
+    });
+
+    // ==========================================
+    // 2. MODERATE LISTENERS: Match Info & Metadata
+    // ==========================================
+    matchRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if(!data){
+            goToAllMatches('This match is offline or has ended. Redirecting to all live matches...');
+            return;
+        }
+        window.latestMatchData = data;
+
+        const ts = data.last_updated || Date.now();
+        const dateStr = new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+        const timeStr = new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        updateLastUpdated(ts);
+
+        if(data.break_clock_title && data.break_clock_time && data.break_clock_time !== ""){
+            document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-stopwatch" style="color:#FBC02D;"></i> ${data.break_clock_title}: ${data.break_clock_time}`;
+            document.getElementById('uiMatchDate').style.color = "#FBC02D";
+        } else {
+            document.getElementById('uiMatchDate').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${dateStr} · Live Kabaddi Arena`;
+            document.getElementById('uiMatchDate').style.color = "#8C8E9F";
+        }
+        document.getElementById('dtDate').innerText = dateStr+", "+timeStr;
+
+        const liveBadge = document.getElementById('uiLiveBadge');
+        const halfStatusRaw = data.half_status || '';
+        const halfStatusLower = halfStatusRaw.toLowerCase();
+        const matchOverFlag = halfStatusLower.includes('over') || halfStatusLower.includes('full time') || halfStatusLower.includes('match over') || (data.match_result && data.match_result.length > 0) || (data.main_clock === '00:00' && halfStatusLower.length > 0);
+        const breakTitleLower = (data.break_clock_title||'').toLowerCase();
+        const breakTimeStr = data.break_clock_time||'';
+        const inBreak = breakTitleLower.length>0 && breakTimeStr && breakTimeStr !== '00:00';
+        
+        if(matchOverFlag){ liveBadge.className='badge-live badge-final'; liveBadge.textContent='Final'; }
+        else if(inBreak){ liveBadge.className='badge-live badge-break'; liveBadge.textContent='Break'; }
+        else { liveBadge.className='badge-live'; liveBadge.textContent='Live'; }
+
+        if(data.left_name && data.right_name){
+            document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
+            document.getElementById('togLeft').innerText = data.left_name;
+            document.getElementById('togRight').innerText = data.right_name;
+        }
+        if(data.left_name){
+            ['uiLeftName','stLeftName','stPerfLeftName','grLeftName','stLeftStrikeTeam'].forEach(id=>document.getElementById(id).innerText=data.left_name);
+            ['stLeftLogo','stPerfLeftLogo','grLeftLogo'].forEach(id=>document.getElementById(id).innerText=getInitials(data.left_name));
+        }
+        if(data.right_name){
+            ['uiRightName','stRightName','stPerfRightName','grRightName','stRightStrikeTeam'].forEach(id=>document.getElementById(id).innerText=data.right_name);
+            ['stRightLogo','stPerfRightLogo','grRightLogo'].forEach(id=>document.getElementById(id).innerText=getInitials(data.right_name));
         }
 
-        renderStats();
-        renderLineups(state);
-      } catch(e){
-        window.__kabaddiLog('ERR', 'Failed to parse or render state_json:', e);
-      }
-    }
-  }, (error) => {
-    window.__kabaddiLog('ERR', 'Failed to read live_matches/' + matchId + ':', error);
-    const status = document.getElementById('uiMatchDate');
-    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Unable to load this match. Check database access and match ID.';
-    status.style.color = '#FF3B30';
-  });
+        const leftColor  = data.left_color  || "#4CAF50";
+        const rightColor = data.right_color || "#2196F3";
+        window.leftTeamColorForGraph  = leftColor;
+        window.rightTeamColorForGraph = rightColor;
+        document.documentElement.style.setProperty('--left-team-color', leftColor);
+        document.documentElement.style.setProperty('--right-team-color', rightColor);
+
+        if(data.match_duration_mins){
+            document.getElementById('dtDuration').innerText = data.match_duration_mins+" Minutes";
+            window.totalMatchMinutes = data.match_duration_mins * 2;
+            let halfMins = data.match_duration_mins;
+            let currentHalfNum = halfStatusRaw.includes("1st") ? 1 : 2;
+            if(halfStatusRaw.includes("Match Over")) currentHalfNum = 2;
+            let minsLeft = halfMins;
+            if(data.main_clock && data.main_clock.includes(":")){
+                const p = data.main_clock.split(":"); minsLeft = parseInt(p[0]) + (parseInt(p[1])/60);
+            }
+            const elapsed = halfMins - minsLeft;
+            window.currentAbsoluteMatchMinute = (currentHalfNum===1) ? elapsed : (halfMins + elapsed);
+            window.currentAbsoluteMatchMinute = Math.max(0, Math.min(window.totalMatchMinutes, window.currentAbsoluteMatchMinute));
+        }
+        if(data.break_duration_mins)  document.getElementById('dtBreak').innerText     = data.break_duration_mins+" Minutes";
+        if(data.players_per_side)     document.getElementById('dtPlayers').innerText   = data.players_per_side+" Players";
+        if(data.timeout_duration_secs) document.getElementById('dtTimeoutDur').innerText = data.timeout_duration_secs+" Seconds";
+        if(data.max_subs)             document.getElementById('dtSubs').innerText      = data.max_subs;
+        if(data.max_timeouts)         document.getElementById('dtTimeouts').innerText  = data.max_timeouts;
+
+        window.teamStatsLeft  = data.team_stats_left  || null;
+        window.teamStatsRight = data.team_stats_right || null;
+    });
+
+    // ==========================================
+    // 3. HEAVY LISTENER (THROTTLED CPU SAVER)
+    // Only runs when the complex state_json actually changes!
+    // ==========================================
+    let stateJsonQueue = null;
+    matchRef.child('state_json').on('value', (snapshot) => {
+        stateJsonQueue = snapshot.val();
+        
+        if (window.__stateJsonTimer) return;
+        window.__stateJsonTimer = setTimeout(() => {
+            window.__stateJsonTimer = null;
+            const raw = stateJsonQueue;
+            stateJsonQueue = null;
+            
+            if (raw) {
+                try {
+                    const state = JSON.parse(raw);
+                    window.latestGlobalState = state;
+                    const data = window.latestMatchData || {}; // Failsafe
+                    
+                    const leftColor  = data.left_color  || "#4CAF50";
+                    const rightColor = data.right_color || "#2196F3";
+
+                    document.getElementById('uiLeftEmptyRaidCount').innerText  = state.leftEmptyRaids  || 0;
+                    document.getElementById('uiRightEmptyRaidCount').innerText = state.rightEmptyRaids || 0;
+                    document.getElementById('uiLeftFouls').innerText     = state.leftFouls    || 0;
+                    document.getElementById('uiRightFouls').innerText    = state.rightFouls   || 0;
+                    document.getElementById('uiLeftTimeouts').innerText  = state.leftTimeouts || 0;
+                    document.getElementById('uiRightTimeouts').innerText = state.rightTimeouts|| 0;
+                    document.getElementById('uiLeftSubs').innerText      = state.leftSubs     || 0;
+                    document.getElementById('uiRightSubs').innerText     = state.rightSubs    || 0;
+
+                    const banner = document.getElementById('uiActiveRaider');
+                    const halfStatusLower = (data.half_status || '').toLowerCase();
+                    const matchOverFlag = halfStatusLower.includes('over') || halfStatusLower.includes('full time') || halfStatusLower.includes('match over') || (data.match_result && data.match_result.length > 0) || (data.main_clock === '00:00' && halfStatusLower.length > 0);
+                    
+                    if(matchOverFlag){
+                        const result = (data.match_result && data.match_result.trim())
+                            ? data.match_result.trim()
+                            : (num(data.left_score) === num(data.right_score) ? 'Match Tied'
+                              : (num(data.left_score) > num(data.right_score)
+                                ? (data.left_name||'Left Team')+' won'
+                                : (data.right_name||'Right Team')+' won'));
+                        banner.classList.remove('idle');
+                        banner.classList.add('match-over');
+                        banner.innerHTML = `<i class="fa-solid fa-flag-checkered"></i> <span>${result}</span>`;
+                    } else if(data.active_raider_name && data.active_raider_name!==""){
+                        banner.classList.remove('match-over','idle');
+                        let isLeftRaid;
+                        const rawTeam = state.currentRaidTeamsLeft !== undefined ? state.currentRaidTeamsLeft : state.currentRaidTeamIsLeft;
+                        if (rawTeam === true  || rawTeam === 1 || rawTeam === '1' || rawTeam === 'true')  isLeftRaid = true;
+                        else if (rawTeam === false || rawTeam === 0 || rawTeam === '0' || rawTeam === 'false') isLeftRaid = false;
+                        else if (data.active_raider_team === 'left')  isLeftRaid = true;
+                        else if (data.active_raider_team === 'right') isLeftRaid = false;
+                        else {
+                            const arid = String(data.active_raider_id || '');
+                            if (arid.startsWith('left_'))  isLeftRaid = true;
+                            else if (arid.startsWith('right_')) isLeftRaid = false;
+                            else isLeftRaid = true;
+                        }
+                        const c = isLeftRaid ? leftColor : rightColor;
+                        banner.innerHTML = `<i class="fa-solid fa-person-running" style="color:${c};"></i> <span style="color:${c};">${data.active_raider_name}</span> is on raid`;
+                    }
+
+                    let lR = [], rR = [];
+                    try { lR = JSON.parse(state.leftRosterJson  || '[]'); } catch(e){}
+                    try { rR = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
+                    window.leftRoster  = lR;
+                    window.rightRoster = rR;
+
+                    renderMatDots(state, lR, rR, leftColor, rightColor);
+
+                    if(state.logsJson){
+                        let logs = [];
+                        try { logs = JSON.parse(state.logsJson); } catch(e){ console.error(e); }
+                        window.matchLogsForGraph = logs;
+                        window.halfStatsCache = computeHalfStats();
+
+                        if(logs.length>0){
+                            const latest = logs[logs.length-1];
+                            if(window.lastSeenLogId !== undefined && latest.id !== window.lastSeenLogId) showEventFlash(latest);
+                            window.lastSeenLogId = latest.id;
+                        }
+                        if(document.getElementById('tab-graph').classList.contains('active')) drawGraph();
+
+                        let logHtml = "";
+                        for(let i=logs.length-1; i>=0; i--){
+                            const log = logs[i];
+                            const iconPath = getLogIconPath(log);
+                            let iconBg;
+                            if(log.isLeftTeam === true) iconBg = leftColor;
+                            else if(log.isLeftTeam === false) iconBg = rightColor;
+                            else iconBg = '#37474F';
+                            let badgeHtml = '';
+                            if(log.points && log.points > 0){
+                                const bc = log.isLeftTeam === true ? leftColor : (log.isLeftTeam === false ? rightColor : '#8C8E9F');
+                                badgeHtml = `<div class="log-points-badge" style="background:${bc}33; color:${bc};">+${log.points}</div>`;
+                            }
+                            const scoreStr = log.scoreStr ? log.scoreStr.replace(/Score:\s*/i,'') : '';
+                            logHtml += `<div class="log-row">
+                              <div class="log-icon-circle" style="--icon-bg: ${iconBg};"><img src="${iconPath}" alt="" onerror="this.onerror=null; this.src='/images/default_event.png';"></div>
+                              <div class="log-body"><div class="log-title">${getEnglishTitle(log)}</div><div class="log-desc">${log.desc||''}</div></div>
+                              <div class="log-side">${badgeHtml}<div class="log-meta-line"><span class="log-time-tag">${log.timeStr||''}</span>${scoreStr?`<span class="log-score-tag">${scoreStr}</span>`:''}</div></div>
+                            </div>`;
+                        }
+                        document.getElementById('uiTimelineLogs').innerHTML = logHtml || '<div class="empty-state"><i class="fa-solid fa-comment-dots"></i>No events recorded yet.</div>';
+                    }
+
+                    renderStats();
+                    renderLineups(state);
+                } catch(e) {
+                    window.__kabaddiLog('ERR', 'Failed to parse state_json:', e);
+                }
+            }
+        }, 150); // 🚨 Throttle delay! Wait 150ms to ensure all simultaneous bursts merge into 1 render.
+    });
 }
 
-// Same authentication sequence as the working broadcast overlay: authenticate first,
-// then attach the live match and viewer-presence listeners.
 auth.signInAnonymously()
   .then(() => {
     window.__kabaddiLog('OK', 'Anonymous Firebase authentication successful.');
@@ -1671,7 +1812,8 @@ auth.signInAnonymously()
     console.error('[KabaddiOne] Firebase anonymous authentication failed:', error);
     const status = document.getElementById('uiMatchDate');
     if (status) {
-      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Secure connection failed. Please try again later.';
+      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Secure connection failed. Please try again later. ' +
+        '<a href="https://kabaddione.com/matches.html" style="color:#FFB830;text-decoration:underline;">Browse all live matches</a>';
       status.style.color = '#FF3B30';
     }
   });
@@ -1695,30 +1837,28 @@ document.addEventListener('DOMContentLoaded', () => {
   observer.observe(document.getElementById('tab-graph'), {attributes:true, attributeFilter:['class']});
 });
 
-(function initAds(){
-  function pushAdSlots(scope){
-    (scope || document).querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])')
-      .forEach(() => {
-        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
-      });
-  }
-  pushAdSlots(document);
-  setTimeout(() => pushAdSlots(document), 1500);
+// ============================================================
+// CLEAN ADSTERRA ANCHOR LOGIC
+// ============================================================
+(function initAdsterraAnchor(){
   const anchor = document.getElementById('adAnchor');
   const anchorClose = document.getElementById('adAnchorClose');
+  
   if (anchor && anchorClose) {
     const dismissed = sessionStorage.getItem('adAnchorDismissed') === '1';
     let shown = dismissed;
+    
     function maybeShowAnchor(){
-      if (shown) return;
+      if(shown) return;
       if (window.scrollY > 400) {
         anchor.classList.add('visible');
         shown = true;
-        pushAdSlots(anchor);
       }
     }
+    
     window.addEventListener('scroll', maybeShowAnchor, { passive: true });
     maybeShowAnchor();
+    
     anchorClose.addEventListener('click', () => {
       anchor.classList.remove('visible');
       shown = true;
