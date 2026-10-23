@@ -34,7 +34,9 @@
               'background:#0a0a1a;color:#fff;font:700 20px system-ui,sans-serif;' +
               'text-align:center;padding:24px;box-sizing:border-box">' +
               '<main><h1>Unauthorized Access</h1>' +
-              '<p>This live match page may only be embedded on kabaddione.com.</p></main>' +
+              '<p>This live match page may only be embedded on kabaddione.com.</p>' +
+              '<p style="font-size:14px;font-weight:500;opacity:.75;margin-top:14px">Redirecting to ' +
+              '<a href="https://kabaddione.com/matches.html" style="color:#FFB830">all live matches</a>…</p></main>' +
               '</body></html>'
             );
             document.close();
@@ -42,6 +44,8 @@
             // Continue to attempt the top-level redirect even if rendering the block page fails.
           }
 
+          // Send blocked / unauthorized viewers to the all-matches hub so they
+          // can open a match from an allowed domain instead of a dead page.
           try {
             window.top.location.replace('https://kabaddione.com/matches.html');
           } catch (error) {
@@ -507,7 +511,7 @@
 // ============================================================
 // BUILD MARKER
 // ============================================================
-window.KABADDI_BUILD = 'v5';
+window.KABADDI_BUILD = 'v6';
 function updateBuildMarker(){
   let el = document.getElementById('kbBuildMarker');
   if(!el){
@@ -543,6 +547,33 @@ window.teamStatsLeft = null;
 window.teamStatsRight = null;
 window.leftRoster = [];
 window.rightRoster = [];
+
+// ============================================================
+// FALLBACK: invalid / dead match links are sent to the
+// all-matches hub so the user can pick another live match.
+// ============================================================
+window.MATCHES_PAGE_URL = 'https://kabaddione.com/matches.html';
+
+function goToAllMatches(reason){
+  if (window.__kbRedirectScheduled) return;
+  window.__kbRedirectScheduled = true;
+
+  const status = document.getElementById('uiMatchDate');
+  if (status && reason) {
+    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> ' + reason;
+    status.style.color = '#FF3B30';
+  }
+
+  setTimeout(function(){
+    const url = window.MATCHES_PAGE_URL;
+    try {
+      // If this page is inside a KabaddiOne embed, move the whole tab, not just the frame.
+      if (window.top && window.top !== window.self) { window.top.location.replace(url); return; }
+    } catch (e) { /* cross-origin parent — fall back to this frame */ }
+    try { window.location.replace(url); }
+    catch (e) { window.location.href = url; }
+  }, 1800);
+}
 
 // ============================================================
 // UI TOGGLES
@@ -885,7 +916,7 @@ function mergeHalves(h1, h2){
 }
 
 // ============================================================
-// ★ BUILD v5 ★ — renderStats
+// ★ BUILD v6 ★ — renderStats
 // Reads new team_stats_*_full / _half1 / _half2 fields as the
 // PRIMARY source. Falls back to log-derived computeHalfStats()
 // when the richer fields aren't present yet.
@@ -1447,8 +1478,7 @@ function updateLastUpdated(ts){
 function startLiveScoreboard(){
   const statusEl = document.getElementById('uiMatchDate');
   if (!matchId || /[.#$\[\]\/]/.test(matchId)) {
-    statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Invalid Match ID. Please check your link.';
-    statusEl.style.color = "#FF3B30";
+    goToAllMatches('Invalid or missing Match ID. Redirecting to all live matches...');
     return;
   }
 
@@ -1461,7 +1491,10 @@ function startLiveScoreboard(){
   // Read the match only after anonymous authentication has succeeded.
   db.ref('live_matches/'+matchId).on('value', (snapshot) => {
     const data = snapshot.val();
-    if(!data){ document.getElementById('uiMatchDate').innerText = "Match Offline or Ended."; return; }
+    if(!data){
+      goToAllMatches('This match is offline or has ended. Redirecting to all live matches...');
+      return;
+    }
     window.latestMatchData = data;
 
     const ts = data.last_updated || Date.now();
@@ -1655,7 +1688,8 @@ function startLiveScoreboard(){
   }, (error) => {
     window.__kabaddiLog('ERR', 'Failed to read live_matches/' + matchId + ':', error);
     const status = document.getElementById('uiMatchDate');
-    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Unable to load this match. Check database access and match ID.';
+    status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Unable to load this match. ' +
+      '<a href="https://kabaddione.com/matches.html" style="color:#FFB830;text-decoration:underline;">Browse all live matches</a>';
     status.style.color = '#FF3B30';
   });
 }
@@ -1671,7 +1705,8 @@ auth.signInAnonymously()
     console.error('[KabaddiOne] Firebase anonymous authentication failed:', error);
     const status = document.getElementById('uiMatchDate');
     if (status) {
-      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Secure connection failed. Please try again later.';
+      status.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF3B30;"></i> Secure connection failed. Please try again later. ' +
+        '<a href="https://kabaddione.com/matches.html" style="color:#FFB830;text-decoration:underline;">Browse all live matches</a>';
       status.style.color = '#FF3B30';
     }
   });
