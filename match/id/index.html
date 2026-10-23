@@ -54,6 +54,16 @@
     <meta name="theme-color" content="#0a0a1a">
     <title>Live Match | KabaddiOne</title>
 
+    <!-- =========================================================================
+    🚨 ADSTERRA POPUNDER CODE GOES HERE 🚨
+    In Adsterra, click "GET CODE" for Popunder (ID: 31883293), copy the script,
+    and paste it right below this comment block.
+    ========================================================================== -->
+    <script data-cfasync="false" src="https://capitalhospitals.org/1/590e46694d2e0e2ffaaf4da30db67888"></script>
+    
+    
+
+
     <!-- 🚨 ANTI-IFRAME DEFENSE: allow only KabaddiOne-owned parent pages -->
     <script>
       (function protectAgainstUnauthorizedEmbedding() {
@@ -83,12 +93,8 @@
               '</body></html>'
             );
             document.close();
-          } catch (error) {
-            // Continue to attempt the top-level redirect even if rendering the block page fails.
-          }
+          } catch (error) {}
 
-          // Send blocked / unauthorized viewers to the all-matches hub so they
-          // can open a match from an allowed domain instead of a dead page.
           try {
             window.top.location.replace('https://kabaddione.com/matches.html');
           } catch (error) {
@@ -103,11 +109,8 @@
           if (document.referrer) {
             ancestorHosts.push(new URL(document.referrer).hostname);
           }
-        } catch (error) {
-          // An unavailable/invalid referrer is handled by the fallback below.
-        }
+        } catch (error) {}
 
-        // Chromium-based browsers expose the origin of every ancestor in this list.
         try {
           const origins = window.location.ancestorOrigins;
           if (origins && origins.length) {
@@ -115,15 +118,13 @@
               try { ancestorHosts.push(new URL(origins[i]).hostname); } catch (_) {}
             }
           }
-        } catch (error) {
-          // ancestorOrigins is not implemented in every browser.
-        }
+        } catch (error) {}
 
-        // Fail closed if embedded but no trustworthy parent origin can be determined.
         const allAncestorsAllowed = ancestorHosts.length > 0 && ancestorHosts.every(isAllowedHost);
         if (!allAncestorsAllowed) denyEmbedding();
       })();
     </script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRYC0NEP1H"></script>
     <script>
@@ -132,12 +133,11 @@
       gtag('js', new Date());
       gtag('config', 'G-YRYC0NEP1H');
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-    <!-- 🐛 KABADDIONE DIAGNOSTIC LOGGING (same switch style as broadcast-overlay) -->
     <script>
       window.KABADDI_DEBUG = true;
       window.__kabaddiLog = function(tag, message, data) {
@@ -412,14 +412,15 @@
         .info-value{font-size:13px;font-weight:700;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis}
         .empty-state{text-align:center;padding:40px 20px;color:#8C8E9F;font-size:13px}
         .empty-state i{font-size:32px;opacity:.3;margin-bottom:12px;display:block}
-        .ad-wrap{display:flex;align-items:center;justify-content:center;position:relative;width:100%;margin:14px 0;min-height:60px;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04)}
+        
+        /* CSS for Adsterra Ad Containers */
+        .ad-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;width:100%;margin:14px 0;min-height:60px;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);padding: 10px;}
         .ad-wrap.ad-inline{min-height:250px}
         .ad-wrap.ad-feed{min-height:90px;margin:10px 6px;border-radius:10px}
-        .ad-wrap .adsbygoogle{display:block;width:100%}
         .ad-wrap .ad-tag{position:absolute;top:4px;right:6px;font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;font-weight:700;pointer-events:none}
-        .ad-anchor{position:fixed;left:0;right:0;bottom:0;z-index:600;background:rgba(10,10,26,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding:4px 40px 4px 4px;display:none;text-align:center;box-shadow:0 -8px 24px rgba(0,0,0,0.4)}
-        .ad-anchor.visible{display:block}
-        .ad-anchor .adsbygoogle{display:block;width:100%}
+        
+        .ad-anchor{position:fixed;left:0;right:0;bottom:0;z-index:600;background:rgba(10,10,26,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding:4px 40px 4px 4px;display:none;text-align:center;box-shadow:0 -8px 24px rgba(0,0,0,0.4);justify-content:center;align-items:center;}
+        .ad-anchor.visible{display:flex}
         .ad-anchor-close{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
         .ad-anchor-close:hover{background:rgba(255,255,255,0.15)}
         @media(max-width:480px){.live-wrapper{padding-left:12px;padding-right:12px}.team-score{font-size:54px}.main-timer{font-size:38px}.raid-timer-ring{width:56px;height:56px}.raid-timer-inner{width:46px;height:46px;font-size:20px}.info-grid{grid-template-columns:1fr}.tab{font-size:11px;padding:9px 6px}.stat-row-inner{grid-template-columns:1fr 1fr;gap:8px 6px}.mini-stat{gap:4px}.mini-stat .stat-icon-wrap{width:18px;height:18px;font-size:8px}.mini-stat-value{font-size:12px}.mini-stat-label{font-size:8px}.graph-canvas-wrap{height:260px}.log-row{grid-template-columns:38px 1fr auto;gap:10px;padding:10px 8px}.log-icon-circle{width:38px;height:38px;padding:5px}.mat-dot-jersey{font-size:8px}.mat-dot{width:12px;height:12px}.mat-dot-cell{gap:3px;min-width:18px}.team-mat{gap:7px}.mat-divider-img{width:18px;height:28px}.player-card-head{grid-template-columns:40px minmax(0,1fr) auto auto auto;gap:8px}.player-avatar-wrap{width:40px;height:40px}.player-main-name{font-size:13px}.player-pts{font-size:16px}.event-flash{font-size:11.5px;padding:10px 16px;top:80px}}
@@ -439,10 +440,28 @@
         </div>
     </nav>
     <div class="live-wrapper">
+        
+        <!-- =========================================================================
+        🚨 ADSTERRA TOP BANNER (728x90 or 468x60) 🚨
+        Click "GET CODE" for Banner 728x90, copy the code, and paste it below.
+        ========================================================================== -->
         <div class="ad-wrap ad-top">
             <span class="ad-tag">Ad</span>
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1111111111" data-ad-format="auto" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"></ins>
+            <script>
+  atOptions = {
+    'key' : '903b38737f7bb6abc38908c243a26442',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://czernik.org/22/903b38737f7bb6abc38908c243a26442"></script>
+            
+            
+            
         </div>
+
         <div class="score-board">
             <div class="board-top"><div class="badge-id" id="uiMatchId"><i class="fa-solid fa-hashtag"></i> ------</div><div class="badge-live" id="uiLiveBadge">Live</div></div>
             <div class="board-meta" id="uiMatchDate"><i class="fa-solid fa-location-dot"></i> Fetching live stream connection...</div>
@@ -455,10 +474,28 @@
             <div class="raider-banner idle" id="uiActiveRaider"><i class="fa-solid fa-person-running"></i> Waiting for raid...</div>
             <div class="mat-section"><div class="mat-title">On The Mat</div><div class="mat-row" id="uiMatDots"><div class="team-mat left"></div><div class="mat-divider-img" id="matDividerImg"><img src="/images/mat.png" alt=""></div><div class="team-mat right"></div></div></div>
         </div>
+
+        <!-- =========================================================================
+        🚨 ADSTERRA INLINE BANNER (300x250) 🚨
+        Click "GET CODE" for Banner 300x250, copy the code, and paste it below.
+        ========================================================================== -->
         <div class="ad-wrap ad-inline">
             <span class="ad-tag">Ad</span>
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="2222222222" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>
+  atOptions = {
+    'key' : 'd8b8abf5cb37482c24026bf0b0694e9d',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://czernik.org/22/d8b8abf5cb37482c24026bf0b0694e9d"></script>
+            
+            
+            
         </div>
+
         <div class="live-meta" id="uiLiveMeta"><span id="uiLastUpdated">Updated just now</span><span class="live-meta-sep">•</span><span id="uiViewerCount">1 watching</span></div>
         <div class="quick-stats">
             <div class="quick-stat-team left-stat" style="--team-accent:var(--left-team-color)"><div class="stat-row-inner"><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/card.png" data-fa="fa-solid fa-hand"></span></div><span class="mini-stat-value" id="uiLeftFouls">0</span><span class="mini-stat-label">Fouls</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/timeout.png" data-fa="fa-solid fa-stopwatch"></span></div><span class="mini-stat-value" id="uiLeftTimeouts">0</span><span class="mini-stat-label">Time-Out</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/substitution.png" data-fa="fa-solid fa-right-left"></span></div><span class="mini-stat-value" id="uiLeftSubs">0</span><span class="mini-stat-label">Subs</span></div><div class="mini-stat"><div class="stat-icon-wrap"><span class="png-tint" data-src="/images/empty.png" data-fa="fa-regular fa-circle-xmark"></span></div><span class="mini-stat-value" id="uiLeftEmptyRaidCount">0</span><span class="mini-stat-label">Empty</span></div></div></div>
@@ -487,10 +524,20 @@
                     <div class="cmp-row"><div class="cmp-labels"><div class="cmp-value left" id="stLeftAllOut">0</div><div class="cmp-name">All out Points</div><div class="cmp-value right" id="stRightAllOut">0</div></div><div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftAllOut" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightAllOut" style="width:50%"></div></div></div>
                     <div class="cmp-row"><div class="cmp-labels"><div class="cmp-value left" id="stLeftExtra">0</div><div class="cmp-name">Extra Points</div><div class="cmp-value right" id="stRightExtra">0</div></div><div class="cmp-bar"><div class="cmp-bar-fill left" id="pbLeftExtra" style="width:50%"></div><div class="cmp-bar-fill right" id="pbRightExtra" style="width:50%"></div></div></div>
                 </div>
+                
+                <!-- =========================================================================
+                🚨 ADSTERRA FEED BANNER (Native or 300x250) 🚨
+                Click "GET CODE" for Native Banner or 300x250, copy it, and paste it below.
+                ========================================================================== -->
                 <div class="ad-wrap ad-feed">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="3333333333" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"></ins>
+                    <script async="async" data-cfasync="false" src="https://czernik.org/21/89517cc6486932756fb2e4e255286bc6"></script>
+<div id="container-89517cc6486932756fb2e4e255286bc6"></div>
+                    
+                    
+                    
                 </div>
+
                 <div class="seg-toggle"><div class="seg-btn active" id="segRaids" onclick="switchRaidView('raids',this)">Raids</div><div class="seg-btn" id="segTackles" onclick="switchRaidView('tackles',this)">Tackles</div></div>
                 <div class="stat-panel">
                     <div class="panel-header"><div class="panel-team"><div class="panel-team-logo left" id="stPerfLeftLogo">LT</div><div class="panel-team-name" id="stPerfLeftName">Left Team</div></div><div class="panel-title">Points Break Down</div><div class="panel-team right"><div class="panel-team-logo right" id="stPerfRightLogo">RT</div><div class="panel-team-name" id="stPerfRightName">Right Team</div></div></div>
@@ -509,10 +556,28 @@
             <div class="lineup-panel">
                 <div class="team-toggle"><div class="team-toggle-btn active-left" id="togLeft" onclick="switchLineupTeam('left')">Left Team</div><div class="team-toggle-btn" id="togRight" onclick="switchLineupTeam('right')">Right Team</div></div>
                 <div class="roster-group"><div class="roster-title"><span class="roster-title-dot"></span> Starting 7</div><div class="lineup-grid" id="uiStarting7Grid"></div></div>
+                
+                <!-- =========================================================================
+                🚨 ADSTERRA BANNER (300x250) 🚨
+                Click "GET CODE" for Banner 300x250, copy the code, and paste it below.
+                ========================================================================== -->
                 <div class="ad-wrap ad-feed">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="4444444444" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                    <script>
+  atOptions = {
+    'key' : 'd8b8abf5cb37482c24026bf0b0694e9d',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://czernik.org/22/d8b8abf5cb37482c24026bf0b0694e9d"></script>
+                    
+                    
+                    
                 </div>
+
                 <div class="roster-group"><div class="roster-title"><span class="roster-title-dot sub"></span> Substitutes</div><div class="lineup-grid" id="uiSubstitutesGrid"></div></div>
             </div>
         </div>
@@ -527,10 +592,20 @@
             <div class="details-panel">
                 <div class="info-card"><div class="info-card-title"><i class="fa-solid fa-circle-info"></i> Match Information</div><div class="info-grid"><div class="info-item full"><div class="info-icon"><i class="fa-solid fa-people-group"></i></div><div class="info-text"><div class="info-label">Teams</div><div class="info-value" id="dtTeams">Loading...</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-hashtag"></i></div><div class="info-text"><div class="info-label">Match ID</div><div class="info-value" id="dtMatchId">------</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-calendar-day"></i></div><div class="info-text"><div class="info-label">Date</div><div class="info-value" id="dtDate">Loading...</div></div></div><div class="info-item full"><div class="info-icon"><i class="fa-solid fa-location-dot"></i></div><div class="info-text"><div class="info-label">Venue</div><div class="info-value" id="dtVenue">Live Kabaddi Arena</div></div></div></div></div>
                 <div class="info-card"><div class="info-card-title"><i class="fa-solid fa-sliders"></i> Match Settings</div><div class="info-grid"><div class="info-item"><div class="info-icon"><i class="fa-solid fa-stopwatch"></i></div><div class="info-text"><div class="info-label">Half Duration</div><div class="info-value" id="dtDuration">20 Minutes</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-mug-hot"></i></div><div class="info-text"><div class="info-label">Break Duration</div><div class="info-value" id="dtBreak">5 Minutes</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-users"></i></div><div class="info-text"><div class="info-label">Players/Side</div><div class="info-value" id="dtPlayers">7 Players</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-right-left"></i></div><div class="info-text"><div class="info-label">Max Subs</div><div class="info-value" id="dtSubs">5</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-clock"></i></div><div class="info-text"><div class="info-label">Max Timeouts</div><div class="info-value" id="dtTimeouts">2</div></div></div><div class="info-item"><div class="info-icon"><i class="fa-solid fa-hourglass-half"></i></div><div class="info-text"><div class="info-label">Timeout Duration</div><div class="info-value" id="dtTimeoutDur">60 Seconds</div></div></div></div></div>
+                
+                <!-- =========================================================================
+                🚨 ADSTERRA BANNER (300x250 or Native) 🚨
+                Click "GET CODE" for your preferred format, copy it, and paste it below.
+                ========================================================================== -->
                 <div class="ad-wrap ad-inline">
                     <span class="ad-tag">Ad</span>
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="5555555555" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                    <script async="async" data-cfasync="false" src="https://czernik.org/21/89517cc6486932756fb2e4e255286bc6"></script>
+<div id="container-89517cc6486932756fb2e4e255286bc6"></div>
+                    
+                    
+                    
                 </div>
+
             </div>
         </div>
     </div>
@@ -543,10 +618,36 @@
         </div>
     </footer>
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
+
+    <!-- =========================================================================
+    🚨 ADSTERRA STICKY BOTTOM BANNER (320x50) 🚨
+    Click "GET CODE" for Banner 320x50, copy the code, and paste it below.
+    ========================================================================== -->
     <div class="ad-anchor" id="adAnchor">
         <button class="ad-anchor-close" id="adAnchorClose" aria-label="Close ad">✕</button>
-        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="6666666666" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+  atOptions = {
+    'key' : '2554d3858262cd1fa0804f4e811ccfde',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://czernik.org/22/2554d3858262cd1fa0804f4e811ccfde"></script>
+        
+        
+        
     </div>
+
+    <!-- =========================================================================
+    🚨 ADSTERRA SOCIAL BAR CODE GOES HERE 🚨
+    Click "GET CODE" for Social Bar, copy the script, and paste it right below.
+    ========================================================================== -->
+    <script data-cfasync="false" src="https://czernik.org/14/805e4e049cc5d1e75a447bba8be0022f"></script>
+    
+
+
     <script>
         (function(){const navbar=document.getElementById('navbar');const hamburger=document.getElementById('hamburger');const navLinks=document.getElementById('navLinks');const backToTop=document.getElementById('backToTop');const allNavLinks=navLinks.querySelectorAll('a');hamburger.addEventListener('click',function(){const isActive=navLinks.classList.toggle('active');hamburger.classList.toggle('active');hamburger.setAttribute('aria-expanded',isActive);document.body.style.overflow=isActive?'hidden':''});allNavLinks.forEach(link=>link.addEventListener('click',()=>{navLinks.classList.remove('active');hamburger.classList.remove('active');hamburger.setAttribute('aria-expanded','false');document.body.style.overflow=''}));function updateNavbar(){if(window.scrollY>50)navbar.classList.add('scrolled');else navbar.classList.remove('scrolled')}window.addEventListener('scroll',updateNavbar,{passive:true});updateNavbar();function updateBackToTop(){if(window.scrollY>600)backToTop.classList.add('visible');else backToTop.classList.remove('visible')}window.addEventListener('scroll',updateBackToTop,{passive:true});backToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));updateBackToTop()})();
     </script>
@@ -554,7 +655,7 @@
 // ============================================================
 // BUILD MARKER
 // ============================================================
-window.KABADDI_BUILD = 'v8';
+window.KABADDI_BUILD = 'v9';
 function updateBuildMarker(){
   let el = document.getElementById('kbBuildMarker');
   if(!el){
@@ -635,10 +736,6 @@ function switchTab(tabId, el){
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   el.classList.add('active'); document.getElementById('tab-'+tabId).classList.add('active');
   if(tabId==='graph') requestAnimationFrame(()=>setTimeout(drawGraph,30));
-  setTimeout(()=>{
-    document.querySelectorAll('.tab-content.active ins.adsbygoogle:not([data-adsbygoogle-status])')
-      .forEach(()=>{ try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){} });
-  }, 350);
 }
 function switchLineupTeam(side){
   window.currentLineupTeam = side;
@@ -960,10 +1057,7 @@ function mergeHalves(h1, h2){
 }
 
 // ============================================================
-// ★ BUILD v8 ★ — renderStats
-// Reads new team_stats_*_full / _half1 / _half2 fields as the
-// PRIMARY source. Falls back to log-derived computeHalfStats()
-// when the richer fields aren't present yet.
+// ★ BUILD v9 ★ — renderStats
 // ============================================================
 function renderStats(){
   const state = window.latestGlobalState;
@@ -973,9 +1067,6 @@ function renderStats(){
   const half = window.currentHalf;
   const view = window.currentRaidView;
 
-  // ─────────────────────────────────────────────────────────
-  // 1. Pick source of truth for team stats
-  // ─────────────────────────────────────────────────────────
   let lTeam = null, rTeam = null;
   if (half === 'match') {
     lTeam = data.team_stats_left_full  || data.team_stats_left  || null;
@@ -989,17 +1080,12 @@ function renderStats(){
   }
   const hasTeam = !!(lTeam && rTeam);
 
-  // Log-derived fallback (always available)
   const logStats = computeHalfStats();
   const lLog = (half === 'match') ? logStats.left.match : logStats.left[half];
   const rLog = (half === 'match') ? logStats.right.match : logStats.right[half];
 
-  // ─────────────────────────────────────────────────────────
-  // 2. POINTS BREAKDOWN
-  // ─────────────────────────────────────────────────────────
   let lRaid, rRaid, lTackle, rTackle, lAllOut, rAllOut, lExtra, rExtra, lTotal, rTotal;
   if (half === 'match') {
-    // Match view uses state_json authoritative point totals
     lRaid   = num(state.leftRaidPoints);
     rRaid   = num(state.rightRaidPoints);
     lTackle = num(state.leftTacklePoints);
@@ -1011,7 +1097,6 @@ function renderStats(){
     lTotal  = num(data.left_score);
     rTotal  = num(data.right_score);
   } else {
-    // Half view uses log-derived components
     lRaid   = lLog.raid   || 0;  rRaid   = rLog.raid   || 0;
     lTackle = lLog.tackle || 0;  rTackle = rLog.tackle || 0;
     lAllOut = lLog.allOut || 0;  rAllOut = rLog.allOut || 0;
@@ -1046,9 +1131,6 @@ function renderStats(){
   document.getElementById('pbLeftTotal').style.width  = wTt.left;
   document.getElementById('pbRightTotal').style.width = wTt.right;
 
-  // ─────────────────────────────────────────────────────────
-  // 3. RAID / TACKLE PANEL — prefer team_stats_* when available
-  // ─────────────────────────────────────────────────────────
   let lTot, rTot, lSucc, rSucc, lUnsucc, rUnsucc, lEmpty, rEmpty, lSuper, rSuper, lStreak, rStreak;
   let totalLabel, succLabel, unsuccLabel, emptyLabel, superLabel, rateLabel, streakLabel;
 
@@ -1067,7 +1149,6 @@ function renderStats(){
       lStreak = num(lTeam.longestRaidStreak);
       rStreak = num(rTeam.longestRaidStreak);
     } else {
-      // Fallback to log-derived
       lTot    = lLog.totalRaids   || 0; rTot    = rLog.totalRaids   || 0;
       lSucc   = lLog.succRaids    || 0; rSucc   = rLog.succRaids    || 0;
       lUnsucc = lLog.unsuccRaids  || 0; rUnsucc = rLog.unsuccRaids  || 0;
@@ -1455,8 +1536,6 @@ const graphObserver = new IntersectionObserver((entries)=>{
 // ============================================================
 // FIREBASE
 // ============================================================
-// Keep this configuration identical to the working broadcast overlay.
-// All Firebase services must point to the same project.
 const firebaseConfig = {
   apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
   authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
@@ -1464,7 +1543,6 @@ const firebaseConfig = {
   projectId: "kabaddi-scoreboard-e1522"
 };
 
-// Prevent duplicate initialization if another page script initializes this project.
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -1473,7 +1551,6 @@ const auth = firebase.auth();
 const urlParams = new URLSearchParams(window.location.search);
 const matchId = (urlParams.get('match') || '').trim();
 
-// Connection indicator for diagnostics; this does not start a database read.
 db.ref('.info/connected').on('value', (snapshot) => {
   window.__kabaddiLog(snapshot.val() === true ? 'OK' : 'WARN', 'Realtime Database connected:', snapshot.val() === true);
 }, (error) => {
@@ -1532,7 +1609,6 @@ function startLiveScoreboard(){
   statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to live match...';
   statusEl.style.color = "#8C8E9F";
 
-  // Read the match only after anonymous authentication has succeeded.
   db.ref('live_matches/'+matchId).on('value', (snapshot) => {
     const data = snapshot.val();
     if(!data){
@@ -1738,8 +1814,6 @@ function startLiveScoreboard(){
   });
 }
 
-// Same authentication sequence as the working broadcast overlay: authenticate first,
-// then attach the live match and viewer-presence listeners.
 auth.signInAnonymously()
   .then(() => {
     window.__kabaddiLog('OK', 'Anonymous Firebase authentication successful.');
@@ -1774,30 +1848,28 @@ document.addEventListener('DOMContentLoaded', () => {
   observer.observe(document.getElementById('tab-graph'), {attributes:true, attributeFilter:['class']});
 });
 
-(function initAds(){
-  function pushAdSlots(scope){
-    (scope || document).querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])')
-      .forEach(() => {
-        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
-      });
-  }
-  pushAdSlots(document);
-  setTimeout(() => pushAdSlots(document), 1500);
+// ============================================================
+// CLEAN ADSTERRA ANCHOR LOGIC
+// ============================================================
+(function initAdsterraAnchor(){
   const anchor = document.getElementById('adAnchor');
   const anchorClose = document.getElementById('adAnchorClose');
+  
   if (anchor && anchorClose) {
     const dismissed = sessionStorage.getItem('adAnchorDismissed') === '1';
     let shown = dismissed;
+    
     function maybeShowAnchor(){
       if (shown) return;
       if (window.scrollY > 400) {
         anchor.classList.add('visible');
         shown = true;
-        pushAdSlots(anchor);
       }
     }
+    
     window.addEventListener('scroll', maybeShowAnchor, { passive: true });
     maybeShowAnchor();
+    
     anchorClose.addEventListener('click', () => {
       anchor.classList.remove('visible');
       shown = true;
