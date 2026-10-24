@@ -1484,7 +1484,7 @@ const graphObserver = new IntersectionObserver((entries)=>{
 }, {threshold:0.15});
 
 // ============================================================
-// CLOUDFLARE CDN POLLING ENGINE (With Smooth Local Ticking)
+// CLOUDFLARE CDN POLLING ENGINE (With Smart Local Ticking!)
 // ============================================================
 const CLOUDFLARE_WORKER_URL = "https://kabaddi-cache.art-gauravkumar.workers.dev";
 const urlParams = new URLSearchParams(window.location.search);
@@ -1493,11 +1493,15 @@ const matchId = (urlParams.get('match') || '').trim();
 let lastProcessedState = null;
 let pollErrorCount = 0;
 
-// 🚨 LOCAL TICKER STATE
+// 🚨 SMART LOCAL TICKER STATE
 let localMainSeconds = -1;
 let localRaidSeconds = -1;
 let isMainClockRunningLocally = false;
 let isRaidClockRunningLocally = false;
+let lastReceivedMainClock = "";
+let lastReceivedRaidClock = "";
+let lastMainChangeTime = 0;
+let lastRaidChangeTime = 0;
 
 function updateLastUpdated(ts){
   const el = document.getElementById('uiLastUpdated'); if(!el) return;
@@ -1507,7 +1511,7 @@ function updateLastUpdated(ts){
   el.innerText = 'Updated '+dateStr+' · '+timeStr;
 }
 
-// 🚨 NEW: SMOOTH LOCAL CLOCK RENDERER
+// 🚨 DRAWS THE SMOOTH TICKS TO THE SCREEN
 function renderLocalClocks() {
     if (localMainSeconds >= 0) {
         const m = String(Math.floor(localMainSeconds / 60)).padStart(2, '0');
@@ -1538,23 +1542,32 @@ function renderLocalClocks() {
 function processMatchData(data) {
     if (!data) return;
     window.latestMatchData = data;
+    const now = Date.now();
 
-    // 1. FAST SYNC FOR LOCAL CLOCKS
-    if(data.main_clock) {
-        const p = data.main_clock.split(':');
-        if(p.length === 2) localMainSeconds = (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0);
+    // 1. SMART CLOCK SYNC (Detects if the Android app paused or is running!)
+    if (data.main_clock) {
+        if (data.main_clock !== lastReceivedMainClock) {
+            // Clock moved! Snap to the real time and start ticking locally.
+            const p = data.main_clock.split(':');
+            localMainSeconds = (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0);
+            isMainClockRunningLocally = true;
+            lastReceivedMainClock = data.main_clock;
+            lastMainChangeTime = now;
+        } else if (now - lastMainChangeTime > 8000) {
+            // Clock hasn't moved in over 8 seconds. It must be paused on the phone!
+            isMainClockRunningLocally = false;
+        }
     }
-    if(data.raid_clock) {
-        localRaidSeconds = parseInt(data.raid_clock) || 0;
-    }
-
-    // Peek at the timer states to control our local JS ticker
-    if (data.state_json) {
-        try {
-            const peekState = JSON.parse(data.state_json);
-            isMainClockRunningLocally = peekState.mainTimerRunning === true;
-            isRaidClockRunningLocally = peekState.raidTimerRunning === true;
-        } catch(e) {}
+    
+    if (data.raid_clock) {
+        if (data.raid_clock !== lastReceivedRaidClock) {
+            localRaidSeconds = parseInt(data.raid_clock) || 0;
+            isRaidClockRunningLocally = true;
+            lastReceivedRaidClock = data.raid_clock;
+            lastRaidChangeTime = now;
+        } else if (now - lastRaidChangeTime > 8000) {
+            isRaidClockRunningLocally = false;
+        }
     }
 
     // CHEAP SCORE UPDATES
@@ -1589,13 +1602,12 @@ function processMatchData(data) {
     else if(inBreak){ liveBadge.className='badge-live badge-break'; liveBadge.textContent='Break'; }
     else { liveBadge.className='badge-live'; liveBadge.textContent='Live'; }
 
-    // If match is completely over or in a break, forcefully pause the local clocks
+    // Force pause clocks if match is over or in a break
     if (matchOverFlag || inBreak) {
         isMainClockRunningLocally = false;
         isRaidClockRunningLocally = false;
     }
 
-    // Instantly render the perfectly synced clocks
     renderLocalClocks();
 
     if(data.left_name && data.right_name){
@@ -1645,7 +1657,7 @@ function processMatchData(data) {
     window.teamStatsLeft  = data.team_stats_left  || null;
     window.teamStatsRight = data.team_stats_right || null;
 
-    // 3. HEAVY STATE JSON PROCESSING (Only runs if a major event occurred)
+    // 3. HEAVY STATE JSON PROCESSING
     if (data.state_json && data.state_json !== lastProcessedState) {
         lastProcessedState = data.state_json;
         
