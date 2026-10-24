@@ -1209,32 +1209,75 @@
         }
 
         // ==========================================
-        // 🚨 SUSPENSION TIMERS
+        // 🚨 SUSPENSION TIMERS (SMART LOCAL TICKING)
         // ==========================================
-        function updateSuspensionTimers(data, state) {
-            let leftRoster = [], rightRoster = [];
-            if (state) {
-                try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e) {}
-                try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e) {}
+        let localSuspensions = { left: null, right: null };
+        let lastMainClockSeconds = -1;
+        let lastParsedStateJson = null;
+
+        function parseMainClock(clockStr) {
+            if (!clockStr || !clockStr.includes(':')) return -1;
+            const p = clockStr.split(':');
+            return (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0);
+        }
+
+        function updateSuspensionTimers(data, state, rawStateJsonStr) {
+            
+            // 1. If the heavy state_json actually changed (a foul just happened or ended), reset our local data!
+            if (rawStateJsonStr && rawStateJsonStr !== lastParsedStateJson) {
+                lastParsedStateJson = rawStateJsonStr;
+                
+                let leftRoster = [], rightRoster = [];
+                if (state) {
+                    try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e) {}
+                    try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e) {}
+                }
+
+                let lSusp = leftRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
+                let rSusp = rightRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
+
+                localSuspensions.left = lSusp ? { 
+                    name: lSusp.name, 
+                    jersey: lSusp.jerseyNumber, 
+                    timeLeft: parseInt(lSusp.suspensionSeconds) 
+                } : null;
+
+                localSuspensions.right = rSusp ? { 
+                    name: rSusp.name, 
+                    jersey: rSusp.jerseyNumber, 
+                    timeLeft: parseInt(rSusp.suspensionSeconds) 
+                } : null;
             }
 
-            let lSusp = null, rSusp = null;
-            if (data && Array.isArray(data.suspended_players) && data.suspended_players.length) {
-                const l = data.suspended_players.find(p => p.team === 'left');
-                const r = data.suspended_players.find(p => p.team === 'right');
-                if (l) lSusp = { jerseyNumber: l.jersey, name: l.name, suspensionSeconds: l.seconds_remaining };
-                if (r) rSusp = { jerseyNumber: r.jersey, name: r.name, suspensionSeconds: r.seconds_remaining };
+            // 2. Calculate if the Main Clock actually ticked down since the last update
+            const currentMainClockSeconds = parseMainClock(data.main_clock);
+            let secondsTicked = 0;
+            
+            // Only tick down if the clock is actively moving downwards (meaning it's not paused)
+            if (lastMainClockSeconds !== -1 && currentMainClockSeconds !== -1 && currentMainClockSeconds < lastMainClockSeconds) {
+                secondsTicked = lastMainClockSeconds - currentMainClockSeconds;
             }
-            if (!lSusp) lSusp = leftRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
-            if (!rSusp) rSusp = rightRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
+            lastMainClockSeconds = currentMainClockSeconds;
 
+            // 3. Apply the tick to our local suspensions
+            if (secondsTicked > 0) {
+                if (localSuspensions.left && localSuspensions.left.timeLeft > 0) {
+                    localSuspensions.left.timeLeft -= secondsTicked;
+                    if (localSuspensions.left.timeLeft < 0) localSuspensions.left.timeLeft = 0;
+                }
+                if (localSuspensions.right && localSuspensions.right.timeLeft > 0) {
+                    localSuspensions.right.timeLeft -= secondsTicked;
+                    if (localSuspensions.right.timeLeft < 0) localSuspensions.right.timeLeft = 0;
+                }
+            }
+
+            // 4. Draw the UI
             const lTimer = document.getElementById('left-suspension-timer');
             if (lTimer) {
-                if (lSusp) {
-                    const secs = parseInt(lSusp.suspensionSeconds) || 0;
-                    document.getElementById('left-suspension-time').textContent = secs;
-                    document.getElementById('left-suspension-player').textContent =
-                        `#${lSusp.jerseyNumber || ''} ${lSusp.name || 'Player'}`.trim();
+                if (localSuspensions.left && localSuspensions.left.timeLeft > 0) {
+                    document.getElementById('left-suspension-time').textContent = localSuspensions.left.timeLeft;
+                    document.getElementById('left-suspension-player').textContent = 
+                        `#${localSuspensions.left.jersey || ''} ${localSuspensions.left.name || 'Player'}`.trim();
                     lTimer.classList.add('show');
                 } else {
                     lTimer.classList.remove('show');
@@ -1243,18 +1286,16 @@
 
             const rTimer = document.getElementById('right-suspension-timer');
             if (rTimer) {
-                if (rSusp) {
-                    const secs = parseInt(rSusp.suspensionSeconds) || 0;
-                    document.getElementById('right-suspension-time').textContent = secs;
-                    document.getElementById('right-suspension-player').textContent =
-                        `#${rSusp.jerseyNumber || ''} ${rSusp.name || 'Player'}`.trim();
+                if (localSuspensions.right && localSuspensions.right.timeLeft > 0) {
+                    document.getElementById('right-suspension-time').textContent = localSuspensions.right.timeLeft;
+                    document.getElementById('right-suspension-player').textContent = 
+                        `#${localSuspensions.right.jersey || ''} ${localSuspensions.right.name || 'Player'}`.trim();
                     rTimer.classList.add('show');
                 } else {
                     rTimer.classList.remove('show');
                 }
             }
         }
-
         // ==========================================
         // 🚨 RAID EVENT POPUP (Bonus / Super Tackle alert)
         // ==========================================
@@ -1468,7 +1509,7 @@
                 }
 
                 handleLast5MinutesUpdate(data, state);
-                updateSuspensionTimers(data, state);
+                updateSuspensionTimers(data, state, data.state_json);
 
                 const leftScore  = data.left_score  || 0;
                 const rightScore = data.right_score || 0;
