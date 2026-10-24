@@ -1562,7 +1562,15 @@ function processMatchData(data) {
     if (data.raid_clock) {
         if (data.raid_clock !== lastReceivedRaidClock) {
             localRaidSeconds = parseInt(data.raid_clock) || 0;
-            isRaidClockRunningLocally = true;
+            
+            // 🚨 THE CLEVER FIX: If the clock resets to 30, the raid is officially over!
+            // It MUST stay paused at 30. It will only start ticking when it drops to 29 or lower.
+            if (localRaidSeconds >= 30) {
+                isRaidClockRunningLocally = false;
+            } else {
+                isRaidClockRunningLocally = true;
+            }
+            
             lastReceivedRaidClock = data.raid_clock;
             lastRaidChangeTime = now;
         } else if (now - lastRaidChangeTime > 8000) {
