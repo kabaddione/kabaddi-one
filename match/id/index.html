@@ -1510,35 +1510,57 @@ db.ref('.info/connected').on('value', (snapshot) => {
 });
 
 function setupViewerPresence(){
-  if(!matchId) return;
-  const viewerEl = document.getElementById('uiViewerCount'); if(!viewerEl) return;
-  try {
-    let clientId = null;
-    try {
-      clientId = localStorage.getItem('kabaddione_client_id');
-      if(!clientId){
-        clientId = 'v_'+Math.random().toString(36).slice(2,11)+'_'+Date.now();
-        localStorage.setItem('kabaddione_client_id', clientId);
-      }
-    } catch(e){ clientId = 'v_'+Math.random().toString(36).slice(2,11)+'_'+Date.now(); }
-    const viewersRef = db.ref('viewers/'+matchId);
-    const myRef = viewersRef.child(clientId);
-    const HB = 20000, STALE = 55000;
-    let hbTimer = null;
-    const beat = () => { myRef.set({lastSeen:Date.now()}).catch(()=>{}); };
-    db.ref('.info/connected').on('value', snap => {
-      if(snap.val() === true){
-        myRef.onDisconnect().remove().then(()=>{ beat(); if(hbTimer) clearInterval(hbTimer); hbTimer = setInterval(beat, HB); }).catch((error)=>{ console.warn('[KabaddiOne] Viewer presence unavailable:', error); viewerEl.innerText='1 watching'; });
-      }
-    }, (error)=>{ console.warn('[KabaddiOne] Viewer connection listener failed:', error); });
-    viewersRef.on('value', snap => {
-      const now = Date.now(); let count = 0;
-      snap.forEach(child => { const v = child.val(); if(v && typeof v.lastSeen==='number' && (now - v.lastSeen) < STALE) count++; });
-      viewerEl.innerText = Math.max(1,count)+' watching';
-    }, ()=>{ viewerEl.innerText='1 watching'; });
-    window.addEventListener('beforeunload', ()=>{ if(hbTimer) clearInterval(hbTimer); myRef.remove().catch(()=>{}); });
-  } catch(e){ viewerEl.innerText='1 watching'; }
-}
+            if(!matchId) return;
+            const viewerEl = document.getElementById('uiViewerCount'); 
+            if(!viewerEl) return;
+            
+            try {
+                let clientId = localStorage.getItem('kabaddione_client_id');
+                if(!clientId){
+                    clientId = 'v_'+Math.random().toString(36).slice(2,11)+'_'+Date.now();
+                    localStorage.setItem('kabaddione_client_id', clientId);
+                }
+                
+                const viewersRef = db.ref('viewers/'+matchId);
+                const myRef = viewersRef.child(clientId);
+                const HB = 20000, STALE = 55000;
+                let hbTimer = null;
+                
+                const beat = () => { myRef.set({lastSeen:Date.now()}).catch(()=>{}); };
+                
+                db.ref('.info/connected').on('value', snap => {
+                    if(snap.val() === true){
+                        myRef.onDisconnect().remove().then(()=>{ 
+                            beat(); 
+                            if(hbTimer) clearInterval(hbTimer); 
+                            hbTimer = setInterval(beat, HB); 
+                        }).catch(()=>{});
+                    }
+                });
+                
+                // 🚨 THE BANDWIDTH FIX: Remove the .on() listener and replace with a 30-second interval!
+                setInterval(() => {
+                    viewersRef.once('value').then(snap => {
+                        const now = Date.now(); 
+                        let count = 0;
+                        snap.forEach(child => { 
+                            const v = child.val(); 
+                            if(v && typeof v.lastSeen === 'number' && (now - v.lastSeen) < STALE) count++; 
+                        });
+                        viewerEl.innerText = Math.max(1, count) + ' watching';
+                    }).catch(()=>{});
+                }, 30000); // Fetches quietly once every 30 seconds instead of triggering constantly
+                
+                // Fetch immediately on load
+                viewersRef.once('value').then(snap => {
+                    const now = Date.now(); let count = 0;
+                    snap.forEach(child => { const v = child.val(); if(v && (now - v.lastSeen) < STALE) count++; });
+                    viewerEl.innerText = Math.max(1, count) + ' watching';
+                });
+
+                window.addEventListener('beforeunload', ()=>{ if(hbTimer) clearInterval(hbTimer); myRef.remove().catch(()=>{}); });
+            } catch(e){ viewerEl.innerText='1 watching'; }
+        }
 
 function updateLastUpdated(ts){
   const el = document.getElementById('uiLastUpdated'); if(!el) return;
