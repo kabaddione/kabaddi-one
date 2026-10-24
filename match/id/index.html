@@ -1484,7 +1484,7 @@ const graphObserver = new IntersectionObserver((entries)=>{
 }, {threshold:0.15});
 
 // ============================================================
-// CLOUDFLARE CDN POLLING ENGINE (Replaces Firebase)
+// CLOUDFLARE CDN POLLING ENGINE (With Smooth Local Ticking)
 // ============================================================
 const CLOUDFLARE_WORKER_URL = "https://kabaddi-cache.art-gauravkumar.workers.dev";
 const urlParams = new URLSearchParams(window.location.search);
@@ -1492,6 +1492,12 @@ const matchId = (urlParams.get('match') || '').trim();
 
 let lastProcessedState = null;
 let pollErrorCount = 0;
+
+// 🚨 LOCAL TICKER STATE
+let localMainSeconds = -1;
+let localRaidSeconds = -1;
+let isMainClockRunningLocally = false;
+let isRaidClockRunningLocally = false;
 
 function updateLastUpdated(ts){
   const el = document.getElementById('uiLastUpdated'); if(!el) return;
@@ -1501,32 +1507,60 @@ function updateLastUpdated(ts){
   el.innerText = 'Updated '+dateStr+' · '+timeStr;
 }
 
+// 🚨 NEW: SMOOTH LOCAL CLOCK RENDERER
+function renderLocalClocks() {
+    if (localMainSeconds >= 0) {
+        const m = String(Math.floor(localMainSeconds / 60)).padStart(2, '0');
+        const s = String(localMainSeconds % 60).padStart(2, '0');
+        const mainClockEl = document.getElementById('uiMainClock');
+        if(mainClockEl) mainClockEl.innerText = `${m}:${s}`;
+    }
+    
+    if (localRaidSeconds >= 0) {
+        const rc = document.getElementById('uiRaidClock');
+        const rCont = document.getElementById('uiRaidTimerContainer');
+        if (rc && rCont) {
+            rc.innerText = localRaidSeconds;
+            const deg = (localRaidSeconds / 30) * 360;
+            const color = localRaidSeconds <= 10 ? "#FF3B30" : "#FBC02D";
+            rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
+            
+            const banner = document.getElementById('uiActiveRaider');
+            if (localRaidSeconds >= 30 && banner && !banner.classList.contains('match-over')) {
+                banner.classList.remove('match-over');
+                banner.classList.add('idle');
+                banner.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Waiting for raid to start...';
+            }
+        }
+    }
+}
+
 function processMatchData(data) {
     if (!data) return;
     window.latestMatchData = data;
 
-    // 1. CHEAP UPDATES (Clocks & Scores)
-    if(data.main_clock) document.getElementById('uiMainClock').innerText = data.main_clock;
+    // 1. FAST SYNC FOR LOCAL CLOCKS
+    if(data.main_clock) {
+        const p = data.main_clock.split(':');
+        if(p.length === 2) localMainSeconds = (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0);
+    }
+    if(data.raid_clock) {
+        localRaidSeconds = parseInt(data.raid_clock) || 0;
+    }
+
+    // Peek at the timer states to control our local JS ticker
+    if (data.state_json) {
+        try {
+            const peekState = JSON.parse(data.state_json);
+            isMainClockRunningLocally = peekState.mainTimerRunning === true;
+            isRaidClockRunningLocally = peekState.raidTimerRunning === true;
+        } catch(e) {}
+    }
+
+    // CHEAP SCORE UPDATES
     if(data.left_score !== undefined) document.getElementById('uiLeftScore').innerText = data.left_score;
     if(data.right_score !== undefined) document.getElementById('uiRightScore').innerText = data.right_score;
     if(data.half_status) document.getElementById('uiHalf').innerHTML = `<i class="fa-solid fa-clock"></i> ${data.half_status}`;
-
-    if(data.raid_clock) {
-        const rc = document.getElementById('uiRaidClock');
-        const rCont = document.getElementById('uiRaidTimerContainer');
-        rc.innerText = data.raid_clock;
-        const ti = parseInt(data.raid_clock) || 30;
-        const deg = (ti/30)*360;
-        const color = ti<=10 ? "#FF3B30" : "#FBC02D";
-        rCont.style.background = `conic-gradient(from 0deg, ${color} 0deg ${deg}deg, rgba(255,255,255,0.06) ${deg}deg 360deg)`;
-        
-        const banner = document.getElementById('uiActiveRaider');
-        if (ti >= 30 && banner && !banner.classList.contains('match-over')) {
-            banner.classList.remove('match-over');
-            banner.classList.add('idle');
-            banner.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Waiting for raid to start...';
-        }
-    }
 
     // 2. METADATA UPDATES
     const ts = data.last_updated || Date.now();
@@ -1554,6 +1588,15 @@ function processMatchData(data) {
     if(matchOverFlag){ liveBadge.className='badge-live badge-final'; liveBadge.textContent='Final'; }
     else if(inBreak){ liveBadge.className='badge-live badge-break'; liveBadge.textContent='Break'; }
     else { liveBadge.className='badge-live'; liveBadge.textContent='Live'; }
+
+    // If match is completely over or in a break, forcefully pause the local clocks
+    if (matchOverFlag || inBreak) {
+        isMainClockRunningLocally = false;
+        isRaidClockRunningLocally = false;
+    }
+
+    // Instantly render the perfectly synced clocks
+    renderLocalClocks();
 
     if(data.left_name && data.right_name){
         document.getElementById('dtTeams').innerText = `${data.left_name} vs ${data.right_name}`;
@@ -1708,7 +1751,7 @@ function pollMatchData() {
             return response.json();
         })
         .then(data => {
-            pollErrorCount = 0; // Reset errors
+            pollErrorCount = 0;
             if (!data || Object.keys(data).length === 0) {
                 goToAllMatches('This match is offline or has ended.');
                 return;
@@ -1736,14 +1779,31 @@ function startLiveScoreboard(){
     statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to live stream...';
     statusEl.style.color = "#8C8E9F";
     
-    // We replaced the Firebase presence tracker with a static "Live Streaming" badge 
-    // to protect your 100-user limit entirely!
     const viewerEl = document.getElementById('uiViewerCount');
     if (viewerEl) viewerEl.innerHTML = '<i class="fa-solid fa-satellite-dish" style="color:#22C55E"></i> Live Streaming';
 
-    // Start Polling Loop
+    // Start 5-second Network Polling
     setInterval(pollMatchData, 5000);
     pollMatchData();
+    
+    // 🚨 NEW: Start 1-second Local Ticker for perfectly smooth clocks!
+    setInterval(() => {
+        let changed = false;
+        
+        if (isMainClockRunningLocally && localMainSeconds > 0) {
+            localMainSeconds--;
+            changed = true;
+        }
+        
+        if (isRaidClockRunningLocally && localRaidSeconds > 0) {
+            localRaidSeconds--;
+            changed = true;
+        }
+        
+        if (changed) {
+            renderLocalClocks();
+        }
+    }, 1000);
 }
 
 // Start immediately on load
