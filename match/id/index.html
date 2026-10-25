@@ -1848,6 +1848,52 @@ document.addEventListener('DOMContentLoaded', () => {
   startLiveScoreboard();
 });
 
+
+
+const PRESENCE_DB_URL = "https://kabaddi-presence-db-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
+function startAuthenticViewerCount() {
+    const viewerEl = document.getElementById('uiViewerCount');
+    if (!viewerEl || !matchId) return;
+
+    // 1. Generate a permanent, unique ID for this fan's browser
+    let viewerId = localStorage.getItem('kb_viewer_id');
+    if (!viewerId) {
+        viewerId = 'v_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('kb_viewer_id', viewerId);
+    }
+
+    function pingAndCount() {
+        const now = Date.now();
+        
+        // 2. Ping the Presence DB to say "I am still watching" (Closes instantly)
+        fetch(`${PRESENCE_DB_URL}/viewers/${matchId}/${viewerId}.json`, {
+            method: 'PUT',
+            body: JSON.stringify({ last_seen: now })
+        }).catch(() => {});
+
+        // 3. Ask the Presence DB: "Who has pinged in the last 40 seconds?"
+        // The .indexOn rule ensures Firebase only sends back the active users.
+        const cutoffTime = now - 40000;
+        const queryUrl = `${PRESENCE_DB_URL}/viewers/${matchId}.json?orderBy="last_seen"&startAt=${cutoffTime}`;
+        
+        fetch(queryUrl)
+            .then(res => res.json())
+            .then(data => {
+                // Count the number of active keys returned by the server
+                const activeCount = data ? Object.keys(data).length : 1;
+                viewerEl.innerHTML = `<i class="fa-solid fa-eye" style="color:#FFB830"></i> ${activeCount} watching`;
+            }).catch(() => {});
+    }
+
+    // Ping immediately on load, then quietly ping every 30 seconds
+    pingAndCount();
+    setInterval(pingAndCount, 30000);
+}
+
+
+        
+
 // ============================================================
 // CLEAN ADSTERRA ANCHOR LOGIC
 // ============================================================
