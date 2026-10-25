@@ -30,9 +30,7 @@
     <title>Live Matches | KabaddiOne</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <!-- 🚨 REMOVED FIREBASE SDK SCRIPTS TO SAVE BANDWIDTH -->
 
     <script>
         // 🐛 DIAGNOSTIC LOGGING
@@ -78,6 +76,7 @@
             --live-red: #FF3B30;
             --break-amber: #FBC02D;
             --done-gray: #546E7A;
+            --paused-blue: #2196F3;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -155,12 +154,17 @@
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
         .page-hero p { color: var(--text-secondary); font-size: clamp(0.95rem, 1.6vw, 1.1rem); max-width: 640px; margin: 0 auto 24px; }
+        
         .hero-stats { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
         .hero-stat {
             display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
             background: var(--surface-1); border: 1px solid var(--glass-border); border-radius: 100px;
             font-size: 12px; font-weight: 700; color: var(--text-secondary); transition: var(--transition-smooth);
+            cursor: pointer; user-select: none; opacity: 0.7;
         }
+        .hero-stat:hover { border-color: rgba(255,255,255,0.2); color: #fff; opacity: 1; }
+        .hero-stat.active { opacity: 1; border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
         .hero-stat .dot { width: 8px; height: 8px; border-radius: 50%; }
         .hero-stat.live .dot { background: var(--live-red); box-shadow: 0 0 10px var(--live-red); animation: livePulse 1.5s ease-in-out infinite; }
         .hero-stat.break .dot { background: var(--break-amber); box-shadow: 0 0 10px var(--break-amber); }
@@ -251,16 +255,24 @@
         .match-card:hover { transform: translateY(-4px); border-color: rgba(255,94,58,0.35); box-shadow: var(--shadow-lift), 0 0 0 1px rgba(255,94,58,0.15); }
         .match-card:hover::before { opacity: 1; }
         .match-card.clicking { transform: scale(0.98); }
+        
+        /* Dynamic Status Borders */
         .match-card.live { border-color: rgba(255,59,48,0.28); }
         .match-card.live::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--live-red), transparent); animation: liveLine 2s ease-in-out infinite; }
+        .match-card.paused { border-color: rgba(33, 150, 243, 0.28); }
+        .match-card.early { border-color: rgba(158, 158, 158, 0.28); }
+        
         @keyframes liveLine { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
 
         .match-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
         .match-id { font-family: 'SF Mono', 'Consolas', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase; }
+        
         .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; }
         .status-pill.live { background: linear-gradient(135deg, var(--live-red), #B71C1C); color: #fff; box-shadow: 0 4px 12px rgba(255,59,48,0.4); }
         .status-pill.live .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: livePulse 1.5s ease-in-out infinite; }
         .status-pill.break { background: linear-gradient(135deg, var(--break-amber), #F57F17); color: #000; box-shadow: 0 4px 12px rgba(251,192,45,0.3); }
+        .status-pill.paused { background: linear-gradient(135deg, var(--paused-blue), #0D47A1); color: #fff; }
+        .status-pill.early { background: linear-gradient(135deg, #757575, #424242); color: #fff; }
         .status-pill.resulted { background: linear-gradient(135deg, var(--done-gray), #263238); color: #fff; }
 
         .match-card-scores { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-bottom: 16px; padding: 12px 0; }
@@ -346,11 +358,13 @@
             <span class="badge"><i class="fa-solid fa-bolt"></i> Live Match Tracker</span>
             <h1>All Kabaddi Matches</h1>
             <p>Every live raid, tackle, and score in real-time. Click any match to follow it with full details, commentary, player stats, and analytics.</p>
+            
+            <!-- 🚨 UPGRADED: Clickable Hero Stats -->
             <div class="hero-stats" id="heroStats">
-                <span class="hero-stat live"><span class="dot"></span><strong id="statLive">0</strong> Live</span>
-                <span class="hero-stat break"><span class="dot"></span><strong id="statBreak">0</strong> Break</span>
-                <span class="hero-stat done"><span class="dot"></span><strong id="statDone">0</strong> Resulted</span>
-                <span class="hero-stat total"><span class="dot"></span><strong id="statTotal">0</strong> Total</span>
+                <span class="hero-stat live active" data-filter="live"><span class="dot"></span><strong id="statLive">0</strong> Live</span>
+                <span class="hero-stat break" data-filter="break"><span class="dot"></span><strong id="statBreak">0</strong> Break / Paused</span>
+                <span class="hero-stat done" data-filter="resulted"><span class="dot"></span><strong id="statDone">0</strong> Ended</span>
+                <span class="hero-stat total" data-filter="all"><span class="dot"></span><strong id="statTotal">0</strong> All Matches</span>
             </div>
         </header>
 
@@ -373,8 +387,8 @@
                     <div class="filter-group">
                         <span class="filter-label">Status</span>
                         <div class="filter-chips" id="statusFilters" role="group" aria-label="Filter by status">
-                            <button class="chip active" data-status="all">All</button>
-                            <button class="chip" data-status="live"><span class="dot"></span> Live</button>
+                            <button class="chip" data-status="all">All</button>
+                            <button class="chip active" data-status="live"><span class="dot"></span> Live</button>
                             <button class="chip" data-status="break">Break</button>
                             <button class="chip" data-status="resulted">Resulted</button>
                         </div>
@@ -430,9 +444,9 @@
                 <a href="/matches.html">Live Matches</a>
                 <a href="/#features">Features</a>
                 <a href="/download.html">Download</a>
-                <a href="/privacy.html">Privacy</a>
-                <a href="/terms.html">Terms</a>
-                <a href="/contact.html">Contact</a>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms & Conditions</a>
+                <a href="/contact.html">Contact Us</a>
             </div>
             <div class="social-links">
                 <a href="https://facebook.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -448,29 +462,10 @@
 
     <script>
         // ============================================================
-        // ⚠️ CONFIG — URL TO YOUR LIVE MATCH PAGE
+        // ⚠️ CONFIG — URL TO YOUR LIVE MATCH PAGE & CLOUDFLARE WORKER
         // ============================================================
         const LIVE_MATCH_PAGE = '/match/id/index.html?match=';
-
-        // ============================================================
-        // FIREBASE INITIALIZATION
-        // ============================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyCn_RSSPwLWUC0T0WlbqOU1_NaTGQLCKmI",
-            authDomain: "kabaddi-scoreboard-e1522.firebaseapp.com",
-            databaseURL: "https://kabaddi-scoreboard-e1522-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "kabaddi-scoreboard-e1522"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
-        const auth = firebase.auth();
-
-        db.ref('.info/connected').on('value', (snapshot) => {
-            window.__kabaddiLog(snapshot.val() === true ? 'OK' : 'WARN', 'Realtime Database connected:', snapshot.val() === true);
-        });
+        const WORKER_URL = "https://kabaddione-matches.art-gauravkumar.workers.dev/";
 
         // ============================================================
         // STATE
@@ -478,7 +473,7 @@
         const state = {
             matches: [],
             filterText: '',
-            filterStatus: 'all',
+            filterStatus: 'live', // 🚨 Default is now LIVE
             filterDate: 'all',
             loading: true,
             error: null
@@ -502,7 +497,6 @@
         const resultPlural   = document.getElementById('resultCountPlural');
         const resetFiltersBtn= document.getElementById('resetFilters');
         const emptyResetBtn  = document.getElementById('emptyResetBtn');
-        const backToTop      = document.getElementById('backToTop');
         const statLive       = document.getElementById('statLive');
         const statBreak      = document.getElementById('statBreak');
         const statDone       = document.getElementById('statDone');
@@ -518,6 +512,7 @@
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
+        // 🚨 UPGRADED: Detects specific match states for true badges
         function getMatchStatus(d) {
             if (!d) return 'resulted';
             const halfStatus  = String(d.half_status || '').toLowerCase();
@@ -527,6 +522,8 @@
             const mainClock   = String(d.main_clock || '').trim();
 
             if (matchResult) return 'resulted';
+            if (halfStatus.includes('ended early')) return 'early';
+            if (halfStatus.includes('paused')) return 'paused';
             if (halfStatus.includes('over') || halfStatus.includes('full time')) return 'resulted';
             if (mainClock === '00:00' && halfStatus.length > 0) return 'resulted';
 
@@ -565,7 +562,11 @@
                 const hay = [m.data.left_name, m.data.right_name, m.data.match_location, m.id].filter(Boolean).join(' ').toLowerCase();
                 if (!hay.includes(txt)) return false;
             }
-            if (state.filterStatus !== 'all' && m.status !== state.filterStatus) return false;
+            if (state.filterStatus !== 'all') {
+                if (state.filterStatus === 'break' && !(m.status === 'break' || m.status === 'paused')) return false;
+                else if (state.filterStatus === 'resulted' && !(m.status === 'resulted' || m.status === 'early')) return false;
+                else if (state.filterStatus === 'live' && m.status !== 'live') return false;
+            }
             if (state.filterDate !== 'all') {
                 const ts  = Number(m.data.last_updated) || 0;
                 const now = Date.now();
@@ -589,18 +590,25 @@
             const location   = escapeHtml(d.match_location || '');
             const matchId    = escapeHtml(m.id);
 
+            // 🚨 UPGRADED: True Condition Badges
             let statusPill = '';
             if (m.status === 'live') {
                 statusPill = '<span class="status-pill live"><span class="dot"></span> Live</span>';
             } else if (m.status === 'break') {
-                statusPill = '<span class="status-pill break"><i class="fa-solid fa-mug-hot"></i> Break</span>';
+                statusPill = `<span class="status-pill break"><i class="fa-solid fa-mug-hot"></i> ${escapeHtml(d.break_clock_title || 'Break')}</span>`;
+            } else if (m.status === 'paused') {
+                statusPill = '<span class="status-pill paused"><i class="fa-solid fa-pause"></i> Paused</span>';
+            } else if (m.status === 'early') {
+                statusPill = '<span class="status-pill early"><i class="fa-solid fa-circle-stop"></i> Ended Early</span>';
             } else {
-                statusPill = '<span class="status-pill resulted"><i class="fa-solid fa-flag-checkered"></i> Resulted</span>';
+                statusPill = '<span class="status-pill resulted"><i class="fa-solid fa-flag-checkered"></i> Match Over</span>';
             }
 
             let winnerBlock = '';
-            if (m.status === 'resulted') {
-                winnerBlock = `<div class="winner-line"><i class="fa-solid fa-trophy"></i> ${escapeHtml(getWinnerText(d))}</div>`;
+            if (m.status === 'resulted' || m.status === 'early') {
+                if (d.match_result && d.match_result.length > 0) {
+                    winnerBlock = `<div class="winner-line"><i class="fa-solid fa-trophy"></i> ${escapeHtml(getWinnerText(d))}</div>`;
+                }
             }
 
             let midLine = '';
@@ -608,6 +616,8 @@
                 midLine = `<i class="fa-regular fa-clock"></i> ${escapeHtml(d.half_status || 'Live')} · ${escapeHtml(d.main_clock || '00:00')}`;
             } else if (m.status === 'break') {
                 midLine = `<i class="fa-solid fa-mug-hot"></i> ${escapeHtml(d.break_clock_title || 'Break')} · ${escapeHtml(d.break_clock_time || '00:00')}`;
+            } else if (m.status === 'paused') {
+                midLine = `<i class="fa-solid fa-pause"></i> Match Paused`;
             } else {
                 midLine = `<i class="fa-solid fa-flag-checkered"></i> Final`;
             }
@@ -653,13 +663,14 @@
         }
 
         function render() {
-            const allLive  = state.matches.filter(m => m.status === 'live').length;
-            const allBreak = state.matches.filter(m => m.status === 'break').length;
-            const allDone  = state.matches.filter(m => m.status === 'resulted').length;
+            // Update Top Counters
+            const allLive  = allMatches.filter(m => m.status === 'live').length;
+            const allBreak = allMatches.filter(m => m.status === 'break' || m.status === 'paused').length;
+            const allDone  = allMatches.filter(m => m.status === 'resulted' || m.status === 'early').length;
             statLive.textContent  = allLive;
             statBreak.textContent = allBreak;
             statDone.textContent  = allDone;
-            statTotal.textContent = state.matches.length;
+            statTotal.textContent = allMatches.length;
 
             if (state.loading) {
                 loadingEl.style.display = 'grid';
@@ -679,7 +690,7 @@
                 return;
             }
 
-            const filtered = state.matches
+            const filtered = allMatches
                 .filter(matchesFilters)
                 .sort((a, b) => (Number(b.data.last_updated) || 0) - (Number(a.data.last_updated) || 0));
 
@@ -707,7 +718,6 @@
                     const id = card.dataset.matchId;
                     if (!id) return;
                     card.classList.add('clicking');
-                    // 🚨 REDIRECTS TO /match/id/index.html?match=XXXX
                     setTimeout(() => { window.location.href = LIVE_MATCH_PAGE + encodeURIComponent(id); }, 150);
                 };
                 card.addEventListener('click', open);
@@ -718,8 +728,66 @@
         }
 
         // ============================================================
-        // INTERACTIONS
+        // THE CLOUDFLARE ENGINE
         // ============================================================
+        async function fetchMatches() {
+            try {
+                const response = await fetch(WORKER_URL);
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+                
+                const matchesObj = data || {};
+                allMatches = Object.entries(matchesObj).map(([id, value]) => ({
+                    id,
+                    data: value || {},
+                    status: getMatchStatus(value)
+                }));
+
+                state.loading = false;
+                state.error = null;
+                render();
+            } catch (error) {
+                window.__kabaddiLog('ERR', 'Fetch failed', error);
+                if (allMatches.length === 0) {
+                    state.loading = false;
+                    state.error = 'Could not load matches. Please check your internet connection.';
+                    render();
+                }
+            }
+        }
+
+        // Fetch immediately, then every 12 seconds
+        fetchMatches();
+        setInterval(fetchMatches, 12000);
+
+        // ============================================================
+        // INTERACTIONS & FILTERS
+        // ============================================================
+        
+        // 🚨 UPGRADED: Clickable Top Stats Filter Sync
+        document.querySelectorAll('.hero-stat').forEach(statBtn => {
+            statBtn.addEventListener('click', () => {
+                let s = 'all';
+                if (statBtn.classList.contains('live')) s = 'live';
+                if (statBtn.classList.contains('break')) s = 'break';
+                if (statBtn.classList.contains('done')) s = 'resulted';
+                if (statBtn.classList.contains('total')) s = 'all';
+                
+                state.filterStatus = s;
+                
+                // Visual toggle top
+                document.querySelectorAll('.hero-stat').forEach(b => b.classList.remove('active'));
+                statBtn.classList.add('active');
+                
+                // Visual toggle bottom panel
+                document.querySelectorAll('#statusFilters .chip').forEach(c => {
+                    c.classList.toggle('active', c.dataset.status === s);
+                });
+                
+                render();
+            });
+        });
+
         filterToggleBtn.addEventListener('click', () => {
             const expanded = filterPanel.classList.toggle('expanded');
             filterToggleBtn.setAttribute('aria-expanded', expanded);
@@ -747,7 +815,17 @@
             if (!btn) return;
             statusFilters.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
-            state.filterStatus = btn.dataset.status;
+            
+            const s = btn.dataset.status;
+            state.filterStatus = s;
+
+            // Sync Top Stats
+            document.querySelectorAll('.hero-stat').forEach(b => b.classList.remove('active'));
+            if (s === 'live') document.querySelector('.hero-stat.live').classList.add('active');
+            else if (s === 'break') document.querySelector('.hero-stat.break').classList.add('active');
+            else if (s === 'resulted') document.querySelector('.hero-stat.done').classList.add('active');
+            else if (s === 'all') document.querySelector('.hero-stat.total').classList.add('active');
+            
             render();
         });
 
@@ -762,83 +840,21 @@
 
         function clearAllFilters() {
             state.filterText   = '';
-            state.filterStatus = 'all';
+            state.filterStatus = 'live'; // Reset back to default Live
             state.filterDate   = 'all';
             searchInput.value  = '';
-            statusFilters.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.status === 'all'));
+            
+            statusFilters.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.status === 'live'));
             dateFilters.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.date === 'all'));
+            
+            document.querySelectorAll('.hero-stat').forEach(b => b.classList.remove('active'));
+            document.querySelector('.hero-stat.live').classList.add('active');
+            
             render();
         }
 
         resetFiltersBtn.addEventListener('click', clearAllFilters);
         emptyResetBtn.addEventListener('click', clearAllFilters);
-
-        // ============================================================
-        // FIREBASE AUTH & DATA FETCHING
-        // ============================================================
-        function startMatchesListener() {
-            window.__kabaddiLog('INFO', 'Attaching listener to matches_summary...');
-            
-            db.ref('matches_summary').on('value', (snapshot) => {
-                const data = snapshot.val();
-                
-                // 🚨 ==========================================
-                // 🚨 THE WEB JANITOR (100% FREE AUTO-DELETE)
-                // ==========================================
-                const sevenDaysInMillis = 604800000;
-                const currentTime = Date.now();
-                
-                if (data) {
-                    Object.keys(data).forEach(matchId => {
-                        const matchData = data[matchId];
-                        const ageInMillis = currentTime - (Number(matchData.last_updated) || 0);
-                        
-                        if (ageInMillis > sevenDaysInMillis) {
-                            window.__kabaddiLog('WARN', '🧹 Web Janitor deleting 7-day old match:', matchId);
-                            // Delete the lightweight summary
-                            db.ref('matches_summary/' + matchId).remove();
-                            // Delete the massive 50KB heavy payload to save database space!
-                            db.ref('live_matches/' + matchId).remove();
-                            
-                            // Delete from the local website data so it doesn't render on the screen
-                            delete data[matchId]; 
-                        }
-                    });
-                }
-                // ==========================================
-
-                const matchCount = data ? Object.keys(data).length : 0;
-                window.__kabaddiLog('OK', `Successfully loaded matches summary (${matchCount} matches found).`);
-                
-                const matchesObj = data || {};
-                state.matches = Object.entries(matchesObj).map(([id, value]) => ({
-                    id,
-                    data: value || {},
-                    status: getMatchStatus(value)
-                }));
-                state.loading = false;
-                state.error = null;
-                render();
-            }, (error) => {
-                window.__kabaddiLog('ERR', 'Permission denied or failed to read matches_summary:', error);
-                state.loading = false;
-                state.error = 'Could not load matches. Please check your Firebase Database Rules. (Error: ' + error.code + ')';
-                render();
-            });
-        }
-
-        window.__kabaddiLog('INFO', 'Starting Anonymous Auth...');
-        auth.signInAnonymously()
-            .then(() => {
-                window.__kabaddiLog('OK', 'Anonymous Auth Successful');
-                startMatchesListener();
-            })
-            .catch((error) => {
-                window.__kabaddiLog('ERR', 'Authentication failed:', error);
-                state.loading = false;
-                state.error = 'Authentication failed. Please check your connection and Firebase API keys.';
-                render();
-            });
 
         setInterval(() => {
             document.querySelectorAll('.time-ago').forEach(el => {
@@ -848,12 +864,13 @@
         }, 60000);
 
         // ============================================================
-        // NAVIGATION & UTILS
+        // UI UTILS
         // ============================================================
         (function() {
             const navbar     = document.getElementById('navbar');
             const hamburger  = document.getElementById('hamburger');
             const navLinks   = document.getElementById('navLinks');
+            const backToTop  = document.getElementById('backToTop');
 
             hamburger.addEventListener('click', function() {
                 const isActive = navLinks.classList.toggle('active');
