@@ -1799,8 +1799,8 @@ function startLiveScoreboard(){
     statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to live stream...';
     statusEl.style.color = "#8C8E9F";
     
-    const viewerEl = document.getElementById('uiViewerCount');
-    if (viewerEl) viewerEl.innerHTML = '<i class="fa-solid fa-satellite-dish" style="color:#22C55E"></i> Live Streaming';
+    // Start the authentic viewer counter using the new database
+    startAuthenticViewerCount();
 
     // Start 5-second Network Polling
     setInterval(pollMatchData, 5000);
@@ -1850,7 +1850,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-const PRESENCE_DB_URL = "https://kabaddi-presence-db-default-rtdb.asia-southeast1.firebasedatabase.app/";
+const PRESENCE_DB_URL = "https://kabaddi-presence-db-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 function startAuthenticViewerCount() {
     const viewerEl = document.getElementById('uiViewerCount');
