@@ -254,7 +254,7 @@
         .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         /* ============================================================
-           PREMIUM EPIC OVERLAY (SUPER RAID / SUPER TACKLE)
+           PKL-STYLE PREMIUM EPIC OVERLAY (SUPER RAID / SUPER TACKLE)
            ============================================================ */
         body.epic-active .broadcast-stage {
             opacity: 0 !important;
@@ -274,7 +274,7 @@
             justify-content: center;
             transform: translateY(0);
             will-change: transform;
-            background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%);
+            background: radial-gradient(ellipse at center, rgba(10, 5, 30, 0.4) 0%, rgba(0, 0, 0, 0.85) 100%);
         }
         .epic-overlay.visible {
             visibility: visible;
@@ -288,43 +288,29 @@
             to   { transform: translateY(105%); }
         }
 
-        /* The 3D Mat Background */
+        /* Sleek Angular Mat */
         .epic-mat {
             position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
-            height: 400px;
-            background: linear-gradient(to top, #10123E 0%, #4A1A7A 40%, #3E248A 70%, #1A2670 100%);
+            height: 180px;
+            background: linear-gradient(to bottom, #1A0B2E 0%, #3D1C63 50%, #1A0B2E 100%);
             transform: translateY(100%);
             z-index: 1;
-            overflow: hidden;
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+            border-top: 3px solid #E91E63;
+            clip-path: polygon(0 20%, 10% 0, 90% 0, 100% 20%, 100% 100%, 0 100%);
         }
         .epic-mat::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 10px;
-            background: linear-gradient(to right, #E91E63, #2196F3, #E91E63);
-            box-shadow: 0 0 20px rgba(255,255,255,0.4);
-        }
-        .epic-mat::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 30px;
-            background: repeating-linear-gradient(
-                -45deg,
-                #E91E63, #E91E63 20px,
-                #FF9800 20px, #FF9800 40px,
-                #2196F3 40px, #2196F3 60px
-            );
-            opacity: 0.8;
-            clip-path: polygon(0 50%, 100% 0, 100% 100%, 0 100%);
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 2;
         }
         .epic-overlay.visible .epic-mat {
-            animation: epicMatUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: epicMatUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @keyframes epicMatUp {
             to { transform: translateY(0); }
@@ -349,153 +335,150 @@
         @keyframes epicParticleFloat {
             0%   { opacity: 0; transform: translateY(0) scale(0.5); }
             20%  { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-300px) scale(1.5); }
+            100% { opacity: 0; transform: translateY(-400px) scale(1.5); }
         }
 
-        /* The 3D Text Setup */
-        .epic-text-wrap {
+        /* Content Wrapper */
+        .epic-content {
             position: relative;
+            width: 100%;
+            height: 100%;
             z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 500px;
-            margin-bottom: 30px;
-            perspective: 1200px;
+            padding-bottom: 80px;
         }
 
+        /* The 3D PKL Text Styling */
         .epic-text {
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            font-size: 240px;
-            line-height: 0.85;
+            font-size: 220px;
+            line-height: 0.9;
             letter-spacing: 5px;
             text-transform: uppercase;
             white-space: nowrap;
             
             /* 3D Gradient Fill */
             color: transparent;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E0E0E0 40%, #B0B0B0 100%);
+            background: linear-gradient(180deg, #FFFFFF 0%, #E0E0E0 40%, #A0A0A0 100%);
             -webkit-background-clip: text;
             background-clip: text;
             
-            /* Extruded 3D Shadow */
+            /* Thick 3D Extrusion */
             text-shadow: 
                 0 2px 0 #d0d0d0,
                 0 4px 0 #b0b0b0,
                 0 6px 0 #909090,
                 0 8px 0 #707070,
                 0 10px 0 #505050,
-                0 12px 20px rgba(0,0,0,0.8),
-                0 20px 40px rgba(0,0,0,0.6);
+                0 12px 0 #303030,
+                0 15px 20px rgba(0,0,0,0.9),
+                0 25px 40px rgba(0,0,0,0.7);
             
             /* Dynamic Sports Angle */
             transform: skewX(-12deg);
             will-change: transform, opacity;
+            z-index: 10;
         }
 
         /* Super Raid Layout */
-        .epic-overlay.animate-raid .epic-text-wrap {
-            justify-content: flex-end;
-            padding-right: 250px; /* Push text to the right to make room for GIF */
-        }
         .epic-overlay.animate-raid .epic-text {
             font-size: 260px;
             opacity: 0;
             transform-origin: center bottom;
         }
-        .epic-overlay.animate-raid .epic-text-wrap.active .epic-text {
-            animation: raidHyperZoom 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        .epic-overlay.animate-raid .epic-text.active {
+            animation: raidHyperZoom 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @keyframes raidHyperZoom {
-            0%   { opacity: 0; transform: skewX(-12deg) scale(0.1) translateY(400px); filter: blur(10px); }
+            0%   { opacity: 0; transform: skewX(-12deg) scale(0.2) translateY(200px); filter: blur(8px); }
             60%  { opacity: 1; transform: skewX(-12deg) scale(1.05) translateY(-10px); filter: blur(0); }
             100% { opacity: 1; transform: skewX(-12deg) scale(1) translateY(0); }
         }
 
         /* Super Tackle Layout */
-        .epic-overlay.animate-tackle .epic-text-wrap {
-            justify-content: center;
-        }
         .epic-text-super, .epic-text-event {
             position: absolute;
             opacity: 0;
         }
         .epic-overlay.animate-tackle .epic-text-super {
-            transform: skewX(-12deg) translateX(-1500px);
+            transform: skewX(-12deg) translateX(-1200px);
         }
         .epic-overlay.animate-tackle .epic-text-event {
-            transform: skewX(-12deg) translateX(1500px);
+            transform: skewX(-12deg) translateX(1200px);
         }
-        .epic-overlay.animate-tackle .epic-text-wrap.active .epic-text-super {
-            animation: tackleLeftIn 0.8s cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
+        .epic-overlay.animate-tackle .epic-text-super.active {
+            animation: tackleLeftIn 0.6s cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
         }
-        .epic-overlay.animate-tackle .epic-text-wrap.active .epic-text-event {
-            animation: tackleRightIn 0.8s cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
+        .epic-overlay.animate-tackle .epic-text-event.active {
+            animation: tackleRightIn 0.6s cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
         }
         
         @keyframes tackleLeftIn {
-            0%   { opacity: 0; transform: skewX(-12deg) translateX(-1500px); }
-            60%  { opacity: 1; transform: skewX(-12deg) translateX(0); }
-            75%  { transform: skewX(-12deg) translateX(20px); } /* Bounce */
-            100% { opacity: 1; transform: skewX(-12deg) translateX(-350px); } /* Settle left */
+            0%   { opacity: 0; transform: skewX(-12deg) translateX(-1200px); }
+            70%  { opacity: 1; transform: skewX(-12deg) translateX(20px); }
+            100% { opacity: 1; transform: skewX(-12deg) translateX(-360px); }
         }
         @keyframes tackleRightIn {
-            0%   { opacity: 0; transform: skewX(-12deg) translateX(1500px); }
-            60%  { opacity: 1; transform: skewX(-12deg) translateX(0); }
-            75%  { transform: skewX(-12deg) translateX(-20px); } /* Bounce */
-            100% { opacity: 1; transform: skewX(-12deg) translateX(350px); } /* Settle right */
+            0%   { opacity: 0; transform: skewX(-12deg) translateX(1200px); }
+            70%  { opacity: 1; transform: skewX(-12deg) translateX(-20px); }
+            100% { opacity: 1; transform: skewX(-12deg) translateX(360px); }
         }
 
-        /* All Out simple layout */
-        .epic-overlay.animate-allout .epic-text-wrap {
-            justify-content: center;
-        }
+        /* All Out */
         .epic-overlay.animate-allout .epic-text {
             opacity: 0;
         }
-        .epic-overlay.animate-allout .epic-text-wrap.active .epic-text {
-            animation: allOutZoom 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        .epic-overlay.animate-allout .epic-text.active {
+            animation: allOutZoom 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @keyframes allOutZoom {
             0%   { opacity: 0; transform: skewX(-12deg) scale(0.3); filter: blur(8px); }
             100% { opacity: 1; transform: skewX(-12deg) scale(1); filter: blur(0); }
         }
 
-        /* The GIF Setup - Perfect Aspect Ratio */
+        /* The GIF - Perfect Aspect Ratio */
         .epic-gif {
             position: absolute;
-            bottom: 50px;
-            z-index: 15;
+            z-index: 20;
             opacity: 0;
             pointer-events: none;
-            object-fit: contain; /* Prevents squishing */
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8)) drop-shadow(0 0 30px rgba(255,255,255,0.15));
+            object-fit: contain;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(255,255,255,0.2));
             transform-origin: bottom center;
             will-change: transform, opacity;
         }
         
-        /* Raid GIF Placement */
+        /* Super Raid GIF Placement (Left side, room made by text) */
+        .epic-overlay.animate-raid .epic-content {
+            justify-content: flex-end;
+            padding-right: 250px;
+        }
         .epic-overlay.animate-raid .epic-gif {
-            left: 12%;
-            height: 480px; /* Auto scales width */
+            left: 8%;
+            bottom: 60px;
+            height: 480px;
             width: auto;
         }
         .epic-overlay.animate-raid .epic-gif.active {
-            animation: gifPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: gifPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
         }
 
-        /* Tackle GIF Placement */
+        /* Super Tackle GIF Placement (Center) */
+        .epic-overlay.animate-tackle .epic-content {
+            justify-content: center;
+        }
         .epic-overlay.animate-tackle .epic-gif {
             left: 50%;
-            bottom: 50px;
+            bottom: 60px;
             height: 360px;
             width: auto;
             transform: translateX(-50%) scale(0);
         }
         .epic-overlay.animate-tackle .epic-gif.active {
-            animation: gifPopInCenter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: gifPopInCenter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
         }
 
         @keyframes gifPopIn {
@@ -1222,8 +1205,10 @@
     <div id="epic-overlay" class="epic-overlay">
         <div class="epic-mat"></div>
         <div class="epic-particles" id="epic-particles"></div>
-        <div class="epic-text-wrap" id="epic-text-wrap"></div>
-        <img id="epic-gif" class="epic-gif" src="" alt="">
+        <div class="epic-content" id="epic-content">
+            <img id="epic-gif" class="epic-gif" src="" alt="">
+            <div id="epic-text-wrap" style="position: relative; display: flex; align-items: center; justify-content: center;"></div>
+        </div>
     </div>
 
     <div id="starting7-overlay" class="fs-overlay">
@@ -2697,7 +2682,7 @@
         }
 
         // ==========================================
-        // PREMIUM EPIC ANIMATION (SUPER RAID / SUPER TACKLE / ALL OUT)
+        // PKL-STYLE PREMIUM EPIC ANIMATION
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
@@ -2710,16 +2695,13 @@
                 const p = document.createElement('div');
                 p.className = 'epic-particle';
 
-                // Random positions across bottom half
                 p.style.left = (5 + Math.random() * 90) + '%';
                 p.style.bottom = (10 + Math.random() * 40) + '%';
                 
-                // Random sizes
                 const size = 3 + Math.random() * 10;
                 p.style.width  = size + 'px';
                 p.style.height = size + 'px';
 
-                // Random animation timings
                 p.style.animationDelay    = (Math.random() * 2) + 's';
                 p.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
 
@@ -2741,10 +2723,10 @@
             // Reset state completely
             overlay.className = 'epic-overlay';
             overlay.style.transform = '';
-            textWrap.className = 'epic-text-wrap';
             textWrap.innerHTML = '';
             gifEl.src = '';
             gifEl.className = 'epic-gif';
+            gifEl.style.display = '';
             particlesContainer.innerHTML = '';
 
             // Setup content based on type
@@ -2777,7 +2759,8 @@
 
             // Tiny delay to allow CSS to apply before starting animations
             setTimeout(() => {
-                textWrap.classList.add('active');
+                const textEls = textWrap.querySelectorAll('.epic-text');
+                textEls.forEach(el => el.classList.add('active'));
                 gifEl.classList.add('active');
             }, 50);
 
