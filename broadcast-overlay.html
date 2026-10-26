@@ -161,29 +161,24 @@
         @keyframes dodBarPulse { from{box-shadow:inset 0px 20px 20px rgba(255,255,255,.2),inset 0px -20px 20px rgba(0,0,0,.5),inset 0 0 20px rgba(255,0,0,.4)} to{box-shadow:inset 0px 20px 20px rgba(255,255,255,.2),inset 0px -20px 20px rgba(0,0,0,.5),inset 0 0 50px rgba(255,0,0,.9)} }
         .name-rotator { position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 
-        /* 🚨 Team/Raider name animation — 3 states each */
         .team-name-text, .raider-name-text {
             position: absolute; width: 100%; text-align: center;
             transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
             will-change: transform, opacity;
         }
-        /* TEAM: base = center visible */
         .team-name-text { transform: translateY(0); opacity: 1; }
         .team-name-text.out { transform: translateY(-130%); opacity: 0; }
-        /* SNAP-BELOW state (used briefly before sliding up) */
         .team-name-text.below {
             transform: translateY(130%);
             opacity: 0;
             transition: none;
         }
-        /* RAIDER: base = below hidden */
         .raider-name-text {
             transform: translateY(130%); opacity: 0; color: #FFF;
             text-shadow: 2px 2px 6px rgba(0,0,0,0.95); font-weight: 900;
         }
         .raider-name-text.show { transform: translateY(0); opacity: 1; }
         .raider-name-text.out { transform: translateY(-130%); opacity: 0; }
-        /* SNAP-BELOW state (used briefly before sliding up) */
         .raider-name-text.below {
             transform: translateY(130%);
             opacity: 0;
@@ -258,26 +253,236 @@
         .center-popup { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5); background: linear-gradient(to bottom, #D32F2F, #8B0000); border: 5px solid #FFD700; border-radius: 15px; padding: 20px 100px; color: white; font-family: 'Teko', sans-serif; font-size: 90px; font-weight: 700; letter-spacing: 6px; box-shadow: 0px 0px 50px rgba(255, 215, 0, 0.8); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); white-space: nowrap; text-transform: uppercase; z-index: 200; }
         .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-        .epic-overlay { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; visibility: hidden; pointer-events: none; overflow: hidden; }
-        .epic-overlay.visible { visibility: visible; }
-        .epic-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; opacity: 1; z-index: 1; }
-        .epic-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%); z-index: 2; opacity: 1; }
-        .epic-main-container { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform: scale(1); opacity: 1; will-change: transform, opacity; }
-        .epic-text { font-family: 'Teko', sans-serif; font-weight: 700; line-height: 0.9; letter-spacing: 12px; text-align: center; text-transform: uppercase; background: linear-gradient(to bottom, #FFFFFF 0%, #ABABAB 50%, #FFFFFF 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
-        .epic-text-super { font-size: 110px; letter-spacing: 18px; }
-        .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
-        .epic-overlay.entry .epic-bg { animation: epicBgFadeIn 0.5s ease-out forwards; }
-        .epic-overlay.entry .epic-vignette { animation: epicBgFadeIn 0.5s ease-out forwards; }
-        .epic-overlay.entry .epic-main-container { animation: epicContainerEntry 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .epic-overlay.hold .epic-main-container { animation: epicHold 2.5s linear forwards; }
-        .epic-overlay.exit .epic-bg { animation: epicBgFadeOut 0.6s ease forwards; }
-        .epic-overlay.exit .epic-vignette { animation: epicBgFadeOut 0.6s ease forwards; }
-        .epic-overlay.exit .epic-main-container { animation: epicContainerExit 0.6s cubic-bezier(0.5, 0, 0.7, 1.5) forwards; }
-        @keyframes epicBgFadeIn  { from{opacity:0} to{opacity:1} }
-        @keyframes epicBgFadeOut { from{opacity:1} to{opacity:0} }
-        @keyframes epicContainerEntry { 0%{transform:scale(15);opacity:0} 55%{transform:scale(1.12);opacity:1} 100%{transform:scale(1);opacity:1} }
-        @keyframes epicHold { from{transform:scale(1)} to{transform:scale(1.05)} }
-        @keyframes epicContainerExit { 0%{transform:scale(1.05);opacity:1} 100%{transform:scale(25);opacity:0} }
+        /* ============================================================
+           REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE / ALL OUT)
+           ============================================================ */
+        body.epic-active .broadcast-stage {
+            opacity: 0 !important;
+            transform: translateY(90px) !important;
+            pointer-events: none !important;
+        }
+
+        .epic-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            visibility: hidden;
+            pointer-events: none;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            transform: translateY(0);
+            will-change: transform;
+        }
+        .epic-overlay.visible {
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .epic-overlay.slide-down {
+            animation: epicSlideDown 0.5s cubic-bezier(0.5, 0, 0.7, 1.15) forwards;
+        }
+        @keyframes epicSlideDown {
+            from { transform: translateY(0); }
+            to   { transform: translateY(105%); }
+        }
+
+        .epic-mat {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 340px;
+            background: linear-gradient(to top,
+                #16002C 0%,
+                #3E1260 25%,
+                #5C1B8A 50%,
+                #7B2FBE 75%,
+                #B14AE8 100%);
+            box-shadow: 0 -12px 45px rgba(150,60,230,0.7), inset 0 4px 0 rgba(255,255,255,0.06);
+            transform: translateY(100%);
+            z-index: 1;
+            overflow: hidden;
+        }
+        .epic-mat::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 120px),
+                linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .epic-overlay.visible .epic-mat {
+            animation: epicMatUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes epicMatUp {
+            to { transform: translateY(0); }
+        }
+
+        .epic-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 5;
+        }
+        .epic-particle {
+            position: absolute;
+            background: radial-gradient(circle, #FFFFFF 0%, rgba(220,235,255,0.85) 35%, rgba(200,220,255,0) 72%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: epicParticleFloat 2s infinite ease-out;
+            will-change: transform, opacity;
+        }
+        @keyframes epicParticleFloat {
+            0%   { opacity: 0; transform: translateY(0) scale(0.4); }
+            18%  { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-220px) scale(1.25); }
+        }
+
+        .epic-text-wrap {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+            perspective: 1200px;
+        }
+
+        .epic-text {
+            font-family: 'Teko', sans-serif;
+            font-weight: 700;
+            line-height: 0.85;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-text-stroke: 2px rgba(255,255,255,0.45);
+            text-shadow:
+                0 1px 0 #d8d8d8,
+                0 2px 0 #c9c9c9,
+                0 3px 0 #bdbdbd,
+                0 4px 0 #b1b1b1,
+                0 5px 0 #a4a4a4,
+                0 6px 1px rgba(0,0,0,0.15),
+                0 0 5px rgba(0,0,0,0.15),
+                0 1px 3px rgba(0,0,0,0.35),
+                0 3px 5px rgba(0,0,0,0.25),
+                0 5px 10px rgba(0,0,0,0.25),
+                0 10px 14px rgba(0,0,0,0.22),
+                0 20px 25px rgba(0,0,0,0.18),
+                0 0 40px rgba(180,210,255,0.55);
+            filter: drop-shadow(0 0 30px rgba(140,90,240,0.55));
+            will-change: transform, opacity;
+        }
+
+        .epic-text-raid {
+            font-size: 260px;
+            letter-spacing: 14px;
+        }
+
+        .epic-overlay.animate-raid .epic-text-raid {
+            opacity: 0;
+            transform-origin: center bottom;
+            animation: raidTextHyperZoom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+        }
+        @keyframes raidTextHyperZoom {
+            0%   { opacity: 0; transform: scale(0.15) translateY(140px) rotateX(-35deg); filter: blur(8px); }
+            55%  { opacity: 1; transform: scale(1.08) translateY(-8px) rotateX(4deg); filter: blur(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); filter: blur(0); }
+        }
+
+        /* SUPER TACKLE specific layout */
+        .epic-text-super,
+        .epic-text-event {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin: 0;
+        }
+        .epic-text-super { font-size: 150px; letter-spacing: 8px; }
+        .epic-text-event { font-size: 150px; letter-spacing: 10px; }
+
+        .epic-overlay.animate-tackle .epic-text-super {
+            opacity: 0;
+            animation: superTackleSlideIn 1s cubic-bezier(0.34, 1.25, 0.64, 1) 0.4s forwards;
+        }
+        .epic-overlay.animate-tackle .epic-text-event {
+            opacity: 0;
+            animation: tackleSlideIn 1s cubic-bezier(0.34, 1.25, 0.64, 1) 0.4s forwards;
+        }
+        @keyframes superTackleSlideIn {
+            0%   { opacity: 0; transform: translate(-50%, -50%) translateX(-900px); }
+            60%  { opacity: 1; transform: translate(-50%, -50%) translateX(0); }
+            72%  { opacity: 1; transform: translate(-50%, -50%) translateX(14px); }
+            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(-370px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateX(-390px); }
+        }
+        @keyframes tackleSlideIn {
+            0%   { opacity: 0; transform: translate(-50%, -50%) translateX(900px); }
+            60%  { opacity: 1; transform: translate(-50%, -50%) translateX(0); }
+            72%  { opacity: 1; transform: translate(-50%, -50%) translateX(-14px); }
+            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(395px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateX(415px); }
+        }
+
+        /* ALL OUT specific */
+        .epic-overlay.animate-allout .epic-text-event {
+            position: static;
+            opacity: 0;
+            animation: allOutZoom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+        }
+        @keyframes allOutZoom {
+            0%   { opacity: 0; transform: scale(0.3); filter: blur(6px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        /* GIF inside overlay */
+        .epic-gif {
+            position: absolute;
+            bottom: 60px;
+            z-index: 15;
+            opacity: 0;
+            pointer-events: none;
+            filter: drop-shadow(0 12px 22px rgba(0,0,0,0.65)) drop-shadow(0 0 24px rgba(255,215,0,0.35));
+        }
+        /* Raid: gif on the left of the text */
+        .epic-overlay.animate-raid .epic-gif {
+            left: 12%;
+            width: 320px;
+            max-height: 320px;
+            transform-origin: bottom center;
+            animation: gifPopInRaid 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 1.05s forwards;
+        }
+        @keyframes gifPopInRaid {
+            0%   { opacity: 0; transform: scale(0.2) translateY(40px); }
+            70%  { opacity: 1; transform: scale(1.08) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        /* Tackle: gif in the middle, between SUPER and TACKLE */
+        .epic-overlay.animate-tackle .epic-gif {
+            left: 50%;
+            bottom: 80px;
+            width: 260px;
+            max-height: 260px;
+            transform: translateX(-50%) scale(0);
+            transform-origin: center bottom;
+            animation: gifPopInTackle 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s forwards;
+        }
+        @keyframes gifPopInTackle {
+            0%   { opacity: 0; transform: translateX(-50%) scale(0); }
+            70%  { opacity: 1; transform: translateX(-50%) scale(1.12); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        /* ============================================================
+           END OF REDESIGNED EPIC OVERLAY
+           ============================================================ */
 
         .fs-overlay { position: fixed; inset: 0; z-index: 9990; display: none; justify-content: center; align-items: center; overflow: hidden; }
         .fs-overlay.show { display: flex; animation: fsFadeIn 0.35s ease-out; }
@@ -475,7 +680,6 @@
             flex: 1;
             position: relative;
             overflow: hidden;
-            /* No border, no background — clean clipping container */
         }
         .rep-marquee-content {
             position: absolute;
@@ -492,7 +696,6 @@
             color: #FFF;
             text-shadow: 0 2px 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.75);
             will-change: transform;
-            /* JS-driven animation */
         }
 
         /* ============================================================
@@ -994,13 +1197,12 @@
         </div>
     </div>
 
+    <!-- REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE / ALL OUT) -->
     <div id="epic-overlay" class="epic-overlay">
-        <div class="epic-bg"></div>
-        <div class="epic-vignette"></div>
-        <div class="epic-main-container">
-            <div id="epic-super-text" class="epic-text epic-text-super">SUPER</div>
-            <div id="epic-event-text" class="epic-text epic-text-event">TACKLE</div>
-        </div>
+        <div class="epic-mat"></div>
+        <div class="epic-particles" id="epic-particles"></div>
+        <div class="epic-text-wrap" id="epic-text-wrap"></div>
+        <img id="epic-gif" class="epic-gif" src="" alt="">
     </div>
 
     <div id="starting7-overlay" class="fs-overlay">
@@ -1217,7 +1419,6 @@
                 <span class="mi-badge-label">Powered by</span>
                 <div class="mi-badge-icon"><img src="/images/kabaddione_logo.png" alt="KabaddiOne"></div>
                 <span class="mi-badge-text">KabaddiOne</span>
-                <span class="mi-badge-tag">Organiser</span>
             </div>
 
             <div class="mi-matchup">
@@ -2475,51 +2676,95 @@
         }
 
         // ==========================================
-        // EPIC ANIMATION
+        // REDESIGNED EPIC ANIMATION (SUPER RAID / SUPER TACKLE / ALL OUT)
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
 
-        function playEpicAnimation(eventType) {
-            const overlay   = document.getElementById('epic-overlay');
-            const superText = document.getElementById('epic-super-text');
-            const eventText = document.getElementById('epic-event-text');
-            if (!overlay || !superText || !eventText) return;
+        function createEpicParticles(container) {
+            if (!container) return;
+            container.innerHTML = '';
+            const count = 34;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'epic-particle';
 
-            if (eventType === 'super_tackle') {
-                superText.style.display = 'block';
-                superText.innerText = 'SUPER';
-                eventText.innerText = 'TACKLE';
-            } else if (eventType === 'super_raid') {
-                superText.style.display = 'block';
-                superText.innerText = 'SUPER';
-                eventText.innerText = 'RAID';
-            } else if (eventType === 'all_out') {
-                superText.style.display = 'none';
-                eventText.innerText = 'ALL OUT';
+                // Spread horizontally across screen
+                const left  = 6 + Math.random() * 88;         // 6% .. 94%
+                const bottom = 4 + Math.random() * 60;        // 4% .. 64% from bottom
+
+                p.style.left = left + '%';
+                p.style.bottom = bottom + '%';
+
+                const size = 5 + Math.random() * 9;           // 5px .. 14px
+                p.style.width  = size + 'px';
+                p.style.height = size + 'px';
+
+                p.style.animationDelay    = (Math.random() * 1.4) + 's';
+                p.style.animationDuration = (1.1 + Math.random() * 1.2) + 's';
+
+                container.appendChild(p);
             }
+        }
 
+        function playEpicAnimation(eventType) {
+            const overlay          = document.getElementById('epic-overlay');
+            const textWrap         = document.getElementById('epic-text-wrap');
+            const gifEl            = document.getElementById('epic-gif');
+            const particlesContainer = document.getElementById('epic-particles');
+            if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
+
+            // Clear any previous timers
             epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
             epicAnimationTimeoutIds = [];
 
-            overlay.classList.remove('entry', 'hold', 'exit', 'visible');
-            void overlay.offsetWidth;
-            overlay.classList.add('visible', 'entry');
+            // Reset state
+            overlay.className = 'epic-overlay';
+            overlay.style.transform = '';
+            textWrap.innerHTML = '';
+            gifEl.src = '';
+            gifEl.style.display = '';
+            particlesContainer.innerHTML = '';
+
+            if (eventType === 'super_raid') {
+                textWrap.innerHTML = '<div class="epic-text epic-text-raid">SUPER RAID</div>';
+                gifEl.src = 'images/thigh-five.gif';
+                overlay.classList.add('animate-raid');
+            } else if (eventType === 'super_tackle') {
+                textWrap.innerHTML =
+                    '<div class="epic-text epic-text-super">SUPER</div>' +
+                    '<div class="epic-text epic-text-event">TACKLE</div>';
+                gifEl.src = 'images/super-tackle.gif';
+                overlay.classList.add('animate-tackle');
+            } else if (eventType === 'all_out') {
+                textWrap.innerHTML = '<div class="epic-text epic-text-event">ALL OUT</div>';
+                gifEl.src = '';
+                gifEl.style.display = 'none';
+                overlay.classList.add('animate-allout');
+            } else {
+                return;
+            }
+
+            // Show overlay + hide scoreboard
+            overlay.classList.add('visible');
+            document.body.classList.add('epic-active');
             epicIsPlaying = true;
 
-            epicAnimationTimeoutIds.push(setTimeout(() => {
-                if (!epicIsPlaying) return;
-                overlay.classList.remove('entry');
-                overlay.classList.add('hold');
-            }, 700));
-            epicAnimationTimeoutIds.push(setTimeout(() => {
-                if (!epicIsPlaying) return;
-                overlay.classList.remove('hold');
-                overlay.classList.add('exit');
-            }, 3200));
+            // Create floating dust particles
+            createEpicParticles(particlesContainer);
 
+            // After 3.5s : start the slide-down
             epicAnimationTimeoutIds.push(setTimeout(() => {
-                overlay.classList.remove('visible', 'exit');
+                overlay.classList.add('slide-down');
+            }, 3500));
+
+            // After 4.0s : fully reset + restore scoreboard + apply pending scores
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                overlay.classList.remove('visible', 'slide-down',
+                    'animate-raid', 'animate-tackle', 'animate-allout');
+                overlay.style.transform = '';
+                document.body.classList.remove('epic-active');
+                particlesContainer.innerHTML = '';
                 epicIsPlaying = false;
 
                 if (window.pendingLeftScore !== undefined) {
@@ -2532,7 +2777,7 @@
                     previousRightScore = window.pendingRightScore;
                     window.pendingRightScore = undefined;
                 }
-            }, 3800));
+            }, 4000));
         }
 
         // ==========================================
@@ -2841,6 +3086,13 @@
             img.alt = (player && player.name) ? String(player.name) : 'Team logo';
         }
 
+        function formatMatchDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return String(dateStr).toUpperCase();
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+        }
+
         function miRender(data, state) {
             const overlay = document.getElementById('match-intro-overlay');
             if (!overlay) return;
@@ -2863,12 +3115,13 @@
 
             const venue = String(data.match_location || data.venue || data.match_venue || '').trim();
             const comp  = String(data.match_category || data.match_group || data.match_title || data.tournament || data.tournament_name || '').trim();
-            const mins  = parseInt(data.match_duration_mins, 10) || 20;
+            const matchDate = data.match_date || data.matchDate || data.date || data.match_datetime || '';
+            const dateFormatted = formatMatchDate(matchDate);
 
             const segs = [];
             if (comp) segs.push(comp.toUpperCase());
             segs.push(venue ? ('LIVE FROM ' + venue.toUpperCase()) : 'LIVE MATCH');
-            segs.push(mins + ' MINUTES PER HALF');
+            segs.push(dateFormatted || 'MATCH DATE TBA');
 
             const subEl = document.getElementById('mi-sub-bar');
             if (subEl) subEl.textContent = segs.join('   •   ');
