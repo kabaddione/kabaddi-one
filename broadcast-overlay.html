@@ -62,7 +62,7 @@
     <style>
         * { box-sizing: border-box; user-select: none; }
         body, html { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent !important; overflow: hidden; font-family: 'Oswald', sans-serif; }
-        .broadcast-stage { position: absolute; bottom: 60px; left: 0; width: 1920px; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); }
+        .broadcast-stage { position: absolute; bottom: 60px; left: 0; width: 1920px; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.34, 1.2, 0.64, 1); }
         .gold-bg { background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%); }
 
         .logo-bar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 30px; background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9)); border: 2px solid rgb(253, 241, 159); margin-bottom: -13px; font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; z-index: 6; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%); }
@@ -494,6 +494,321 @@
             will-change: transform;
             /* JS-driven animation */
         }
+
+        /* ============================================================
+           MATCH INTRO (TEAM INTRODUCTION) CSS
+           ============================================================ */
+        body.mi-active .broadcast-stage {
+            opacity: 0 !important;
+            transform: translateY(90px) !important;
+            pointer-events: none !important;
+        }
+
+        .mi-overlay {
+            --mi-left-color: #E91E63;
+            --mi-right-color: #2196F3;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 1920px !important;
+            height: 1080px !important;
+            z-index: 99999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(6, 6, 22, 0.30) 0%, rgba(2, 2, 10, 0.86) 100%) !important;
+            transition: opacity 0.55s ease, visibility 0s linear 0.55s;
+        }
+        .mi-overlay.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            transition: opacity 0.55s ease, visibility 0s linear 0s !important;
+        }
+
+        .mi-panel {
+            position: relative;
+            width: 1640px;
+            height: 820px;
+            border-radius: 30px;
+            padding: 46px 60px 54px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%) !important;
+            border: 2px solid rgba(130, 205, 255, 0.55) !important;
+            box-shadow: 0 0 0 8px rgba(80, 40, 180, 0.16), 0 0 100px rgba(90, 40, 210, 0.75), inset 0 0 170px rgba(70, 30, 160, 0.55) !important;
+            opacity: 0;
+            transform: scale(0.86) translateY(26px);
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .mi-panel::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 22px;
+            border: 1px solid rgba(150, 200, 255, 0.16);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .mi-overlay.show .mi-panel { opacity: 1; transform: scale(1) translateY(0); }
+        .mi-overlay.exit .mi-panel {
+            opacity: 0;
+            transform: scale(0.94) translateY(12px);
+            transition: opacity 0.4s ease, transform 0.45s ease;
+        }
+
+        .mi-glow {
+            position: absolute;
+            width: 760px;
+            height: 760px;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.30;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .mi-glow-left  { left: -220px; top: 30px;  background: var(--mi-left-color); }
+        .mi-glow-right { right: -220px; top: 30px; background: var(--mi-right-color); }
+
+        .mi-badge {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 28px;
+            border-radius: 10px;
+            background: linear-gradient(to bottom, rgba(20, 20, 44, 0.96), rgba(0, 0, 0, 0.92));
+            border: 2px solid rgb(253, 241, 159);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.55), inset 0 1px 0 rgba(255, 215, 0, 0.18);
+            font-family: "Segoe UI", system-ui, sans-serif;
+            opacity: 0;
+            transform: translateY(-28px);
+            transition: opacity 0.6s ease 0.30s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.30s;
+        }
+        .mi-overlay.show .mi-badge { opacity: 1; transform: translateY(0); }
+        .mi-overlay.exit .mi-badge { opacity: 0; transform: translateY(-18px); transition: opacity 0.28s ease, transform 0.28s ease; }
+
+        .mi-badge-label { color: #B9B9B9; font-size: 14px; font-weight: 600; letter-spacing: 1.2px; }
+        .mi-badge-icon {
+            width: 38px; height: 38px; border-radius: 8px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
+        }
+        .mi-badge-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .mi-badge-text { color: #FFF; font-size: 22px; font-weight: 800; letter-spacing: 0.8px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.45); }
+        .mi-badge-tag {
+            margin-left: 8px; padding: 3px 12px; border-radius: 999px;
+            background: linear-gradient(to bottom, #FFD75E, #C99A00);
+            color: #241A00; font-size: 11px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
+        }
+
+        .mi-matchup {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 56px;
+        }
+
+        .mi-team { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .mi-team-left {
+            opacity: 0;
+            transform: translateX(-150px) scale(0.9);
+            transition: opacity 0.65s ease 0.45s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
+        }
+        .mi-overlay.show .mi-team-left { opacity: 1; transform: translateX(0) scale(1); }
+        .mi-overlay.exit .mi-team-left { opacity: 0; transform: translateX(-90px) scale(0.94); transition: opacity 0.3s ease, transform 0.3s ease; }
+
+        .mi-team-right {
+            opacity: 0;
+            transform: translateX(150px) scale(0.9);
+            transition: opacity 0.65s ease 0.45s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
+        }
+        .mi-overlay.show .mi-team-right { opacity: 1; transform: translateX(0) scale(1); }
+        .mi-overlay.exit .mi-team-right { opacity: 0; transform: translateX(90px) scale(0.94); transition: opacity 0.3s ease, transform 0.3s ease; }
+
+        .mi-logo-frame {
+            position: relative;
+            width: 470px;
+            height: 300px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.38) 100%);
+            border: 2px solid rgba(150, 210, 255, 0.35);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 42px rgba(120, 80, 255, 0.35);
+        }
+        .mi-logo-frame::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            box-shadow: inset 0 0 70px var(--mi-team-color, #4A9EFF);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .mi-logo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10, 8, 30, 0.85) 0%, rgba(10, 8, 30, 0) 58%);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .mi-logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center bottom;
+            z-index: 1;
+        }
+        .mi-team-left  .mi-logo-frame { --mi-team-color: var(--mi-left-color); }
+        .mi-team-right .mi-logo-frame { --mi-team-color: var(--mi-right-color); }
+
+        .mi-vs {
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            filter: drop-shadow(0 0 24px rgba(150, 90, 255, 0.85));
+            opacity: 0;
+            transform: scale(0.4) rotate(-25deg);
+            transition: opacity 0.5s ease 0.72s, transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.72s;
+        }
+        .mi-overlay.show .mi-vs { opacity: 1; transform: scale(1) rotate(0deg); }
+        .mi-overlay.exit .mi-vs { opacity: 0; transform: scale(0.5) rotate(15deg); transition: opacity 0.28s ease, transform 0.28s ease; }
+
+        .mi-vs-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            clip-path: polygon(50% 0%, 100% 27%, 100% 73%, 50% 100%, 0% 73%, 0% 27%);
+            background: linear-gradient(160deg, #8B4BE8 0%, #4A2496 45%, #2A1259 75%, #16092F 100%);
+            border: none;
+        }
+        .mi-vs-text {
+            font-family: 'Teko', sans-serif;
+            font-size: 86px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: 4px;
+            color: #FFFFFF;
+            text-shadow: 0 0 18px rgba(120, 220, 255, 0.95), 0 0 40px rgba(150, 90, 255, 0.9);
+            padding-bottom: 6px;
+        }
+
+        .mi-name-bar {
+            position: relative;
+            z-index: 2;
+            width: 1240px;
+            height: 86px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            clip-path: polygon(2.5% 0, 97.5% 0, 100% 100%, 0 100%);
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6EBF3 50%, #C2CBD9 100%);
+            opacity: 0;
+            transform: translateY(30px) scaleX(0.94);
+            transition: opacity 0.55s ease 0.95s, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.95s;
+        }
+        .mi-overlay.show .mi-name-bar { opacity: 1; transform: translateY(0) scaleX(1); }
+        .mi-overlay.exit .mi-name-bar { opacity: 0; transform: translateY(20px); transition: opacity 0.26s ease, transform 0.26s ease; }
+
+        .mi-bar-accent {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .mi-bar-accent.left {
+            left: 0;
+            background: linear-gradient(90deg, var(--mi-left-color) 0%, rgba(255, 255, 255, 0) 78%);
+            clip-path: polygon(0 0, 46% 0, 100% 100%, 0 100%);
+        }
+        .mi-bar-accent.right {
+            right: 0;
+            background: linear-gradient(270deg, var(--mi-right-color) 0%, rgba(255, 255, 255, 0) 78%);
+            clip-path: polygon(54% 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .mi-name-half {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 30px;
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-weight: 900;
+            font-size: 44px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #0E1220;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mi-bar-divider {
+            position: relative;
+            z-index: 3;
+            flex-shrink: 0;
+            width: 4px;
+            height: 62%;
+            background: linear-gradient(to bottom, rgba(90, 40, 180, 0), #6A2BB5 18%, #6A2BB5 82%, rgba(90, 40, 180, 0));
+            box-shadow: 0 0 14px rgba(120, 60, 220, 0.95);
+        }
+
+        .mi-sub-bar {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            padding: 9px 54px;
+            border-radius: 999px;
+            background: linear-gradient(to bottom, #4C1D95 0%, #2A0D5C 100%);
+            border: 1.5px solid rgba(160, 130, 255, 0.65);
+            box-shadow: 0 0 34px rgba(120, 60, 255, 0.7), inset 0 0 24px rgba(120, 60, 255, 0.35);
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            color: #74E0FF;
+            text-shadow: 0 0 14px rgba(80, 200, 255, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0;
+            transform: translateY(24px) scale(0.92);
+            transition: opacity 0.5s ease 1.15s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 1.15s;
+        }
+        .mi-overlay.show .mi-sub-bar { opacity: 1; transform: translateY(0) scale(1); }
+        .mi-overlay.exit .mi-sub-bar { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.24s ease, transform 0.24s ease; }
     </style>
 </head>
 <body>
@@ -892,10 +1207,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-         ⬇️  ADDED: MATCH INTRO / TEAM INTRODUCTION SCREEN MARKUP
-         (purely additive — nothing above was changed)
-         ============================================================ -->
+    <!-- MATCH INTRO / TEAM INTRODUCTION SCREEN -->
     <div id="match-intro-overlay" class="mi-overlay">
         <div class="mi-panel" id="mi-panel">
             <div class="mi-glow mi-glow-left"></div>
@@ -1578,7 +1890,7 @@
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
-                handleMatchIntroScreen(data, state);   // ⬅️ ADDED LINE
+                handleMatchIntroScreen(data, state);   // MATCH INTRO LOGIC
 
             }, (error) => {
                 window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — Auth blocked the read', error);
@@ -2482,348 +2794,16 @@
             for (let i = 0; i < unsuccTack; i++) tackleSequence.push('U');
             ppRenderSequence('pp-tackle-sequence', tackleSequence, 'tackle');
         }
-    </script>
 
-    <!-- ============================================================
-         ⬇️  ADDED: MATCH INTRO (TEAM INTRODUCTION) ENGINE
-         ============================================================ -->
-    <style>
-        /* ---------- Match Intro — layout & animation ---------- */
-
-        /* Hide the whole bottom scoreboard while the intro is on screen */
-        .broadcast-stage {
-            transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.34, 1.2, 0.64, 1);
-        }
-        body.mi-active .broadcast-stage {
-            opacity: 0;
-            transform: translateY(90px);
-            pointer-events: none;
-        }
-
-        .mi-overlay {
-            --mi-left-color: #E91E63;
-            --mi-right-color: #2196F3;
-            position: fixed;
-            inset: 0;
-            z-index: 9985;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, rgba(6, 6, 22, 0.30) 0%, rgba(2, 2, 10, 0.86) 100%);
-            transition: opacity 0.55s ease, visibility 0s linear 0.55s;
-        }
-        .mi-overlay.show {
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.55s ease, visibility 0s linear 0s;
-        }
-
-        /* ---------- Panel ---------- */
-        .mi-panel {
-            position: relative;
-            width: 1640px;
-            height: 820px;
-            border-radius: 30px;
-            padding: 46px 60px 54px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 28px;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%);
-            border: 2px solid rgba(130, 205, 255, 0.55);
-            box-shadow:
-                0 0 0 8px rgba(80, 40, 180, 0.16),
-                0 0 100px rgba(90, 40, 210, 0.75),
-                inset 0 0 170px rgba(70, 30, 160, 0.55);
-            opacity: 0;
-            transform: scale(0.86) translateY(26px);
-            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .mi-panel::before {
-            content: '';
-            position: absolute;
-            inset: 12px;
-            border-radius: 22px;
-            border: 1px solid rgba(150, 200, 255, 0.16);
-            pointer-events: none;
-            z-index: 1;
-        }
-        .mi-overlay.show .mi-panel { opacity: 1; transform: scale(1) translateY(0); }
-        .mi-overlay.exit .mi-panel {
-            opacity: 0;
-            transform: scale(0.94) translateY(12px);
-            transition: opacity 0.4s ease, transform 0.45s ease;
-        }
-
-        /* soft team-colour glows inside the panel */
-        .mi-glow {
-            position: absolute;
-            width: 760px;
-            height: 760px;
-            border-radius: 50%;
-            filter: blur(110px);
-            opacity: 0.30;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .mi-glow-left  { left: -220px; top: 30px;  background: var(--mi-left-color); }
-        .mi-glow-right { right: -220px; top: 30px; background: var(--mi-right-color); }
-
-        /* ---------- Top "Powered by KabaddiOne / Organiser" badge ---------- */
-        .mi-badge {
-            position: relative;
-            z-index: 2;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 28px;
-            border-radius: 10px;
-            background: linear-gradient(to bottom, rgba(20, 20, 44, 0.96), rgba(0, 0, 0, 0.92));
-            border: 2px solid rgb(253, 241, 159);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.55), inset 0 1px 0 rgba(255, 215, 0, 0.18);
-            font-family: "Segoe UI", system-ui, sans-serif;
-            opacity: 0;
-            transform: translateY(-28px);
-            transition: opacity 0.6s ease 0.30s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.30s;
-        }
-        .mi-overlay.show .mi-badge { opacity: 1; transform: translateY(0); }
-        .mi-overlay.exit .mi-badge { opacity: 0; transform: translateY(-18px); transition: opacity 0.28s ease, transform 0.28s ease; }
-
-        .mi-badge-label { color: #B9B9B9; font-size: 14px; font-weight: 600; letter-spacing: 1.2px; }
-        .mi-badge-icon {
-            width: 38px; height: 38px; border-radius: 8px; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
-        }
-        .mi-badge-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .mi-badge-text { color: #FFF; font-size: 22px; font-weight: 800; letter-spacing: 0.8px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.45); }
-        .mi-badge-tag {
-            margin-left: 8px; padding: 3px 12px; border-radius: 999px;
-            background: linear-gradient(to bottom, #FFD75E, #C99A00);
-            color: #241A00; font-size: 11px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
-        }
-
-        /* ---------- Matchup row ---------- */
-        .mi-matchup {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 56px;
-        }
-
-        .mi-team { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .mi-team-left {
-            opacity: 0;
-            transform: translateX(-150px) scale(0.9);
-            transition: opacity 0.65s ease 0.45s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
-        }
-        .mi-overlay.show .mi-team-left { opacity: 1; transform: translateX(0) scale(1); }
-        .mi-overlay.exit .mi-team-left { opacity: 0; transform: translateX(-90px) scale(0.94); transition: opacity 0.3s ease, transform 0.3s ease; }
-
-        .mi-team-right {
-            opacity: 0;
-            transform: translateX(150px) scale(0.9);
-            transition: opacity 0.65s ease 0.45s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
-        }
-        .mi-overlay.show .mi-team-right { opacity: 1; transform: translateX(0) scale(1); }
-        .mi-overlay.exit .mi-team-right { opacity: 0; transform: translateX(90px) scale(0.94); transition: opacity 0.3s ease, transform 0.3s ease; }
-
-        .mi-logo-frame {
-            position: relative;
-            width: 470px;
-            height: 300px;
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.38) 100%);
-            border: 2px solid rgba(150, 210, 255, 0.35);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 42px rgba(120, 80, 255, 0.35);
-        }
-        .mi-logo-frame::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 16px;
-            box-shadow: inset 0 0 70px var(--mi-team-color, #4A9EFF);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: 2;
-        }
-        .mi-logo-frame::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(10, 8, 30, 0.85) 0%, rgba(10, 8, 30, 0) 58%);
-            pointer-events: none;
-            z-index: 3;
-        }
-        .mi-logo-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center bottom;
-            z-index: 1;
-        }
-        .mi-team-left  .mi-logo-frame { --mi-team-color: var(--mi-left-color); }
-        .mi-team-right .mi-logo-frame { --mi-team-color: var(--mi-right-color); }
-
-        /* ---------- VS hexagon ---------- */
-        .mi-vs {
-            width: 200px;
-            height: 200px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            filter: drop-shadow(0 0 24px rgba(150, 90, 255, 0.85));
-            opacity: 0;
-            transform: scale(0.4) rotate(-25deg);
-            transition: opacity 0.5s ease 0.72s, transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.72s;
-        }
-        .mi-overlay.show .mi-vs { opacity: 1; transform: scale(1) rotate(0deg); }
-        .mi-overlay.exit .mi-vs { opacity: 0; transform: scale(0.5) rotate(15deg); transition: opacity 0.28s ease, transform 0.28s ease; }
-
-        .mi-vs-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            clip-path: polygon(50% 0%, 100% 27%, 100% 73%, 50% 100%, 0% 73%, 0% 27%);
-            background: linear-gradient(160deg, #8B4BE8 0%, #4A2496 45%, #2A1259 75%, #16092F 100%);
-            border: none;
-        }
-        .mi-vs-text {
-            font-family: 'Teko', sans-serif;
-            font-size: 86px;
-            font-weight: 700;
-            line-height: 1;
-            letter-spacing: 4px;
-            color: #FFFFFF;
-            text-shadow: 0 0 18px rgba(120, 220, 255, 0.95), 0 0 40px rgba(150, 90, 255, 0.9);
-            padding-bottom: 6px;
-        }
-
-        /* ---------- Bottom team-name bar ---------- */
-        .mi-name-bar {
-            position: relative;
-            z-index: 2;
-            width: 1240px;
-            height: 86px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            clip-path: polygon(2.5% 0, 97.5% 0, 100% 100%, 0 100%);
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6EBF3 50%, #C2CBD9 100%);
-            opacity: 0;
-            transform: translateY(30px) scaleX(0.94);
-            transition: opacity 0.55s ease 0.95s, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.95s;
-        }
-        .mi-overlay.show .mi-name-bar { opacity: 1; transform: translateY(0) scaleX(1); }
-        .mi-overlay.exit .mi-name-bar { opacity: 0; transform: translateY(20px); transition: opacity 0.26s ease, transform 0.26s ease; }
-
-        .mi-bar-accent {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 280px;
-            z-index: 1;
-            pointer-events: none;
-        }
-        .mi-bar-accent.left {
-            left: 0;
-            background: linear-gradient(90deg, var(--mi-left-color) 0%, rgba(255, 255, 255, 0) 78%);
-            clip-path: polygon(0 0, 46% 0, 100% 100%, 0 100%);
-        }
-        .mi-bar-accent.right {
-            right: 0;
-            background: linear-gradient(270deg, var(--mi-right-color) 0%, rgba(255, 255, 255, 0) 78%);
-            clip-path: polygon(54% 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .mi-name-half {
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            min-width: 0;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 30px;
-            font-family: 'Mukta', 'Oswald', sans-serif;
-            font-weight: 900;
-            font-size: 44px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #0E1220;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .mi-bar-divider {
-            position: relative;
-            z-index: 3;
-            flex-shrink: 0;
-            width: 4px;
-            height: 62%;
-            background: linear-gradient(to bottom, rgba(90, 40, 180, 0), #6A2BB5 18%, #6A2BB5 82%, rgba(90, 40, 180, 0));
-            box-shadow: 0 0 14px rgba(120, 60, 220, 0.95);
-        }
-
-        /* ---------- Bottom info / venue pill ---------- */
-        .mi-sub-bar {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            padding: 9px 54px;
-            border-radius: 999px;
-            background: linear-gradient(to bottom, #4C1D95 0%, #2A0D5C 100%);
-            border: 1.5px solid rgba(160, 130, 255, 0.65);
-            box-shadow: 0 0 34px rgba(120, 60, 255, 0.7), inset 0 0 24px rgba(120, 60, 255, 0.35);
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
-            font-size: 22px;
-            letter-spacing: 3.5px;
-            text-transform: uppercase;
-            color: #74E0FF;
-            text-shadow: 0 0 14px rgba(80, 200, 255, 0.9);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            opacity: 0;
-            transform: translateY(24px) scale(0.92);
-            transition: opacity 0.5s ease 1.15s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 1.15s;
-        }
-        .mi-overlay.show .mi-sub-bar { opacity: 1; transform: translateY(0) scale(1); }
-        .mi-overlay.exit .mi-sub-bar { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.24s ease, transform 0.24s ease; }
-    </style>
-
-    <script>
         // ============================================================
-        // ⬇️  ADDED: MATCH INTRO (TEAM INTRODUCTION) CONTROLLER
+        // MATCH INTRO (TEAM INTRODUCTION) CONTROLLER
         // ============================================================
-        const matchIntroState = {
-            shown: false,       // has the intro already played for this match?
-            active: false,      // is it on screen right now?
-            timer: null,
-            exitTimer: null,
-            durationMs: 600000    // 6 seconds on screen
+        let matchIntroState = {
+            active: false,
+            matchStarted: false,
+            suspendedForOverlay: false
         };
 
-        /* --- pick the first player of a roster (used as the team "logo") --- */
         function miPickTeamLogoPlayer(rosterJsonStr) {
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch (e) { roster = []; }
@@ -2837,7 +2817,6 @@
             return withImage || pool[0];
         }
 
-        /* --- resolve a player image, always falling back to the default profile --- */
         function miResolveImage(player) {
             if (player && player.imageUri) {
                 const s = String(player.imageUri).trim();
@@ -2862,7 +2841,6 @@
             img.alt = (player && player.name) ? String(player.name) : 'Team logo';
         }
 
-        /* --- fill the intro screen with live match data --- */
         function miRender(data, state) {
             const overlay = document.getElementById('match-intro-overlay');
             if (!overlay) return;
@@ -2883,7 +2861,6 @@
             miApplyTeamLogo('mi-left-logo',  state && state.leftRosterJson);
             miApplyTeamLogo('mi-right-logo', state && state.rightRosterJson);
 
-            /* --- bottom info: match data + venue --- */
             const venue = String(data.match_location || data.venue || data.match_venue || '').trim();
             const comp  = String(data.match_category || data.match_group || data.match_title || data.tournament || data.tournament_name || '').trim();
             const mins  = parseInt(data.match_duration_mins, 10) || 20;
@@ -2897,21 +2874,15 @@
             if (subEl) subEl.textContent = segs.join('   •   ');
         }
 
-        /* --- is the match still "fresh" (0-0, nothing played yet)? --- */
         function miIsMatchNotStarted(data, state) {
             if (!data) return false;
             if (data.match_result) return false;
-
             const half = String(data.half_status || '').toLowerCase();
-            if (half.indexOf('over') !== -1 || half.indexOf('full time') !== -1) return false;
-
-            const breakTitle = String(data.break_clock_title || '').trim();
-            const breakTime  = String(data.break_clock_time  || '').trim();
-            if (breakTitle && breakTime && breakTime !== '00:00') return false;
+            if (half.includes('over') || half.includes('full time')) return false;
 
             const ls = parseInt(data.left_score, 10) || 0;
             const rs = parseInt(data.right_score, 10) || 0;
-            if (ls !== 0 || rs !== 0) return false;
+            if (ls > 0 || rs > 0) return false;
 
             if (state && state.raidTimerRunning === true) return false;
             const raidClock = parseInt(data.raid_clock, 10);
@@ -2921,7 +2892,6 @@
             try { logs = JSON.parse((state && state.logsJson) || '[]'); } catch (e) { logs = []; }
             if (Array.isArray(logs) && logs.length > 0) return false;
 
-            // clock has already ticked down => match has started
             const fullSecs = (parseInt(data.match_duration_mins, 10) || 20) * 60;
             const remain = parseMainClock(data.main_clock);
             if (remain >= 0 && remain < fullSecs - 1) return false;
@@ -2929,33 +2899,23 @@
             return true;
         }
 
-        /* --- show / hide --- */
         function showMatchIntro(data, state) {
-            if (matchIntroState.active || matchIntroState.shown) return;
+            if (matchIntroState.active || matchIntroState.matchStarted) return;
             const overlay = document.getElementById('match-intro-overlay');
             if (!overlay) return;
 
-            matchIntroState.shown  = true;
             matchIntroState.active = true;
-
             miRender(data, state);
 
-            clearTimeout(matchIntroState.exitTimer);
             overlay.classList.remove('exit', 'show');
-            void overlay.offsetWidth;              // force reflow so the transition replays
+            void overlay.offsetWidth;
             overlay.classList.add('show');
-
             document.body.classList.add('mi-active');
-
-            clearTimeout(matchIntroState.timer);
-            matchIntroState.timer = setTimeout(function () { hideMatchIntro(); }, matchIntroState.durationMs);
         }
 
         function hideMatchIntro() {
             if (!matchIntroState.active) return;
             matchIntroState.active = false;
-            clearTimeout(matchIntroState.timer);
-            matchIntroState.timer = null;
 
             const overlay = document.getElementById('match-intro-overlay');
             if (!overlay) { document.body.classList.remove('mi-active'); return; }
@@ -2963,37 +2923,41 @@
             overlay.classList.remove('show');
             overlay.classList.add('exit');
 
-            clearTimeout(matchIntroState.exitTimer);
-            matchIntroState.exitTimer = setTimeout(function () {
+            setTimeout(() => {
                 overlay.classList.remove('exit');
                 document.body.classList.remove('mi-active');
-            }, 560);
+            }, 600);
         }
 
-        /* --- called on every Firebase snapshot --- */
         function handleMatchIntroScreen(data, state) {
             if (!data) return;
             const overlayOpen = String(data.overlay_screen || '').trim().length > 0;
+            const notStarted = miIsMatchNotStarted(data, state);
 
-            if (matchIntroState.active) {
-                // aborts mid-flight if the match starts or the operator opens another screen
-                if (overlayOpen || !miIsMatchNotStarted(data, state)) hideMatchIntro();
+            if (!notStarted) {
+                matchIntroState.matchStarted = true;
+                if (matchIntroState.active) hideMatchIntro();
                 return;
             }
-            if (matchIntroState.shown) return;
-            if (overlayOpen) return;
-            if (!miIsMatchNotStarted(data, state)) return;
 
-            showMatchIntro(data, state);
+            if (overlayOpen) {
+                if (matchIntroState.active) {
+                    hideMatchIntro();
+                    matchIntroState.suspendedForOverlay = true;
+                }
+                return;
+            }
+
+            if (!overlayOpen && matchIntroState.suspendedForOverlay) {
+                matchIntroState.suspendedForOverlay = false;
+                showMatchIntro(data, state);
+                return;
+            }
+
+            if (!matchIntroState.active && !matchIntroState.matchStarted && !overlayOpen) {
+                showMatchIntro(data, state);
+            }
         }
-
-        // expose the needed ids on the two logo frames (per-team glow colour)
-        (function miInitTeamColorVars() {
-            const overlay = document.getElementById('match-intro-overlay');
-            if (!overlay) return;
-            overlay.style.setProperty('--mi-left-color', '#009900');
-            overlay.style.setProperty('--mi-right-color', '#0055ff');
-        })();
     </script>
 </body>
 </html>
