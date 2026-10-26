@@ -2888,13 +2888,10 @@
             const raidClock = parseInt(data.raid_clock, 10);
             if (!isNaN(raidClock) && raidClock > 0 && raidClock < 30) return false;
 
-            let logs = [];
-            try { logs = JSON.parse((state && state.logsJson) || '[]'); } catch (e) { logs = []; }
-            if (Array.isArray(logs) && logs.length > 0) return false;
-
+            // If the main clock has ticked down by more than 5 seconds, the match has started
             const fullSecs = (parseInt(data.match_duration_mins, 10) || 20) * 60;
             const remain = parseMainClock(data.main_clock);
-            if (remain >= 0 && remain < fullSecs - 1) return false;
+            if (remain >= 0 && remain < fullSecs - 5) return false;
 
             return true;
         }
@@ -2931,7 +2928,8 @@
 
         function handleMatchIntroScreen(data, state) {
             if (!data) return;
-            const overlayOpen = String(data.overlay_screen || '').trim().length > 0;
+            const overlayScreen = String(data.overlay_screen || '').trim().toLowerCase();
+            const overlayOpen = overlayScreen.length > 0 && overlayScreen !== 'none' && overlayScreen !== 'null';
             const notStarted = miIsMatchNotStarted(data, state);
 
             if (!notStarted) {
@@ -2940,11 +2938,13 @@
                 return;
             }
 
+            matchIntroState.matchStarted = false;
+
             if (overlayOpen) {
                 if (matchIntroState.active) {
                     hideMatchIntro();
-                    matchIntroState.suspendedForOverlay = true;
                 }
+                matchIntroState.suspendedForOverlay = true;
                 return;
             }
 
@@ -2954,7 +2954,7 @@
                 return;
             }
 
-            if (!matchIntroState.active && !matchIntroState.matchStarted && !overlayOpen) {
+            if (!matchIntroState.active && !matchIntroState.matchStarted) {
                 showMatchIntro(data, state);
             }
         }
