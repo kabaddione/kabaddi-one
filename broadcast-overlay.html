@@ -1128,17 +1128,22 @@
         }
         
         .toss-row {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 0;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+            height: 60px;
+            width: max-content;
+            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6EBF3 50%, #C2CBD9 100%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
         
         .toss-tag {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 54px;
+            height: 100%;
             padding: 0 30px;
             font-family: 'Mukta', 'Oswald', sans-serif;
             font-weight: 800;
@@ -1150,29 +1155,34 @@
         }
         
         .toss-winner-tag {
-            background: #FFFFFF;
-            color: #000;
-            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
+            background: transparent;
+            color: #0E1220;
             padding-left: 40px;
-            padding-right: 30px;
+            padding-right: 20px;
         }
         
         .toss-winner-name {
-            background: #FF007A; /* Default pink, overwritten by JS */
+            background: #FF007A; /* Default, overwritten by JS */
             color: #FFF;
             clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
-            padding-left: 30px;
+            padding-left: 35px;
             padding-right: 40px;
             margin-left: -15px;
             z-index: 1;
         }
         
+        .toss-choice-row {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 15px 100%);
+            background: linear-gradient(to bottom, #4A2496 0%, #2A1259 100%);
+            width: max-content;
+            margin-left: 30px; /* Stagger */
+        }
+        
         .toss-choice-tag {
-            background: #3B1E5C;
             color: #FFF;
-            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
-            padding-left: 40px;
+            padding-left: 30px;
             padding-right: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         
         .toss-start-soon {
@@ -1180,7 +1190,7 @@
             align-items: center;
             justify-content: center;
             height: 42px;
-            padding: 0 40px;
+            padding: 0 30px;
             background: #1A1A3A;
             color: #00FFFF;
             font-family: 'Oswald', sans-serif;
@@ -1188,8 +1198,9 @@
             font-size: 20px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 15px 100%);
+            margin-left: 60px; /* Further Stagger */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -1422,10 +1433,10 @@
             <div class="toss-tag toss-winner-tag">TOSS WON BY</div>
             <div class="toss-tag toss-winner-name" id="toss-winner-name">TEAM A</div>
         </div>
-        <div class="toss-row">
+        <div class="toss-row toss-choice-row">
             <div class="toss-tag toss-choice-tag" id="toss-choice-text">TEAM B TO RAID FIRST</div>
         </div>
-        <div class="toss-row">
+        <div class="toss-row" style="background: none; box-shadow: none; filter: none; clip-path: none;">
             <div class="toss-start-soon">MATCH WILL START SOON...</div>
         </div>
     </div>
@@ -3581,6 +3592,8 @@
                 preMatchState.active = true;
                 setPreMatchPhase('intro', 20000); // 20 seconds
                 startPreMatchTicker();
+            } else if (preMatchState.phase === 'intro') {
+                miRender(data, state); // Continuously update intro screen data
             }
         }
 
