@@ -31,11 +31,26 @@
     <link rel="preload" as="image" href="/images/kabaddione_bg.jpg">
     <link rel="preload" as="image" href="images/starting7-mat.png">
     <script>
-        (function preloadEpicAssets() {
-            ['images/raid-mat.png', 'images/tackle-mat.png', 'images/thigh-five.gif', 'images/super-tackle.gif', '/images/kabaddione_bg.jpg', 'images/starting7-mat.png'].forEach(function (src) {
+        // Global object to hold GIF data in memory
+        window.epicGifBlobs = { raid: null, tackle: null };
+
+        (async function preloadEpicAssets() {
+            // Standard image preload for static assets
+            ['images/raid-mat.png', 'images/tackle-mat.png', '/images/kabaddione_bg.jpg', 'images/starting7-mat.png'].forEach(function (src) {
                 var img = new Image();
                 img.src = src;
             });
+
+            // Preload GIFs as Blobs to control playback start perfectly without network flashes
+            try {
+                const raidRes = await fetch('images/thigh-five.gif');
+                window.epicGifBlobs.raid = await raidRes.blob();
+                
+                const tackleRes = await fetch('images/super-tackle.gif');
+                window.epicGifBlobs.tackle = await tackleRes.blob();
+            } catch (err) {
+                window.__kabaddiLog('WARN', 'Failed to preload GIFs as Blobs', err);
+            }
         })();
     </script>
 
@@ -3147,6 +3162,12 @@
             epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
             epicAnimationTimeoutIds = [];
 
+            // Clear previous blob URL to avoid memory leaks
+            if (gifEl.dataset.blobUrl) {
+                URL.revokeObjectURL(gifEl.dataset.blobUrl);
+                gifEl.dataset.blobUrl = '';
+            }
+
             overlay.className = 'epic-overlay';
             overlay.style.transform = '';
             textWrap.innerHTML = '';
@@ -3159,14 +3180,34 @@
                 textWrap.innerHTML =
                     '<div class="epic-text epic-text-super">SUPER</div>' +
                     '<div class="epic-text epic-text-event">RAID</div>';
-                gifEl.src = 'images/thigh-five.gif';
+                
+                // Force GIF to restart from frame 1 instantly using the Blob
+                if (window.epicGifBlobs.raid) {
+                    const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
+                    gifEl.src = newUrl;
+                    gifEl.dataset.blobUrl = newUrl;
+                } else {
+                    // Fallback if Blob failed
+                    gifEl.src = 'images/thigh-five.gif?t=' + Date.now(); 
+                }
                 overlay.classList.add('animate-raid');
+                
             } else if (eventType === 'super_tackle') {
                 textWrap.innerHTML =
                     '<div class="epic-text epic-text-super">SUPER</div>' +
                     '<div class="epic-text epic-text-event">TACKLE</div>';
-                gifEl.src = 'images/super-tackle.gif';
+                
+                // Force GIF to restart from frame 1 instantly using the Blob
+                if (window.epicGifBlobs.tackle) {
+                    const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
+                    gifEl.src = newUrl;
+                    gifEl.dataset.blobUrl = newUrl;
+                } else {
+                    // Fallback if Blob failed
+                    gifEl.src = 'images/super-tackle.gif?t=' + Date.now(); 
+                }
                 overlay.classList.add('animate-tackle');
+                
             } else if (eventType === 'all_out') {
                 textWrap.innerHTML = '<div class="epic-text epic-text-event">ALL OUT</div>';
                 gifEl.src = '';
@@ -3175,6 +3216,8 @@
             } else {
                 return;
             }
+            
+            // ... (keep the rest of the function the same)
 
             overlay.classList.add('visible');
             document.body.classList.add('epic-active');
@@ -3193,6 +3236,12 @@
                 document.body.classList.remove('epic-active');
                 particlesContainer.innerHTML = '';
                 epicIsPlaying = false;
+                
+                // Clean up the Blob URL when animation is done
+                if (gifEl.dataset.blobUrl) {
+                    URL.revokeObjectURL(gifEl.dataset.blobUrl);
+                    gifEl.dataset.blobUrl = '';
+                }
 
                 if (window.pendingLeftScore !== undefined) {
                     updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
