@@ -729,6 +729,7 @@
         .raid-event-popup.show {
             opacity: 1;
             transform: translateY(0) scale(1);
+            background: rgba(0,0,0,0.4);
         }
         .raid-event-popup.l5-active,
         .raid-event-popup.dod-active {
@@ -742,7 +743,7 @@
             padding: 0 20px;
             min-width: 180px;
             flex-shrink: 0;
-            border: 2px solid #FFD700;
+            border: 0px solid #FFD700;
             color: #FFF;
             font-family: 'Teko', sans-serif;
             font-size: 20px;
@@ -771,7 +772,8 @@
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: rgba(0,0,0,0.5);
+            clip-path: polygon(2.5% 0, 100% 0, 100% 100%, 0 100%);
+            margin-left: -25px;
         }
         .rep-marquee-content {
             position: absolute;
