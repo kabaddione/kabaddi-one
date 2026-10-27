@@ -570,6 +570,33 @@
            END OF REDESIGNED EPIC OVERLAY
            ============================================================ */
 
+
+        /* ============================================================
+           OLD STYLE EPIC OVERLAY (ALL OUT)
+           ============================================================ */
+        .epic-overlay-allout { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; visibility: hidden; pointer-events: none; overflow: hidden; }
+        .epic-overlay-allout.visible { visibility: visible; }
+        .epic-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; opacity: 1; z-index: 1; }
+        .epic-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%); z-index: 2; opacity: 1; }
+        .epic-main-container { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform: scale(1); opacity: 1; will-change: transform, opacity; }
+        .epic-text { font-family: 'Teko', sans-serif; font-weight: 700; line-height: 0.9; letter-spacing: 12px; text-align: center; text-transform: uppercase; background: linear-gradient(to bottom, #FFFFFF 0%, #ABABAB 50%, #FFFFFF 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
+        .epic-text-super { font-size: 110px; letter-spacing: 18px; }
+        .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
+        .epic-overlay-allout.entry .epic-bg { animation: epicBgFadeIn 0.5s ease-out forwards; }
+        .epic-overlay-allout.entry .epic-vignette { animation: epicBgFadeIn 0.5s ease-out forwards; }
+        .epic-overlay-allout.entry .epic-main-container { animation: epicContainerEntry 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .epic-overlay-allout.hold .epic-main-container { animation: epicHold 2.5s linear forwards; }
+        .epic-overlay-allout.exit .epic-bg { animation: epicBgFadeOut 0.6s ease forwards; }
+        .epic-overlay-allout.exit .epic-vignette { animation: epicBgFadeOut 0.6s ease forwards; }
+        .epic-overlay-allout.exit .epic-main-container { animation: epicContainerExit 0.6s cubic-bezier(0.5, 0, 0.7, 1.5) forwards; }
+        @keyframes epicBgFadeIn  { from{opacity:0} to{opacity:1} }
+        @keyframes epicBgFadeOut { from{opacity:1} to{opacity:0} }
+        @keyframes epicContainerEntry { 0%{transform:scale(15);opacity:0} 55%{transform:scale(1.12);opacity:1} 100%{transform:scale(1);opacity:1} }
+        @keyframes epicHold { from{transform:scale(1)} to{transform:scale(1.05)} }
+        @keyframes epicContainerExit { 0%{transform:scale(1.05);opacity:1} 100%{transform:scale(25);opacity:0} }
+
+        
+
         .fs-overlay { position: fixed; inset: 0; z-index: 9990; display: none; justify-content: center; align-items: center; overflow: hidden; }
         .fs-overlay.show { display: flex; animation: fsFadeIn 0.35s ease-out; }
         @keyframes fsFadeIn { from{opacity:0} to{opacity:1} }
@@ -1441,12 +1468,22 @@
         </div>
     </div>
 
-    <!-- REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE / ALL OUT) -->
+    <!-- REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE) -->
     <div id="epic-overlay" class="epic-overlay">
         <div class="epic-mat"></div>
         <div class="epic-particles" id="epic-particles"></div>
         <div class="epic-text-wrap" id="epic-text-wrap"></div>
         <img id="epic-gif" class="epic-gif" src="" alt="">
+    </div>
+
+    <!-- OLD STYLE EPIC OVERLAY (ALL OUT ONLY) -->
+    <div id="epic-overlay-allout" class="epic-overlay-allout">
+        <div class="epic-bg"></div>
+        <div class="epic-vignette"></div>
+        <div class="epic-main-container">
+            <div id="epic-super-text" class="epic-text epic-text-super">SUPER</div>
+            <div id="epic-event-text" class="epic-text epic-text-event">ALL OUT</div>
+        </div>
     </div>
 
     <!-- STARTING 7 OVERLAY (Uses MI-PANEL layout) -->
@@ -3169,109 +3206,135 @@
         }
 
         function playEpicAnimation(eventType) {
-            const overlay          = document.getElementById('epic-overlay');
-            const textWrap         = document.getElementById('epic-text-wrap');
-            const gifEl            = document.getElementById('epic-gif');
-            const particlesContainer = document.getElementById('epic-particles');
-            if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
-
             epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
             epicAnimationTimeoutIds = [];
-
-            // Clear previous blob URL to avoid memory leaks
-            if (gifEl.dataset.blobUrl) {
-                URL.revokeObjectURL(gifEl.dataset.blobUrl);
-                gifEl.dataset.blobUrl = '';
-            }
-
-            overlay.className = 'epic-overlay';
-            overlay.style.transform = '';
-            textWrap.innerHTML = '';
-            gifEl.src = '';
-            gifEl.style.display = '';
-            gifEl.className = 'epic-gif';
-            particlesContainer.innerHTML = '';
-
-            // Check if running as a local file to avoid breaking paths with ?t=
-            const isLocal = window.location.protocol === 'file:';
-            const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
-
-            if (eventType === 'super_raid') {
-                textWrap.innerHTML =
-                    '<div class="epic-text epic-text-super">SUPER</div>' +
-                    '<div class="epic-text epic-text-event">RAID</div>';
-                
-                if (window.epicGifBlobs.raid) {
-                    const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
-                    gifEl.src = newUrl;
-                    gifEl.dataset.blobUrl = newUrl;
-                } else {
-                    // Safe fallback
-                    gifEl.src = 'images/thigh-five.gif' + cacheBuster; 
-                }
-                overlay.classList.add('animate-raid');
-                
-            } else if (eventType === 'super_tackle') {
-                textWrap.innerHTML =
-                    '<div class="epic-text epic-text-super">SUPER</div>' +
-                    '<div class="epic-text epic-text-event">TACKLE</div>';
-                
-                if (window.epicGifBlobs.tackle) {
-                    const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
-                    gifEl.src = newUrl;
-                    gifEl.dataset.blobUrl = newUrl;
-                } else {
-                    // Safe fallback
-                    gifEl.src = 'images/super-tackle.gif' + cacheBuster; 
-                }
-                overlay.classList.add('animate-tackle');
-                
-            } else if (eventType === 'all_out') {
-                textWrap.innerHTML = '<div class="epic-text epic-text-event">ALL OUT</div>';
-                gifEl.src = '';
-                gifEl.style.display = 'none';
-                overlay.classList.add('animate-allout');
-            } else {
-                return;
-            }
-            
-            // ... (keep the rest of the function the same)
-
-            overlay.classList.add('visible');
-            document.body.classList.add('epic-active');
             epicIsPlaying = true;
+            document.body.classList.add('epic-active');
 
-            createEpicParticles(particlesContainer);
+            if (eventType === 'all_out') {
+                // =====================================
+                // OLD STYLE: ALL OUT (3D Zoom)
+                // =====================================
+                const overlay = document.getElementById('epic-overlay-allout');
+                const superText = document.getElementById('epic-super-text');
+                const eventText = document.getElementById('epic-event-text');
+                if (!overlay || !superText || !eventText) return;
 
-            epicAnimationTimeoutIds.push(setTimeout(() => {
-                overlay.classList.add('slide-down');
-            }, 4000));
+                superText.style.display = 'none';
+                eventText.innerText = 'ALL OUT';
 
-            epicAnimationTimeoutIds.push(setTimeout(() => {
-                overlay.classList.remove('visible', 'slide-down',
-                    'animate-raid', 'animate-tackle', 'animate-allout');
-                overlay.style.transform = '';
-                document.body.classList.remove('epic-active');
-                particlesContainer.innerHTML = '';
-                epicIsPlaying = false;
+                overlay.classList.remove('entry', 'hold', 'exit', 'visible');
+                void overlay.offsetWidth;
+                overlay.classList.add('visible', 'entry');
+
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    if (!epicIsPlaying) return;
+                    overlay.classList.remove('entry');
+                    overlay.classList.add('hold');
+                }, 700));
                 
-                // Clean up the Blob URL when animation is done
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    if (!epicIsPlaying) return;
+                    overlay.classList.remove('hold');
+                    overlay.classList.add('exit');
+                }, 3200));
+
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    overlay.classList.remove('visible', 'exit');
+                    epicIsPlaying = false;
+                    document.body.classList.remove('epic-active');
+                    
+                    if (window.pendingLeftScore !== undefined) {
+                        updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
+                        previousLeftScore = window.pendingLeftScore;
+                        window.pendingLeftScore = undefined;
+                    }
+                    if (window.pendingRightScore !== undefined) {
+                        updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
+                        previousRightScore = window.pendingRightScore;
+                        window.pendingRightScore = undefined;
+                    }
+                }, 3800));
+
+            } else {
+                // =====================================
+                // NEW STYLE: SUPER RAID & TACKLE (GIFs)
+                // =====================================
+                const overlay = document.getElementById('epic-overlay');
+                const textWrap = document.getElementById('epic-text-wrap');
+                const gifEl = document.getElementById('epic-gif');
+                const particlesContainer = document.getElementById('epic-particles');
+                if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
+
                 if (gifEl.dataset.blobUrl) {
                     URL.revokeObjectURL(gifEl.dataset.blobUrl);
                     gifEl.dataset.blobUrl = '';
                 }
 
-                if (window.pendingLeftScore !== undefined) {
-                    updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
-                    previousLeftScore = window.pendingLeftScore;
-                    window.pendingLeftScore = undefined;
+                overlay.className = 'epic-overlay';
+                overlay.style.transform = '';
+                textWrap.innerHTML = '';
+                gifEl.src = '';
+                gifEl.style.display = '';
+                gifEl.className = 'epic-gif';
+                particlesContainer.innerHTML = '';
+
+                const isLocal = window.location.protocol === 'file:';
+                const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
+
+                if (eventType === 'super_raid') {
+                    textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">RAID</div>';
+                    if (window.epicGifBlobs.raid) {
+                        const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
+                        gifEl.src = newUrl;
+                        gifEl.dataset.blobUrl = newUrl;
+                    } else {
+                        gifEl.src = 'images/thigh-five.gif' + cacheBuster; 
+                    }
+                    overlay.classList.add('animate-raid');
+                } else if (eventType === 'super_tackle') {
+                    textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">TACKLE</div>';
+                    if (window.epicGifBlobs.tackle) {
+                        const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
+                        gifEl.src = newUrl;
+                        gifEl.dataset.blobUrl = newUrl;
+                    } else {
+                        gifEl.src = 'images/super-tackle.gif' + cacheBuster; 
+                    }
+                    overlay.classList.add('animate-tackle');
                 }
-                if (window.pendingRightScore !== undefined) {
-                    updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
-                    previousRightScore = window.pendingRightScore;
-                    window.pendingRightScore = undefined;
-                }
-            }, 4500));
+
+                overlay.classList.add('visible');
+                createEpicParticles(particlesContainer);
+
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    overlay.classList.add('slide-down');
+                }, 4000));
+
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    overlay.classList.remove('visible', 'slide-down', 'animate-raid', 'animate-tackle');
+                    overlay.style.transform = '';
+                    document.body.classList.remove('epic-active');
+                    particlesContainer.innerHTML = '';
+                    epicIsPlaying = false;
+                    
+                    if (gifEl.dataset.blobUrl) {
+                        URL.revokeObjectURL(gifEl.dataset.blobUrl);
+                        gifEl.dataset.blobUrl = '';
+                    }
+
+                    if (window.pendingLeftScore !== undefined) {
+                        updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
+                        previousLeftScore = window.pendingLeftScore;
+                        window.pendingLeftScore = undefined;
+                    }
+                    if (window.pendingRightScore !== undefined) {
+                        updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
+                        previousRightScore = window.pendingRightScore;
+                        window.pendingRightScore = undefined;
+                    }
+                }, 4500));
+            }
         }
 
         // ==========================================
