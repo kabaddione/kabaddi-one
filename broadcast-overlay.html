@@ -1106,6 +1106,82 @@
         }
         .mi-overlay.show .mi-sub-bar { opacity: 1; transform: translateY(0) scale(1); }
         .mi-overlay.exit .mi-sub-bar { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.24s ease, transform 0.24s ease; }
+
+
+        /* ============================================================
+           PRE-MATCH TOSS SCREEN CSS
+           ============================================================ */
+        .toss-overlay {
+            position: fixed;
+            bottom: 180px; /* Positions it above the main scoreboard area */
+            left: 0;
+            z-index: 9998;
+            display: flex;
+            align-items: flex-end;
+            visibility: hidden;
+            pointer-events: none;
+            overflow: hidden;
+            width: 100%;
+            padding-left: 140px; /* Offset from left edge */
+        }
+
+        .toss-overlay.show {
+            visibility: visible;
+        }
+
+        .toss-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+            transform: translateX(-150%);
+            opacity: 0;
+            transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+            will-change: transform, opacity;
+        }
+
+        .toss-overlay.show .toss-container {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toss-overlay.exit .toss-container {
+            transform: translateX(-150%);
+            opacity: 0;
+            transition: transform 0.65s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.4s ease;
+        }
+
+        .toss-main-bar {
+            width: 1100px;
+            height: 70px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            /* Overriding background to match toss-screen.webp exactly */
+            background: linear-gradient(to right, #FFFFFF 45%, #2A0D5C 45.1%); 
+            opacity: 1 !important; transform: none !important; transition: none !important;
+            clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%);
+        }
+
+        .toss-sub-bar {
+            position: relative;
+            z-index: 1;
+            width: 700px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 80px;
+            margin-top: -5px; /* Slight overlap */
+            margin-left: 20px;
+            background: linear-gradient(to right, #3F2382, #1A0B42);
+            color: #74E0FF;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -1553,6 +1629,23 @@
         </div>
     </div>
 
+    <!-- PRE-MATCH TOSS SCREEN -->
+    <div id="toss-result-overlay" class="toss-overlay">
+        <div class="toss-container">
+            <!-- Main Bar -->
+            <div class="mi-name-bar toss-main-bar" id="toss-main-bar">
+                <div class="mi-bar-accent left" id="toss-accent-left"></div>
+                <div class="mi-name-half toss-winner-text" id="toss-winner-text" style="color: #000; justify-content: flex-start; padding-left: 40px;">TOSS WON BY TEAM A</div>
+                <div class="mi-bar-divider" style="background: transparent; box-shadow: none; border-left: 2px solid rgba(0,0,0,0.1);"></div>
+                <div class="mi-name-half toss-choice-text" id="toss-choice-text" style="color: #FFF;">TEAM B TO RAID FIRST</div>
+            </div>
+            <!-- Bottom Sub Bar -->
+            <div class="toss-sub-bar">
+                MATCH WILL START SOON...
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         // FIREBASE INIT & AUTH
@@ -1602,6 +1695,15 @@
         let seenLogKeys = new Set();
         let initialLoadDone = false;
 
+        let preMatchCycle = {
+            active: false,
+            currentState: 'none', // 'intro' or 'toss'
+            timeRemaining: 0,
+            isFirstIntro: true,
+            lastTickTime: 0,
+            rafId: null
+        };
+
         let marqueeRafId = null;
 
         let lastL5TriggerBucket = 0;
@@ -1625,6 +1727,115 @@
             const n = Number.parseInt(value, 10);
             return Number.isFinite(n) ? Math.max(0, n) : 0;
         }
+
+        function renderTossScreen(data) {
+            const winnerTextEl = document.getElementById('toss-winner-text');
+            const choiceTextEl = document.getElementById('toss-choice-text');
+            const accentLeftEl = document.getElementById('toss-accent-left');
+            
+            const tossWinner = (data.toss_winner || '').trim().toUpperCase();
+            const tossChoice = (data.toss_choice || '').trim().toUpperCase();
+            const leftName = (data.left_name || 'TEAM A').trim().toUpperCase();
+            const rightName = (data.right_name || 'TEAM B').trim().toUpperCase();
+
+            // Determine gradient colors based on who won the toss
+            let winnerColor = '#E91E63'; // Fallback
+            let otherTeamName = rightName;
+            
+            if (tossWinner === leftName) {
+                winnerColor = data.left_color || '#E91E63';
+                otherTeamName = rightName;
+            } else if (tossWinner === rightName) {
+                winnerColor = data.right_color || '#2196F3';
+                otherTeamName = leftName;
+            }
+
+            // Style the left accent gradient
+            if (accentLeftEl) {
+                accentLeftEl.style.background = `linear-gradient(90deg, ${winnerColor} 0%, rgba(255, 255, 255, 0) 90%)`;
+            }
+
+            // Set Text
+            if (winnerTextEl) {
+                winnerTextEl.innerText = tossWinner ? `TOSS WON BY ${tossWinner}` : 'TOSS RESULT PENDING';
+            }
+
+            // Logic to determine action: If choice is COURT, the OTHER team raids first. 
+            // If choice is RAID, the WINNING team raids first.
+            if (choiceTextEl) {
+                if (!tossChoice) {
+                    choiceTextEl.innerText = 'DECISION PENDING...';
+                } else if (tossChoice === 'COURT' || tossChoice === 'DEFEND') {
+                    choiceTextEl.innerText = `${otherTeamName} TO RAID FIRST`;
+                } else {
+                    choiceTextEl.innerText = `${tossWinner} TO RAID FIRST`;
+                }
+            }
+        }
+
+        function cyclePreMatchLoop(timestamp) {
+            if (!preMatchCycle.active) return;
+            
+            // Calculate delta
+            if (!preMatchCycle.lastTickTime) preMatchCycle.lastTickTime = timestamp;
+            const delta = timestamp - preMatchCycle.lastTickTime;
+            preMatchCycle.lastTickTime = timestamp;
+
+            // PAUSE TIMER if Starting 7 or Team Stats overlay is open
+            if (!matchIntroState.suspendedForOverlay) {
+                preMatchCycle.timeRemaining -= delta;
+            }
+
+            if (preMatchCycle.timeRemaining <= 0) {
+                // Switch States
+                if (preMatchCycle.currentState === 'intro') {
+                    // Hide Intro, Show Toss for 2 mins (120000ms)
+                    hideMatchIntro();
+                    showTossScreen();
+                    preMatchCycle.currentState = 'toss';
+                    preMatchCycle.timeRemaining = 120000;
+                    preMatchCycle.isFirstIntro = false;
+                } else {
+                    // Hide Toss, Show Intro for 10s (10000ms)
+                    hideTossScreen();
+                    // Force the intro to render
+                    const overlay = document.getElementById('match-intro-overlay');
+                    if (overlay) {
+                        overlay.classList.remove('exit', 'show');
+                        void overlay.offsetWidth;
+                        overlay.classList.add('show');
+                        matchIntroState.active = true;
+                        updateMainStageVisibility();
+                    }
+                    preMatchCycle.currentState = 'intro';
+                    preMatchCycle.timeRemaining = 10000; 
+                }
+            }
+            preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
+        }
+
+        function showTossScreen() {
+            const overlay = document.getElementById('toss-result-overlay');
+            if (!overlay) return;
+            overlay.classList.remove('exit', 'show');
+            void overlay.offsetWidth;
+            overlay.classList.add('show');
+            // Hide the main stage so the Toss Banner stands out, identical to Match Intro behavior
+            document.body.classList.add('mi-active');
+        }
+
+        function hideTossScreen() {
+            const overlay = document.getElementById('toss-result-overlay');
+            if (!overlay || !overlay.classList.contains('show')) return;
+            overlay.classList.remove('show');
+            overlay.classList.add('exit');
+            // Only un-hide the main stage if match intro isn't about to pop up
+            if (preMatchCycle.currentState !== 'intro') {
+                document.body.classList.remove('mi-active');
+            }
+        }
+
+        
         function ppSetText(id, value) {
             const el = document.getElementById(id);
             if (el) el.textContent = String(value);
@@ -3417,29 +3628,50 @@
             const notStarted = miIsMatchNotStarted(data, state);
 
             if (!notStarted) {
+                // MATCH HAS STARTED
                 matchIntroState.matchStarted = true;
+                preMatchCycle.active = false; // Kill rotation
+                if (preMatchCycle.rafId) cancelAnimationFrame(preMatchCycle.rafId);
+                
                 if (matchIntroState.active) hideMatchIntro();
+                hideTossScreen();
                 return;
             }
 
             matchIntroState.matchStarted = false;
+            
+            // Prepare data for rendering just in case
+            miRender(data, state);
+            renderTossScreen(data);
 
             if (overlayOpen) {
-                if (matchIntroState.active) {
-                    hideMatchIntro();
-                }
+                // User opened a fullscreen overlay (like Starting 7)
+                if (matchIntroState.active) hideMatchIntro();
+                hideTossScreen();
                 matchIntroState.suspendedForOverlay = true;
                 return;
             }
 
-            if (!overlayOpen && matchIntroState.suspendedForOverlay) {
-                matchIntroState.suspendedForOverlay = false;
+            // Start or resume cycle
+            if (!preMatchCycle.active) {
+                preMatchCycle.active = true;
+                preMatchCycle.currentState = 'intro';
+                preMatchCycle.timeRemaining = 20000; // 20s for the first run
+                preMatchCycle.lastTickTime = performance.now();
+                preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
+                
+                // Show initial intro immediately
                 showMatchIntro(data, state);
-                return;
             }
 
-            if (!matchIntroState.active && !matchIntroState.matchStarted) {
-                showMatchIntro(data, state);
+            if (!overlayOpen && matchIntroState.suspendedForOverlay) {
+                // Overlay closed, resume whatever screen was supposed to be showing
+                matchIntroState.suspendedForOverlay = false;
+                if (preMatchCycle.currentState === 'intro') {
+                    showMatchIntro(data, state);
+                } else if (preMatchCycle.currentState === 'toss') {
+                    showTossScreen();
+                }
             }
         }
     </script>
