@@ -3257,85 +3257,95 @@
                 }, 3800));
 
             } else {
-                // =====================================
-                // NEW STYLE: SUPER RAID & TACKLE (GIFs)
-                // =====================================
-                const overlay = document.getElementById('epic-overlay');
-                const textWrap = document.getElementById('epic-text-wrap');
-                const gifEl = document.getElementById('epic-gif');
-                const particlesContainer = document.getElementById('epic-particles');
-                if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
+    // =====================================
+    // NEW STYLE: SUPER RAID & TACKLE (GIFs)
+    // =====================================
+    const overlay = document.getElementById('epic-overlay');
+    const textWrap = document.getElementById('epic-text-wrap');
+    const gifEl = document.getElementById('epic-gif');
+    const particlesContainer = document.getElementById('epic-particles');
+    if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
 
-                if (gifEl.dataset.blobUrl) {
-                    URL.revokeObjectURL(gifEl.dataset.blobUrl);
-                    gifEl.dataset.blobUrl = '';
-                }
+    if (gifEl.dataset.blobUrl) {
+        URL.revokeObjectURL(gifEl.dataset.blobUrl);
+        gifEl.dataset.blobUrl = '';
+    }
 
-                overlay.className = 'epic-overlay';
-                overlay.style.transform = '';
-                textWrap.innerHTML = '';
-                gifEl.src = '';
-                gifEl.style.display = '';
-                gifEl.className = 'epic-gif';
-                particlesContainer.innerHTML = '';
+    overlay.className = 'epic-overlay';
+    overlay.style.transform = '';
+    textWrap.innerHTML = '';
+    gifEl.src = '';
+    gifEl.style.display = '';
+    gifEl.className = 'epic-gif';
+    particlesContainer.innerHTML = '';
 
-                const isLocal = window.location.protocol === 'file:';
-                const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
+    const isLocal = window.location.protocol === 'file:';
+    const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
 
-                if (eventType === 'super_raid') {
-                    textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">RAID</div>';
-                    if (window.epicGifBlobs.raid) {
-                        const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
-                        gifEl.src = newUrl;
-                        gifEl.dataset.blobUrl = newUrl;
-                    } else {
-                        gifEl.src = 'images/thigh-five.gif' + cacheBuster; 
-                    }
-                    overlay.classList.add('animate-raid');
-                } else if (eventType === 'super_tackle') {
-                    textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">TACKLE</div>';
-                    if (window.epicGifBlobs.tackle) {
-                        const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
-                        gifEl.src = newUrl;
-                        gifEl.dataset.blobUrl = newUrl;
-                    } else {
-                        gifEl.src = 'images/super-tackle.gif' + cacheBuster; 
-                    }
-                    overlay.classList.add('animate-tackle');
-                }
+    if (eventType === 'super_raid') {
+        textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">RAID</div>';
+        overlay.classList.add('animate-raid');
+    } else if (eventType === 'super_tackle') {
+        textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">TACKLE</div>';
+        overlay.classList.add('animate-tackle');
+    }
 
-                overlay.classList.add('visible');
-                createEpicParticles(particlesContainer);
+    overlay.classList.add('visible');
+    createEpicParticles(particlesContainer);
 
-                epicAnimationTimeoutIds.push(setTimeout(() => {
-                    overlay.classList.add('slide-down');
-                }, 4000));
-
-                epicAnimationTimeoutIds.push(setTimeout(() => {
-                    overlay.classList.remove('visible', 'slide-down', 'animate-raid', 'animate-tackle');
-                    overlay.style.transform = '';
-                    document.body.classList.remove('epic-active');
-                    particlesContainer.innerHTML = '';
-                    epicIsPlaying = false;
-                    
-                    if (gifEl.dataset.blobUrl) {
-                        URL.revokeObjectURL(gifEl.dataset.blobUrl);
-                        gifEl.dataset.blobUrl = '';
-                    }
-
-                    if (window.pendingLeftScore !== undefined) {
-                        updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
-                        previousLeftScore = window.pendingLeftScore;
-                        window.pendingLeftScore = undefined;
-                    }
-                    if (window.pendingRightScore !== undefined) {
-                        updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
-                        previousRightScore = window.pendingRightScore;
-                        window.pendingRightScore = undefined;
-                    }
-                }, 4500));
+    // ⬇️ KEY FIX: Don't set gifEl.src yet. Wait until just before the
+    //     gifPopInCenter animation (1.3s delay) reveals the GIF.
+    //     This makes the GIF start from frame 1 instead of already being
+    //     1.3 seconds into its playback.
+    epicAnimationTimeoutIds.push(setTimeout(() => {
+        if (!epicIsPlaying) return;
+        if (eventType === 'super_raid') {
+            if (window.epicGifBlobs.raid) {
+                const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
+                gifEl.src = newUrl;
+                gifEl.dataset.blobUrl = newUrl;
+            } else {
+                gifEl.src = 'images/thigh-five.gif' + cacheBuster;
+            }
+        } else if (eventType === 'super_tackle') {
+            if (window.epicGifBlobs.tackle) {
+                const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
+                gifEl.src = newUrl;
+                gifEl.dataset.blobUrl = newUrl;
+            } else {
+                gifEl.src = 'images/super-tackle.gif' + cacheBuster;
             }
         }
+    }, 1250)); // matches the CSS 1.3s animation-delay (50ms decode buffer)
+
+    epicAnimationTimeoutIds.push(setTimeout(() => {
+        overlay.classList.add('slide-down');
+    }, 4000));
+
+    epicAnimationTimeoutIds.push(setTimeout(() => {
+        overlay.classList.remove('visible', 'slide-down', 'animate-raid', 'animate-tackle');
+        overlay.style.transform = '';
+        document.body.classList.remove('epic-active');
+        particlesContainer.innerHTML = '';
+        epicIsPlaying = false;
+
+        if (gifEl.dataset.blobUrl) {
+            URL.revokeObjectURL(gifEl.dataset.blobUrl);
+            gifEl.dataset.blobUrl = '';
+        }
+
+        if (window.pendingLeftScore !== undefined) {
+            updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
+            previousLeftScore = window.pendingLeftScore;
+            window.pendingLeftScore = undefined;
+        }
+        if (window.pendingRightScore !== undefined) {
+            updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
+            previousRightScore = window.pendingRightScore;
+            window.pendingRightScore = undefined;
+        }
+    }, 4500));
+}
 
         // ==========================================
         // REMOTE-CONTROLLED OVERLAY SCREENS
