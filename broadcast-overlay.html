@@ -28,9 +28,10 @@
     <link rel="preload" as="image" href="images/tackle-mat.png">
     <link rel="preload" as="image" href="images/thigh-five.gif">
     <link rel="preload" as="image" href="images/super-tackle.gif">
+    <link rel="preload" as="image" href="/images/kabaddione_bg.jpg">
     <script>
         (function preloadEpicAssets() {
-            ['images/raid-mat.png', 'images/tackle-mat.png', 'images/thigh-five.gif', 'images/super-tackle.gif'].forEach(function (src) {
+            ['images/raid-mat.png', 'images/tackle-mat.png', 'images/thigh-five.gif', 'images/super-tackle.gif', '/images/kabaddione_bg.jpg'].forEach(function (src) {
                 var img = new Image();
                 img.src = src;
             });
@@ -201,8 +202,8 @@
             text-shadow: 2px 2px 6px rgba(0,0,0,0.95);
             font-weight: 900;
         }
-        /* DOD text variant — slightly smaller so "NEXT DO OR DIE" fits nicely */
-        .raider-name-text.dod-text { font-size: 30px !important; letter-spacing: 0.5px; }
+        /* DOD text variant — smaller so "NEXT DO OR DIE" fits the pill */
+        .raider-name-text.dod-text { font-size: 28px !important; letter-spacing: 0.3px; }
 
         .score-left-wrap { width: 180px; height: 80px; clip-path: polygon(0 0, 72% 0, 100% 100%, 26% 100%); margin-left: -40px; z-index: 2; padding: 5px; }
         .score-left-inner { width: 100%; height: 100%; background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); clip-path: polygon(2% 0, 71% 0, 98% 100%, 26% 100%); display: flex; align-items: center; justify-content: center; color: black; font-family: 'Teko', sans-serif; font-size: 75px; font-weight: 700; padding-left: 15px; padding-top: 10px; box-shadow: inset 0px 10px 15px rgba(0,0,0,0.2); }
@@ -270,7 +271,29 @@
         .center-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         /* ============================================================
-           REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE / ALL OUT)
+           ALL OUT — ORIGINAL ZOOM-IN/OUT ANIMATION (from old code)
+           ============================================================ */
+        .allout-overlay { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; visibility: hidden; pointer-events: none; overflow: hidden; }
+        .allout-overlay.visible { visibility: visible; }
+        .allout-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; opacity: 1; z-index: 1; }
+        .allout-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%); z-index: 2; opacity: 1; }
+        .allout-main-container { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform: scale(1); opacity: 1; will-change: transform, opacity; }
+        .allout-text { font-family: 'Teko', sans-serif; font-weight: 700; line-height: 0.9; letter-spacing: 20px; text-align: center; text-transform: uppercase; font-size: 250px; background: linear-gradient(to bottom, #FFFFFF 0%, #ABABAB 50%, #FFFFFF 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
+        .allout-overlay.entry .allout-bg { animation: alloutBgFadeIn 0.5s ease-out forwards; }
+        .allout-overlay.entry .allout-vignette { animation: alloutBgFadeIn 0.5s ease-out forwards; }
+        .allout-overlay.entry .allout-main-container { animation: alloutContainerEntry 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .allout-overlay.hold .allout-main-container { animation: alloutHold 2.5s linear forwards; }
+        .allout-overlay.exit .allout-bg { animation: alloutBgFadeOut 0.6s ease forwards; }
+        .allout-overlay.exit .allout-vignette { animation: alloutBgFadeOut 0.6s ease forwards; }
+        .allout-overlay.exit .allout-main-container { animation: alloutContainerExit 0.6s cubic-bezier(0.5, 0, 0.7, 1.5) forwards; }
+        @keyframes alloutBgFadeIn  { from{opacity:0} to{opacity:1} }
+        @keyframes alloutBgFadeOut { from{opacity:1} to{opacity:0} }
+        @keyframes alloutContainerEntry { 0%{transform:scale(15);opacity:0} 55%{transform:scale(1.12);opacity:1} 100%{transform:scale(1);opacity:1} }
+        @keyframes alloutHold { from{transform:scale(1)} to{transform:scale(1.05)} }
+        @keyframes alloutContainerExit { 0%{transform:scale(1.05);opacity:1} 100%{transform:scale(25);opacity:0} }
+
+        /* ============================================================
+           SUPER RAID / SUPER TACKLE — MAT + COLLISION ANIMATION
            ============================================================ */
         body.epic-active .broadcast-stage {
             opacity: 0 !important;
@@ -303,59 +326,36 @@
             to   { transform: translateY(105%); }
         }
 
-        /* MAT BASE — replaced gradient with image mats per event */
         .epic-mat {
             position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
             height: 240px;
-            background: linear-gradient(to top,
-                #16002C 0%,
-                #3E1260 25%,
-                #5C1B8A 50%,
-                #7B2FBE 75%,
-                #B14AE8 100%);
             background-size: 100% 100%;
             background-repeat: no-repeat;
             background-position: bottom center;
-            box-shadow: 0 -12px 45px rgba(150,60,230,0.7), inset 0 4px 0 rgba(255,255,255,0.06);
             transform: translateY(100%);
             z-index: 1;
             overflow: hidden;
         }
         .epic-overlay.animate-raid .epic-mat {
             background-image: url('images/raid-mat.png');
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            background-position: bottom center;
             background-color: transparent;
             box-shadow: none;
         }
         .epic-overlay.animate-tackle .epic-mat {
             background-image: url('images/tackle-mat.png');
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            background-position: bottom center;
             background-color: transparent;
             box-shadow: none;
         }
-        .epic-overlay.animate-allout .epic-mat {
-            background-image: none;
-            background: linear-gradient(to top, #16002C 0%, #3E1260 25%, #5C1B8A 50%, #7B2FBE 75%, #B14AE8 100%);
-        }
-        .epic-mat::before {
+        .epic-overlay.animate-raid .epic-mat::before,
+        .epic-overlay.animate-tackle .epic-mat::before {
             content: '';
             position: absolute;
             inset: 0;
-            background:
-                linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 120px),
-                linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .epic-overlay.animate-raid .epic-mat::before,
-        .epic-overlay.animate-tackle .epic-mat::before {
             background: linear-gradient(to top, rgba(0,0,0,0.18) 0%, transparent 45%);
+            pointer-events: none;
         }
         .epic-overlay.visible .epic-mat {
             animation: epicMatUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -397,7 +397,7 @@
             perspective: 1200px;
         }
 
-        /* ENHANCED 3D EXTRUSION TEXT */
+        /* 3D extruded text base */
         .epic-text {
             font-family: 'Teko', sans-serif;
             font-weight: 700;
@@ -435,47 +435,32 @@
                 0 3px 6px rgba(0,0,0,0.35),
                 0 6px 12px rgba(0,0,0,0.30),
                 0 12px 18px rgba(0,0,0,0.25),
-                0 22px 30px rgba(0,0,0,0.20),
-                0 0 50px rgba(180,210,255,0.70);
-            filter: drop-shadow(0 0 30px rgba(140,90,240,0.55));
+                0 22px 30px rgba(0,0,0,0.20);
             will-change: transform, opacity;
         }
 
-        .epic-text-raid {
-            font-size: 260px;
-            letter-spacing: 14px;
+        /* Warm neon glow for SUPER RAID — matches the warm wood mat */
+        .epic-overlay.animate-raid .epic-text {
+            filter:
+                drop-shadow(0 0 22px rgba(255, 200, 80, 0.95))
+                drop-shadow(0 0 45px rgba(255, 150, 40, 0.85))
+                drop-shadow(0 0 85px rgba(255, 90, 0, 0.65))
+                drop-shadow(0 0 150px rgba(255, 60, 0, 0.42));
         }
 
-        /* Super Raid is now a two-word layout (SUPER + RAID), same pattern as tackle */
-        .epic-text-raid-legacy {
-            /* legacy class kept for compatibility; not used by new layout */
-            font-size: 260px;
-            letter-spacing: 14px;
+        /* Cool neon glow for SUPER TACKLE — matches the grey stone/moss mat */
+        .epic-overlay.animate-tackle .epic-text {
+            filter:
+                drop-shadow(0 0 22px rgba(200, 240, 255, 0.95))
+                drop-shadow(0 0 45px rgba(140, 210, 255, 0.85))
+                drop-shadow(0 0 85px rgba(80, 160, 255, 0.65))
+                drop-shadow(0 0 150px rgba(60, 120, 200, 0.42));
         }
 
-        .epic-overlay.animate-raid .epic-text-raid {
-            opacity: 0;
-            transform-origin: center bottom;
-            animation: raidTextHyperZoom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
-        }
-        @keyframes raidTextHyperZoom {
-            0%   { opacity: 0; transform: scale(0.15) translateY(140px) rotateX(-35deg); filter: blur(8px); }
-            55%  { opacity: 1; transform: scale(1.08) translateY(-8px) rotateX(4deg); filter: blur(0); }
-            100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); filter: blur(0); }
-        }
+        .epic-text-super { font-size: 150px; letter-spacing: 8px; position: absolute; top: 50%; left: 50%; margin: 0; }
+        .epic-text-event { font-size: 150px; letter-spacing: 10px; position: absolute; top: 50%; left: 50%; margin: 0; }
 
-        /* SUPER TACKLE / SUPER RAID shared layout */
-        .epic-text-super,
-        .epic-text-event {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin: 0;
-        }
-        .epic-text-super { font-size: 150px; letter-spacing: 8px; }
-        .epic-text-event { font-size: 150px; letter-spacing: 10px; }
-
-        /* SUPER TACKLE animations */
+        /* SUPER TACKLE */
         .epic-overlay.animate-tackle .epic-text-super {
             opacity: 0;
             animation: superTackleSlideIn 1s cubic-bezier(0.34, 1.25, 0.64, 1) 0.4s forwards;
@@ -488,18 +473,18 @@
             0%   { opacity: 0; transform: translate(-50%, -50%) translateX(-900px); }
             60%  { opacity: 1; transform: translate(-50%, -50%) translateX(0); }
             72%  { opacity: 1; transform: translate(-50%, -50%) translateX(14px); }
-            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(-370px); }
-            100% { opacity: 1; transform: translate(-50%, -50%) translateX(-390px); }
+            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(-460px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateX(-480px); }
         }
         @keyframes tackleSlideIn {
             0%   { opacity: 0; transform: translate(-50%, -50%) translateX(900px); }
             60%  { opacity: 1; transform: translate(-50%, -50%) translateX(0); }
             72%  { opacity: 1; transform: translate(-50%, -50%) translateX(-14px); }
-            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(395px); }
-            100% { opacity: 1; transform: translate(-50%, -50%) translateX(415px); }
+            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(485px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateX(505px); }
         }
 
-        /* SUPER RAID animations — same collision + separation pattern */
+        /* SUPER RAID — same collision pattern */
         .epic-overlay.animate-raid .epic-text-super {
             opacity: 0;
             animation: superRaidSlideIn 1s cubic-bezier(0.34, 1.25, 0.64, 1) 0.4s forwards;
@@ -512,29 +497,18 @@
             0%   { opacity: 0; transform: translate(-50%, -50%) translateX(-900px); }
             60%  { opacity: 1; transform: translate(-50%, -50%) translateX(0); }
             72%  { opacity: 1; transform: translate(-50%, -50%) translateX(14px); }
-            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(-360px); }
-            100% { opacity: 1; transform: translate(-50%, -50%) translateX(-380px); }
+            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(-450px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateX(-470px); }
         }
         @keyframes raidSlideIn {
             0%   { opacity: 0; transform: translate(-50%, -50%) translateX(900px); }
             60%  { opacity: 1; transform: translate(-50%, -50%) translateX(0); }
             72%  { opacity: 1; transform: translate(-50%, -50%) translateX(-14px); }
-            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(360px); }
-            100% { opacity: 1; transform: translate(-50%, -50%) translateX(380px); }
+            85%  { opacity: 1; transform: translate(-50%, -50%) translateX(450px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) translateX(470px); }
         }
 
-        /* ALL OUT specific */
-        .epic-overlay.animate-allout .epic-text-event {
-            position: static;
-            opacity: 0;
-            animation: allOutZoom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
-        }
-        @keyframes allOutZoom {
-            0%   { opacity: 0; transform: scale(0.3); filter: blur(6px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0); }
-        }
-
-        /* GIF inside overlay — natural aspect ratio, centered for both raid & tackle */
+        /* GIF — 1.5× bigger, natural aspect ratio */
         .epic-gif {
             position: absolute;
             bottom: 60px;
@@ -543,13 +517,12 @@
             pointer-events: none;
             filter: drop-shadow(0 12px 22px rgba(0,0,0,0.65)) drop-shadow(0 0 24px rgba(255,215,0,0.35));
         }
-        /* Both raid and tackle now share the same centered gif slot */
         .epic-overlay.animate-raid .epic-gif,
         .epic-overlay.animate-tackle .epic-gif {
             left: 50%;
-            bottom: 80px;
-            width: 400px;
-            height: 280px;
+            bottom: 70px;
+            width: 600px;
+            height: 420px;
             object-fit: contain;
             transform: translateX(-50%) scale(0);
             transform-origin: center bottom;
@@ -561,24 +534,9 @@
             100% { opacity: 1; transform: translateX(-50%) scale(1); }
         }
 
-        /* Keep legacy raid gif rules for backward compatibility (unused) */
-        .epic-overlay.animate-raid .epic-gif.legacy-raid {
-            left: 12%;
-            width: 320px;
-            max-height: 320px;
-            transform-origin: bottom center;
-            animation: gifPopInRaid 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 1.05s forwards;
-        }
-        @keyframes gifPopInRaid {
-            0%   { opacity: 0; transform: scale(0.2) translateY(40px); }
-            70%  { opacity: 1; transform: scale(1.08) translateY(0); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
         /* ============================================================
-           END OF REDESIGNED EPIC OVERLAY
+           FULL-SCREEN OVERLAYS (Starting7 / TeamStats / PlayerPerf)
            ============================================================ */
-
         .fs-overlay { position: fixed; inset: 0; z-index: 9990; display: none; justify-content: center; align-items: center; overflow: hidden; }
         .fs-overlay.show { display: flex; animation: fsFadeIn 0.35s ease-out; }
         @keyframes fsFadeIn { from{opacity:0} to{opacity:1} }
@@ -792,321 +750,6 @@
             text-shadow: 0 2px 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.75);
             will-change: transform;
         }
-
-        /* ============================================================
-           MATCH INTRO (TEAM INTRODUCTION) CSS
-           ============================================================ */
-        body.mi-active .broadcast-stage {
-            opacity: 0 !important;
-            transform: translateY(90px) !important;
-            pointer-events: none !important;
-        }
-
-        .mi-overlay {
-            --mi-left-color: #E91E63;
-            --mi-right-color: #2196F3;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 1920px !important;
-            height: 1080px !important;
-            z-index: 99999 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, rgba(6, 6, 22, 0.30) 0%, rgba(2, 2, 10, 0.86) 100%) !important;
-            transition: opacity 0.55s ease, visibility 0s linear 0.55s;
-        }
-        .mi-overlay.show {
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-            transition: opacity 0.55s ease, visibility 0s linear 0s !important;
-        }
-
-        .mi-panel {
-            position: relative;
-            width: 1640px;
-            height: 820px;
-            border-radius: 30px;
-            padding: 46px 60px 54px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 28px;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%) !important;
-            border: 2px solid rgba(130, 205, 255, 0.55) !important;
-            box-shadow: 0 0 0 8px rgba(80, 40, 180, 0.16), 0 0 100px rgba(90, 40, 210, 0.75), inset 0 0 170px rgba(70, 30, 160, 0.55) !important;
-            opacity: 0;
-            transform: scale(0.86) translateY(26px);
-            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .mi-panel::before {
-            content: '';
-            position: absolute;
-            inset: 12px;
-            border-radius: 22px;
-            border: 1px solid rgba(150, 200, 255, 0.16);
-            pointer-events: none;
-            z-index: 1;
-        }
-        .mi-overlay.show .mi-panel { opacity: 1; transform: scale(1) translateY(0); }
-        .mi-overlay.exit .mi-panel {
-            opacity: 0;
-            transform: scale(0.94) translateY(12px);
-            transition: opacity 0.4s ease, transform 0.45s ease;
-        }
-
-        .mi-glow {
-            position: absolute;
-            width: 760px;
-            height: 760px;
-            border-radius: 50%;
-            filter: blur(110px);
-            opacity: 0.30;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .mi-glow-left  { left: -220px; top: 30px;  background: var(--mi-left-color); }
-        .mi-glow-right { right: -220px; top: 30px; background: var(--mi-right-color); }
-
-        .mi-badge {
-            position: relative;
-            z-index: 2;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 28px;
-            border-radius: 10px;
-            background: linear-gradient(to bottom, rgba(20, 20, 44, 0.96), rgba(0, 0, 0, 0.92));
-            border: 2px solid rgb(253, 241, 159);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.55), inset 0 1px 0 rgba(255, 215, 0, 0.18);
-            font-family: "Segoe UI", system-ui, sans-serif;
-            opacity: 0;
-            transform: translateY(-28px);
-            transition: opacity 0.6s ease 0.30s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.30s;
-        }
-        .mi-overlay.show .mi-badge { opacity: 1; transform: translateY(0); }
-        .mi-overlay.exit .mi-badge { opacity: 0; transform: translateY(-18px); transition: opacity 0.28s ease, transform 0.28s ease; }
-
-        .mi-badge-label { color: #B9B9B9; font-size: 14px; font-weight: 600; letter-spacing: 1.2px; }
-        .mi-badge-icon {
-            width: 38px; height: 38px; border-radius: 8px; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
-        }
-        .mi-badge-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .mi-badge-text { color: #FFF; font-size: 22px; font-weight: 800; letter-spacing: 0.8px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.45); }
-        .mi-badge-tag {
-            margin-left: 8px; padding: 3px 12px; border-radius: 999px;
-            background: linear-gradient(to bottom, #FFD75E, #C99A00);
-            color: #241A00; font-size: 11px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
-        }
-
-        .mi-matchup {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 56px;
-        }
-
-        .mi-team { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .mi-team-left {
-            opacity: 0;
-            transform: translateX(-150px) scale(0.9);
-            transition: opacity 0.65s ease 0.45s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
-        }
-        .mi-overlay.show .mi-team-left { opacity: 1; transform: translateX(0) scale(1); }
-        .mi-overlay.exit .mi-team-left { opacity: 0; transform: translateX(-90px) scale(0.94); transition: opacity 0.3s ease, transform 0.3s ease; }
-
-        .mi-team-right {
-            opacity: 0;
-            transform: translateX(150px) scale(0.9);
-            transition: opacity 0.65s ease 0.45s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
-        }
-        .mi-overlay.show .mi-team-right { opacity: 1; transform: translateX(0) scale(1); }
-        .mi-overlay.exit .mi-team-right { opacity: 0; transform: translateX(90px) scale(0.94); transition: opacity 0.3s ease, transform 0.3s ease; }
-
-        .mi-logo-frame {
-            position: relative;
-            width: 470px;
-            height: 300px;
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.38) 100%);
-            border: 2px solid rgba(150, 210, 255, 0.35);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 42px rgba(120, 80, 255, 0.35);
-        }
-        .mi-logo-frame::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 16px;
-            box-shadow: inset 0 0 70px var(--mi-team-color, #4A9EFF);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: 2;
-        }
-        .mi-logo-frame::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(10, 8, 30, 0.85) 0%, rgba(10, 8, 30, 0) 58%);
-            pointer-events: none;
-            z-index: 3;
-        }
-        .mi-logo-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center bottom;
-            z-index: 1;
-        }
-        .mi-team-left  .mi-logo-frame { --mi-team-color: var(--mi-left-color); }
-        .mi-team-right .mi-logo-frame { --mi-team-color: var(--mi-right-color); }
-
-        .mi-vs {
-            width: 200px;
-            height: 200px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            filter: drop-shadow(0 0 24px rgba(150, 90, 255, 0.85));
-            opacity: 0;
-            transform: scale(0.4) rotate(-25deg);
-            transition: opacity 0.5s ease 0.72s, transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.72s;
-        }
-        .mi-overlay.show .mi-vs { opacity: 1; transform: scale(1) rotate(0deg); }
-        .mi-overlay.exit .mi-vs { opacity: 0; transform: scale(0.5) rotate(15deg); transition: opacity 0.28s ease, transform 0.28s ease; }
-
-        .mi-vs-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            clip-path: polygon(50% 0%, 100% 27%, 100% 73%, 50% 100%, 0% 73%, 0% 27%);
-            background: linear-gradient(160deg, #8B4BE8 0%, #4A2496 45%, #2A1259 75%, #16092F 100%);
-            border: none;
-        }
-        .mi-vs-text {
-            font-family: 'Teko', sans-serif;
-            font-size: 86px;
-            font-weight: 700;
-            line-height: 1;
-            letter-spacing: 4px;
-            color: #FFFFFF;
-            text-shadow: 0 0 18px rgba(120, 220, 255, 0.95), 0 0 40px rgba(150, 90, 255, 0.9);
-            padding-bottom: 6px;
-        }
-
-        .mi-name-bar {
-            position: relative;
-            z-index: 2;
-            width: 1240px;
-            height: 86px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            clip-path: polygon(2.5% 0, 97.5% 0, 100% 100%, 0 100%);
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6EBF3 50%, #C2CBD9 100%);
-            opacity: 0;
-            transform: translateY(30px) scaleX(0.94);
-            transition: opacity 0.55s ease 0.95s, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.95s;
-        }
-        .mi-overlay.show .mi-name-bar { opacity: 1; transform: translateY(0) scaleX(1); }
-        .mi-overlay.exit .mi-name-bar { opacity: 0; transform: translateY(20px); transition: opacity 0.26s ease, transform 0.26s ease; }
-
-        .mi-bar-accent {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 280px;
-            z-index: 1;
-            pointer-events: none;
-        }
-        .mi-bar-accent.left {
-            left: 0;
-            background: linear-gradient(90deg, var(--mi-left-color) 0%, rgba(255, 255, 255, 0) 78%);
-            clip-path: polygon(0 0, 46% 0, 100% 100%, 0 100%);
-        }
-        .mi-bar-accent.right {
-            right: 0;
-            background: linear-gradient(270deg, var(--mi-right-color) 0%, rgba(255, 255, 255, 0) 78%);
-            clip-path: polygon(54% 0, 100% 0, 100% 100%, 0 100%);
-        }
-
-        .mi-name-half {
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            min-width: 0;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 30px;
-            font-family: 'Mukta', 'Oswald', sans-serif;
-            font-weight: 900;
-            font-size: 44px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #0E1220;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .mi-bar-divider {
-            position: relative;
-            z-index: 3;
-            flex-shrink: 0;
-            width: 4px;
-            height: 62%;
-            background: linear-gradient(to bottom, rgba(90, 40, 180, 0), #6A2BB5 18%, #6A2BB5 82%, rgba(90, 40, 180, 0));
-            box-shadow: 0 0 14px rgba(120, 60, 220, 0.95);
-        }
-
-        .mi-sub-bar {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            padding: 9px 54px;
-            border-radius: 999px;
-            background: linear-gradient(to bottom, #4C1D95 0%, #2A0D5C 100%);
-            border: 1.5px solid rgba(160, 130, 255, 0.65);
-            box-shadow: 0 0 34px rgba(120, 60, 255, 0.7), inset 0 0 24px rgba(120, 60, 255, 0.35);
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
-            font-size: 22px;
-            letter-spacing: 3.5px;
-            text-transform: uppercase;
-            color: #74E0FF;
-            text-shadow: 0 0 14px rgba(80, 200, 255, 0.9);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            opacity: 0;
-            transform: translateY(24px) scale(0.92);
-            transition: opacity 0.5s ease 1.15s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 1.15s;
-        }
-        .mi-overlay.show .mi-sub-bar { opacity: 1; transform: translateY(0) scale(1); }
-        .mi-overlay.exit .mi-sub-bar { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.24s ease, transform 0.24s ease; }
     </style>
 </head>
 <body>
@@ -1292,7 +935,16 @@
         </div>
     </div>
 
-    <!-- REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE / ALL OUT) -->
+    <!-- ALL OUT — ORIGINAL ZOOM-IN/OUT ANIMATION -->
+    <div id="allout-overlay" class="allout-overlay">
+        <div class="allout-bg"></div>
+        <div class="allout-vignette"></div>
+        <div class="allout-main-container">
+            <div class="allout-text">ALL OUT</div>
+        </div>
+    </div>
+
+    <!-- SUPER RAID / SUPER TACKLE — MAT + COLLISION ANIMATION -->
     <div id="epic-overlay" class="epic-overlay">
         <div class="epic-mat"></div>
         <div class="epic-particles" id="epic-particles"></div>
@@ -1504,48 +1156,6 @@
         </div>
     </div>
 
-    <!-- MATCH INTRO / TEAM INTRODUCTION SCREEN -->
-    <div id="match-intro-overlay" class="mi-overlay">
-        <div class="mi-panel" id="mi-panel">
-            <div class="mi-glow mi-glow-left"></div>
-            <div class="mi-glow mi-glow-right"></div>
-
-            <div class="mi-badge">
-                <span class="mi-badge-label">Powered by</span>
-                <div class="mi-badge-icon"><img src="/images/kabaddione_logo.png" alt="KabaddiOne"></div>
-                <span class="mi-badge-text">KabaddiOne</span>
-            </div>
-
-            <div class="mi-matchup">
-                <div class="mi-team mi-team-left">
-                    <div class="mi-logo-frame">
-                        <img id="mi-left-logo" src="/images/player_profile_starting.png" alt="Left team">
-                    </div>
-                </div>
-
-                <div class="mi-vs">
-                    <div class="mi-vs-inner"><span class="mi-vs-text">VS</span></div>
-                </div>
-
-                <div class="mi-team mi-team-right">
-                    <div class="mi-logo-frame">
-                        <img id="mi-right-logo" src="/images/player_profile_starting.png" alt="Right team">
-                    </div>
-                </div>
-            </div>
-
-            <div class="mi-name-bar">
-                <div class="mi-bar-accent left"></div>
-                <div class="mi-bar-accent right"></div>
-                <div class="mi-name-half" id="mi-left-bar-name">TEAM A</div>
-                <div class="mi-bar-divider"></div>
-                <div class="mi-name-half" id="mi-right-bar-name">TEAM B</div>
-            </div>
-
-            <div class="mi-sub-bar" id="mi-sub-bar">LIVE MATCH</div>
-        </div>
-    </div>
-
     <script>
         // ============================================================
         // FIREBASE INIT & AUTH
@@ -1605,7 +1215,6 @@
             left:  { active: false, timer: null, currentRaider: null },
             right: { active: false, timer: null, currentRaider: null }
         };
-        // DOD team-name rotation state (separate from raider name)
         const dodRotationState = {
             left:  { active: false, timer: null },
             right: { active: false, timer: null }
@@ -1868,7 +1477,7 @@
         }
 
         // ==========================================
-        // 🚨 SUSPENSION TIMERS (SMART LOCAL TICKING)
+        // 🚨 SUSPENSION TIMERS
         // ==========================================
         let localSuspensions = { left: null, right: null };
         let lastMainClockSeconds = -1;
@@ -1881,44 +1490,26 @@
         }
 
         function updateSuspensionTimers(data, state, rawStateJsonStr) {
-            
-            // 1. If the heavy state_json actually changed (a foul just happened or ended), reset our local data!
             if (rawStateJsonStr && rawStateJsonStr !== lastParsedStateJson) {
                 lastParsedStateJson = rawStateJsonStr;
-                
                 let leftRoster = [], rightRoster = [];
                 if (state) {
                     try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e) {}
                     try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e) {}
                 }
-
                 let lSusp = leftRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
                 let rSusp = rightRoster.find(p => parseInt(p.suspensionSeconds) > 0) || null;
-
-                localSuspensions.left = lSusp ? { 
-                    name: lSusp.name, 
-                    jersey: lSusp.jerseyNumber, 
-                    timeLeft: parseInt(lSusp.suspensionSeconds) 
-                } : null;
-
-                localSuspensions.right = rSusp ? { 
-                    name: rSusp.name, 
-                    jersey: rSusp.jerseyNumber, 
-                    timeLeft: parseInt(rSusp.suspensionSeconds) 
-                } : null;
+                localSuspensions.left = lSusp ? { name: lSusp.name, jersey: lSusp.jerseyNumber, timeLeft: parseInt(lSusp.suspensionSeconds) } : null;
+                localSuspensions.right = rSusp ? { name: rSusp.name, jersey: rSusp.jerseyNumber, timeLeft: parseInt(rSusp.suspensionSeconds) } : null;
             }
 
-            // 2. Calculate if the Main Clock actually ticked down since the last update
             const currentMainClockSeconds = parseMainClock(data.main_clock);
             let secondsTicked = 0;
-            
-            // Only tick down if the clock is actively moving downwards (meaning it's not paused)
             if (lastMainClockSeconds !== -1 && currentMainClockSeconds !== -1 && currentMainClockSeconds < lastMainClockSeconds) {
                 secondsTicked = lastMainClockSeconds - currentMainClockSeconds;
             }
             lastMainClockSeconds = currentMainClockSeconds;
 
-            // 3. Apply the tick to our local suspensions
             if (secondsTicked > 0) {
                 if (localSuspensions.left && localSuspensions.left.timeLeft > 0) {
                     localSuspensions.left.timeLeft -= secondsTicked;
@@ -1930,24 +1521,22 @@
                 }
             }
 
-            // 4. Draw the UI
             const lTimer = document.getElementById('left-suspension-timer');
             if (lTimer) {
                 if (localSuspensions.left && localSuspensions.left.timeLeft > 0) {
                     document.getElementById('left-suspension-time').textContent = localSuspensions.left.timeLeft;
-                    document.getElementById('left-suspension-player').textContent = 
+                    document.getElementById('left-suspension-player').textContent =
                         `#${localSuspensions.left.jersey || ''} ${localSuspensions.left.name || 'Player'}`.trim();
                     lTimer.classList.add('show');
                 } else {
                     lTimer.classList.remove('show');
                 }
             }
-
             const rTimer = document.getElementById('right-suspension-timer');
             if (rTimer) {
                 if (localSuspensions.right && localSuspensions.right.timeLeft > 0) {
                     document.getElementById('right-suspension-time').textContent = localSuspensions.right.timeLeft;
-                    document.getElementById('right-suspension-player').textContent = 
+                    document.getElementById('right-suspension-player').textContent =
                         `#${localSuspensions.right.jersey || ''} ${localSuspensions.right.name || 'Player'}`.trim();
                     rTimer.classList.add('show');
                 } else {
@@ -1955,8 +1544,9 @@
                 }
             }
         }
+
         // ==========================================
-        // 🚨 RAID EVENT POPUP (Bonus / Super Tackle alert)
+        // 🚨 RAID EVENT POPUP
         // ==========================================
         function countAlivePlayers(rosterJsonStr, outIdsStr) {
             let roster = [];
@@ -1974,27 +1564,20 @@
             return Math.max(0, starting7.length - inactive);
         }
 
-        // 🚨 JS-driven marquee — uses actual measured widths to prevent mid-path clipping
         function startMarqueeAnimation() {
             const el = document.getElementById('rep-marquee-content');
             if (!el || !el.parentElement) return;
-
             if (marqueeRafId) { cancelAnimationFrame(marqueeRafId); marqueeRafId = null; }
-
-            // Reset to start position (left: 100% puts it off-screen right)
             el.style.transform = 'translateX(0)';
-            void el.offsetWidth; // force reflow
-
+            void el.offsetWidth;
             const container = el.parentElement;
             const textWidth = el.scrollWidth;
             const containerWidth = container.clientWidth;
             const totalDistance = textWidth + containerWidth;
             if (totalDistance <= 0 || textWidth <= 0) return;
-
-            const speed = 130; // px/sec
+            const speed = 130;
             const duration = (totalDistance / speed) * 1000;
             let startTime = null;
-
             function animate(timestamp) {
                 if (!startTime) startTime = timestamp;
                 const elapsed = timestamp - startTime;
@@ -2004,98 +1587,61 @@
             }
             marqueeRafId = requestAnimationFrame(animate);
         }
-
         function stopMarqueeAnimation() {
             if (marqueeRafId) { cancelAnimationFrame(marqueeRafId); marqueeRafId = null; }
         }
-
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) return;
             const popup = document.getElementById('center-popup');
-            if (popup && popup.classList.contains('show')) {
-                startMarqueeAnimation();
-            }
+            if (popup && popup.classList.contains('show')) startMarqueeAnimation();
         });
 
         function updateRaidEventPopup(state, data) {
             const popup = document.getElementById('center-popup');
             if (!popup) return;
-
             const raidClock = parseInt(data.raid_clock);
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(raidClock) && raidClock > 0 && raidClock < 30);
-
             if (!raidActive) {
-                if (popup.classList.contains('show')) {
-                    popup.classList.remove('show');
-                    stopMarqueeAnimation();
-                }
+                if (popup.classList.contains('show')) { popup.classList.remove('show'); stopMarqueeAnimation(); }
                 const mq = document.getElementById('rep-marquee-content');
                 if (mq) mq.dataset.state = '';
                 return;
             }
-
             let isLeftRaid = true;
-            const raw = state.currentRaidTeamIsLeft !== undefined
-                ? state.currentRaidTeamIsLeft
-                : state.currentRaidTeamsLeft;
+            const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
             if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  isLeftRaid = true;
             else if (raw === false || raw === 0 || raw === '0' || raw === 'false') isLeftRaid = false;
-
             const defenderCount = isLeftRaid
                 ? countAlivePlayers(state.rightRosterJson, state.rightOutIds)
                 : countAlivePlayers(state.leftRosterJson, state.leftOutIds);
-
             const labelEl   = document.getElementById('rep-label');
             const marqueeEl = document.getElementById('rep-marquee-content');
             if (!labelEl || !marqueeEl) return;
-
             let type = null, newStateKey = '', labelClass = '', labelText = '', msg = '';
-
             if (defenderCount >= 6) {
-                type = 'bonus';
-                newStateKey = 'bonus-' + defenderCount;
-                labelClass = 'rep-label bonus';
-                labelText = 'BONUS IS ON';
+                type = 'bonus'; newStateKey = 'bonus-' + defenderCount;
+                labelClass = 'rep-label bonus'; labelText = 'BONUS IS ON';
                 msg = 'A Bonus Point is awarded when a raider crosses the bonus line with one foot in the air while 6+ defenders are active.';
             } else if (defenderCount <= 3) {
-                type = 'super';
-                newStateKey = 'super-' + defenderCount;
-                labelClass = 'rep-label super-tackle';
-                labelText = 'SUPER TACKLE IS ON';
+                type = 'super'; newStateKey = 'super-' + defenderCount;
+                labelClass = 'rep-label super-tackle'; labelText = 'SUPER TACKLE IS ON';
                 msg = 'If 3 or less defenders remain on the mat, a super tackle gives the team 2 points.';
             }
-
             if (!type) {
-                if (popup.classList.contains('show')) {
-                    popup.classList.remove('show');
-                    stopMarqueeAnimation();
-                }
+                if (popup.classList.contains('show')) { popup.classList.remove('show'); stopMarqueeAnimation(); }
                 marqueeEl.dataset.state = '';
                 return;
             }
-
             let needsRestart = false;
-
-            if (labelEl.className !== labelClass) {
-                labelEl.className = labelClass;
-                labelEl.innerText = labelText;
-            }
-
+            if (labelEl.className !== labelClass) { labelEl.className = labelClass; labelEl.innerText = labelText; }
             if (marqueeEl.dataset.state !== newStateKey) {
                 marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
                 marqueeEl.dataset.state = newStateKey;
                 needsRestart = true;
             }
-
-            if (!popup.classList.contains('show')) {
-                popup.classList.add('show');
-                needsRestart = true;
-            }
-
-            if (needsRestart) {
-                startMarqueeAnimation();
-            }
+            if (!popup.classList.contains('show')) { popup.classList.add('show'); needsRestart = true; }
+            if (needsRestart) startMarqueeAnimation();
         }
 
         // ==========================================
@@ -2115,17 +1661,14 @@
 
         function initBroadcastEngine(id) {
             const matchRef = db.ref('live_matches/' + id);
-
             matchRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
                     window.__kabaddiLog('WARN', 'Snapshot has NO data for match: ' + id);
                     return;
                 }
-
                 const leftColor  = data.left_color  || "#009900";
                 const rightColor = data.right_color || "#0055ff";
-
                 currentLeftColor  = leftColor;
                 currentRightColor = rightColor;
 
@@ -2133,15 +1676,12 @@
                 if (data.state_json) {
                     try {
                         state = JSON.parse(data.state_json);
-
                         renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
                         renderDots('right-dot', state.rightOutIds, state.rightRosterJson, rightColor);
                         handleRaidTimers(state, data.raid_clock, leftColor, rightColor);
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
-
                         updateRaidEventPopup(state, data);
-
                         handleEventTimeline(state);
                     } catch (e) {
                         window.__kabaddiLog('WARN', 'State JSON parse error', e);
@@ -2150,7 +1690,6 @@
 
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
-
                 document.getElementById('left-name').innerText  = leftName;
                 document.getElementById('right-name').innerText = rightName;
 
@@ -2172,7 +1711,6 @@
 
                 const leftScore  = data.left_score  || 0;
                 const rightScore = data.right_score || 0;
-
                 if (epicIsPlaying) {
                     window.pendingLeftScore  = leftScore;
                     window.pendingRightScore = rightScore;
@@ -2191,7 +1729,6 @@
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
-                handleMatchIntroScreen(data, state);   // MATCH INTRO LOGIC
 
             }, (error) => {
                 window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — Auth blocked the read', error);
@@ -2230,13 +1767,11 @@
             let winnerColor = '#4A4A4A';
             let winnerSoft  = 'rgba(74,74,74,0.4)';
             let resultText  = `${leftName} TIED ${rightName}`;
-
             if (ls > rs)      { winnerColor = leftColor;  winnerSoft = darkenColor(leftColor, 20) + '66'; resultText = `${leftName} BEAT ${rightName}`; }
             else if (rs > ls) { winnerColor = rightColor; winnerSoft = darkenColor(rightColor, 20) + '66'; resultText = `${rightName} BEAT ${leftName}`; }
 
             document.getElementById('me-score').innerText = `${ls} - ${rs}`;
             document.getElementById('me-result-text').innerText = resultText;
-
             const inner = document.getElementById('me-inner');
             inner.style.setProperty('--winner-color', winnerColor);
             inner.style.setProperty('--winner-color-soft', winnerSoft);
@@ -2301,36 +1836,27 @@
         function renderDots(dotClassName, outIdsStr, rosterJsonStr, teamColor) {
             const dots = document.getElementsByClassName(dotClassName);
             if (!dots.length) return;
-
             for (let i = 0; i < dots.length; i++) {
                 dots[i].style.setProperty('--dot-active-color', teamColor);
             }
-
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const pJ = j => { const n = parseInt(j); return isNaN(n) ? 999 : n; };
             const starting7 = roster.filter(p => p.isStarting7).sort((a,b) => pJ(a.jerseyNumber) - pJ(b.jerseyNumber));
             if (starting7.length === 0) return;
-
             const outOrder = splitConcatenatedIds(outIdsStr || '', starting7);
             const outSet   = new Set(outOrder);
             const cardInactiveIds = [];
-
             starting7.forEach(p => {
                 if (outSet.has(p.id)) return;
                 const disqualified = p.isDisqualified === true;
                 const suspended = (parseInt(p.suspensionSeconds) || 0) > 0;
-                if (disqualified || suspended) {
-                    cardInactiveIds.push(p.id);
-                    outSet.add(p.id);
-                }
+                if (disqualified || suspended) { cardInactiveIds.push(p.id); outSet.add(p.id); }
             });
-
             const alive = starting7.filter(p => !outSet.has(p.id));
             const outP  = outOrder.map(id => starting7.find(p => p.id === id)).filter(Boolean);
             const cardP = cardInactiveIds.map(id => starting7.find(p => p.id === id)).filter(Boolean);
             const allInactive = [...outP, ...cardP];
-
             const isLeft = (dotClassName === 'left-dot');
             let items;
             if (isLeft) {
@@ -2345,7 +1871,6 @@
                 ];
             }
             while (items.length < 7) items.push({ alive: false, id: null });
-
             for (let i = 0; i < dots.length && i < 7; i++) {
                 dots[i].classList.toggle('active', !!items[i].alive);
             }
@@ -2377,20 +1902,11 @@
 
             if (raidActive) {
                 let actualLeftRaid = true;
-                const raw = state.currentRaidTeamIsLeft !== undefined
-                    ? state.currentRaidTeamIsLeft
-                    : state.currentRaidTeamsLeft;
+                const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
                 if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
                 else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
-
-                if (actualLeftRaid) {
-                    trackLeft.classList.add('visible');
-                    trackRight.classList.remove('visible');
-                } else {
-                    trackRight.classList.add('visible');
-                    trackLeft.classList.remove('visible');
-                }
-
+                if (actualLeftRaid) { trackLeft.classList.add('visible'); trackRight.classList.remove('visible'); }
+                else { trackRight.classList.add('visible'); trackLeft.classList.remove('visible'); }
                 const percentage = Math.max(0, Math.min(100, (displayTime / 30) * 100));
                 barLeft.style.width  = percentage + "%";
                 barRight.style.width = percentage + "%";
@@ -2407,37 +1923,29 @@
                 previousRaidActive = isRaidActive;
                 const timerEl = document.getElementById('raid-timer');
                 const logoEl  = document.getElementById('splash-logo');
-                if (isRaidActive) {
-                    logoEl.classList.remove('show', 'out');
-                    timerEl.classList.remove('out');
-                } else {
-                    timerEl.classList.add('out');
-                    logoEl.classList.remove('out');
-                    logoEl.classList.add('show');
-                }
+                if (isRaidActive) { logoEl.classList.remove('show', 'out'); timerEl.classList.remove('out'); }
+                else { timerEl.classList.add('out'); logoEl.classList.remove('out'); logoEl.classList.add('show'); }
                 return;
             }
             if (isRaidActive === previousRaidActive) return;
             previousRaidActive = isRaidActive;
-
             const timerEl = document.getElementById('raid-timer');
             const logoEl  = document.getElementById('splash-logo');
-
-            if (isRaidActive) {
-                logoEl.classList.remove('show');
-                logoEl.classList.add('out');
-                timerEl.classList.remove('out');
-            } else {
-                timerEl.classList.add('out');
-                logoEl.classList.remove('out');
-                logoEl.classList.add('show');
-            }
+            if (isRaidActive) { logoEl.classList.remove('show'); logoEl.classList.add('out'); timerEl.classList.remove('out'); }
+            else { timerEl.classList.add('out'); logoEl.classList.remove('out'); logoEl.classList.add('show'); }
         }
 
         // ==========================================
-        // 🚨 RAIDER NAME ROTATION — smooth slide from BELOW
-        // + NEW: DOD team-name rotation when defending team has 2+ empty raids
+        // 🚨 RAIDER NAME ROTATION + DOD WARNING
+        // FIXED: no more killing DOD via stopRaiderRotation on defending team
         // ==========================================
+        function snapBelow(el) {
+            el.classList.remove('out', 'show');
+            el.classList.add('below');
+            void el.offsetWidth;
+            el.classList.remove('below');
+        }
+
         function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
             const raidActive = state.raidTimerRunning === true
@@ -2454,55 +1962,36 @@
             const raiderName = (data.active_raider_name || '').trim();
 
             let actualLeftRaid = true;
-            const raw = state.currentRaidTeamIsLeft !== undefined
-                ? state.currentRaidTeamIsLeft
-                : state.currentRaidTeamsLeft;
+            const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
             if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
             else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
 
-            // --- 1. Raiding team: normal raider-name rotation ---
-            if (actualLeftRaid) {
-                if (raiderName) {
-                    startRaiderRotation('left', raiderName);
-                } else {
-                    stopRaiderRotation('left');
-                    raiderRotationState.left.currentRaider = null;
-                }
-                stopRaiderRotation('right');
-                raiderRotationState.right.currentRaider = null;
-            } else {
-                if (raiderName) {
-                    startRaiderRotation('right', raiderName);
-                } else {
-                    stopRaiderRotation('right');
-                    raiderRotationState.right.currentRaider = null;
-                }
-                stopRaiderRotation('left');
-                raiderRotationState.left.currentRaider = null;
-            }
-
-            // --- 2. Defending team: DOD warning rotation if their empty raid count >= 2 ---
             const leftEmpty  = parseInt(state.leftEmptyRaids)  || 0;
             const rightEmpty = parseInt(state.rightEmptyRaids) || 0;
             const leftDOD  = !actualLeftRaid && leftEmpty  >= 2;
             const rightDOD =  actualLeftRaid && rightEmpty >= 2;
 
-            if (leftDOD) startDodRotation('left'); else stopDodRotation('left');
-            if (rightDOD) startDodRotation('right'); else stopDodRotation('right');
-        }
+            const raidSide = actualLeftRaid ? 'left' : 'right';
+            const defSide  = actualLeftRaid ? 'right' : 'left';
+            const defDOD   = actualLeftRaid ? rightDOD : leftDOD;
 
-        // Helper: snap element to "below center" with no transition
-        function snapBelow(el) {
-            el.classList.remove('out', 'show');
-            el.classList.add('below');
-            void el.offsetWidth;   // force reflow to register the below state
-            el.classList.remove('below');
-        }
+            // 1) Raiding team: raider name rotation
+            if (raiderName) {
+                startRaiderRotation(raidSide, raiderName);
+            } else {
+                stopRaiderRotation(raidSide);
+                raiderRotationState[raidSide].currentRaider = null;
+            }
 
-        // Helper: snap element to "above center" (out state) with no transition
-        function snapAbove(el) {
-            el.classList.remove('show', 'below');
-            el.classList.add('out');
+            // 2) Defending team: DOD warning (or clean up if not applicable)
+            if (defDOD) {
+                // Do NOT call stopRaiderRotation here — that would wipe the DOD classes every snapshot.
+                startDodRotation(defSide);
+            } else {
+                stopDodRotation(defSide);
+                stopRaiderRotation(defSide);
+                raiderRotationState[defSide].currentRaider = null;
+            }
         }
 
         function startRaiderRotation(side, raiderName) {
@@ -2524,33 +2013,24 @@
             st.active = true;
             st.currentRaider = raiderName;
 
-            // === INITIAL TRANSITION: team slides up, raider slides up from below ===
-            nameEl.classList.add('out');         // team slides up out
-            snapBelow(raiderEl);                 // snap raider to below (no visual jump — it's already below)
-            raiderEl.classList.add('show');      // raider slides up from below to center
+            nameEl.classList.add('out');
+            snapBelow(raiderEl);
+            raiderEl.classList.add('show');
 
             let showingRaider = true;
 
             const tick = () => {
                 if (!st.active) return;
-
                 if (showingRaider) {
-                    // === SWITCH TO TEAM: raider slides up out, team slides up from below ===
                     raiderEl.classList.remove('show');
-                    raiderEl.classList.add('out');   // raider slides up out
-
-                    snapBelow(nameEl);               // snap team to below (no visual transition)
-                    // (team slides up smoothly to center by removing 'below')
-
+                    raiderEl.classList.add('out');
+                    snapBelow(nameEl);
                     showingRaider = false;
                     st.timer = setTimeout(tick, 5000);
                 } else {
-                    // === SWITCH TO RAIDER: team slides up out, raider slides up from below ===
-                    nameEl.classList.add('out');     // team slides up out
-
-                    snapBelow(raiderEl);             // snap raider to below
-                    raiderEl.classList.add('show');  // raider slides up to center
-
+                    nameEl.classList.add('out');
+                    snapBelow(raiderEl);
+                    raiderEl.classList.add('show');
                     showingRaider = true;
                     st.timer = setTimeout(tick, 3000);
                 }
@@ -2571,9 +2051,8 @@
         }
 
         // ==========================================
-        // 🚨 DOD (NEXT DO OR DIE) TEAM-NAME ROTATION
-        // Reuses the same DOM elements & transition mechanics as raider name
-        // Shows "NEXT DO OR DIE" for 3s, then team name for 5s, repeat
+        // 🚨 NEXT DO OR DIE ROTATION
+        // Same slide mechanics as raider name — team up, DOD from below, 3s, reverse, 5s
         // ==========================================
         function startDodRotation(side) {
             const st = dodRotationState[side];
@@ -2584,7 +2063,7 @@
             const nameEl   = container.querySelector('.team-name-text');
             const raiderEl = container.querySelector('.raider-name-text');
 
-            // Make sure raider rotation isn't fighting us for the same elements
+            // Take ownership of the raider element on this side
             stopRaiderRotation(side);
             raiderRotationState[side].currentRaider = null;
 
@@ -2592,7 +2071,6 @@
             raiderEl.innerText = 'NEXT DO OR DIE';
             raiderEl.classList.add('dod-text');
 
-            // Initial: DOD text slides up from below, team name slides out
             nameEl.classList.add('out');
             snapBelow(raiderEl);
             raiderEl.classList.add('show');
@@ -2601,19 +2079,14 @@
 
             const tick = () => {
                 if (!st.active) return;
-
                 if (showingDod) {
-                    // Switch to team name
                     raiderEl.classList.remove('show');
                     raiderEl.classList.add('out');
-
                     snapBelow(nameEl);
                     showingDod = false;
                     st.timer = setTimeout(tick, 5000);
                 } else {
-                    // Switch back to DOD
                     nameEl.classList.add('out');
-
                     snapBelow(raiderEl);
                     raiderEl.classList.add('show');
                     showingDod = true;
@@ -2628,7 +2101,6 @@
             if (st.timer) { clearTimeout(st.timer); st.timer = null; }
             if (!st.active) return;
             st.active = false;
-
             const container = document.querySelector(`#${side}-team-bg .name-rotator`);
             if (!container) return;
             const nameEl   = container.querySelector('.team-name-text');
@@ -2638,7 +2110,7 @@
         }
 
         // ==========================================
-        // DO-OR-DIE (ORIGINAL BANNER — keeps old behaviour)
+        // DO-OR-DIE BANNER (original behaviour)
         // ==========================================
         function handleDoOrDie(state, raidClockStr) {
             const dodLeftBanner  = document.getElementById('dod-left');
@@ -2649,9 +2121,7 @@
             const rightWrap = document.getElementById('right-team-wrap');
 
             let actualLeftRaid = true;
-            const raw = state.currentRaidTeamIsLeft !== undefined
-                ? state.currentRaidTeamIsLeft
-                : state.currentRaidTeamsLeft;
+            const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
             if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
             else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
 
@@ -2665,24 +2135,10 @@
             const leftDOD  = raidActive && actualLeftRaid  && leftEmpty  >= 2;
             const rightDOD = raidActive && !actualLeftRaid && rightEmpty >= 2;
 
-            if (leftDOD) {
-                dodLeftBanner.classList.add('show');
-                leftBar.classList.add('dod-active');
-                leftWrap.classList.add('dod-active');
-            } else {
-                dodLeftBanner.classList.remove('show');
-                leftBar.classList.remove('dod-active');
-                leftWrap.classList.remove('dod-active');
-            }
-            if (rightDOD) {
-                dodRightBanner.classList.add('show');
-                rightBar.classList.add('dod-active');
-                rightWrap.classList.add('dod-active');
-            } else {
-                dodRightBanner.classList.remove('show');
-                rightBar.classList.remove('dod-active');
-                rightWrap.classList.remove('dod-active');
-            }
+            if (leftDOD) { dodLeftBanner.classList.add('show'); leftBar.classList.add('dod-active'); leftWrap.classList.add('dod-active'); }
+            else { dodLeftBanner.classList.remove('show'); leftBar.classList.remove('dod-active'); leftWrap.classList.remove('dod-active'); }
+            if (rightDOD) { dodRightBanner.classList.add('show'); rightBar.classList.add('dod-active'); rightWrap.classList.add('dod-active'); }
+            else { dodRightBanner.classList.remove('show'); rightBar.classList.remove('dod-active'); rightWrap.classList.remove('dod-active'); }
         }
 
         // ==========================================
@@ -2696,13 +2152,8 @@
 
             const jerseyMatches = [...String(descText || '').matchAll(/\((\d+)\)/g)].map(m => m[1]);
             let outName = 'Player', inName = 'Player';
-            if (jerseyMatches.length >= 2) {
-                outName = 'Player ' + jerseyMatches[0];
-                inName  = 'Player ' + jerseyMatches[1];
-            } else {
-                outName = descText || 'Player';
-                inName  = descText || 'Player';
-            }
+            if (jerseyMatches.length >= 2) { outName = 'Player ' + jerseyMatches[0]; inName = 'Player ' + jerseyMatches[1]; }
+            else { outName = descText || 'Player'; inName = descText || 'Player'; }
             outNameEl.innerText = outName;
             inNameEl.innerText  = inName;
 
@@ -2717,11 +2168,9 @@
 
             subBannerTimeoutIds.forEach(id => clearTimeout(id));
             subBannerTimeoutIds = [];
-
             banner.className = 'side-banner ' + (isLeft ? 'pos-left' : 'pos-right');
             void banner.offsetWidth;
             banner.classList.add('show');
-
             subBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('phase-in'); }, 2000));
             subBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('hide'); }, 4000));
             subBannerTimeoutIds.push(setTimeout(() => { banner.classList.remove('show', 'hide', 'phase-in'); }, 4700));
@@ -2736,83 +2185,56 @@
             if (!log) return false;
             const typeUc  = (log.type  || '').toUpperCase();
             const titleLc = (log.title || '').toLowerCase();
-
-            if (typeUc === 'CARD' || typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') {
-                return true;
-            }
+            if (typeUc === 'CARD' || typeUc === 'YELLOW_CARD' || typeUc === 'RED_CARD' || typeUc === 'GREEN_CARD') return true;
             if (/(yellow|red|green)\s*card/i.test(titleLc)) return true;
             if (titleLc.includes('येलो') || titleLc.includes('रेड') || titleLc.includes('ग्रीन')) return true;
-            if (typeUc === 'EXTRA' || typeUc === 'TECHNICAL' || titleLc.includes('penalty') || titleLc.includes('technical')) {
-                return false;
-            }
+            if (typeUc === 'EXTRA' || typeUc === 'TECHNICAL' || titleLc.includes('penalty') || titleLc.includes('technical')) return false;
             return false;
         }
-
         function detectCardColor(log) {
             const titleLc = (log.title || '').toLowerCase();
             const typeUc  = (log.type  || '').toUpperCase();
             const descLc  = (log.desc  || '').toLowerCase();
-
             const priority = titleLc + ' ' + typeUc.toLowerCase();
             if (priority.includes('red')    || priority.includes('रेड'))   return 'red';
             if (priority.includes('green')  || priority.includes('ग्रीन')) return 'green';
             if (priority.includes('yellow') || priority.includes('येलो') || priority.includes('पीला')) return 'yellow';
-
             if (descLc.includes('red')    || descLc.includes('रेड'))   return 'red';
             if (descLc.includes('green')  || descLc.includes('ग्रीन')) return 'green';
             return 'yellow';
         }
-
         function triggerCardBanner(log) {
             const banner     = document.getElementById('card-side-banner');
             const playerEl   = document.getElementById('card-side-player-name');
             const badgeText  = document.getElementById('card-side-badge-text');
             if (!banner || !playerEl || !badgeText) return;
-
             const isLeft  = log.isLeftTeam === true;
             const isRight = log.isLeftTeam === false;
             if (!isLeft && !isRight) return;
-
             const cardColor = detectCardColor(log);
-
             let typeText = 'YELLOW CARD';
             if (cardColor === 'red')        typeText = 'RED CARD';
             else if (cardColor === 'green') typeText = 'GREEN CARD';
-
             let playerText = String(log.desc || '').trim();
             playerText = playerText
-                .replace(/yellow\s*card/ig, '')
-                .replace(/red\s*card/ig, '')
-                .replace(/green\s*card/ig, '')
-                .replace(/येलो\s*कार्ड/g, '')
-                .replace(/रेड\s*कार्ड/g, '')
-                .replace(/ग्रीन\s*कार्ड/g, '')
-                .replace(/कार्ड/g, '')
-                .replace(/^[\s\-–—:|·]+|[\s\-–—:|·]+$/g, '');
+                .replace(/yellow\s*card/ig, '').replace(/red\s*card/ig, '').replace(/green\s*card/ig, '')
+                .replace(/येलो\s*कार्ड/g, '').replace(/रेड\s*कार्ड/g, '').replace(/ग्रीन\s*कार्ड/g, '')
+                .replace(/कार्ड/g, '').replace(/^[\s\-–—:|·]+|[\s\-–—:|·]+$/g, '');
             if (!playerText) playerText = 'Foul Committed';
-
             playerEl.innerText = playerText;
             badgeText.innerText = typeText;
-
             const teamColor = isLeft ? currentLeftColor : currentRightColor;
             const darkColor = darkenColor(teamColor, 60);
             banner.style.background = isLeft
                 ? `linear-gradient(to right, ${darkColor}, ${teamColor})`
                 : `linear-gradient(to left, ${darkColor}, ${teamColor})`;
-
             cardBannerTimeoutIds.forEach(id => clearTimeout(id));
             cardBannerTimeoutIds = [];
-
             banner.className = 'side-banner card-side-banner ' + (isLeft ? 'pos-left' : 'pos-right') + ' ' + cardColor;
             void banner.offsetWidth;
             banner.classList.add('show');
-
-            cardBannerTimeoutIds.push(setTimeout(() => {
-                banner.classList.add('hide');
-            }, 3500));
-            cardBannerTimeoutIds.push(setTimeout(() => {
-                banner.classList.remove('show', 'hide');
-            }, 4200));
+            cardBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('hide'); }, 3500));
+            cardBannerTimeoutIds.push(setTimeout(() => { banner.classList.remove('show', 'hide'); }, 4200));
         }
 
         // ==========================================
@@ -2823,29 +2245,25 @@
             try {
                 const logs = JSON.parse(state.logsJson);
                 if (logs.length === 0) return;
-
                 if (!initialLoadDone) {
                     logs.forEach(log => seenLogKeys.add(getLogKey(log)));
                     initialLoadDone = true;
                     return;
                 }
-
                 for (const log of logs) {
                     const key = getLogKey(log);
                     if (seenLogKeys.has(key)) continue;
                     seenLogKeys.add(key);
-
                     const title = (log.title || '').toLowerCase();
                     const type  = log.type  || '';
-
                     if (type === 'ALL_OUT' || title.includes("all out") || title.includes("ऑल आउट") || title.includes("ऑलआउट")) {
-                        playEpicAnimation('all_out');
+                        playAllOutAnimation();
                     }
                     else if (type === 'SUPER_TACKLE' || title.includes("super tackle") || title.includes("सुपर टैकल") || title.includes("सुपरटैकल")) {
-                        playEpicAnimation('super_tackle');
+                        playSuperEventAnimation('super_tackle');
                     }
                     else if (title.includes("super raid") || title.includes("सुपर रेड") || title.includes("सुपररेड") || (type === "RAID" && log.points >= 3)) {
-                        playEpicAnimation('super_raid');
+                        playSuperEventAnimation('super_raid');
                     }
                     else if (title.includes("substitution") || title.includes("सब्स्टीट्यूशन")) {
                         triggerSubstitutionGraphic(log.desc || '', log.isLeftTeam);
@@ -2860,61 +2278,91 @@
         }
 
         // ==========================================
-        // REDESIGNED EPIC ANIMATION (SUPER RAID / SUPER TACKLE / ALL OUT)
+        // ALL OUT — ORIGINAL ZOOM ANIMATION
         // ==========================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
 
+        function playAllOutAnimation() {
+            const overlay = document.getElementById('allout-overlay');
+            if (!overlay) return;
+
+            epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
+            epicAnimationTimeoutIds = [];
+
+            overlay.classList.remove('entry', 'hold', 'exit', 'visible');
+            void overlay.offsetWidth;
+            overlay.classList.add('visible', 'entry');
+            epicIsPlaying = true;
+
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                if (!epicIsPlaying) return;
+                overlay.classList.remove('entry');
+                overlay.classList.add('hold');
+            }, 700));
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                if (!epicIsPlaying) return;
+                overlay.classList.remove('hold');
+                overlay.classList.add('exit');
+            }, 3200));
+            epicAnimationTimeoutIds.push(setTimeout(() => {
+                overlay.classList.remove('visible', 'exit');
+                epicIsPlaying = false;
+                if (window.pendingLeftScore !== undefined) {
+                    updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
+                    previousLeftScore = window.pendingLeftScore;
+                    window.pendingLeftScore = undefined;
+                }
+                if (window.pendingRightScore !== undefined) {
+                    updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
+                    previousRightScore = window.pendingRightScore;
+                    window.pendingRightScore = undefined;
+                }
+            }, 3800));
+        }
+
+        // ==========================================
+        // SUPER RAID / SUPER TACKLE — MAT + COLLISION
+        // ==========================================
         function createEpicParticles(container) {
             if (!container) return;
             container.innerHTML = '';
-            // More particles for a richer collision dust burst
             const count = 70;
             for (let i = 0; i < count; i++) {
                 const p = document.createElement('div');
                 p.className = 'epic-particle';
-
-                // Spread horizontally across screen
-                const left  = 6 + Math.random() * 88;         // 6% .. 94%
-                const bottom = 4 + Math.random() * 60;        // 4% .. 64% from bottom
-
+                const left  = 6 + Math.random() * 88;
+                const bottom = 4 + Math.random() * 60;
                 p.style.left = left + '%';
                 p.style.bottom = bottom + '%';
-
-                const size = 6 + Math.random() * 14;          // 6px .. 20px
+                const size = 6 + Math.random() * 14;
                 p.style.width  = size + 'px';
                 p.style.height = size + 'px';
-
                 p.style.animationDelay    = (Math.random() * 1.4) + 's';
                 p.style.animationDuration = (1.1 + Math.random() * 1.2) + 's';
                 p.style.opacity = 0.85 + Math.random() * 0.15;
-
                 container.appendChild(p);
             }
         }
 
-        function playEpicAnimation(eventType) {
+        function playSuperEventAnimation(eventType) {
             const overlay          = document.getElementById('epic-overlay');
             const textWrap         = document.getElementById('epic-text-wrap');
             const gifEl            = document.getElementById('epic-gif');
             const particlesContainer = document.getElementById('epic-particles');
             if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
 
-            // Clear any previous timers
             epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
             epicAnimationTimeoutIds = [];
 
-            // Reset state
             overlay.className = 'epic-overlay';
             overlay.style.transform = '';
             textWrap.innerHTML = '';
             gifEl.src = '';
             gifEl.style.display = '';
-            gifEl.className = 'epic-gif';
             particlesContainer.innerHTML = '';
 
             if (eventType === 'super_raid') {
-                // NEW: two-word layout — SUPER from left, RAID from right, collide, separate
                 textWrap.innerHTML =
                     '<div class="epic-text epic-text-super">SUPER</div>' +
                     '<div class="epic-text epic-text-event">RAID</div>';
@@ -2926,37 +2374,27 @@
                     '<div class="epic-text epic-text-event">TACKLE</div>';
                 gifEl.src = 'images/super-tackle.gif';
                 overlay.classList.add('animate-tackle');
-            } else if (eventType === 'all_out') {
-                textWrap.innerHTML = '<div class="epic-text epic-text-event">ALL OUT</div>';
-                gifEl.src = '';
-                gifEl.style.display = 'none';
-                overlay.classList.add('animate-allout');
             } else {
                 return;
             }
 
-            // Show overlay + hide scoreboard
             overlay.classList.add('visible');
             document.body.classList.add('epic-active');
             epicIsPlaying = true;
 
-            // Create floating dust particles
             createEpicParticles(particlesContainer);
 
-            // After 3.5s : start the slide-down
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.add('slide-down');
             }, 3500));
 
-            // After 4.0s : fully reset + restore scoreboard + apply pending scores
             epicAnimationTimeoutIds.push(setTimeout(() => {
                 overlay.classList.remove('visible', 'slide-down',
-                    'animate-raid', 'animate-tackle', 'animate-allout');
+                    'animate-raid', 'animate-tackle');
                 overlay.style.transform = '';
                 document.body.classList.remove('epic-active');
                 particlesContainer.innerHTML = '';
                 epicIsPlaying = false;
-
                 if (window.pendingLeftScore !== undefined) {
                     updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
                     previousLeftScore = window.pendingLeftScore;
@@ -2978,13 +2416,7 @@
             const team   = (data.overlay_screen_team || '').trim();
             const playerId = (data.overlay_screen_player_id || '').trim();
 
-            if (!screen) {
-                hideAllFsOverlays();
-                lastOverlayScreen = '';
-                lastOverlayTeam = '';
-                lastOverlayPlayerId = '';
-                return;
-            }
+            if (!screen) { hideAllFsOverlays(); lastOverlayScreen = ''; lastOverlayTeam = ''; lastOverlayPlayerId = ''; return; }
 
             const leftName  = data.left_name  || 'TEAM A';
             const rightName = data.right_name || 'TEAM B';
@@ -2998,8 +2430,7 @@
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
                     renderStarting7(actualName, actualColor, rosterJson);
                     showFsOverlay('starting7-overlay');
-                    lastOverlayScreen = screen;
-                    lastOverlayTeam = team;
+                    lastOverlayScreen = screen; lastOverlayTeam = team;
                 }
                 return;
             }
@@ -3022,9 +2453,7 @@
                 if (screen !== lastOverlayScreen || team !== lastOverlayTeam || playerId !== lastOverlayPlayerId || !document.getElementById('player-perf-overlay').classList.contains('show')) {
                     renderPlayerPerformance(rosterJson, playerId, actualColor, actualName);
                     showFsOverlay('player-perf-overlay');
-                    lastOverlayScreen = screen;
-                    lastOverlayTeam = team;
-                    lastOverlayPlayerId = playerId;
+                    lastOverlayScreen = screen; lastOverlayTeam = team; lastOverlayPlayerId = playerId;
                 } else {
                     renderPlayerPerformance(rosterJson, playerId, actualColor, actualName);
                 }
@@ -3034,12 +2463,9 @@
         }
 
         function showFsOverlay(id) {
-            document.querySelectorAll('.fs-overlay').forEach(el => {
-                if (el.id !== id) el.classList.remove('show');
-            });
+            document.querySelectorAll('.fs-overlay').forEach(el => { if (el.id !== id) el.classList.remove('show'); });
             document.getElementById(id).classList.add('show');
         }
-
         function hideAllFsOverlays() {
             document.querySelectorAll('.fs-overlay').forEach(el => el.classList.remove('show'));
         }
@@ -3050,15 +2476,11 @@
         function renderStarting7(teamName, teamColor, rosterJsonStr) {
             const nameEl = document.getElementById('s7-team-name');
             const parts = (teamName || 'TEAM NAME').trim().split(' ');
-            if (parts.length >= 2) {
-                nameEl.innerHTML = escapeHtml(parts[0]) + '<br>' + escapeHtml(parts.slice(1).join(' '));
-            } else {
-                nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
-            }
+            if (parts.length >= 2) nameEl.innerHTML = escapeHtml(parts[0]) + '<br>' + escapeHtml(parts.slice(1).join(' '));
+            else nameEl.textContent = escapeHtml(teamName || 'TEAM NAME');
             const overlayEl = document.getElementById('starting7-overlay');
             overlayEl.style.setProperty('--s7-team-color', teamColor);
             overlayEl.style.setProperty('--s7-team-color-dark', darkenColor(teamColor, 30));
-
             let roster = [];
             try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
             const starters = roster.filter(p => p.isStarting7 === true);
@@ -3069,7 +2491,6 @@
                 renderS7PlayerCard(slot, player, pos);
             });
         }
-
         function renderS7PlayerCard(slotEl, player, positionLabel) {
             if (!player) {
                 slotEl.innerHTML = `
@@ -3136,7 +2557,6 @@
             setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate,   rightColor);
             setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate, rightColor);
         }
-
         function setPieRing(ringId, valueId, percent, color) {
             const ring = document.getElementById(ringId);
             const val  = document.getElementById(valueId);
@@ -3157,19 +2577,10 @@
             ppSetText('pp-team-label', (teamName || 'TEAM').toUpperCase());
 
             let roster = [];
-            try {
-                const parsed = JSON.parse(rosterJsonStr || '[]');
-                roster = Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                window.__kabaddiLog('WARN', 'Player performance roster JSON parse error', e);
-                roster = [];
-            }
+            try { const parsed = JSON.parse(rosterJsonStr || '[]'); roster = Array.isArray(parsed) ? parsed : []; }
+            catch (e) { window.__kabaddiLog('WARN', 'Player performance roster JSON parse error', e); roster = []; }
             const player = roster.find(p => p && String(p.id) === String(playerId)) || null;
-
-            if (!player) {
-                ppResetPerformance(teamName);
-                return;
-            }
+            if (!player) { ppResetPerformance(teamName); return; }
 
             const jersey = player.jerseyNumber !== undefined && player.jerseyNumber !== null ? String(player.jerseyNumber).trim() : '';
             const displayName = jersey ? `${player.name || 'Player'} (${jersey})` : (player.name || 'Player');
@@ -3182,7 +2593,6 @@
             const tacklePts = ppNumber(player.tacklePoints);
             const totalPts = raidPts + tacklePts;
             const touchPts = Math.max(0, raidPts - bonusPts);
-
             const succRaids = ppNumber(player.successfulRaids);
             const unsuccRaids = ppNumber(player.unsuccessfulRaids);
             const emptyRaids = ppNumber(player.emptyRaids);
@@ -3228,217 +2638,6 @@
             for (let i = 0; i < superTack; i++) tackleSequence.push('ST');
             for (let i = 0; i < unsuccTack; i++) tackleSequence.push('U');
             ppRenderSequence('pp-tackle-sequence', tackleSequence, 'tackle');
-        }
-
-        // ============================================================
-        // MATCH INTRO (TEAM INTRODUCTION) CONTROLLER
-        // ============================================================
-        let matchIntroState = {
-            active: false,
-            matchStarted: false,
-            suspendedForOverlay: false
-        };
-
-        function miPickTeamLogoPlayer(rosterJsonStr) {
-            let roster = [];
-            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch (e) { roster = []; }
-            if (!Array.isArray(roster) || roster.length === 0) return null;
-
-            const starters = roster.filter(p => p && p.isStarting7 === true);
-            const pool = starters.length ? starters : roster.filter(Boolean);
-            if (!pool.length) return null;
-
-            const withImage = pool.find(p => p && p.imageUri && String(p.imageUri).trim().length > 0);
-            return withImage || pool[0];
-        }
-
-        function miResolveImage(player) {
-            if (player && player.imageUri) {
-                const s = String(player.imageUri).trim();
-                if (s.startsWith('data:image')) return s;
-                if (/^https?:\/\//i.test(s)) return s;
-            }
-            return DEFAULT_PLAYER_IMG;
-        }
-
-        function miApplyTeamLogo(imgId, rosterJsonStr) {
-            const img = document.getElementById(imgId);
-            if (!img) return;
-
-            const player = miPickTeamLogoPlayer(rosterJsonStr);
-            const src = miResolveImage(player);
-
-            img.onerror = function () {
-                img.onerror = null;
-                if (img.getAttribute('src') !== DEFAULT_PLAYER_IMG) img.src = DEFAULT_PLAYER_IMG;
-            };
-            img.src = src;
-            img.alt = (player && player.name) ? String(player.name) : 'Team logo';
-        }
-
-        // UPDATED: output "SUN 21 OCT 2026" style — accepts Date or string
-        function formatMatchDate(dateStr) {
-            if (!dateStr) return '';
-            let d;
-            if (dateStr instanceof Date) {
-                d = dateStr;
-            } else {
-                d = new Date(dateStr);
-            }
-            if (isNaN(d.getTime())) return String(dateStr).toUpperCase();
-
-            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${days[d.getDay()]} ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
-        }
-
-        // NEW: derive date from last_updated timestamp (seconds or ms)
-        function formatMatchDateFromTimestamp(ts) {
-            if (!ts) return '';
-            let ms;
-            if (typeof ts === 'number') {
-                ms = ts < 10000000000 ? ts * 1000 : ts;
-            } else {
-                const n = Number(ts);
-                if (!isNaN(n)) {
-                    ms = n < 10000000000 ? n * 1000 : n;
-                } else {
-                    ms = new Date(ts).getTime();
-                }
-            }
-            if (isNaN(ms)) return '';
-            const d = new Date(ms);
-            if (isNaN(d.getTime())) return '';
-            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${days[d.getDay()]} ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
-        }
-
-        function miRender(data, state) {
-            const overlay = document.getElementById('match-intro-overlay');
-            if (!overlay) return;
-
-            const leftName  = String(data.left_name  || 'TEAM A').trim();
-            const rightName = String(data.right_name || 'TEAM B').trim();
-            const leftColor  = data.left_color  || '#009900';
-            const rightColor = data.right_color || '#0055ff';
-
-            overlay.style.setProperty('--mi-left-color', leftColor);
-            overlay.style.setProperty('--mi-right-color', rightColor);
-
-            const lEl = document.getElementById('mi-left-bar-name');
-            const rEl = document.getElementById('mi-right-bar-name');
-            if (lEl) lEl.textContent = leftName.toUpperCase();
-            if (rEl) rEl.textContent = rightName.toUpperCase();
-
-            miApplyTeamLogo('mi-left-logo',  state && state.leftRosterJson);
-            miApplyTeamLogo('mi-right-logo', state && state.rightRosterJson);
-
-            const venue = String(data.match_location || data.venue || data.match_venue || '').trim();
-            const comp  = String(data.match_category || data.match_group || data.match_title || data.tournament || data.tournament_name || '').trim();
-
-            // NEW: prefer last_updated timestamp for match date
-            const lastTs = data.last_updated || data.lastUpdated || data.updated_at || data.updatedAt || data.timestamp;
-            let dateFormatted = formatMatchDateFromTimestamp(lastTs);
-            if (!dateFormatted) {
-                const matchDate = data.match_date || data.matchDate || data.date || data.match_datetime || '';
-                dateFormatted = formatMatchDate(matchDate);
-            }
-
-            const segs = [];
-            if (comp) segs.push(comp.toUpperCase());
-            segs.push(venue ? ('LIVE FROM ' + venue.toUpperCase()) : 'LIVE MATCH');
-            segs.push(dateFormatted || 'MATCH DATE TBA');
-
-            const subEl = document.getElementById('mi-sub-bar');
-            if (subEl) subEl.textContent = segs.join('   •   ');
-        }
-
-        function miIsMatchNotStarted(data, state) {
-            if (!data) return false;
-            if (data.match_result) return false;
-            const half = String(data.half_status || '').toLowerCase();
-            if (half.includes('over') || half.includes('full time')) return false;
-
-            const ls = parseInt(data.left_score, 10) || 0;
-            const rs = parseInt(data.right_score, 10) || 0;
-            if (ls > 0 || rs > 0) return false;
-
-            if (state && state.raidTimerRunning === true) return false;
-            const raidClock = parseInt(data.raid_clock, 10);
-            if (!isNaN(raidClock) && raidClock > 0 && raidClock < 30) return false;
-
-            // If the main clock has ticked down by more than 5 seconds, the match has started
-            const fullSecs = (parseInt(data.match_duration_mins, 10) || 20) * 60;
-            const remain = parseMainClock(data.main_clock);
-            if (remain >= 0 && remain < fullSecs - 5) return false;
-
-            return true;
-        }
-
-        function showMatchIntro(data, state) {
-            if (matchIntroState.active || matchIntroState.matchStarted) return;
-            const overlay = document.getElementById('match-intro-overlay');
-            if (!overlay) return;
-
-            matchIntroState.active = true;
-            miRender(data, state);
-
-            overlay.classList.remove('exit', 'show');
-            void overlay.offsetWidth;
-            overlay.classList.add('show');
-            document.body.classList.add('mi-active');
-        }
-
-        function hideMatchIntro() {
-            if (!matchIntroState.active) return;
-            matchIntroState.active = false;
-
-            const overlay = document.getElementById('match-intro-overlay');
-            if (!overlay) { document.body.classList.remove('mi-active'); return; }
-
-            overlay.classList.remove('show');
-            overlay.classList.add('exit');
-
-            setTimeout(() => {
-                overlay.classList.remove('exit');
-                document.body.classList.remove('mi-active');
-            }, 600);
-        }
-
-        function handleMatchIntroScreen(data, state) {
-            if (!data) return;
-            const overlayScreen = String(data.overlay_screen || '').trim().toLowerCase();
-            const overlayOpen = overlayScreen.length > 0 && overlayScreen !== 'none' && overlayScreen !== 'null';
-            const notStarted = miIsMatchNotStarted(data, state);
-
-            if (!notStarted) {
-                matchIntroState.matchStarted = true;
-                if (matchIntroState.active) hideMatchIntro();
-                return;
-            }
-
-            matchIntroState.matchStarted = false;
-
-            if (overlayOpen) {
-                if (matchIntroState.active) {
-                    hideMatchIntro();
-                }
-                matchIntroState.suspendedForOverlay = true;
-                return;
-            }
-
-            if (!overlayOpen && matchIntroState.suspendedForOverlay) {
-                matchIntroState.suspendedForOverlay = false;
-                showMatchIntro(data, state);
-                return;
-            }
-
-            if (!matchIntroState.active && !matchIntroState.matchStarted) {
-                showMatchIntro(data, state);
-            }
         }
     </script>
 </body>
