@@ -551,12 +551,12 @@
         /* ============================================================
            STARTING 7 OVERLAY (Uses MI-PANEL layout)
            ============================================================ */
-        .s7-panel {
-            background: url('images/starting7-mat.png') center bottom / cover no-repeat, linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%) !important;
+        #starting7-overlay .mi-panel {
+            background: url('images/starting7-mat.png') center bottom / 100% 100% no-repeat, linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%) !important;
             border: 2px solid rgba(255, 255, 255, 0.2) !important;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.9) !important;
         }
-        .s7-panel::before {
+        #starting7-overlay .mi-panel::before {
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         
@@ -836,9 +836,9 @@
             justify-content: center;
             gap: 28px;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%) !important;
-            border: 2px solid rgba(130, 205, 255, 0.55) !important;
-            box-shadow: 0 0 0 8px rgba(80, 40, 180, 0.16), 0 0 100px rgba(90, 40, 210, 0.75), inset 0 0 170px rgba(70, 30, 160, 0.55) !important;
+            background: linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%);
+            border: 2px solid rgba(130, 205, 255, 0.55);
+            box-shadow: 0 0 0 8px rgba(80, 40, 180, 0.16), 0 0 100px rgba(90, 40, 210, 0.75), inset 0 0 170px rgba(70, 30, 160, 0.55);
             opacity: 0;
             transform: scale(0.86) translateY(26px);
             transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1297,7 +1297,7 @@
 
     <!-- STARTING 7 OVERLAY (Uses MI-PANEL layout) -->
     <div id="starting7-overlay" class="mi-overlay">
-        <div class="mi-panel s7-panel" id="s7-mi-panel">
+        <div class="mi-panel" id="s7-mi-panel">
             <div class="mi-glow mi-glow-left"></div>
             <div class="mi-glow mi-glow-right"></div>
 
@@ -2223,12 +2223,22 @@
 
             let winnerColor = '#4A4A4A';
             let winnerSoft  = 'rgba(74,74,74,0.4)';
-            let resultText  = `${leftName} TIED ${rightName}`;
+            let scoreText   = `${ls} - ${rs}`;
+            let resultText  = `${leftName} TIED WITH ${rightName}`;
 
-            if (ls > rs)      { winnerColor = leftColor;  winnerSoft = darkenColor(leftColor, 20) + '66'; resultText = `${leftName} BEAT ${rightName}`; }
-            else if (rs > ls) { winnerColor = rightColor; winnerSoft = darkenColor(rightColor, 20) + '66'; resultText = `${rightName} BEAT ${leftName}`; }
+            if (ls > rs) {
+                winnerColor = leftColor;
+                winnerSoft = darkenColor(leftColor, 20) + '66';
+                scoreText = `${ls} - ${rs}`; // Winning score first
+                resultText = `${leftName} BEAT ${rightName}`;
+            } else if (rs > ls) {
+                winnerColor = rightColor;
+                winnerSoft = darkenColor(rightColor, 20) + '66';
+                scoreText = `${rs} - ${ls}`; // Winning score first
+                resultText = `${rightName} BEAT ${leftName}`;
+            }
 
-            document.getElementById('me-score').innerText = `${ls} - ${rs}`;
+            document.getElementById('me-score').innerText = scoreText;
             document.getElementById('me-result-text').innerText = resultText;
 
             const inner = document.getElementById('me-inner');
