@@ -78,7 +78,7 @@
     <style>
         * { box-sizing: border-box; user-select: none; }
         body, html { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent !important; overflow: hidden; font-family: 'Oswald', sans-serif; }
-        .broadcast-stage { position: absolute; bottom: 60px; left: 0; width: 1920px; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.34, 1.2, 0.64, 1); }
+        .broadcast-stage { position: absolute; bottom: 30px; left: 0; width: 1920px; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.9)); transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.34, 1.2, 0.64, 1); }
         .gold-bg { background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%); }
 
         .logo-bar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 30px; background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9)); border: 2px solid rgb(253, 241, 159); margin-bottom: -13px; font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; z-index: 6; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%); }
@@ -1113,7 +1113,7 @@
            ============================================================ */
         .toss-overlay {
             position: fixed;
-            bottom: 180px; 
+            bottom: 50px; 
             left: 0;
             z-index: 9998;
             display: flex;
@@ -1180,6 +1180,7 @@
             padding: 0 50px 0 45px; 
             clip-path: polygon(25px 0px, 100% 0px, calc(100% - 25px) 100%, 0px 100%);
             z-index: 1;
+            margin-left: -10px;
         }
 
         .toss-sub-bar-wrapper {
