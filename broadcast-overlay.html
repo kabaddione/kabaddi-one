@@ -34,6 +34,25 @@
         // Global object to hold GIF data in memory
         window.epicGifBlobs = { raid: null, tackle: null };
 
+        // Robust blob loader that works on web AND local OBS file systems (bypasses fetch CORS)
+        function loadLocalBlob(url) {
+            return new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'blob';
+                xhr.onload = function() {
+                    // 200 is web success, 0 is local file:// success in OBS
+                    if (this.status === 200 || this.status === 0) {
+                        resolve(this.response);
+                    } else {
+                        reject('Failed with status: ' + this.status);
+                    }
+                };
+                xhr.onerror = function() { reject('Network error'); };
+                xhr.send();
+            });
+        }
+
         (async function preloadEpicAssets() {
             // Standard image preload for static assets
             ['images/raid-mat.png', 'images/tackle-mat.png', '/images/kabaddione_bg.jpg', 'images/starting7-mat.png'].forEach(function (src) {
@@ -41,13 +60,10 @@
                 img.src = src;
             });
 
-            // Preload GIFs as Blobs to control playback start perfectly without network flashes
+            // Preload GIFs as Blobs via robust XHR
             try {
-                const raidRes = await fetch('images/thigh-five.gif');
-                window.epicGifBlobs.raid = await raidRes.blob();
-                
-                const tackleRes = await fetch('images/super-tackle.gif');
-                window.epicGifBlobs.tackle = await tackleRes.blob();
+                window.epicGifBlobs.raid = await loadLocalBlob('images/thigh-five.gif');
+                window.epicGifBlobs.tackle = await loadLocalBlob('images/super-tackle.gif');
             } catch (err) {
                 window.__kabaddiLog('WARN', 'Failed to preload GIFs as Blobs', err);
             }
@@ -3176,19 +3192,22 @@
             gifEl.className = 'epic-gif';
             particlesContainer.innerHTML = '';
 
+            // Check if running as a local file to avoid breaking paths with ?t=
+            const isLocal = window.location.protocol === 'file:';
+            const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
+
             if (eventType === 'super_raid') {
                 textWrap.innerHTML =
                     '<div class="epic-text epic-text-super">SUPER</div>' +
                     '<div class="epic-text epic-text-event">RAID</div>';
                 
-                // Force GIF to restart from frame 1 instantly using the Blob
                 if (window.epicGifBlobs.raid) {
                     const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
                     gifEl.src = newUrl;
                     gifEl.dataset.blobUrl = newUrl;
                 } else {
-                    // Fallback if Blob failed
-                    gifEl.src = 'images/thigh-five.gif?t=' + Date.now(); 
+                    // Safe fallback
+                    gifEl.src = 'images/thigh-five.gif' + cacheBuster; 
                 }
                 overlay.classList.add('animate-raid');
                 
@@ -3197,14 +3216,13 @@
                     '<div class="epic-text epic-text-super">SUPER</div>' +
                     '<div class="epic-text epic-text-event">TACKLE</div>';
                 
-                // Force GIF to restart from frame 1 instantly using the Blob
                 if (window.epicGifBlobs.tackle) {
                     const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
                     gifEl.src = newUrl;
                     gifEl.dataset.blobUrl = newUrl;
                 } else {
-                    // Fallback if Blob failed
-                    gifEl.src = 'images/super-tackle.gif?t=' + Date.now(); 
+                    // Safe fallback
+                    gifEl.src = 'images/super-tackle.gif' + cacheBuster; 
                 }
                 overlay.classList.add('animate-tackle');
                 
