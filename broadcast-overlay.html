@@ -903,6 +903,11 @@
         }
         .mi-badge-icon img { width: 100%; height: 100%; object-fit: contain; }
         .mi-badge-text { color: #FFF; font-size: 22px; font-weight: 800; letter-spacing: 0.8px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.45); }
+        .mi-badge-tag {
+            margin-left: 8px; padding: 3px 12px; border-radius: 999px;
+            background: linear-gradient(to bottom, #FFD75E, #C99A00);
+            color: #241A00; font-size: 11px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
+        }
 
         .mi-matchup {
             position: relative;
@@ -1103,12 +1108,12 @@
         .mi-overlay.exit .mi-sub-bar { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.24s ease, transform 0.24s ease; }
 
         /* ============================================================
-           TOSS RESULT OVERLAY (Matching Reference Image)
+           TOSS RESULT OVERLAY
            ============================================================ */
         #toss-overlay {
             position: fixed !important;
-            bottom: 150px !important;
-            left: 100px !important;
+            bottom: 120px !important;
+            left: 80px !important;
             z-index: 99999 !important;
             display: flex;
             flex-direction: column;
@@ -1128,61 +1133,52 @@
         }
         
         .toss-row {
-            position: relative;
             display: flex;
             align-items: center;
-            height: 60px;
-            width: max-content;
-            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6EBF3 50%, #C2CBD9 100%);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            gap: 0;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
         }
         
         .toss-tag {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            height: 54px;
             padding: 0 30px;
             font-family: 'Mukta', 'Oswald', sans-serif;
             font-weight: 800;
-            font-size: 24px;
-            letter-spacing: 1.5px;
+            font-size: 18px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             position: relative;
             z-index: 2;
         }
         
         .toss-winner-tag {
-            background: transparent;
-            color: #0E1220;
-            padding-left: 40px;
-            padding-right: 20px;
+            background: #FFFFFF;
+            color: #000;
+            clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+            padding-right: 40px;
         }
         
         .toss-winner-name {
-            background: #FF007A; /* Default, overwritten by JS */
+            background: var(--mi-left-color, #E91E63);
             color: #FFF;
-            clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%);
-            padding-left: 35px;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            padding-left: 40px;
             padding-right: 40px;
             margin-left: -15px;
             z-index: 1;
         }
         
-        .toss-choice-row {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 15px 100%);
-            background: linear-gradient(to bottom, #4A2496 0%, #2A1259 100%);
-            width: max-content;
-            margin-left: 30px; /* Stagger */
-        }
-        
         .toss-choice-tag {
+            background: #4A1C6F;
             color: #FFF;
-            padding-left: 30px;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            padding-left: 40px;
             padding-right: 40px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin-left: -15px;
+            z-index: 0;
         }
         
         .toss-start-soon {
@@ -1190,17 +1186,18 @@
             align-items: center;
             justify-content: center;
             height: 42px;
-            padding: 0 30px;
-            background: #1A1A3A;
+            padding: 0 40px;
+            margin-left: 60px;
+            margin-top: 5px;
+            background: #2D1B4E;
             color: #00FFFF;
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
             font-size: 20px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 15px 100%);
-            margin-left: 60px; /* Further Stagger */
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
         }
     </style>
 </head>
@@ -1433,12 +1430,10 @@
             <div class="toss-tag toss-winner-tag">TOSS WON BY</div>
             <div class="toss-tag toss-winner-name" id="toss-winner-name">TEAM A</div>
         </div>
-        <div class="toss-row toss-choice-row">
+        <div class="toss-row">
             <div class="toss-tag toss-choice-tag" id="toss-choice-text">TEAM B TO RAID FIRST</div>
         </div>
-        <div class="toss-row" style="background: none; box-shadow: none; filter: none; clip-path: none;">
-            <div class="toss-start-soon">MATCH WILL START SOON...</div>
-        </div>
+        <div class="toss-start-soon">MATCH WILL START SOON...</div>
     </div>
 
     <div id="team-stats-overlay" class="fs-overlay">
@@ -3495,29 +3490,27 @@
             const subEl = document.getElementById('mi-sub-bar');
             if (subEl) subEl.textContent = segs.join('   •   ');
             
-            // --- TOSS DATA PROCESSING ---
-            const tossWinner = data.toss_winner || "";
+            // Also update toss data here
+            const tossWinnerName = data.toss_winner || "";
             const tossChoice = data.toss_choice || "";
             
-            let winnerIsLeft = (tossWinner === leftName);
-            let winnerColor = winnerIsLeft ? leftColor : rightColor;
-            let winnerName = tossWinner || leftName; // Fallback if toss not done
-            
-            // If choice is 'Raid', winner raids first. If 'Court', the OTHER team raids first.
-            let raidTeam = winnerName;
-            if (tossChoice.toLowerCase() !== 'raid') {
-                raidTeam = winnerIsLeft ? rightName : leftName;
+            let winnerName = leftName;
+            let winnerColor = leftColor;
+            let raiderName = rightName; // default if toss_choice is Court
+
+            if (tossWinnerName.toLowerCase().includes(rightName.toLowerCase()) || tossWinnerName.toLowerCase().includes("right")) {
+                winnerName = rightName;
+                winnerColor = rightColor;
+                raiderName = leftName;
             }
             
-            const tossWinnerEl = document.getElementById('toss-winner-name');
-            if (tossWinnerEl) {
-                tossWinnerEl.textContent = winnerName.toUpperCase();
-                tossWinnerEl.style.background = winnerColor;
+            if (tossChoice.toLowerCase().includes("raid")) {
+                raiderName = winnerName;
             }
-            const tossChoiceEl = document.getElementById('toss-choice-text');
-            if (tossChoiceEl) {
-                tossChoiceEl.textContent = (raidTeam + ' TO RAID FIRST').toUpperCase();
-            }
+
+            document.getElementById('toss-winner-name').textContent = winnerName.toUpperCase();
+            document.getElementById('toss-winner-name').style.background = winnerColor;
+            document.getElementById('toss-choice-text').textContent = (raiderName + ' TO RAID FIRST').toUpperCase();
         }
 
         function miIsMatchNotStarted(data, state) {
@@ -3592,8 +3585,6 @@
                 preMatchState.active = true;
                 setPreMatchPhase('intro', 20000); // 20 seconds
                 startPreMatchTicker();
-            } else if (preMatchState.phase === 'intro') {
-                miRender(data, state); // Continuously update intro screen data
             }
         }
 
