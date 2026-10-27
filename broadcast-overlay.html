@@ -1112,8 +1112,8 @@
            ============================================================ */
         #toss-overlay {
             position: fixed !important;
-            bottom: 60px !important;
-            left: 60px !important;
+            bottom: 120px !important;
+            left: 80px !important;
             z-index: 99999 !important;
             display: flex;
             flex-direction: column;
@@ -1132,91 +1132,72 @@
             transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, visibility 0s linear 0s;
         }
         
-        .toss-bar {
-            position: relative;
-            height: 74px;
+        .toss-row {
             display: flex;
             align-items: center;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(26, 38, 112, 0.97) 0%, rgba(62, 36, 138, 0.97) 34%, rgba(74, 26, 122, 0.97) 64%, rgba(16, 18, 62, 0.97) 100%);
-            border: 2px solid rgba(130, 205, 255, 0.55);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 40px rgba(90, 40, 210, 0.5);
-            clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+            gap: 0;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
         }
         
-        .toss-bar-1 { width: 650px; }
-        .toss-bar-2 { width: 850px; }
-
-        .toss-label {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 220px;
+        .toss-tag {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(to bottom, #FFFFFF 0%, #E6EBF3 50%, #C2CBD9 100%);
-            clip-path: polygon(0 0, 85% 0, 100% 100%, 0 100%);
-            z-index: 2;
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
+            height: 54px;
+            padding: 0 30px;
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-weight: 800;
             font-size: 18px;
-            letter-spacing: 1.5px;
-            color: #0E1220;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            position: relative;
+            z-index: 2;
         }
         
-        .toss-value {
-            position: relative;
+        .toss-winner-tag {
+            background: #FFFFFF;
+            color: #000;
+            clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+            padding-right: 40px;
+        }
+        
+        .toss-winner-name {
+            background: var(--mi-left-color, #E91E63);
+            color: #FFF;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            padding-left: 40px;
+            padding-right: 40px;
+            margin-left: -15px;
             z-index: 1;
-            margin-left: 220px;
-            flex: 1;
-            height: 100%;
+        }
+        
+        .toss-choice-tag {
+            background: #4A1C6F;
+            color: #FFF;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            padding-left: 40px;
+            padding-right: 40px;
+            margin-left: -15px;
+            z-index: 0;
+        }
+        
+        .toss-start-soon {
             display: flex;
             align-items: center;
-            padding: 0 20px;
-            font-family: 'Mukta', 'Oswald', sans-serif;
-            font-weight: 900;
-            font-size: 32px;
-            letter-spacing: 1px;
-            color: #FFFFFF;
-            text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            white-space: nowrap;
-        }
-        
-        .toss-accent {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 280px;
-            z-index: 0;
-            pointer-events: none;
-            clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%);
-            opacity: 0.8;
-        }
-
-        .toss-bar-2 .toss-label {
-            background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9));
-            color: #74E0FF;
-            border-right: 2px solid rgba(160, 130, 255, 0.65);
-        }
-        .toss-bar-2 .toss-value {
-            font-size: 28px;
-            color: #FFD700;
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            padding-right: 30px;
-        }
-        .toss-bar-2 .toss-subtext {
-            font-size: 16px;
-            color: #FFF;
+            justify-content: center;
+            height: 42px;
+            padding: 0 40px;
+            margin-left: 60px;
+            margin-top: 5px;
+            background: #2D1B4E;
+            color: #00FFFF;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
             letter-spacing: 2px;
-            margin-left: 20px;
-            opacity: 0.8;
+            text-transform: uppercase;
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
         }
     </style>
 </head>
@@ -1445,19 +1426,12 @@
 
     <!-- TOSS RESULT OVERLAY -->
     <div id="toss-overlay">
-        <div class="toss-bar toss-bar-1">
-            <div class="toss-accent" id="toss-accent-1"></div>
-            <div class="toss-label">TOSS WON BY</div>
-            <div class="toss-value" id="toss-winner-name">TEAM A</div>
+        <div class="toss-row">
+            <div class="toss-tag toss-winner-tag">TOSS WON BY</div>
+            <div class="toss-tag toss-winner-name" id="toss-winner-name">TEAM A</div>
+            <div class="toss-tag toss-choice-tag" id="toss-choice-text">TEAM B TO RAID FIRST</div>
         </div>
-        <div class="toss-bar toss-bar-2">
-            <div class="toss-accent" id="toss-accent-2"></div>
-            <div class="toss-label">DECISION</div>
-            <div class="toss-value">
-                <span id="toss-choice-text">TO RAID FIRST</span>
-                <span class="toss-subtext">MATCH WILL START SOON...</span>
-            </div>
-        </div>
+        <div class="toss-start-soon">MATCH WILL START SOON...</div>
     </div>
 
     <div id="team-stats-overlay" class="fs-overlay">
@@ -2339,7 +2313,7 @@
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
-                handlePreMatchFlow(data, state);   // NEW PRE-MATCH FLOW
+                handlePreMatchFlow(data, state);   // PRE-MATCH FLOW
 
             }, (error) => {
                 window.__kabaddiLog('ERR', '❌ DB read PERMISSION ERROR — Auth blocked the read', error);
@@ -3155,7 +3129,9 @@
             const s7 = document.getElementById('starting7-overlay');
             const mi = document.getElementById('match-intro-overlay');
             const toss = document.getElementById('toss-overlay');
-            const isAnyActive = (s7 && s7.classList.contains('show')) || (mi && mi.classList.contains('show')) || (toss && toss.classList.contains('show'));
+            const isAnyActive = (s7 && s7.classList.contains('show')) || 
+                                (mi && mi.classList.contains('show')) || 
+                                (toss && toss.classList.contains('show'));
             if (isAnyActive) {
                 document.body.classList.add('mi-active');
             } else {
@@ -3376,6 +3352,174 @@
         }
 
         // ============================================================
+        // MATCH INTRO (TEAM INTRODUCTION) CONTROLLER
+        // ============================================================
+        function miPickTeamLogoPlayer(rosterJsonStr) {
+            let roster = [];
+            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch (e) { roster = []; }
+            if (!Array.isArray(roster) || roster.length === 0) return null;
+
+            const starters = roster.filter(p => p && p.isStarting7 === true);
+            const pool = starters.length ? starters : roster.filter(Boolean);
+            if (!pool.length) return null;
+
+            const withImage = pool.find(p => p && p.imageUri && String(p.imageUri).trim().length > 0);
+            return withImage || pool[0];
+        }
+
+        function miResolveImage(player) {
+            if (player && player.imageUri) {
+                const s = String(player.imageUri).trim();
+                if (s.startsWith('data:image')) return s;
+                if (/^https?:\/\//i.test(s)) return s;
+            }
+            return DEFAULT_PLAYER_IMG;
+        }
+
+        function miApplyTeamLogo(imgId, rosterJsonStr) {
+            const img = document.getElementById(imgId);
+            if (!img) return;
+
+            const player = miPickTeamLogoPlayer(rosterJsonStr);
+            const src = miResolveImage(player);
+
+            img.onerror = function () {
+                img.onerror = null;
+                if (img.getAttribute('src') !== DEFAULT_PLAYER_IMG) img.src = DEFAULT_PLAYER_IMG;
+            };
+            img.src = src;
+            img.alt = (player && player.name) ? String(player.name) : 'Team logo';
+        }
+
+        function formatMatchDate(dateStr) {
+            if (!dateStr) return '';
+            let d;
+            if (dateStr instanceof Date) {
+                d = dateStr;
+            } else {
+                d = new Date(dateStr);
+            }
+            if (isNaN(d.getTime())) return String(dateStr).toUpperCase();
+
+            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${days[d.getDay()]} ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function formatMatchDateFromTimestamp(ts) {
+            if (!ts) return '';
+            let ms;
+            if (typeof ts === 'number') {
+                ms = ts < 10000000000 ? ts * 1000 : ts;
+            } else {
+                const n = Number(ts);
+                if (!isNaN(n)) {
+                    ms = n < 10000000000 ? n * 1000 : n;
+                } else {
+                    ms = new Date(ts).getTime();
+                }
+            }
+            if (isNaN(ms)) return '';
+            const d = new Date(ms);
+            if (isNaN(d.getTime())) return '';
+            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${days[d.getDay()]} ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function miRender(data, state) {
+            const overlay = document.getElementById('match-intro-overlay');
+            if (!overlay) return;
+
+            const leftName  = String(data.left_name  || 'TEAM A').trim();
+            const rightName = String(data.right_name || 'TEAM B').trim();
+            const leftColor  = data.left_color  || '#009900';
+            const rightColor = data.right_color || '#0055ff';
+
+            overlay.style.setProperty('--mi-left-color', leftColor);
+            overlay.style.setProperty('--mi-right-color', rightColor);
+
+            const lEl = document.getElementById('mi-left-bar-name');
+            const rEl = document.getElementById('mi-right-bar-name');
+            if (lEl) lEl.textContent = leftName.toUpperCase();
+            if (rEl) rEl.textContent = rightName.toUpperCase();
+
+            miApplyTeamLogo('mi-left-logo',  state && state.leftRosterJson);
+            miApplyTeamLogo('mi-right-logo', state && state.rightRosterJson);
+
+            const venue = String(data.match_location || data.venue || data.match_venue || '').trim();
+            const comp  = String(data.match_category || data.match_group || data.match_title || data.tournament || data.tournament_name || '').trim();
+
+            const lastTs = data.last_updated || data.lastUpdated || data.updated_at || data.updatedAt || data.timestamp;
+            let dateFormatted = formatMatchDateFromTimestamp(lastTs);
+            if (!dateFormatted) {
+                const matchDate = data.match_date || data.matchDate || data.date || data.match_datetime || '';
+                dateFormatted = formatMatchDate(matchDate);
+            }
+
+            const segs = [];
+            if (comp) segs.push(comp.toUpperCase());
+            segs.push(venue ? ('LIVE FROM ' + venue.toUpperCase()) : 'LIVE MATCH');
+            segs.push(dateFormatted || 'MATCH DATE TBA');
+
+            const subEl = document.getElementById('mi-sub-bar');
+            if (subEl) subEl.textContent = segs.join('   •   ');
+        }
+
+        function miIsMatchNotStarted(data, state) {
+            if (!data) return false;
+            if (data.match_result) return false;
+            const half = String(data.half_status || '').toLowerCase();
+            if (half.includes('over') || half.includes('full time')) return false;
+
+            const ls = parseInt(data.left_score, 10) || 0;
+            const rs = parseInt(data.right_score, 10) || 0;
+            if (ls > 0 || rs > 0) return false;
+
+            if (state && state.raidTimerRunning === true) return false;
+            const raidClock = parseInt(data.raid_clock, 10);
+            if (!isNaN(raidClock) && raidClock > 0 && raidClock < 30) return false;
+
+            const fullSecs = (parseInt(data.match_duration_mins, 10) || 20) * 60;
+            const remain = parseMainClock(data.main_clock);
+            if (remain >= 0 && remain < fullSecs - 5) return false;
+
+            return true;
+        }
+
+        function showMatchIntro(data, state) {
+            if (matchIntroState.active || matchIntroState.matchStarted) return;
+            const overlay = document.getElementById('match-intro-overlay');
+            if (!overlay) return;
+
+            matchIntroState.active = true;
+            miRender(data, state);
+
+            overlay.classList.remove('exit', 'show');
+            void overlay.offsetWidth;
+            overlay.classList.add('show');
+            updateMainStageVisibility();
+        }
+
+        function hideMatchIntro() {
+            if (!matchIntroState.active) return;
+            matchIntroState.active = false;
+
+            const overlay = document.getElementById('match-intro-overlay');
+            if (!overlay) { document.body.classList.remove('mi-active'); return; }
+
+            overlay.classList.remove('show');
+            overlay.classList.add('exit');
+
+            setTimeout(() => {
+                overlay.classList.remove('exit');
+                updateMainStageVisibility();
+            }, 600);
+        }
+
+        // ============================================================
         // PRE-MATCH FLOW CONTROLLER (INTRO -> TOSS -> INTRO -> TOSS)
         // ============================================================
         function handlePreMatchFlow(data, state) {
@@ -3468,26 +3612,295 @@
             updateMainStageVisibility();
         }
 
-        function miIsMatchNotStarted(data, state) {
-            if (!data) return false;
-            if (data.match_result) return false;
-            const half = String(data.half_status || '').toLowerCase();
-            if (half.includes('over') || half.includes('full time')) return false;
+        // ==========================================
+        // HANDLE OVERLAY SCREENS (Pause/Resume Logic)
+        // ==========================================
+        let matchIntroState = {
+            active: false,
+            matchStarted: false,
+            suspendedForOverlay: false
+        };
 
-            const ls = parseInt(data.left_score, 10) || 0;
-            const rs = parseInt(data.right_score, 10) || 0;
-            if (ls > 0 || rs > 0) return false;
+        function handleOverlayScreens(data, state, leftColor, rightColor) {
+            const screen = (data.overlay_screen || '').trim();
+            const team   = (data.overlay_screen_team || '').trim();
+            const playerId = (data.overlay_screen_player_id || '').trim();
 
-            if (state && state.raidTimerRunning === true) return false;
-            const raidClock = parseInt(data.raid_clock, 10);
-            if (!isNaN(raidClock) && raidClock > 0 && raidClock < 30) return false;
+            if (!screen) {
+                hideAllFsOverlays();
+                lastOverlayScreen = '';
+                lastOverlayTeam = '';
+                lastOverlayPlayerId = '';
+                return;
+            }
 
-            const fullSecs = (parseInt(data.match_duration_mins, 10) || 20) * 60;
-            const remain = parseMainClock(data.main_clock);
-            if (remain >= 0 && remain < fullSecs - 5) return false;
+            const leftName  = data.left_name  || 'TEAM A';
+            const rightName = data.right_name || 'TEAM B';
 
-            return true;
+            if (screen === 'starting7') {
+                const isLeft = (team !== 'right');
+                const actualKey = isLeft ? 'left' : 'right';
+                const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
+                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
+                const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
+                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
+                    renderStarting7(actualName, actualColor, rosterJson);
+                    showFsOverlay('starting7-overlay');
+                    lastOverlayScreen = screen;
+                    lastOverlayTeam = team;
+                }
+                return;
+            }
+            if (screen === 'team_stats') {
+                if (screen !== lastOverlayScreen || !document.getElementById('team-stats-overlay').classList.contains('show')) {
+                    renderTeamStats(data, state, leftName, rightName, leftColor, rightColor);
+                    showFsOverlay('team-stats-overlay');
+                    lastOverlayScreen = screen;
+                } else {
+                    renderTeamStats(data, state, leftName, rightName, leftColor, rightColor);
+                }
+                return;
+            }
+            if (screen === 'player_performance') {
+                const isLeft = (team !== 'right');
+                const actualKey = isLeft ? 'left' : 'right';
+                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
+                const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
+                const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
+                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || playerId !== lastOverlayPlayerId || !document.getElementById('player-perf-overlay').classList.contains('show')) {
+                    renderPlayerPerformance(rosterJson, playerId, actualColor, actualName);
+                    showFsOverlay('player-perf-overlay');
+                    lastOverlayScreen = screen;
+                    lastOverlayTeam = team;
+                    lastOverlayPlayerId = playerId;
+                } else {
+                    renderPlayerPerformance(rosterJson, playerId, actualColor, actualName);
+                }
+                return;
+            }
+            hideAllFsOverlays();
         }
+
+        function showFsOverlay(id) {
+            document.querySelectorAll('.fs-overlay, .mi-overlay:not(#match-intro-overlay)').forEach(el => {
+                if (el.id !== id) el.classList.remove('show');
+            });
+            document.getElementById(id).classList.add('show');
+            updateMainStageVisibility();
+        }
+
+        function hideAllFsOverlays() {
+            document.querySelectorAll('.fs-overlay, .mi-overlay:not(#match-intro-overlay)').forEach(el => {
+                el.classList.remove('show');
+            });
+            const formEl = document.getElementById('s7-formation');
+            if (formEl) formEl.classList.remove('s7-animate-in');
+            updateMainStageVisibility();
+        }
+
+        // ==========================================
+        // RENDER: STARTING 7 (New MI-PANEL layout)
+        // ==========================================
+        function renderStarting7(teamName, teamColor, rosterJsonStr) {
+            const nameEl = document.getElementById('s7-team-name-bar');
+            if (nameEl) nameEl.textContent = (teamName || 'TEAM NAME').toUpperCase();
+
+            const subEl = document.getElementById('s7-sub-bar');
+            if (subEl) subEl.textContent = 'STARTING 7';
+
+            const overlayEl = document.getElementById('starting7-overlay');
+            overlayEl.style.setProperty('--mi-left-color', teamColor);
+            overlayEl.style.setProperty('--mi-right-color', teamColor);
+            overlayEl.style.setProperty('--s7-team-color', teamColor);
+            overlayEl.style.setProperty('--s7-team-color-dark', darkenColor(teamColor, 30));
+
+            let roster = [];
+            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch(e) { roster = []; }
+            const starters = roster.filter(p => p.isStarting7 === true);
+            const slots = document.querySelectorAll('#starting7-overlay .s7-player');
+            slots.forEach(slot => {
+                const pos = slot.getAttribute('data-pos');
+                const player = starters.find(p => (p.positionOnMat || '').toUpperCase() === pos);
+                renderS7PlayerCard(slot, player, pos);
+            });
+
+            // Trigger the cascade animation
+            const formEl = document.getElementById('s7-formation');
+            if (formEl) {
+                formEl.classList.remove('s7-animate-in');
+                void formEl.offsetWidth; // force reflow
+                formEl.classList.add('s7-animate-in');
+            }
+        }
+
+        function renderS7PlayerCard(slotEl, player, positionLabel) {
+            if (!player) {
+                slotEl.innerHTML = `
+                    <div class="s7-avatar"><img src="${DEFAULT_PLAYER_IMG}" alt=""></div>
+                    <div class="s7-name-tag">
+                        <div class="s7-name-top">—</div>
+                        <div class="s7-name-bottom">${escapeHtml(positionLabel || '—')}</div>
+                    </div>`;
+                return;
+            }
+            const jersey = player.jerseyNumber || '';
+            const name = player.name || 'Player';
+            const displayName = jersey ? `${name} (${jersey})` : name;
+            const imgSrc = resolvePlayerImage(player);
+            slotEl.innerHTML = `
+                <div class="s7-avatar"><img src="${imgSrc}" alt=""></div>
+                <div class="s7-name-tag">
+                    <div class="s7-name-top">${escapeHtml(displayName)}</div>
+                    <div class="s7-name-bottom">${escapeHtml(positionLabel)}</div>
+                </div>`;
+        }
+
+        // ==========================================
+        // RENDER: TEAM STATS
+        // ==========================================
+        function renderTeamStats(data, state, leftName, rightName, leftColor, rightColor) {
+            const ls = data.left_score || 0;
+            const rs = data.right_score || 0;
+            document.getElementById('ts-main-score').innerText = `${ls} - ${rs}`;
+            document.getElementById('ts-match-status').innerText = (data.half_status || '1st Half').toUpperCase();
+            document.getElementById('ts-left-team-name').innerText = leftName;
+            document.getElementById('ts-right-team-name').innerText = rightName;
+
+            const lRaid   = parseInt(state?.leftRaidPoints   || 0);
+            const rRaid   = parseInt(state?.rightRaidPoints  || 0);
+            const lTackle = parseInt(state?.leftTacklePoints || 0);
+            const rTackle = parseInt(state?.rightTacklePoints|| 0);
+            const lAO     = parseInt(state?.leftAllOutPoints || 0);
+            const rAO     = parseInt(state?.rightAllOutPoints|| 0);
+            const lExtra  = parseInt(state?.leftExtraPoints  || 0);
+            const rExtra  = parseInt(state?.rightExtraPoints || 0);
+
+            document.getElementById('ts-left-raid').innerText    = lRaid;
+            document.getElementById('ts-right-raid').innerText   = rRaid;
+            document.getElementById('ts-left-tackle').innerText  = lTackle;
+            document.getElementById('ts-right-tackle').innerText = rTackle;
+            document.getElementById('ts-left-allout').innerText  = lAO;
+            document.getElementById('ts-right-allout').innerText = rAO;
+            document.getElementById('ts-left-extra').innerText   = lExtra;
+            document.getElementById('ts-right-extra').innerText  = rExtra;
+
+            document.querySelectorAll('#team-stats-overlay .ts-cell-left').forEach(el => { el.style.background = leftColor; });
+            document.querySelectorAll('#team-stats-overlay .ts-cell-right').forEach(el => { el.style.background = rightColor; });
+
+            const lStat = data['team_stats_left_full']  || {};
+            const rStat = data['team_stats_right_full'] || {};
+            const lRaidRate   = parseFloat(lStat.raidStrikeRate)   || 0;
+            const rRaidRate   = parseFloat(rStat.raidStrikeRate)   || 0;
+            const lTackleRate = parseFloat(lStat.tackleStrikeRate) || 0;
+            const rTackleRate = parseFloat(rStat.tackleStrikeRate) || 0;
+
+            setPieRing('ts-left-raid-pie',   'ts-left-raid-val',   lRaidRate,   leftColor);
+            setPieRing('ts-left-tackle-pie', 'ts-left-tackle-val', lTackleRate, leftColor);
+            setPieRing('ts-right-raid-pie',  'ts-right-raid-val',  rRaidRate,   rightColor);
+            setPieRing('ts-right-tackle-pie','ts-right-tackle-val',rTackleRate, rightColor);
+        }
+
+        function setPieRing(ringId, valueId, percent, color) {
+            const ring = document.getElementById(ringId);
+            const val  = document.getElementById(valueId);
+            const p = Math.max(0, Math.min(100, percent));
+            const deg = (p / 100) * 360;
+            ring.style.setProperty('--pie-deg', deg + 'deg');
+            if (color) ring.style.setProperty('--pie-color', color);
+            val.innerText = Math.floor(p) + '%';
+        }
+
+        // ==========================================
+        // RENDER: PLAYER PERFORMANCE
+        // ==========================================
+        function renderPlayerPerformance(rosterJsonStr, playerId, teamColor, teamName) {
+            const overlayEl = document.getElementById('player-perf-overlay');
+            overlayEl.style.setProperty('--pp-team-color', teamColor || '#8E24AA');
+            overlayEl.style.setProperty('--pp-team-color-dark', darkenColor(teamColor || '#8E24AA', 55));
+            ppSetText('pp-team-label', (teamName || 'TEAM').toUpperCase());
+
+            let roster = [];
+            try {
+                const parsed = JSON.parse(rosterJsonStr || '[]');
+                roster = Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                window.__kabaddiLog('WARN', 'Player performance roster JSON parse error', e);
+                roster = [];
+            }
+            const player = roster.find(p => p && String(p.id) === String(playerId)) || null;
+
+            if (!player) {
+                ppResetPerformance(teamName);
+                return;
+            }
+
+            const jersey = player.jerseyNumber !== undefined && player.jerseyNumber !== null ? String(player.jerseyNumber).trim() : '';
+            const displayName = jersey ? `${player.name || 'Player'} (${jersey})` : (player.name || 'Player');
+            ppRenderAvatar(player);
+            ppSetText('pp-name-badge', displayName.toUpperCase());
+            ppSetText('pp-position-badge', String(player.positionOnMat || (player.isStarting7 === true ? 'STARTING 7' : 'SUBSTITUTE')).toUpperCase());
+
+            const raidPts = ppNumber(player.raidPoints);
+            const bonusPts = ppNumber(player.bonusPoints);
+            const tacklePts = ppNumber(player.tacklePoints);
+            const totalPts = raidPts + tacklePts;
+            const touchPts = Math.max(0, raidPts - bonusPts);
+
+            const succRaids = ppNumber(player.successfulRaids);
+            const unsuccRaids = ppNumber(player.unsuccessfulRaids);
+            const emptyRaids = ppNumber(player.emptyRaids);
+            const totalRaids = ppNumber(player.totalRaids) || (succRaids + unsuccRaids + emptyRaids);
+            const succTack = ppNumber(player.successfulTackles);
+            const unsuccTack = ppNumber(player.unsuccessfulTackles);
+            const superTack = ppNumber(player.superTackles);
+            const totalTack = ppNumber(player.totalTackles) || (succTack + unsuccTack);
+
+            ppSetText('pp-total-points', totalPts);
+            ppSetText('pp-raid-points', raidPts);
+            ppSetText('pp-touch-points', touchPts);
+            ppSetText('pp-bonus-points', bonusPts);
+            ppSetText('pp-tackle-points', tacklePts);
+            ppSetText('pp-total-raids', totalRaids);
+            ppSetText('pp-total-tackles', totalTack);
+            ppSetText('pp-raid-success', succRaids);
+            ppSetText('pp-raid-unsuccess', unsuccRaids);
+            ppSetText('pp-raid-empty', emptyRaids);
+            ppSetText('pp-tackle-success', succTack);
+            ppSetText('pp-tackle-unsuccess', unsuccTack);
+            ppSetText('pp-tackle-super', superTack);
+            ppSetText('pp-on-mat', formatOnMatTime(player.onMatSeconds || 0));
+
+            ppSetDonut('pp-raid-success-ring', succRaids, totalRaids);
+            ppSetDonut('pp-raid-unsuccess-ring', unsuccRaids, totalRaids);
+            ppSetDonut('pp-raid-empty-ring', emptyRaids, totalRaids);
+            ppSetDonut('pp-tackle-success-ring', succTack, totalTack);
+            ppSetDonut('pp-tackle-unsuccess-ring', unsuccTack, totalTack);
+            ppSetDonut('pp-tackle-super-ring', superTack, totalTack);
+
+            const raidStrike = totalRaids > 0 ? Math.floor((succRaids / totalRaids) * 100) : 0;
+            const tackleStrike = totalTack > 0 ? Math.floor((succTack / totalTack) * 100) : 0;
+            ppSetText('pp-raid-rate', raidStrike + '%');
+            ppSetText('pp-tackle-rate', tackleStrike + '%');
+            document.getElementById('pp-raid-ring').style.setProperty('--pie-deg', ((raidStrike / 100) * 360) + 'deg');
+            document.getElementById('pp-tackle-ring').style.setProperty('--pie-deg', ((tackleStrike / 100) * 360) + 'deg');
+
+            ppRenderSequence('pp-raid-sequence', ppParseRaidSequence(player), 'raid');
+
+            const tackleSequence = [];
+            for (let i = 0; i < Math.max(0, succTack - superTack); i++) tackleSequence.push('S');
+            for (let i = 0; i < superTack; i++) tackleSequence.push('ST');
+            for (let i = 0; i < unsuccTack; i++) tackleSequence.push('U');
+            ppRenderSequence('pp-tackle-sequence', tackleSequence, 'tackle');
+        }
+
+        // ============================================================
+        // MATCH INTRO (TEAM INTRODUCTION) CONTROLLER
+        // ============================================================
+        let matchIntroState = {
+            active: false,
+            matchStarted: false,
+            suspendedForOverlay: false
+        };
 
         function miPickTeamLogoPlayer(rosterJsonStr) {
             let roster = [];
