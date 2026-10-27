@@ -1163,11 +1163,14 @@
         
         .toss-accent-color {
             position: absolute;
-            left: 0;
             top: 0;
             bottom: 0;
-            width: 50px;
-            background: #E91E63; /* Dynamically colored via JS */
+            left: 0;
+            width: 280px;
+            z-index: 1;
+            pointer-events: none;
+            clip-path: polygon(0 0, 46% 0, 100% 100%, 0 100%);
+            /* The gradient background is set dynamically via JS */
         }
 
         .toss-choice-box {
@@ -1792,9 +1795,9 @@
                 otherTeamName = leftName;
             }
 
-            // Fill the accent block with solid team color
+            // Fill the accent block with gradient matching match intro style
             if (accentLeftEl) {
-                accentLeftEl.style.background = winnerColor;
+                accentLeftEl.style.background = `linear-gradient(90deg, ${winnerColor} 0%, rgba(255, 255, 255, 0) 78%)`;
             }
 
             // Set Text
