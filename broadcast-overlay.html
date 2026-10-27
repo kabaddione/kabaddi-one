@@ -1113,7 +1113,7 @@
            ============================================================ */
         .toss-overlay {
             position: fixed;
-            bottom: 180px; /* Positions it above the main scoreboard area */
+            bottom: 180px; 
             left: 0;
             z-index: 9998;
             display: flex;
@@ -1122,65 +1122,102 @@
             pointer-events: none;
             overflow: hidden;
             width: 100%;
-            padding-left: 140px; /* Offset from left edge */
+            padding-left: 140px; 
         }
-
-        .toss-overlay.show {
-            visibility: visible;
-        }
-
+        .toss-overlay.show { visibility: visible; }
+        
         .toss-container {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
             gap: 0px;
             transform: translateX(-150%);
             opacity: 0;
             transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
             will-change: transform, opacity;
         }
-
-        .toss-overlay.show .toss-container {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
+        .toss-overlay.show .toss-container { transform: translateX(0); opacity: 1; }
         .toss-overlay.exit .toss-container {
-            transform: translateX(-150%);
-            opacity: 0;
+            transform: translateX(-150%); opacity: 0;
             transition: transform 0.65s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.4s ease;
         }
 
-        .toss-main-bar {
-            width: 1100px;
+        .toss-main-bar-wrapper {
+            display: flex;
+            align-items: stretch;
             height: 70px;
-            border-radius: 4px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            /* Overriding background to match toss-screen.webp exactly */
-            background: linear-gradient(to right, #FFFFFF 45%, #2A0D5C 45.1%); 
-            opacity: 1 !important; transform: none !important; transition: none !important;
-            clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); /* Applies shadow around the custom shapes */
         }
-
-        .toss-sub-bar {
+        
+        /* Auto-sizing box using fixed pixel polygon so slant angles are perfectly parallel */
+        .toss-winner-box {
             position: relative;
-            z-index: 1;
-            width: 700px;
-            height: 50px;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            padding-left: 80px;
-            margin-top: -5px; /* Slight overlap */
-            margin-left: 20px;
+            background: #FFFFFF;
+            padding: 0 45px 0 60px; /* Auto handles text padding */
+            clip-path: polygon(25px 0px, 100% 0px, calc(100% - 25px) 100%, 0px 100%);
+            margin-right: -15px; /* Slide under the right box slightly */
+            z-index: 2;
+        }
+        
+        .toss-accent-color {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 50px;
+            background: #E91E63; /* Dynamically colored via JS */
+        }
+
+        .toss-choice-box {
+            display: flex;
+            align-items: center;
             background: linear-gradient(to right, #3F2382, #1A0B42);
-            color: #74E0FF;
+            padding: 0 50px 0 45px; 
+            clip-path: polygon(25px 0px, 100% 0px, calc(100% - 25px) 100%, 0px 100%);
+            z-index: 1;
+        }
+
+        .toss-sub-bar-wrapper {
+            margin-top: -5px; /* Pull up to snap together perfectly */
+            margin-left: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            z-index: 3;
+        }
+        
+        .toss-sub-bar {
+            display: inline-flex; 
+            align-items: center;
+            height: 50px;
+            padding: 0 40px;
+            background: linear-gradient(90deg, rgb(255, 243, 163) 0%, rgb(212, 175, 55) 40%, rgb(170, 119, 0) 60%, rgb(255, 215, 0) 100%);
+            color: #000000;
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
             font-size: 22px;
             letter-spacing: 2px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            clip-path: polygon(18px 0px, 100% 0px, calc(100% - 18px) 100%, 0px 100%);
+        }
+
+        .toss-text-dark {
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-weight: 900;
+            font-size: 34px;
+            letter-spacing: 1.5px;
+            color: #000000;
+            position: relative;
+            z-index: 2;
+            white-space: nowrap;
+        }
+        
+        .toss-text-light {
+            font-family: 'Mukta', 'Oswald', sans-serif;
+            font-weight: 900;
+            font-size: 34px;
+            letter-spacing: 1.5px;
+            color: #FFFFFF;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -1633,15 +1670,20 @@
     <div id="toss-result-overlay" class="toss-overlay">
         <div class="toss-container">
             <!-- Main Bar -->
-            <div class="mi-name-bar toss-main-bar" id="toss-main-bar">
-                <div class="mi-bar-accent left" id="toss-accent-left"></div>
-                <div class="mi-name-half toss-winner-text" id="toss-winner-text" style="color: #000; justify-content: flex-start; padding-left: 40px;">TOSS WON BY TEAM A</div>
-                <div class="mi-bar-divider" style="background: transparent; box-shadow: none; border-left: 2px solid rgba(0,0,0,0.1);"></div>
-                <div class="mi-name-half toss-choice-text" id="toss-choice-text" style="color: #FFF;">TEAM B TO RAID FIRST</div>
+            <div class="toss-main-bar-wrapper">
+                <div class="toss-winner-box" id="toss-winner-box">
+                    <div class="toss-accent-color" id="toss-accent-left"></div>
+                    <span id="toss-winner-text" class="toss-text-dark">TOSS WON BY PATNA PIRATES</span>
+                </div>
+                <div class="toss-choice-box" id="toss-choice-box">
+                    <span id="toss-choice-text" class="toss-text-light">BENGAL WARRIORS TO RAID FIRST</span>
+                </div>
             </div>
             <!-- Bottom Sub Bar -->
-            <div class="toss-sub-bar">
-                MATCH WILL START SOON...
+            <div class="toss-sub-bar-wrapper">
+                <div class="toss-sub-bar">
+                    MATCH WILL START SOON...
+                </div>
             </div>
         </div>
     </div>
@@ -1750,9 +1792,9 @@
                 otherTeamName = leftName;
             }
 
-            // Style the left accent gradient
+            // Fill the accent block with solid team color
             if (accentLeftEl) {
-                accentLeftEl.style.background = `linear-gradient(90deg, ${winnerColor} 0%, rgba(255, 255, 255, 0) 90%)`;
+                accentLeftEl.style.background = winnerColor;
             }
 
             // Set Text
@@ -1760,8 +1802,6 @@
                 winnerTextEl.innerText = tossWinner ? `TOSS WON BY ${tossWinner}` : 'TOSS RESULT PENDING';
             }
 
-            // Logic to determine action: If choice is COURT, the OTHER team raids first. 
-            // If choice is RAID, the WINNING team raids first.
             if (choiceTextEl) {
                 if (!tossChoice) {
                     choiceTextEl.innerText = 'DECISION PENDING...';
@@ -3227,7 +3267,12 @@
         function updateMainStageVisibility() {
             const s7 = document.getElementById('starting7-overlay');
             const mi = document.getElementById('match-intro-overlay');
-            const isAnyActive = (s7 && s7.classList.contains('show')) || (mi && mi.classList.contains('show'));
+            const toss = document.getElementById('toss-result-overlay'); // Added Toss check
+            
+            const isAnyActive = (s7 && s7.classList.contains('show')) || 
+                                (mi && mi.classList.contains('show')) ||
+                                (toss && toss.classList.contains('show'));
+                                
             if (isAnyActive) {
                 document.body.classList.add('mi-active');
             } else {
