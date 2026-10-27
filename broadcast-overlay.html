@@ -1429,6 +1429,8 @@
         <div class="toss-row">
             <div class="toss-tag toss-winner-tag">TOSS WON BY</div>
             <div class="toss-tag toss-winner-name" id="toss-winner-name">TEAM A</div>
+        </div>
+        <div class="toss-row">
             <div class="toss-tag toss-choice-tag" id="toss-choice-text">TEAM B TO RAID FIRST</div>
         </div>
         <div class="toss-start-soon">MATCH WILL START SOON...</div>
@@ -1728,6 +1730,12 @@
             remainingTime: 0,
             lastTick: 0,
             timerId: null
+        };
+
+        let matchIntroState = {
+            active: false,
+            matchStarted: false,
+            suspendedForOverlay: false
         };
 
         // ==========================================
@@ -3153,6 +3161,21 @@
             });
             const formEl = document.getElementById('s7-formation');
             if (formEl) formEl.classList.remove('s7-animate-in');
+
+            // If pre-match is active, bring back the correct pre-match overlay
+            if (preMatchState.active) {
+                if (preMatchState.phase === 'intro') {
+                    const mi = document.getElementById('match-intro-overlay');
+                    if (mi) {
+                        mi.classList.remove('exit', 'show');
+                        void mi.offsetWidth;
+                        mi.classList.add('show');
+                    }
+                } else if (preMatchState.phase === 'toss') {
+                    document.getElementById('toss-overlay').classList.add('show');
+                }
+            }
+            
             updateMainStageVisibility();
         }
 
@@ -3466,6 +3489,23 @@
 
             const subEl = document.getElementById('mi-sub-bar');
             if (subEl) subEl.textContent = segs.join('   •   ');
+            
+            // Also update toss data here
+            const tossWinnerIsLeft = data.tossWinnerIsLeft !== false;
+            const tossChoiceIsRaid = data.tossChoiceIsRaid !== false;
+            const winnerName = tossWinnerIsLeft ? leftName : rightName;
+            const winnerColor = tossWinnerIsLeft ? leftColor : rightColor;
+            
+            document.getElementById('toss-winner-name').textContent = winnerName.toUpperCase();
+            document.getElementById('toss-winner-name').style.background = winnerColor;
+            
+            let raiderName;
+            if (tossChoiceIsRaid) {
+                raiderName = winnerName;
+            } else {
+                raiderName = tossWinnerIsLeft ? rightName : leftName;
+            }
+            document.getElementById('toss-choice-text').textContent = (raiderName + ' TO RAID FIRST').toUpperCase();
         }
 
         function miIsMatchNotStarted(data, state) {
@@ -3612,73 +3652,18 @@
             updateMainStageVisibility();
         }
 
-        // ==========================================
-        // HANDLE OVERLAY SCREENS (Pause/Resume Logic)
-        // ==========================================
-        let matchIntroState = {
-            active: false,
-            matchStarted: false,
-            suspendedForOverlay: false
-        };
-
-        function handleOverlayScreens(data, state, leftColor, rightColor) {
-            const screen = (data.overlay_screen || '').trim();
-            const team   = (data.overlay_screen_team || '').trim();
-            const playerId = (data.overlay_screen_player_id || '').trim();
-
-            if (!screen) {
-                hideAllFsOverlays();
-                lastOverlayScreen = '';
-                lastOverlayTeam = '';
-                lastOverlayPlayerId = '';
-                return;
+        function updateMainStageVisibility() {
+            const s7 = document.getElementById('starting7-overlay');
+            const mi = document.getElementById('match-intro-overlay');
+            const toss = document.getElementById('toss-overlay');
+            const isAnyActive = (s7 && s7.classList.contains('show')) || 
+                                (mi && mi.classList.contains('show')) || 
+                                (toss && toss.classList.contains('show'));
+            if (isAnyActive) {
+                document.body.classList.add('mi-active');
+            } else {
+                document.body.classList.remove('mi-active');
             }
-
-            const leftName  = data.left_name  || 'TEAM A';
-            const rightName = data.right_name || 'TEAM B';
-
-            if (screen === 'starting7') {
-                const isLeft = (team !== 'right');
-                const actualKey = isLeft ? 'left' : 'right';
-                const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
-                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
-                const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
-                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
-                    renderStarting7(actualName, actualColor, rosterJson);
-                    showFsOverlay('starting7-overlay');
-                    lastOverlayScreen = screen;
-                    lastOverlayTeam = team;
-                }
-                return;
-            }
-            if (screen === 'team_stats') {
-                if (screen !== lastOverlayScreen || !document.getElementById('team-stats-overlay').classList.contains('show')) {
-                    renderTeamStats(data, state, leftName, rightName, leftColor, rightColor);
-                    showFsOverlay('team-stats-overlay');
-                    lastOverlayScreen = screen;
-                } else {
-                    renderTeamStats(data, state, leftName, rightName, leftColor, rightColor);
-                }
-                return;
-            }
-            if (screen === 'player_performance') {
-                const isLeft = (team !== 'right');
-                const actualKey = isLeft ? 'left' : 'right';
-                const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
-                const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
-                const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
-                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || playerId !== lastOverlayPlayerId || !document.getElementById('player-perf-overlay').classList.contains('show')) {
-                    renderPlayerPerformance(rosterJson, playerId, actualColor, actualName);
-                    showFsOverlay('player-perf-overlay');
-                    lastOverlayScreen = screen;
-                    lastOverlayTeam = team;
-                    lastOverlayPlayerId = playerId;
-                } else {
-                    renderPlayerPerformance(rosterJson, playerId, actualColor, actualName);
-                }
-                return;
-            }
-            hideAllFsOverlays();
         }
 
         function showFsOverlay(id) {
@@ -3695,6 +3680,21 @@
             });
             const formEl = document.getElementById('s7-formation');
             if (formEl) formEl.classList.remove('s7-animate-in');
+
+            // If pre-match is active, bring back the correct pre-match overlay
+            if (preMatchState.active) {
+                if (preMatchState.phase === 'intro') {
+                    const mi = document.getElementById('match-intro-overlay');
+                    if (mi) {
+                        mi.classList.remove('exit', 'show');
+                        void mi.offsetWidth;
+                        mi.classList.add('show');
+                    }
+                } else if (preMatchState.phase === 'toss') {
+                    document.getElementById('toss-overlay').classList.add('show');
+                }
+            }
+            
             updateMainStageVisibility();
         }
 
@@ -3891,143 +3891,6 @@
             for (let i = 0; i < superTack; i++) tackleSequence.push('ST');
             for (let i = 0; i < unsuccTack; i++) tackleSequence.push('U');
             ppRenderSequence('pp-tackle-sequence', tackleSequence, 'tackle');
-        }
-
-        // ============================================================
-        // MATCH INTRO (TEAM INTRODUCTION) CONTROLLER
-        // ============================================================
-        let matchIntroState = {
-            active: false,
-            matchStarted: false,
-            suspendedForOverlay: false
-        };
-
-        function miPickTeamLogoPlayer(rosterJsonStr) {
-            let roster = [];
-            try { roster = JSON.parse(rosterJsonStr || '[]'); } catch (e) { roster = []; }
-            if (!Array.isArray(roster) || roster.length === 0) return null;
-
-            const starters = roster.filter(p => p && p.isStarting7 === true);
-            const pool = starters.length ? starters : roster.filter(Boolean);
-            if (!pool.length) return null;
-
-            const withImage = pool.find(p => p && p.imageUri && String(p.imageUri).trim().length > 0);
-            return withImage || pool[0];
-        }
-
-        function miResolveImage(player) {
-            if (player && player.imageUri) {
-                const s = String(player.imageUri).trim();
-                if (s.startsWith('data:image')) return s;
-                if (/^https?:\/\//i.test(s)) return s;
-            }
-            return DEFAULT_PLAYER_IMG;
-        }
-
-        function miApplyTeamLogo(imgId, rosterJsonStr) {
-            const img = document.getElementById(imgId);
-            if (!img) return;
-
-            const player = miPickTeamLogoPlayer(rosterJsonStr);
-            const src = miResolveImage(player);
-
-            img.onerror = function () {
-                img.onerror = null;
-                if (img.getAttribute('src') !== DEFAULT_PLAYER_IMG) img.src = DEFAULT_PLAYER_IMG;
-            };
-            img.src = src;
-            img.alt = (player && player.name) ? String(player.name) : 'Team logo';
-        }
-
-        function formatMatchDate(dateStr) {
-            if (!dateStr) return '';
-            let d;
-            if (dateStr instanceof Date) {
-                d = dateStr;
-            } else {
-                d = new Date(dateStr);
-            }
-            if (isNaN(d.getTime())) return String(dateStr).toUpperCase();
-
-            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${days[d.getDay()]} ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
-        }
-
-        function formatMatchDateFromTimestamp(ts) {
-            if (!ts) return '';
-            let ms;
-            if (typeof ts === 'number') {
-                ms = ts < 10000000000 ? ts * 1000 : ts;
-            } else {
-                const n = Number(ts);
-                if (!isNaN(n)) {
-                    ms = n < 10000000000 ? n * 1000 : n;
-                } else {
-                    ms = new Date(ts).getTime();
-                }
-            }
-            if (isNaN(ms)) return '';
-            const d = new Date(ms);
-            if (isNaN(d.getTime())) return '';
-            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${days[d.getDay()]} ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
-        }
-
-        function miRender(data, state) {
-            const overlay = document.getElementById('match-intro-overlay');
-            if (!overlay) return;
-
-            const leftName  = String(data.left_name  || 'TEAM A').trim();
-            const rightName = String(data.right_name || 'TEAM B').trim();
-            const leftColor  = data.left_color  || '#009900';
-            const rightColor = data.right_color || '#0055ff';
-
-            overlay.style.setProperty('--mi-left-color', leftColor);
-            overlay.style.setProperty('--mi-right-color', rightColor);
-
-            const lEl = document.getElementById('mi-left-bar-name');
-            const rEl = document.getElementById('mi-right-bar-name');
-            if (lEl) lEl.textContent = leftName.toUpperCase();
-            if (rEl) rEl.textContent = rightName.toUpperCase();
-
-            miApplyTeamLogo('mi-left-logo',  state && state.leftRosterJson);
-            miApplyTeamLogo('mi-right-logo', state && state.rightRosterJson);
-
-            const venue = String(data.match_location || data.venue || data.match_venue || '').trim();
-            const comp  = String(data.match_category || data.match_group || data.match_title || data.tournament || data.tournament_name || '').trim();
-
-            const lastTs = data.last_updated || data.lastUpdated || data.updated_at || data.updatedAt || data.timestamp;
-            let dateFormatted = formatMatchDateFromTimestamp(lastTs);
-            if (!dateFormatted) {
-                const matchDate = data.match_date || data.matchDate || data.date || data.match_datetime || '';
-                dateFormatted = formatMatchDate(matchDate);
-            }
-
-            const segs = [];
-            if (comp) segs.push(comp.toUpperCase());
-            segs.push(venue ? ('LIVE FROM ' + venue.toUpperCase()) : 'LIVE MATCH');
-            segs.push(dateFormatted || 'MATCH DATE TBA');
-
-            const subEl = document.getElementById('mi-sub-bar');
-            if (subEl) subEl.textContent = segs.join('   •   ');
-            
-            // Also update toss data here
-            const tossWinnerIsLeft = data.tossWinnerIsLeft !== false;
-            const tossChoiceIsRaid = data.tossChoiceIsRaid !== false;
-            const winnerName = tossWinnerIsLeft ? leftName : rightName;
-            const winnerColor = tossWinnerIsLeft ? leftColor : rightColor;
-            const choiceText = tossChoiceIsRaid ? 'TO RAID FIRST' : 'TO DEFEND FIRST';
-            
-            document.getElementById('toss-winner-name').textContent = winnerName.toUpperCase();
-            document.getElementById('toss-choice-text').textContent = (winnerName + ' ' + choiceText).toUpperCase();
-            
-            // Apply accent colors
-            document.getElementById('toss-accent-1').style.background = `linear-gradient(90deg, transparent 0%, ${winnerColor} 100%)`;
-            document.getElementById('toss-accent-2').style.background = `linear-gradient(90deg, transparent 0%, ${winnerColor} 100%)`;
         }
     </script>
 </body>
