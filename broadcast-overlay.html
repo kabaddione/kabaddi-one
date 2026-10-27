@@ -1864,8 +1864,9 @@
             overlay.classList.remove('exit', 'show');
             void overlay.offsetWidth;
             overlay.classList.add('show');
-            // Hide the main stage so the Toss Banner stands out, identical to Match Intro behavior
-            document.body.classList.add('mi-active');
+            
+            // Let the unified function handle the main scoreboard visibility safely
+            updateMainStageVisibility();
         }
 
         function hideTossScreen() {
@@ -1873,10 +1874,9 @@
             if (!overlay || !overlay.classList.contains('show')) return;
             overlay.classList.remove('show');
             overlay.classList.add('exit');
-            // Only un-hide the main stage if match intro isn't about to pop up
-            if (preMatchCycle.currentState !== 'intro') {
-                document.body.classList.remove('mi-active');
-            }
+            
+            // Safely check if any other screen (like Starting 7) is open before showing the scoreboard
+            updateMainStageVisibility(); 
         }
 
         
