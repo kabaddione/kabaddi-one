@@ -730,7 +730,8 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-        .raid-event-popup.l5-active {
+        .raid-event-popup.l5-active,
+        .raid-event-popup.dod-active {
             translate: 0 -55px;
         }
 
@@ -770,6 +771,7 @@
             flex: 1;
             position: relative;
             overflow: hidden;
+            background: rgba(0,0,0,0.5);
         }
         .rep-marquee-content {
             position: absolute;
@@ -2060,6 +2062,18 @@
                 msg = 'If 3 or less defenders remain on the mat, a super tackle gives the team 2 points.';
             }
 
+            // Check if DO-OR-DIE banners are active
+            const leftEmpty = parseInt(state.leftEmptyRaids) || 0;
+            const rightEmpty = parseInt(state.rightEmptyRaids) || 0;
+            const leftDOD = raidActive && isLeftRaid && leftEmpty >= 2;
+            const rightDOD = raidActive && !isLeftRaid && rightEmpty >= 2;
+
+            if (leftDOD || rightDOD) {
+                popup.classList.add('dod-active');
+            } else {
+                popup.classList.remove('dod-active');
+            }
+
             if (!type) {
                 if (popup.classList.contains('show')) {
                     popup.classList.remove('show');
@@ -2077,7 +2091,7 @@
             }
 
             if (marqueeEl.dataset.state !== newStateKey) {
-                marqueeEl.innerText = msg + '      •      ' + msg + '      •      ' + msg + '      •      ';
+                marqueeEl.innerText = msg + '      •      ';
                 marqueeEl.dataset.state = newStateKey;
                 needsRestart = true;
             }
@@ -2997,11 +3011,23 @@
             hideAllFsOverlays();
         }
 
+        function updateMainStageVisibility() {
+            const s7 = document.getElementById('starting7-overlay');
+            const mi = document.getElementById('match-intro-overlay');
+            const isAnyActive = (s7 && s7.classList.contains('show')) || (mi && mi.classList.contains('show'));
+            if (isAnyActive) {
+                document.body.classList.add('mi-active');
+            } else {
+                document.body.classList.remove('mi-active');
+            }
+        }
+
         function showFsOverlay(id) {
             document.querySelectorAll('.fs-overlay, .mi-overlay:not(#match-intro-overlay)').forEach(el => {
                 if (el.id !== id) el.classList.remove('show');
             });
             document.getElementById(id).classList.add('show');
+            updateMainStageVisibility();
         }
 
         function hideAllFsOverlays() {
@@ -3010,6 +3036,7 @@
             });
             const formEl = document.getElementById('s7-formation');
             if (formEl) formEl.classList.remove('s7-animate-in');
+            updateMainStageVisibility();
         }
 
         // ==========================================
@@ -3362,7 +3389,7 @@
             overlay.classList.remove('exit', 'show');
             void overlay.offsetWidth;
             overlay.classList.add('show');
-            document.body.classList.add('mi-active');
+            updateMainStageVisibility();
         }
 
         function hideMatchIntro() {
@@ -3377,7 +3404,7 @@
 
             setTimeout(() => {
                 overlay.classList.remove('exit');
-                document.body.classList.remove('mi-active');
+                updateMainStageVisibility();
             }, 600);
         }
 
