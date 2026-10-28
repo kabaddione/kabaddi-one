@@ -1284,9 +1284,32 @@
             color: #FFFFFF;
             white-space: nowrap;
         }
+
+        /* ============================================================
+           PERMANENT CHANNEL LOGO
+           ============================================================ */
+        .channel-logo-container {
+            position: fixed;
+            top: 45px;
+            right: 50px;
+            width: 160px; /* Adjust this width as needed */
+            z-index: 100000; /* Stays above all other overlays */
+            pointer-events: none;
+        }
+        .channel-logo-container img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.65));
+        }
     </style>
 </head>
 <body>
+
+    <!-- Permanent Top Right Channel Logo -->
+    <div class="channel-logo-container">
+        <img src="images/top-channel-logo.webp" alt="Channel Logo">
+    </div>
 
     <div class="broadcast-stage">
 
@@ -3210,12 +3233,17 @@
             epicAnimationTimeoutIds.forEach(id => clearTimeout(id));
             epicAnimationTimeoutIds = [];
             epicIsPlaying = true;
-            document.body.classList.add('epic-active');
+            
+            // REMOVED: document.body.classList.add('epic-active'); from here 
+            // so we don't accidentally hide the scoreboard for everything!
 
             if (eventType === 'all_out') {
                 // =====================================
                 // OLD STYLE: ALL OUT (3D Zoom)
                 // =====================================
+                // ONLY hide main scoreboard for ALL OUT
+                document.body.classList.add('epic-active'); 
+
                 const overlay = document.getElementById('epic-overlay-allout');
                 const superText = document.getElementById('epic-super-text');
                 const eventText = document.getElementById('epic-event-text');
@@ -3243,6 +3271,8 @@
                 epicAnimationTimeoutIds.push(setTimeout(() => {
                     overlay.classList.remove('visible', 'exit');
                     epicIsPlaying = false;
+                    
+                    // Bring the scoreboard back after ALL OUT
                     document.body.classList.remove('epic-active');
                     
                     if (window.pendingLeftScore !== undefined) {
@@ -3261,94 +3291,90 @@
                 // =====================================
                 // NEW STYLE: SUPER RAID & TACKLE (GIFs)
                 // =====================================
+                // Notice we DO NOT hide the scoreboard here! It stays perfectly visible underneath.
+                
                 const overlay = document.getElementById('epic-overlay');
-    const textWrap = document.getElementById('epic-text-wrap');
-    const gifEl = document.getElementById('epic-gif');
-    const particlesContainer = document.getElementById('epic-particles');
-    if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
+                const textWrap = document.getElementById('epic-text-wrap');
+                const gifEl = document.getElementById('epic-gif');
+                const particlesContainer = document.getElementById('epic-particles');
+                if (!overlay || !textWrap || !gifEl || !particlesContainer) return;
 
-    if (gifEl.dataset.blobUrl) {
-        URL.revokeObjectURL(gifEl.dataset.blobUrl);
-        gifEl.dataset.blobUrl = '';
-    }
+                if (gifEl.dataset.blobUrl) {
+                    URL.revokeObjectURL(gifEl.dataset.blobUrl);
+                    gifEl.dataset.blobUrl = '';
+                }
 
-    overlay.className = 'epic-overlay';
-    overlay.style.transform = '';
-    textWrap.innerHTML = '';
-    gifEl.src = '';
-    gifEl.style.display = '';
-    gifEl.className = 'epic-gif';
-    particlesContainer.innerHTML = '';
+                overlay.className = 'epic-overlay';
+                overlay.style.transform = '';
+                textWrap.innerHTML = '';
+                gifEl.src = '';
+                gifEl.style.display = '';
+                gifEl.className = 'epic-gif';
+                particlesContainer.innerHTML = '';
 
-    const isLocal = window.location.protocol === 'file:';
-    const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
+                const isLocal = window.location.protocol === 'file:';
+                const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
 
-    if (eventType === 'super_raid') {
-        textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">RAID</div>';
-        overlay.classList.add('animate-raid');
-    } else if (eventType === 'super_tackle') {
-        textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">TACKLE</div>';
-        overlay.classList.add('animate-tackle');
-    }
+                if (eventType === 'super_raid') {
+                    textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">RAID</div>';
+                    overlay.classList.add('animate-raid');
+                } else if (eventType === 'super_tackle') {
+                    textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">TACKLE</div>';
+                    overlay.classList.add('animate-tackle');
+                }
 
-    overlay.classList.add('visible');
-    createEpicParticles(particlesContainer);
+                overlay.classList.add('visible');
+                createEpicParticles(particlesContainer);
 
-    // ⬇️ KEY FIX: Don't set gifEl.src yet. Wait until just before the
-    //     gifPopInCenter animation (1.3s delay) reveals the GIF.
-    //     This makes the GIF start from frame 1 instead of already being
-    //     1.3 seconds into its playback.
-    epicAnimationTimeoutIds.push(setTimeout(() => {
-        if (!epicIsPlaying) return;
-        if (eventType === 'super_raid') {
-            if (window.epicGifBlobs.raid) {
-                const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
-                gifEl.src = newUrl;
-                gifEl.dataset.blobUrl = newUrl;
-            } else {
-                gifEl.src = 'images/thigh-five.gif' + cacheBuster;
-            }
-        } else if (eventType === 'super_tackle') {
-            if (window.epicGifBlobs.tackle) {
-                const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
-                gifEl.src = newUrl;
-                gifEl.dataset.blobUrl = newUrl;
-            } else {
-                gifEl.src = 'images/super-tackle.gif' + cacheBuster;
-            }
-        }
-    }, 1250)); // matches the CSS 1.3s animation-delay (50ms decode buffer)
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    if (!epicIsPlaying) return;
+                    if (eventType === 'super_raid') {
+                        if (window.epicGifBlobs.raid) {
+                            const newUrl = URL.createObjectURL(window.epicGifBlobs.raid);
+                            gifEl.src = newUrl;
+                            gifEl.dataset.blobUrl = newUrl;
+                        } else {
+                            gifEl.src = 'images/thigh-five.gif' + cacheBuster;
+                        }
+                    } else if (eventType === 'super_tackle') {
+                        if (window.epicGifBlobs.tackle) {
+                            const newUrl = URL.createObjectURL(window.epicGifBlobs.tackle);
+                            gifEl.src = newUrl;
+                            gifEl.dataset.blobUrl = newUrl;
+                        } else {
+                            gifEl.src = 'images/super-tackle.gif' + cacheBuster;
+                        }
+                    }
+                }, 1250)); 
 
-    epicAnimationTimeoutIds.push(setTimeout(() => {
-        overlay.classList.add('slide-down');
-    }, 4000));
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    overlay.classList.add('slide-down');
+                }, 4000));
 
-    epicAnimationTimeoutIds.push(setTimeout(() => {
-        overlay.classList.remove('visible', 'slide-down', 'animate-raid', 'animate-tackle');
-        overlay.style.transform = '';
-        document.body.classList.remove('epic-active');
-        particlesContainer.innerHTML = '';
-        epicIsPlaying = false;
+                epicAnimationTimeoutIds.push(setTimeout(() => {
+                    overlay.classList.remove('visible', 'slide-down', 'animate-raid', 'animate-tackle');
+                    overlay.style.transform = '';
+                    particlesContainer.innerHTML = '';
+                    epicIsPlaying = false;
+                    
+                    if (gifEl.dataset.blobUrl) {
+                        URL.revokeObjectURL(gifEl.dataset.blobUrl);
+                        gifEl.dataset.blobUrl = '';
+                    }
 
-        if (gifEl.dataset.blobUrl) {
-            URL.revokeObjectURL(gifEl.dataset.blobUrl);
-            gifEl.dataset.blobUrl = '';
-        }
-
-        if (window.pendingLeftScore !== undefined) {
-            updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
-            previousLeftScore = window.pendingLeftScore;
-            window.pendingLeftScore = undefined;
-        }
-        if (window.pendingRightScore !== undefined) {
-            updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
-            previousRightScore = window.pendingRightScore;
-            window.pendingRightScore = undefined;
-        }
-    }, 4500));
+                    if (window.pendingLeftScore !== undefined) {
+                        updateScoreWithAnimation('left-score', window.pendingLeftScore, previousLeftScore);
+                        previousLeftScore = window.pendingLeftScore;
+                        window.pendingLeftScore = undefined;
+                    }
+                    if (window.pendingRightScore !== undefined) {
+                        updateScoreWithAnimation('right-score', window.pendingRightScore, previousRightScore);
+                        previousRightScore = window.pendingRightScore;
+                        window.pendingRightScore = undefined;
+                    }
+                }, 4500));
             }
         }
-
         // ==========================================
         // REMOTE-CONTROLLED OVERLAY SCREENS
         // ==========================================
