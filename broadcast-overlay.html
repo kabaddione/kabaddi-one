@@ -576,18 +576,26 @@
            ============================================================ */
         .epic-overlay-allout { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; visibility: hidden; pointer-events: none; overflow: hidden; }
         .epic-overlay-allout.visible { visibility: visible; }
-        .epic-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; opacity: 1; z-index: 1; }
-        .epic-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%); z-index: 2; opacity: 1; }
-        .epic-main-container { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform: scale(1); opacity: 1; will-change: transform, opacity; }
-        .epic-text { font-family: 'Teko', sans-serif; font-weight: 700; line-height: 0.9; letter-spacing: 12px; text-align: center; text-transform: uppercase; background: linear-gradient(to bottom, #FFFFFF 0%, #ABABAB 50%, #FFFFFF 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
-        .epic-text-super { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
-        .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; }
-        .epic-overlay-allout.entry .epic-bg { animation: epicBgFadeIn 0.5s ease-out forwards; }
-        .epic-overlay-allout.entry .epic-vignette { animation: epicBgFadeIn 0.5s ease-out forwards; }
+        .epic-overlay-allout .epic-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; opacity: 1; z-index: 1; }
+        .epic-overlay-allout .epic-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%); z-index: 2; opacity: 1; }
+        
+        .epic-overlay-allout .epic-main-container { 
+            position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            gap: 10px; transform: scale(1); opacity: 1; 
+            transform-origin: center center; /* Forces zoom from exact center */
+            will-change: transform, opacity; 
+        }
+        
+        .epic-overlay-allout .epic-text { font-family: 'Teko', sans-serif; font-weight: 700; line-height: 0.9; text-align: center; text-transform: uppercase; background: linear-gradient(to bottom, #FFFFFF 0%, #ABABAB 50%, #FFFFFF 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
+        
+        /* Negative margin-right exactly matches letter-spacing to fix off-center visual weight */
+        .epic-overlay-allout .epic-text-super { font-size: 110px; letter-spacing: 18px; font-weight: 900; margin-right: -18px; }
+        .epic-overlay-allout .epic-text-event { font-size: 200px; letter-spacing: 20px; font-weight: 900; margin-right: -20px; }
+        
+        .epic-overlay-allout.entry .epic-bg, .epic-overlay-allout.entry .epic-vignette { animation: epicBgFadeIn 0.5s ease-out forwards; }
         .epic-overlay-allout.entry .epic-main-container { animation: epicContainerEntry 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .epic-overlay-allout.hold .epic-main-container { animation: epicHold 2.5s linear forwards; }
-        .epic-overlay-allout.exit .epic-bg { animation: epicBgFadeOut 0.6s ease forwards; }
-        .epic-overlay-allout.exit .epic-vignette { animation: epicBgFadeOut 0.6s ease forwards; }
+        .epic-overlay-allout.exit .epic-bg, .epic-overlay-allout.exit .epic-vignette { animation: epicBgFadeOut 0.6s ease forwards; }
         .epic-overlay-allout.exit .epic-main-container { animation: epicContainerExit 0.6s cubic-bezier(0.5, 0, 0.7, 1.5) forwards; }
         @keyframes epicBgFadeIn  { from{opacity:0} to{opacity:1} }
         @keyframes epicBgFadeOut { from{opacity:1} to{opacity:0} }
@@ -1492,15 +1500,15 @@
         </div>
     </div>
 
-    <!-- REDESIGNED EPIC OVERLAY (SUPER RAID / SUPER TACKLE) -->
+    <!-- NEW STYLE EPIC OVERLAY (SUPER RAID / SUPER TACKLE GIFS) -->
     <div id="epic-overlay" class="epic-overlay">
-        <div class="epic-mat"></div>
+        <!-- Backgrounds removed here so main scoreboard stays visible -->
         <div class="epic-particles" id="epic-particles"></div>
         <div class="epic-text-wrap" id="epic-text-wrap"></div>
         <img id="epic-gif" class="epic-gif" src="" alt="">
     </div>
 
-    <!-- OLD STYLE EPIC OVERLAY (ALL OUT ONLY) -->
+    <!-- OLD STYLE EPIC OVERLAY (ALL OUT 3D ZOOM) -->
     <div id="epic-overlay-allout" class="epic-overlay-allout">
         <div class="epic-bg"></div>
         <div class="epic-vignette"></div>
@@ -2461,24 +2469,35 @@
         // ENGINE
         // ==========================================
         function startBroadcastEngine() {
-            if (!matchId) {
-                window.__kabaddiLog('ERR', '❌ No ?match= parameter in URL');
-                document.getElementById('left-name').innerText = "NO MATCH ID";
-                document.getElementById('right-name').innerText = "LINK URL ERROR";
-            } else {
-                document.getElementById('match-id').innerText = matchId.toUpperCase();
-                window.__kabaddiLog('OK', '✅ Calling initBroadcastEngine("' + matchId + '")');
-                initBroadcastEngine(matchId);
+            const urlParams = new URLSearchParams(window.location.search);
+            const matchId = urlParams.get('match');
+            const matchCode = urlParams.get('code'); // Security code parameter
+
+            // If match ID or security code is missing, redirect immediately
+            if (!matchId || !matchCode) {
+                window.top.location.href = "https://kabaddione.com/matches.html";
+                return;
             }
+
+            document.getElementById('match-id').innerText = matchId.toUpperCase();
+            initBroadcastEngine(matchId, matchCode);
         }
 
-        function initBroadcastEngine(id) {
+        function initBroadcastEngine(id, matchCode) {
             const matchRef = db.ref('live_matches/' + id);
 
             matchRef.on('value', (snapshot) => {
                 const data = snapshot.val();
+                
+                // If match was deleted or doesn't exist in the database, redirect
                 if (!data) {
-                    window.__kabaddiLog('WARN', 'Snapshot has NO data for match: ' + id);
+                    window.top.location.href = "https://kabaddione.com/matches.html";
+                    return;
+                }
+
+                // If your database has a 'security_code' field, strictly enforce it
+                if (data.security_code && String(data.security_code).trim() !== matchCode.trim()) {
+                    window.top.location.href = "https://kabaddione.com/matches.html";
                     return;
                 }
 
