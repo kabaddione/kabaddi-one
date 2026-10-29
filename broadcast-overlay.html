@@ -1965,7 +1965,7 @@ let lastRemoteTossData = null;
             document.addEventListener(evt, unlockRaidAudio, { passive: true })
         );
 
-        function syncRaidAudio(raidActive, clockValue) {
+        function syncRaidAudio(isTicking, clockValue) {
             const audioEl = window.raidClockAudio;
             if (!audioEl) return;
 
@@ -1975,31 +1975,35 @@ let lastRemoteTossData = null;
             // Calculate EXACT audio position based on 30s countdown
             const targetTime = 30 - cv; 
 
-            // Strictly enforce volume every tick to prevent 100% blasts
+            // Aggressively enforce volume to prevent OBS 100% bug
             audioEl.volume = 0.5;
 
-            if (!raidActive) {
+            if (!isTicking || cv >= 30 || cv <= 0) {
                 // ── CLOCK PAUSED OR RESET ──
                 if (!audioEl.paused) {
                     try { audioEl.pause(); } catch(e) {}
                 }
                 
-                // If clock is reset to 30 or reaches 0, rewind ready for next raid
+                // If it reached the ends, rewind completely
                 if (cv >= 30 || cv <= 0) {
                     try { audioEl.currentTime = 0; } catch(e) {}
+                } else {
+                    // It is paused in the middle of a raid. 
+                    // Keep playhead exactly at the target time so resume is instant.
+                    if (Math.abs(audioEl.currentTime - targetTime) > 0.2) {
+                        try { audioEl.currentTime = targetTime; } catch(e) {}
+                    }
                 }
             } else {
                 // ── CLOCK ACTIVE & TICKING ──
-                
-                // Drift Correction: If the audio position doesn't match the Firebase clock
-                // (e.g., jumping from paused state, or network lag), snap it exactly to target.
-                // We use a 0.8s tolerance so it doesn't stutter on micro-delays.
+                // Drift Correction: If audio is out of sync, snap it to the exact time.
                 if (Math.abs(audioEl.currentTime - targetTime) > 0.8) {
                     try { audioEl.currentTime = Math.max(0, targetTime); } catch(e) {}
                 }
 
-                if (audioEl.paused && cv < 30 && cv > 0) {
+                if (audioEl.paused) {
                     try {
+                        audioEl.volume = 0.5; // Double enforce volume right before playback
                         const p = audioEl.play();
                         if (p !== undefined) {
                             p.catch(e => window.__kabaddiLog('WARN', 'Raid audio blocked', e));
@@ -3114,7 +3118,9 @@ function handleRemoteToss(data) {
 
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
-            syncRaidAudio(raidActive, displayTime);   // 🔊 sync the raid-countdown sound
+            
+            // 🔊 Strict sync using ONLY the actual running state of the timer
+            syncRaidAudio(state.raidTimerRunning === true, displayTime);
 
             updateRaidClockVisual(raidActive);
 
