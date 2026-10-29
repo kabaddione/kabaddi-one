@@ -1930,129 +1930,83 @@ let remoteTossConfirmTimer = null;
 let remoteTossSavedCycle = null;
 let lastRemoteTossData = null;
 
-                        // ── Raid Clock Audio (kabaddi-30.mp3) ──
-        // Re-use the object that was already created + buffered in <head>,
-        // so the file is fully loaded long before the first raid begins.
-        const raidClockAudio = window.raidClockAudio || new Audio('kabaddi-30.mp3');
-        raidClockAudio.volume  = 0.5;         // 50% volume only
-        raidClockAudio.preload = 'auto';
-        raidClockAudio.loop    = false;
-        let raidAudioIsPlaying = false;
-                // Memory of the last clock value we saw — used to decide
-        // "fresh start (0:00)" vs "resume from pause (same position)".
-        let lastRaidClockValue = null;
-
-        // ── One-time audio unlock (needed by every browser until a gesture happens) ──
-        // OBS users should ALSO launch OBS with --autoplay-policy=no-user-gesture-required
-        // (see the setup notes at the end). This handler is a safety net.
+        // ============================================================
+        // 🔊 RAID CLOCK AUDIO SYNC (Strict Mathematical Sync)
+        // ============================================================
+        // Re-use the global object to prevent duplicate 100% volume overlapping
+        window.raidClockAudio = window.raidClockAudio || new Audio('kabaddi-30.mp3');
+        window.raidClockAudio.volume  = 0.5;
+        window.raidClockAudio.preload = 'auto';
+        window.raidClockAudio.loop    = false;
+        
         let raidAudioUnlocked = false;
+        
+        // Unlock audio context safely
         async function unlockRaidAudio() {
             if (raidAudioUnlocked) return;
             try {
-                const prevVol = raidClockAudio.volume;
-                raidClockAudio.muted  = true;
-                raidClockAudio.volume = 0;
-                const p = raidClockAudio.play();
+                window.raidClockAudio.muted = true;
+                const p = window.raidClockAudio.play();
                 if (p && p.then) await p;
-                raidClockAudio.pause();
-                raidClockAudio.currentTime = 0;
-                raidClockAudio.muted  = false;
-                raidClockAudio.volume = prevVol;
+                window.raidClockAudio.pause();
+                window.raidClockAudio.currentTime = 0;
+                window.raidClockAudio.muted = false;
+                window.raidClockAudio.volume = 0.5; // Strictly set 50%
                 raidAudioUnlocked = true;
                 window.__kabaddiLog('OK', '🔊 Raid audio unlocked');
             } catch (e) {
-                raidClockAudio.muted  = false;
-                raidClockAudio.volume = 0.5;
+                window.raidClockAudio.muted = false;
+                window.raidClockAudio.volume = 0.5;
             }
         }
-        // Attempt immediately (works in OBS with the launch flag) …
+        
         setTimeout(unlockRaidAudio, 800);
-        // … and on any user interaction as a fallback for regular browser tabs.
         ['click','keydown','touchstart','pointerdown'].forEach(evt =>
             document.addEventListener(evt, unlockRaidAudio, { passive: true })
         );
 
-                // ============================================================
-        // 🔊 RAID CLOCK AUDIO SYNC (kabaddi-30.mp3, exactly 30s)
-        // ------------------------------------------------------------
-        // States:
-        //   • Clock back to 30 or 0      → RESET  (rewind, paused, do NOT play)
-        //   • raidActive true, 1st tick  → PLAY FROM 0   (fresh raid)
-        //   • raidActive true, resuming  → PLAY FROM LAST position (continue)
-        //   • raidActive false, 1..29    → PAUSE at current position (freeze)
-        // Never plays twice in the same raid; resets quietly.
-        // ============================================================
         function syncRaidAudio(raidActive, clockValue) {
+            const audioEl = window.raidClockAudio;
+            if (!audioEl) return;
+
+            // Ensure valid clock value, default to 30
             const cv = (typeof clockValue === 'number' && !isNaN(clockValue)) ? clockValue : 30;
+            
+            // Calculate EXACT audio position based on 30s countdown
+            const targetTime = 30 - cv; 
 
-            // ────────────────────────────────────────────────────
-            // A) RESET — clock at 0 (raid just ended) or at 30 (idle)
-            //    Rewind the file but keep it silent until next raid.
-            // ────────────────────────────────────────────────────
-            if (cv === 0 || (!raidActive && cv === 30)) {
-                if (!raidClockAudio.paused) {
-                    try { raidClockAudio.pause(); } catch (e) {}
+            // Strictly enforce volume every tick to prevent 100% blasts
+            audioEl.volume = 0.5;
+
+            if (!raidActive) {
+                // ── CLOCK PAUSED OR RESET ──
+                if (!audioEl.paused) {
+                    try { audioEl.pause(); } catch(e) {}
                 }
-                if (raidClockAudio.currentTime !== 0) {
-                    try { raidClockAudio.currentTime = 0; } catch (e) {}
+                
+                // If clock is reset to 30 or reaches 0, rewind ready for next raid
+                if (cv >= 30 || cv <= 0) {
+                    try { audioEl.currentTime = 0; } catch(e) {}
                 }
-                raidAudioIsPlaying = false;
-                lastRaidClockValue = cv;
-                return;
-            }
+            } else {
+                // ── CLOCK ACTIVE & TICKING ──
+                
+                // Drift Correction: If the audio position doesn't match the Firebase clock
+                // (e.g., jumping from paused state, or network lag), snap it exactly to target.
+                // We use a 0.8s tolerance so it doesn't stutter on micro-delays.
+                if (Math.abs(audioEl.currentTime - targetTime) > 0.8) {
+                    try { audioEl.currentTime = Math.max(0, targetTime); } catch(e) {}
+                }
 
-            // ────────────────────────────────────────────────────
-            // B) PLAY / RESUME — raid is ticking
-            // ────────────────────────────────────────────────────
-            if (raidActive) {
-                if (!raidAudioIsPlaying) {
-                    // Fresh start OR resume?
-                    // Fresh start when: no previous value, or previous clock was
-                    // near-full (>= 29) / was 0, or the CURRENT clock is near-full
-                    // (indicates the app just reset to 30 and started immediately).
-                    const isFreshStart = (
-                        lastRaidClockValue === null ||
-                        isNaN(lastRaidClockValue) ||
-                        lastRaidClockValue >= 29 ||
-                        lastRaidClockValue === 0 ||
-                        cv >= 29
-                    );
-
-                    if (isFreshStart) {
-                        try { raidClockAudio.currentTime = 0; } catch (e) {}
-                    }
-                    // else: keep currentTime → resumes exactly where it paused
-
-                    raidClockAudio.muted  = false;
-                    raidClockAudio.volume = 0.5;
-                    raidAudioIsPlaying = true;
-
+                if (audioEl.paused && cv < 30 && cv > 0) {
                     try {
-                        const p = raidClockAudio.play();
-                        if (p && typeof p.catch === 'function') {
-                            p.catch(e => {
-                                window.__kabaddiLog('WARN', 'Raid audio play blocked', e);
-                                raidAudioIsPlaying = false;
-                            });
+                        const p = audioEl.play();
+                        if (p !== undefined) {
+                            p.catch(e => window.__kabaddiLog('WARN', 'Raid audio blocked', e));
                         }
-                    } catch (e) {
-                        raidAudioIsPlaying = false;
-                        window.__kabaddiLog('WARN', 'Raid audio play error', e);
-                    }
+                    } catch(e) {}
                 }
             }
-            // ────────────────────────────────────────────────────
-            // C) PAUSE — raid not ticking but clock 1..29 (paused mid-raid)
-            //    Freeze here. Do NOT reset currentTime.
-            // ────────────────────────────────────────────────────
-            else {
-                if (raidAudioIsPlaying) {
-                    try { raidClockAudio.pause(); } catch (e) {}
-                    raidAudioIsPlaying = false;
-                }
-            }
-
-            lastRaidClockValue = cv;
         }
 
         let lastL5TriggerBucket = 0;
