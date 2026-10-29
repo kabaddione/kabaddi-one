@@ -32,7 +32,7 @@
     <link rel="preload" as="image" href="images/starting7-mat.png">
     <script>
         // Global object to hold GIF data in memory
-        window.epicGifBlobs = { raid: null, tackle: null };
+        window.epicGifBlobs = { raid: null, tackle: null, coin: null };
 
         // Robust blob loader that works on web AND local OBS file systems (bypasses fetch CORS)
         function loadLocalBlob(url) {
@@ -53,21 +53,53 @@
             });
         }
 
-        (async function preloadEpicAssets() {
-            // Standard image preload for static assets
-            ['images/raid-mat.png', 'images/tackle-mat.png', '/images/kabaddione_bg.jpg', 'images/starting7-mat.png'].forEach(function (src) {
+                (async function preloadEpicAssets() {
+            // ─────────────────────────────────────────────────────
+            // 1) PRELOAD ALL STATIC IMAGES USED ANYWHERE IN THE PAGE
+            // ─────────────────────────────────────────────────────
+            [
+                'images/raid-mat.png',
+                'images/tackle-mat.png',
+                '/images/kabaddione_bg.jpg',
+                'images/starting7-mat.png',
+                'images/starting7-mat.webp',
+                '/images/kabaddione_logo.png',
+                '/images/ic_splash_logo1.png',
+                '/images/performance_bg.jpg',
+                '/images/player_profile_starting.png',
+                'images/top-channel-logo.webp',
+                'images/coin-animation.gif'      // fallback for non-blob path
+            ].forEach(function (src) {
                 var img = new Image();
                 img.src = src;
             });
 
-            // Preload GIFs as Blobs via robust XHR
+            // ─────────────────────────────────────────────────────
+            // 2) PRELOAD ALL GIFs AS BLOBS (works on web AND OBS file://)
+            // ─────────────────────────────────────────────────────
             try {
-                window.epicGifBlobs.raid = await loadLocalBlob('images/thigh-five.gif');
-                window.epicGifBlobs.tackle = await loadLocalBlob('images/super-tackle.gif');
+                const results = await Promise.allSettled([
+                    loadLocalBlob('images/thigh-five.gif'),
+                    loadLocalBlob('images/super-tackle.gif'),
+                    loadLocalBlob('images/coin-animation.gif')
+                ]);
+                if (results[0].status === 'fulfilled') window.epicGifBlobs.raid   = results[0].value;
+                if (results[1].status === 'fulfilled') window.epicGifBlobs.tackle = results[1].value;
+                if (results[2].status === 'fulfilled') window.epicGifBlobs.coin   = results[2].value;
             } catch (err) {
                 window.__kabaddiLog('WARN', 'Failed to preload GIFs as Blobs', err);
             }
         })();
+
+        // ─────────────────────────────────────────────────────
+        // 3) PRELOAD RAID CLOCK AUDIO (kabaddi-30.mp3)
+        //    Created here so the browser starts buffering immediately.
+        // ─────────────────────────────────────────────────────
+        window.raidClockAudio = new Audio('kabaddi-30.mp3');
+        window.raidClockAudio.volume  = 0.5;      // 50% volume only
+        window.raidClockAudio.preload = 'auto';
+        window.raidClockAudio.loop    = false;
+        try { window.raidClockAudio.load(); } catch (e) {}
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
@@ -1898,21 +1930,55 @@ let remoteTossConfirmTimer = null;
 let remoteTossSavedCycle = null;
 let lastRemoteTossData = null;
 
-                // ── Raid Clock Audio (kabaddi-30.mp3) ──
-        const raidClockAudio = new Audio('kabaddi-30.mp3');
-        raidClockAudio.volume = 0.5;          // 50% volume only
+                        // ── Raid Clock Audio (kabaddi-30.mp3) ──
+        // Re-use the object that was already created + buffered in <head>,
+        // so the file is fully loaded long before the first raid begins.
+        const raidClockAudio = window.raidClockAudio || new Audio('kabaddi-30.mp3');
+        raidClockAudio.volume  = 0.5;         // 50% volume only
         raidClockAudio.preload = 'auto';
-        raidClockAudio.loop = false;
+        raidClockAudio.loop    = false;
         let raidAudioIsPlaying = false;
+
+        // ── One-time audio unlock (needed by every browser until a gesture happens) ──
+        // OBS users should ALSO launch OBS with --autoplay-policy=no-user-gesture-required
+        // (see the setup notes at the end). This handler is a safety net.
+        let raidAudioUnlocked = false;
+        async function unlockRaidAudio() {
+            if (raidAudioUnlocked) return;
+            try {
+                const prevVol = raidClockAudio.volume;
+                raidClockAudio.muted  = true;
+                raidClockAudio.volume = 0;
+                const p = raidClockAudio.play();
+                if (p && p.then) await p;
+                raidClockAudio.pause();
+                raidClockAudio.currentTime = 0;
+                raidClockAudio.muted  = false;
+                raidClockAudio.volume = prevVol;
+                raidAudioUnlocked = true;
+                window.__kabaddiLog('OK', '🔊 Raid audio unlocked');
+            } catch (e) {
+                raidClockAudio.muted  = false;
+                raidClockAudio.volume = 0.5;
+            }
+        }
+        // Attempt immediately (works in OBS with the launch flag) …
+        setTimeout(unlockRaidAudio, 800);
+        // … and on any user interaction as a fallback for regular browser tabs.
+        ['click','keydown','touchstart','pointerdown'].forEach(evt =>
+            document.addEventListener(evt, unlockRaidAudio, { passive: true })
+        );
 
         function syncRaidAudio(raidActive) {
             // Raid just STARTED → reset to 0 and play from the top
             if (raidActive && !raidAudioIsPlaying) {
                 try {
                     raidClockAudio.currentTime = 0;
+                    raidClockAudio.muted  = false;
+                    raidClockAudio.volume = 0.5;
                     const p = raidClockAudio.play();
                     if (p && typeof p.catch === 'function') {
-                        p.catch(e => window.__kabaddiLog('WARN', 'Raid audio play failed', e));
+                        p.catch(e => window.__kabaddiLog('WARN', 'Raid audio play blocked', e));
                     }
                 } catch (e) {
                     window.__kabaddiLog('WARN', 'Raid audio error', e);
@@ -2092,8 +2158,18 @@ function updateTossScreenContent(data, mode) {
     // No toss data
     if (winnerBox) winnerBox.classList.add('hidden');
 
-    if (mode === 'remote-confirmed') {
-        if (coinGif)    coinGif.classList.add('show');
+       if (mode === 'remote-confirmed') {
+        if (coinGif) {
+            // Swap to the preloaded blob URL once, so the first show is instant
+            if (window.epicGifBlobs && window.epicGifBlobs.coin && !coinGif.dataset.blobReady) {
+                if (coinGif.dataset.blobUrl) URL.revokeObjectURL(coinGif.dataset.blobUrl);
+                const blobUrl = URL.createObjectURL(window.epicGifBlobs.coin);
+                coinGif.dataset.blobUrl = blobUrl;
+                coinGif.dataset.blobReady = '1';
+                coinGif.src = blobUrl;
+            }
+            coinGif.classList.add('show');
+        }
         if (choiceText) choiceText.innerText = 'TOSS TIME NOW';
         if (subText)    subText.innerText    = 'TOSS IS HAPPENING RIGHT NOW';
     } else {
