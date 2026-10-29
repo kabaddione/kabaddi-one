@@ -91,15 +91,7 @@
             }
         })();
 
-        // ─────────────────────────────────────────────────────
-        // 3) PRELOAD RAID CLOCK AUDIO (kabaddi-30.mp3)
-        //    Created here so the browser starts buffering immediately.
-        // ─────────────────────────────────────────────────────
-        window.raidClockAudio = new Audio('kabaddi-30.mp3');
-        window.raidClockAudio.volume  = 0.5;      // 50% volume only
-        window.raidClockAudio.preload = 'auto';
-        window.raidClockAudio.loop    = false;
-        try { window.raidClockAudio.load(); } catch (e) {}
+        
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
@@ -1381,6 +1373,12 @@
 </head>
 <body>
 
+    <body>
+    <!-- NATIVE DOM AUDIO FOR OBS COMPATIBILITY -->
+    <audio id="raid-audio-player" src="kabaddi-30.mp3" preload="auto" loop="false"></audio>
+
+    <!-- Permanent Top Right Channel Logo -->
+
     <!-- Permanent Top Right Channel Logo -->
     <div class="channel-logo-container">
         <img src="images/top-channel-logo.webp" alt="Channel Logo">
@@ -1931,32 +1929,29 @@ let remoteTossSavedCycle = null;
 let lastRemoteTossData = null;
 
         // ============================================================
-        // 🔊 RAID CLOCK AUDIO SYNC (Strict Mathematical Sync)
+        // 🔊 RAID CLOCK AUDIO SYNC (OBS DOM-OPTIMIZED)
         // ============================================================
-        // Re-use the global object to prevent duplicate 100% volume overlapping
-        window.raidClockAudio = window.raidClockAudio || new Audio('kabaddi-30.mp3');
-        window.raidClockAudio.volume  = 0.5;
-        window.raidClockAudio.preload = 'auto';
-        window.raidClockAudio.loop    = false;
-        
         let raidAudioUnlocked = false;
-        
-        // Unlock audio context safely
+
+        // Safely unlock the DOM audio element
         async function unlockRaidAudio() {
             if (raidAudioUnlocked) return;
+            const audioEl = document.getElementById('raid-audio-player');
+            if (!audioEl) return;
+            
             try {
-                window.raidClockAudio.muted = true;
-                const p = window.raidClockAudio.play();
+                audioEl.muted = true;
+                const p = audioEl.play();
                 if (p && p.then) await p;
-                window.raidClockAudio.pause();
-                window.raidClockAudio.currentTime = 0;
-                window.raidClockAudio.muted = false;
-                window.raidClockAudio.volume = 0.5; // Strictly set 50%
+                audioEl.pause();
+                audioEl.currentTime = 0;
+                audioEl.muted = false;
+                audioEl.volume = 0.5; // Strictly enforce 50% volume here
                 raidAudioUnlocked = true;
-                window.__kabaddiLog('OK', '🔊 Raid audio unlocked');
+                window.__kabaddiLog('OK', '🔊 Raid DOM audio unlocked');
             } catch (e) {
-                window.raidClockAudio.muted = false;
-                window.raidClockAudio.volume = 0.5;
+                audioEl.muted = false;
+                audioEl.volume = 0.5;
             }
         }
         
@@ -1966,49 +1961,53 @@ let lastRemoteTossData = null;
         );
 
         function syncRaidAudio(isTicking, clockValue) {
-            const audioEl = window.raidClockAudio;
+            const audioEl = document.getElementById('raid-audio-player');
             if (!audioEl) return;
 
             // Ensure valid clock value, default to 30
             const cv = (typeof clockValue === 'number' && !isNaN(clockValue)) ? clockValue : 30;
             
-            // Calculate EXACT audio position based on 30s countdown
+            // Calculate exactly where the audio SHOULD be (e.g., Clock is 23, Audio should be at 7s)
             const targetTime = 30 - cv; 
 
-            // Aggressively enforce volume to prevent OBS 100% bug
+            // Hardcode volume to 50% natively to prevent OBS blasts
             audioEl.volume = 0.5;
 
-            if (!isTicking || cv >= 30 || cv <= 0) {
-                // ── CLOCK PAUSED OR RESET ──
+            // CONDITION 1: Clock is Reset or Finished (30 or 0)
+            if (cv >= 30 || cv <= 0) {
+                if (!audioEl.paused) audioEl.pause();
+                if (audioEl.currentTime !== 0) audioEl.currentTime = 0; // Rewind silently
+                return;
+            }
+
+            // CONDITION 2: Raid is Active, but PAUSED
+            if (!isTicking) {
                 if (!audioEl.paused) {
-                    try { audioEl.pause(); } catch(e) {}
+                    audioEl.pause();
                 }
-                
-                // If it reached the ends, rewind completely
-                if (cv >= 30 || cv <= 0) {
-                    try { audioEl.currentTime = 0; } catch(e) {}
-                } else {
-                    // It is paused in the middle of a raid. 
-                    // Keep playhead exactly at the target time so resume is instant.
-                    if (Math.abs(audioEl.currentTime - targetTime) > 0.2) {
-                        try { audioEl.currentTime = targetTime; } catch(e) {}
-                    }
+                // While paused, secretly snap the audio to the exact target time 
+                // so when you hit resume, it starts from the perfect spot.
+                if (Math.abs(audioEl.currentTime - targetTime) > 0.5) {
+                    audioEl.currentTime = targetTime;
                 }
-            } else {
-                // ── CLOCK ACTIVE & TICKING ──
-                // Drift Correction: If audio is out of sync, snap it to the exact time.
-                if (Math.abs(audioEl.currentTime - targetTime) > 0.8) {
-                    try { audioEl.currentTime = Math.max(0, targetTime); } catch(e) {}
+                return;
+            }
+
+            // CONDITION 3: Raid is Active AND TICKING
+            if (isTicking) {
+                // DRIFT CORRECTION: Only force the time if it's off by more than 1.5 seconds.
+                // If we do this too aggressively (like your last code), OBS panics and loops/stutters.
+                if (Math.abs(audioEl.currentTime - targetTime) > 1.5) {
+                    audioEl.currentTime = Math.max(0, targetTime);
                 }
 
+                // Play the audio if it isn't playing already
                 if (audioEl.paused) {
-                    try {
-                        audioEl.volume = 0.5; // Double enforce volume right before playback
-                        const p = audioEl.play();
-                        if (p !== undefined) {
-                            p.catch(e => window.__kabaddiLog('WARN', 'Raid audio blocked', e));
-                        }
-                    } catch(e) {}
+                    audioEl.volume = 0.5;
+                    const p = audioEl.play();
+                    if (p !== undefined) {
+                        p.catch(e => window.__kabaddiLog('WARN', 'OBS Blocked Audio Playback', e));
+                    }
                 }
             }
         }
