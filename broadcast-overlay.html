@@ -1222,81 +1222,64 @@ function tryPlayRaidAudio() {
     }
 }
 
-function syncRaidAudio(isTicking, clockStr) {
+// ============================================================
+// RAID CLOCK AUDIO — Pure raid_clock driven sync
+// ============================================================
+let lastRaidClock = null;
+
+function syncRaidAudio(clock) {
     const el = getRaidAudioEl();
     if (!el) return;
 
-    const clock = Number.parseInt(clockStr, 10);
-    const safeClock = Number.isFinite(clock) ? Math.max(0, Math.min(RAID_AUDIO_DURATION, clock)) : RAID_AUDIO_DURATION;
-    const ticking = isTicking === true || isTicking === 'true' || isTicking === 1 || isTicking === '1';
+    const safeClock = Math.max(0, Math.min(30, Number.parseInt(clock, 10) || 0));
 
-    window.__kabaddiLog('INFO', `syncAudio: tick=${ticking}, clk=${safeClock}, armed=${raidAudio.armed}, started=${raidAudio.started}, paused=${raidAudio.paused}`);
-
-    // 1. FULL RESET
-    if (!ticking && safeClock >= RAID_AUDIO_DURATION) {
-        if (!el.paused) el.pause();
-        try { el.currentTime = 0; } catch(e) {}
-        raidAudio.armed     = true;
-        raidAudio.started   = false;
-        raidAudio.ended     = false;
-        raidAudio.paused    = false;
-        raidAudio.savedTime = 0;
-        raidAudio.playPending = false;
-        return;
-    }
-
-    // 2. CLOCK EXPIRED
-    if (safeClock <= 0) {
-        if (!el.paused) el.pause();
-        try { el.currentTime = 0; } catch(e) {}
-        raidAudio.started   = false;
-        raidAudio.armed     = false;
-        raidAudio.ended     = false;
-        raidAudio.paused    = false;
-        raidAudio.savedTime = 0;
-        raidAudio.playPending = false;
-        return;
-    }
-
-    // 3. TICKING
-    if (ticking) {
-        if (!raidAudio.started) {
-            if (!raidAudio.armed) {
-                window.__kabaddiLog('INFO', 'syncAudio: Ignored, armed is false');
-                return;
-            }
-            try { el.currentTime = RAID_AUDIO_DURATION - safeClock; } catch(e) {}
-            raidAudio.started   = true;
-            raidAudio.armed     = false;
-            raidAudio.ended     = false;
-            raidAudio.paused    = false;
-            raidAudio.savedTime = el.currentTime;
-        } else if (raidAudio.paused) {
-            try { el.currentTime = raidAudio.savedTime; } catch(e) {}
-            raidAudio.paused = false;
+    // 1. RESET STATE: Clock is 30 (start) or 0 (end) -> Pause and reset to 0s
+    if (safeClock === 30 || safeClock === 0) {
+        if (!el.paused) {
+            el.pause();
+            window.__kabaddiLog('INFO', 'syncAudio: Paused & Reset (Clock at ' + safeClock + ')');
         }
+        el.currentTime = 0;
+        lastRaidClock = safeClock;
+        return;
+    }
 
-        const expected = RAID_AUDIO_DURATION - safeClock;
+    // 2. FIRST SNAPSHOT MID-RAID: Page loaded while raid was already paused/running
+    // We set the correct position but do NOT play, waiting for the first tick.
+    if (lastRaidClock === null || lastRaidClock === 30 || lastRaidClock === 0) {
+        try { el.currentTime = 30 - safeClock; } catch(e) {}
+        lastRaidClock = safeClock;
+        return;
+    }
+
+    // 3. TICKING (Clock Decreased): Raid is running
+    if (safeClock < lastRaidClock) {
+        // Correct drift if it skipped more than 1.5 seconds
+        const expectedTime = 30 - safeClock;
         try {
-            if (Math.abs(el.currentTime - expected) > 1.5) {
-                el.currentTime = expected;
+            if (Math.abs(el.currentTime - expectedTime) > 1.5) {
+                el.currentTime = expectedTime;
             }
         } catch(e) {}
 
-        tryPlayRaidAudio();
-        return;
+        // Resume playback if it was paused
+        if (el.paused) {
+            el.play().then(() => {
+                window.__kabaddiLog('OK', 'syncAudio: Playing (Clock ticking down to ' + safeClock + ')');
+            }).catch(err => {
+                window.__kabaddiLog('WARN', 'syncAudio: Play blocked', err);
+            });
+        }
+    } 
+    // 4. PAUSED (Clock Unchanged): Raid clock is paused
+    else if (safeClock === lastRaidClock) {
+        if (!el.paused) {
+            el.pause();
+            window.__kabaddiLog('INFO', 'syncAudio: Paused mid-raid at ' + el.currentTime);
+        }
     }
 
-    // 4. PAUSED
-    if (raidAudio.started && !raidAudio.paused) {
-        el.pause();
-        raidAudio.savedTime = el.currentTime;
-        raidAudio.paused    = true;
-        window.__kabaddiLog('INFO', 'syncAudio: Paused at ' + raidAudio.savedTime);
-    } else if (!raidAudio.started && raidAudio.armed) {
-        try { el.currentTime = RAID_AUDIO_DURATION - safeClock; } catch(e) {}
-        raidAudio.savedTime = el.currentTime;
-    }
+    lastRaidClock = safeClock;
 }
 
         // TEST AUDIO button — grants autoplay permission once per session.
@@ -2388,62 +2371,55 @@ function syncRaidAudio(isTicking, clockStr) {
         // RAID TIMER BARS
         // ==========================================
         function handleRaidTimers(state, raidClockStr, leftColor, rightColor) {
-            const raidTimerText = document.getElementById('raid-timer');
-            const trackLeft  = document.getElementById('raid-track-left');
-            const trackRight = document.getElementById('raid-track-right');
-            const barLeft    = document.getElementById('raid-bar-left');
-            const barRight   = document.getElementById('raid-bar-right');
+    const raidTimerText = document.getElementById('raid-timer');
+    const trackLeft  = document.getElementById('raid-track-left');
+    const trackRight = document.getElementById('raid-track-right');
+    const barLeft    = document.getElementById('raid-bar-left');
+    const barRight   = document.getElementById('raid-bar-right');
 
-            barLeft.style.setProperty('--raid-bar-color',  leftColor);
-            barRight.style.setProperty('--raid-bar-color', rightColor);
-            trackLeft.style.setProperty('--raid-bar-color',  leftColor);
-            trackRight.style.setProperty('--raid-bar-color', rightColor);
+    barLeft.style.setProperty('--raid-bar-color',  leftColor);
+    barRight.style.setProperty('--raid-bar-color', rightColor);
+    trackLeft.style.setProperty('--raid-bar-color',  leftColor);
+    trackRight.style.setProperty('--raid-bar-color', rightColor);
 
-            const timeInt = parseInt(raidClockStr);
-            const displayTime = isNaN(timeInt) ? 30 : timeInt;
-            raidTimerText.innerText = displayTime;
+    const timeInt = parseInt(raidClockStr);
+    const displayTime = isNaN(timeInt) ? 30 : timeInt;
+    raidTimerText.innerText = displayTime;
 
-            const raidActive = state.raidTimerRunning === true
-                || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
+    const raidActive = state.raidTimerRunning === true
+        || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
-                        let isTicking = false;
-            if (state.raidTimerRunning === true || state.raidTimerRunning === 'true' || state.raidTimerRunning === 1 || state.raidTimerRunning === '1') {
-                isTicking = true;
-            } else if (state.raidTimerRunning === undefined && raidActive) {
-                // Fallback: If the app forgets to send 'running', assume it is ticking if the clock is moving
-                isTicking = true;
-            }
-            
-            syncRaidAudio(isTicking, displayTime);
+    // 🔊 THE ONLY AUDIO CALL: Strictly driven by the clock string
+    syncRaidAudio(displayTime);
 
-            updateRaidClockVisual(raidActive);
+    updateRaidClockVisual(raidActive);
 
-            if (raidActive) {
-                let actualLeftRaid = true;
-                const raw = state.currentRaidTeamIsLeft !== undefined
-                    ? state.currentRaidTeamIsLeft
-                    : state.currentRaidTeamsLeft;
-                if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
-                else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
+    if (raidActive) {
+        let actualLeftRaid = true;
+        const raw = state.currentRaidTeamIsLeft !== undefined
+            ? state.currentRaidTeamIsLeft
+            : state.currentRaidTeamsLeft;
+        if (raw === true  || raw === 1 || raw === '1' || raw === 'true')  actualLeftRaid = true;
+        else if (raw === false || raw === 0 || raw === '0' || raw === 'false') actualLeftRaid = false;
 
-                if (actualLeftRaid) {
-                    trackLeft.classList.add('visible');
-                    trackRight.classList.remove('visible');
-                } else {
-                    trackRight.classList.add('visible');
-                    trackLeft.classList.remove('visible');
-                }
-
-                const percentage = Math.max(0, Math.min(100, (displayTime / 30) * 100));
-                barLeft.style.width  = percentage + "%";
-                barRight.style.width = percentage + "%";
-            } else {
-                trackLeft.classList.remove('visible');
-                trackRight.classList.remove('visible');
-                barLeft.style.width  = "100%";
-                barRight.style.width = "100%";
-            }
+        if (actualLeftRaid) {
+            trackLeft.classList.add('visible');
+            trackRight.classList.remove('visible');
+        } else {
+            trackRight.classList.add('visible');
+            trackLeft.classList.remove('visible');
         }
+
+        const percentage = Math.max(0, Math.min(100, (displayTime / 30) * 100));
+        barLeft.style.width  = percentage + "%";
+        barRight.style.width = percentage + "%";
+    } else {
+        trackLeft.classList.remove('visible');
+        trackRight.classList.remove('visible');
+        barLeft.style.width  = "100%";
+        barRight.style.width = "100%";
+    }
+}
 
         function updateRaidClockVisual(isRaidActive) {
             if (previousRaidActive === null) {
