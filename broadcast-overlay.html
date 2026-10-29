@@ -1225,61 +1225,40 @@ function tryPlayRaidAudio() {
 // ============================================================
 // RAID CLOCK AUDIO — Pure raid_clock driven sync
 // ============================================================
-let lastRaidClock = null;
+let audioHasStartedThisRaid = false;
 
-function syncRaidAudio(clock) {
+function syncRaidAudio(isTicking, clockStr) {
     const el = getRaidAudioEl();
     if (!el) return;
 
-    const safeClock = Math.max(0, Math.min(30, Number.parseInt(clock, 10) || 0));
+    const clock = Number.parseInt(clockStr, 10);
+    const safeClock = Number.isFinite(clock) ? Math.max(0, Math.min(30, clock)) : 30;
 
-    // 1. RESET STATE: Clock is 30 (start) or 0 (end) -> Pause and reset to 0s
+    // 1. PURELY DEPENDENT ON RAID_CLOCK: Reset at 30 or 0
     if (safeClock === 30 || safeClock === 0) {
-        if (!el.paused) {
-            el.pause();
-            window.__kabaddiLog('INFO', 'syncAudio: Paused & Reset (Clock at ' + safeClock + ')');
-        }
-        el.currentTime = 0;
-        lastRaidClock = safeClock;
+        if (!el.paused) el.pause();
+        try { el.currentTime = 0; } catch(e) {}
+        audioHasStartedThisRaid = false;
         return;
     }
 
-    // 2. FIRST SNAPSHOT MID-RAID: Page loaded while raid was already paused/running
-    // We set the correct position but do NOT play, waiting for the first tick.
-    if (lastRaidClock === null || lastRaidClock === 30 || lastRaidClock === 0) {
-        try { el.currentTime = 30 - safeClock; } catch(e) {}
-        lastRaidClock = safeClock;
-        return;
-    }
-
-    // 3. TICKING (Clock Decreased): Raid is running
-    if (safeClock < lastRaidClock) {
-        // Correct drift if it skipped more than 1.5 seconds
-        const expectedTime = 30 - safeClock;
-        try {
-            if (Math.abs(el.currentTime - expectedTime) > 1.5) {
-                el.currentTime = expectedTime;
-            }
-        } catch(e) {}
-
-        // Resume playback if it was paused
+    // 2. PLAY / PAUSE BASED ON APP STATE
+    if (isTicking) {
         if (el.paused) {
-            el.play().then(() => {
-                window.__kabaddiLog('OK', 'syncAudio: Playing (Clock ticking down to ' + safeClock + ')');
-            }).catch(err => {
-                window.__kabaddiLog('WARN', 'syncAudio: Play blocked', err);
-            });
+            // Only seek to the exact second ONCE when the raid first starts.
+            // If it pauses and resumes, it will seamlessly resume from where it left off without jittering.
+            if (!audioHasStartedThisRaid) {
+                try { el.currentTime = 30 - safeClock; } catch(e) {}
+                audioHasStartedThisRaid = true;
+            }
+            el.play().catch(() => {});
         }
-    } 
-    // 4. PAUSED (Clock Unchanged): Raid clock is paused
-    else if (safeClock === lastRaidClock) {
+    } else {
+        // Paused mid-raid by the app
         if (!el.paused) {
             el.pause();
-            window.__kabaddiLog('INFO', 'syncAudio: Paused mid-raid at ' + el.currentTime);
         }
     }
-
-    lastRaidClock = safeClock;
 }
 
         // TEST AUDIO button — grants autoplay permission once per session.
@@ -2389,8 +2368,16 @@ function syncRaidAudio(clock) {
     const raidActive = state.raidTimerRunning === true
         || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
-    // 🔊 THE ONLY AUDIO CALL: Strictly driven by the clock string
-    syncRaidAudio(displayTime);
+    // SAFE FALLBACK: If the app doesn't send raidTimerRunning, assume it's ticking if clock is 1-29
+    let isTicking = false;
+    if (state.raidTimerRunning !== undefined) {
+        isTicking = (state.raidTimerRunning === true || state.raidTimerRunning === 'true' || state.raidTimerRunning === 1 || state.raidTimerRunning === '1');
+    } else {
+        isTicking = raidActive;
+    }
+
+    // 🔊 Sync with pure clock logic (no jitter)
+    syncRaidAudio(isTicking, displayTime);
 
     updateRaidClockVisual(raidActive);
 
@@ -2420,7 +2407,6 @@ function syncRaidAudio(clock) {
         barRight.style.width = "100%";
     }
 }
-
         function updateRaidClockVisual(isRaidActive) {
             if (previousRaidActive === null) {
                 previousRaidActive = isRaidActive;
