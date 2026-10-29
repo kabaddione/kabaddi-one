@@ -2030,53 +2030,65 @@ let lastRemoteTossData = null;
             document.addEventListener(evt, unlockRaidAudio, { passive: true })
         );
 
+        let audioPauseTimeout = null;
+
         function syncRaidAudio(isTicking, clockValue) {
             const audioEl = document.getElementById('raid-audio-player');
             if (!audioEl) return;
 
             // Ensure valid clock value, default to 30
             const cv = (typeof clockValue === 'number' && !isNaN(clockValue)) ? clockValue : 30;
-            
-            // Calculate exactly where the audio SHOULD be (e.g., Clock is 23, Audio should be at 7s)
             const targetTime = 30 - cv; 
 
-            // Hardcode volume to 50% natively to prevent OBS blasts
-            audioEl.volume = 0.5;
+            // Force volume to 50%
+            if (audioEl.volume !== 0.5) audioEl.volume = 0.5;
 
-            // CONDITION 1: Clock is Reset or Finished (30 or 0)
+            // ── CONDITION 1: Clock is Reset or Finished (30 or 0) ──
             if (cv >= 30 || cv <= 0) {
+                if (audioPauseTimeout) clearTimeout(audioPauseTimeout);
                 if (!audioEl.paused) audioEl.pause();
                 if (audioEl.currentTime !== 0) audioEl.currentTime = 0; // Rewind silently
                 return;
             }
 
-            // CONDITION 2: Raid is Active, but PAUSED
-            if (!isTicking) {
-                if (!audioEl.paused) {
-                    audioEl.pause();
-                }
-                // While paused, secretly snap the audio to the exact target time 
-                // so when you hit resume, it starts from the perfect spot.
-                if (Math.abs(audioEl.currentTime - targetTime) > 0.5) {
-                    audioEl.currentTime = targetTime;
-                }
-                return;
-            }
-
-            // CONDITION 3: Raid is Active AND TICKING
+            // ── CONDITION 2: Raid is Active AND TICKING ──
             if (isTicking) {
-                // DRIFT CORRECTION: Only force the time if it's off by more than 1.5 seconds.
-                // If we do this too aggressively (like your last code), OBS panics and loops/stutters.
+                // Cancel any pending pauses immediately (Anti-Jitter)
+                if (audioPauseTimeout) {
+                    clearTimeout(audioPauseTimeout);
+                    audioPauseTimeout = null;
+                }
+                
+                // Drift Correction: Only force the time if it's off by more than 1.5s
                 if (Math.abs(audioEl.currentTime - targetTime) > 1.5) {
                     audioEl.currentTime = Math.max(0, targetTime);
                 }
 
                 // Play the audio if it isn't playing already
                 if (audioEl.paused) {
-                    audioEl.volume = 0.5;
                     const p = audioEl.play();
                     if (p !== undefined) {
-                        p.catch(e => window.__kabaddiLog('WARN', 'OBS Blocked Audio Playback', e));
+                        p.catch(e => window.__kabaddiLog('WARN', 'OBS Blocked Audio', e));
+                    }
+                }
+            } 
+            // ── CONDITION 3: Raid is Active, but PAUSED mid-raid ──
+            else {
+                // ANTI-JITTER: Wait 250ms before actually pausing. 
+                // If a 'true' (play) signal comes in immediately after, it cancels this pause!
+                if (!audioEl.paused && !audioPauseTimeout) {
+                    audioPauseTimeout = setTimeout(() => {
+                        audioEl.pause();
+                        // Secretly align the audio while paused so it resumes perfectly
+                        if (Math.abs(audioEl.currentTime - targetTime) > 0.5) {
+                            audioEl.currentTime = targetTime;
+                        }
+                        audioPauseTimeout = null;
+                    }, 250);
+                } else if (audioEl.paused) {
+                    // Already completely paused, just keep it perfectly aligned
+                    if (Math.abs(audioEl.currentTime - targetTime) > 0.5) {
+                        audioEl.currentTime = targetTime;
                     }
                 }
             }
@@ -3188,8 +3200,12 @@ function handleRemoteToss(data) {
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
             
-            // 🔊 Strict sync using ONLY the actual running state of the timer
-            syncRaidAudio(state.raidTimerRunning === true, displayTime);
+            // Safely parse the running state (handles booleans, strings, and numbers)
+            const rawRun = state.raidTimerRunning;
+            const isTicking = (rawRun === true || rawRun === 'true' || rawRun === 1 || rawRun === '1');
+            
+            // 🔊 Sync with anti-jitter
+            syncRaidAudio(isTicking, displayTime);
 
             updateRaidClockVisual(raidActive);
 
