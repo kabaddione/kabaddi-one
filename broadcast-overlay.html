@@ -1400,7 +1400,7 @@
 
     <body>
     <!-- NATIVE DOM AUDIO FOR OBS COMPATIBILITY -->
-    <audio id="raid-audio-player" src="kabaddi-30.mp3" preload="auto" loop="false"></audio>
+    <audio id="raid-audio-player" src="kabaddi-30.mp3" preload="auto"></audio>
         
 
     <!-- Permanent Top Right Channel Logo -->
@@ -1957,141 +1957,251 @@ let remoteTossSavedCycle = null;
 let lastRemoteTossData = null;
 
         // ============================================================
-        // 🔊 RAID CLOCK AUDIO SYNC (OBS DOM-OPTIMIZED)
+        // RAID CLOCK AUDIO SYNC (Firebase-driven, OBS-friendly)
         // ============================================================
-        let raidAudioUnlocked = false;
+        const RAID_AUDIO_DURATION_SECONDS = 30;
+        const RAID_AUDIO_VOLUME = 0.5;
 
-        // Safely unlock the DOM audio element
-        async function unlockRaidAudio() {
-            if (raidAudioUnlocked) return;
-            const audioEl = document.getElementById('raid-audio-player');
+        let raidAudioUnlocked = false;
+        let raidAudioState = {
+            initialized: false,
+            armed: true,          // Allows one new playback when the next raid starts.
+            started: false,       // True after the current raid's music has been started/positioned.
+            isTicking: false,     // Previous Firebase running state.
+            lastClock: null,
+            ended: false,         // Prevents replay if the MP3 ends before the raid does.
+            playBlocked: false,
+            playPending: false
+        };
+
+        function getRaidAudioElement() {
+            return document.getElementById('raid-audio-player');
+        }
+
+        function setRaidAudioPosition(seconds) {
+            const audioEl = getRaidAudioElement();
             if (!audioEl) return;
-            
+            const target = Math.max(0, Math.min(RAID_AUDIO_DURATION_SECONDS, Number(seconds) || 0));
             try {
-                audioEl.muted = true;
-                const p = audioEl.play();
-                if (p && p.then) await p;
-                audioEl.pause();
-                audioEl.currentTime = 0;
-                audioEl.muted = false;
-                audioEl.volume = 0.5; // Strictly enforce 50% volume here
-                raidAudioUnlocked = true;
-                window.__kabaddiLog('OK', '🔊 Raid DOM audio unlocked');
-            } catch (e) {
-                audioEl.muted = false;
-                audioEl.volume = 0.5;
+                audioEl.currentTime = target;
+            } catch (err) {
+                // If metadata is not ready yet, apply the requested position once it is.
+                audioEl.addEventListener('loadedmetadata', function setPendingRaidPosition() {
+                    try { audioEl.currentTime = target; }
+                    catch (seekErr) { window.__kabaddiLog('WARN', 'Raid audio seek failed', seekErr); }
+                }, { once: true });
             }
         }
-        
-        setTimeout(unlockRaidAudio, 800);
-        // ------------------------------------------------------------
-        // 🛠️ DIAGNOSTIC AUDIO EVENT LISTENERS & TEST BUTTON
-        // ------------------------------------------------------------
-        const testBtn = document.getElementById('audio-test-btn');
-        const audioDebugEl = document.getElementById('raid-audio-player');
 
-        if (testBtn && audioDebugEl) {
-            // 1. Manual Toggle Button Logic
-            testBtn.addEventListener('click', () => {
-                if (audioDebugEl.paused) {
-                    audioDebugEl.volume = 0.5; // Force 50%
-                    window.__kabaddiLog('INFO', 'Test Button: Attempting Play...');
-                    audioDebugEl.play().then(() => {
-                        window.__kabaddiLog('OK', 'Test Button: Play Success!');
-                        testBtn.innerText = 'PAUSE AUDIO';
-                        testBtn.style.backgroundColor = '#22C55E'; // Green
-                    }).catch(err => {
-                        window.__kabaddiLog('ERR', 'Test Button: Play Blocked!', err);
-                    });
-                } else {
-                    audioDebugEl.pause();
-                    window.__kabaddiLog('OK', 'Test Button: Paused');
-                    testBtn.innerText = 'PLAY AUDIO';
-                    testBtn.style.backgroundColor = '#EF4444'; // Red
-                }
-            });
-
-            // 2. Comprehensive DOM Event Logging
-            const audioEvents = ['play', 'playing', 'pause', 'ended', 'error', 'waiting', 'stalled', 'volumechange'];
-            audioEvents.forEach(evt => {
-                audioDebugEl.addEventListener(evt, (e) => {
-                    let extra = '';
-                    if (evt === 'volumechange') {
-                        extra = ` | Current Vol: ${audioDebugEl.volume}`;
-                    } else if (evt === 'error') {
-                        const errObj = audioDebugEl.error;
-                        extra = ` | Error Code: ${errObj ? errObj.code : 'Unknown'} | Msg: ${errObj ? errObj.message : e.message}`;
-                    }
-                    window.__kabaddiLog('INFO', `[AUDIO EVENT] -> ${evt.toUpperCase()} at ${audioDebugEl.currentTime.toFixed(2)}s${extra}`);
-                });
-            });
-        }
-        ['click','keydown','touchstart','pointerdown'].forEach(evt =>
-            document.addEventListener(evt, unlockRaidAudio, { passive: true })
-        );
-
-        let audioPauseTimeout = null;
-
-        function syncRaidAudio(isTicking, clockValue) {
-            const audioEl = document.getElementById('raid-audio-player');
+        function stopAndResetRaidAudio(rearmForNextRaid) {
+            const audioEl = getRaidAudioElement();
             if (!audioEl) return;
+            audioEl.loop = false;
+            if (!audioEl.paused) audioEl.pause();
+            setRaidAudioPosition(0);
+            raidAudioState.started = false;
+            raidAudioState.ended = false;
+            raidAudioState.playPending = false;
+            raidAudioState.playBlocked = false;
+            raidAudioState.armed = !!rearmForNextRaid;
+        }
 
-            // Ensure valid clock value, default to 30
-            const cv = (typeof clockValue === 'number' && !isNaN(clockValue)) ? clockValue : 30;
-            const targetTime = 30 - cv; 
+        function attemptRaidAudioPlayback() {
+            const audioEl = getRaidAudioElement();
+            if (!audioEl || !raidAudioState.isTicking || !raidAudioState.started || raidAudioState.ended) return;
+            if (raidAudioState.playPending) return;
+            if (raidAudioState.playBlocked && !raidAudioUnlocked) return;
+            if (!audioEl.paused) return;
 
-            // Force volume to 50%
-            if (audioEl.volume !== 0.5) audioEl.volume = 0.5;
+            audioEl.loop = false;
+            audioEl.muted = false;
+            audioEl.volume = RAID_AUDIO_VOLUME;
 
-            // ── CONDITION 1: Clock is Reset or Finished (30 or 0) ──
-            if (cv >= 30 || cv <= 0) {
-                if (audioPauseTimeout) clearTimeout(audioPauseTimeout);
-                if (!audioEl.paused) audioEl.pause();
-                if (audioEl.currentTime !== 0) audioEl.currentTime = 0; // Rewind silently
+            let playPromise;
+            try {
+                playPromise = audioEl.play();
+            } catch (err) {
+                raidAudioState.playBlocked = true;
+                window.__kabaddiLog('ERR', 'Raid audio playback could not start', err);
                 return;
             }
 
-            // ── CONDITION 2: Raid is Active AND TICKING ──
-            if (isTicking) {
-                // Cancel any pending pauses immediately (Anti-Jitter)
-                if (audioPauseTimeout) {
-                    clearTimeout(audioPauseTimeout);
-                    audioPauseTimeout = null;
+            if (playPromise && typeof playPromise.then === 'function') {
+                raidAudioState.playPending = true;
+                playPromise.then(() => {
+                    raidAudioState.playPending = false;
+                    raidAudioState.playBlocked = false;
+                    window.__kabaddiLog('OK', 'Raid audio playing', { currentTime: audioEl.currentTime.toFixed(2) });
+                }).catch(err => {
+                    raidAudioState.playPending = false;
+                    raidAudioState.playBlocked = true;
+                    window.__kabaddiLog('WARN', 'Raid audio play() was blocked. Click TEST AUDIO once in the page/OBS Interact window, then it can resume on the current raid.', err);
+                });
+            }
+        }
+
+        // A real user gesture can authorize audible media playback in browsers that restrict autoplay.
+        // OBS Browser Source usually works without this, but test it before going live.
+        function unlockRaidAudio() {
+            const wasUnlocked = raidAudioUnlocked;
+            raidAudioUnlocked = true;
+            raidAudioState.playBlocked = false;
+            if (!wasUnlocked) window.__kabaddiLog('OK', 'Raid audio user-gesture permission registered');
+            if (raidAudioState.isTicking) attemptRaidAudioPlayback();
+        }
+
+        // Test button is intentionally retained for diagnostics and OBS audio verification.
+        const testBtn = document.getElementById('audio-test-btn');
+        const audioDebugEl = getRaidAudioElement();
+
+        if (testBtn && audioDebugEl) {
+            testBtn.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                raidAudioUnlocked = true;
+                raidAudioState.playBlocked = false;
+                audioDebugEl.loop = false;
+                audioDebugEl.muted = false;
+                audioDebugEl.volume = RAID_AUDIO_VOLUME;
+
+                if (audioDebugEl.paused) {
+                    // Test only: when no raid has begun, play from zero. During a raid,
+                    // retain the current position rather than rewinding the live track.
+                    if (!raidAudioState.isTicking && !raidAudioState.started) setRaidAudioPosition(0);
+                    try {
+                        await audioDebugEl.play();
+                        window.__kabaddiLog('OK', 'Test Audio: playback started');
+                        testBtn.innerText = 'PAUSE AUDIO';
+                        testBtn.style.backgroundColor = '#22C55E';
+                    } catch (err) {
+                        raidAudioState.playBlocked = true;
+                        window.__kabaddiLog('ERR', 'Test Audio failed. Check the MP3 path and browser/OBS audio permissions.', err);
+                    }
+                } else {
+                    audioDebugEl.pause();
+                    window.__kabaddiLog('INFO', 'Test Audio: paused');
+                    testBtn.innerText = 'TEST AUDIO';
+                    testBtn.style.backgroundColor = '#EF4444';
                 }
-                
-                // Drift Correction: Only force the time if it's off by more than 1.5s
-                if (Math.abs(audioEl.currentTime - targetTime) > 1.5) {
-                    audioEl.currentTime = Math.max(0, targetTime);
+            });
+
+            const audioEvents = ['play', 'playing', 'pause', 'ended', 'error', 'waiting', 'stalled', 'volumechange'];
+            audioEvents.forEach(evt => {
+                audioDebugEl.addEventListener(evt, (e) => {
+                    if (evt === 'ended' && raidAudioState.isTicking && raidAudioState.started) {
+                        raidAudioState.ended = true;
+                        raidAudioState.playPending = false;
+                        window.__kabaddiLog('INFO', 'Raid MP3 ended; it will not replay during this raid');
+                    }
+                    let extra = '';
+                    if (evt === 'volumechange') extra = ` | Current Vol: ${audioDebugEl.volume}`;
+                    if (evt === 'error') {
+                        const errObj = audioDebugEl.error;
+                        extra = ` | Error Code: ${errObj ? errObj.code : 'Unknown'} | Msg: ${errObj ? errObj.message : e.message}`;
+                    }
+                    window.__kabaddiLog('INFO', `[AUDIO EVENT] -> ${evt.toUpperCase()} at ${Number(audioDebugEl.currentTime || 0).toFixed(2)}s${extra}`);
+                });
+            });
+        }
+
+        // Do not attempt to autoplay from a timeout. Track playback is requested only by the
+        // Firebase raid state; these gestures merely make browser playback available if needed.
+        ['click', 'keydown', 'touchstart', 'pointerdown'].forEach(evt => {
+            document.addEventListener(evt, (event) => {
+                if (event.target && event.target.closest && event.target.closest('#audio-test-btn')) return;
+                unlockRaidAudio();
+            }, { passive: true });
+        });
+
+        function syncRaidAudio(isTicking, clockValue) {
+            const audioEl = getRaidAudioElement();
+            if (!audioEl) return;
+
+            const parsedClock = Number.parseInt(clockValue, 10);
+            const clock = Number.isFinite(parsedClock)
+                ? Math.max(0, Math.min(RAID_AUDIO_DURATION_SECONDS, parsedClock))
+                : RAID_AUDIO_DURATION_SECONDS;
+            const ticking = isTicking === true || isTicking === 'true' || isTicking === 1 || isTicking === '1';
+            const firstSnapshot = !raidAudioState.initialized;
+            const wasTicking = raidAudioState.isTicking;
+            const targetTime = RAID_AUDIO_DURATION_SECONDS - clock;
+
+            audioEl.loop = false;
+            audioEl.volume = RAID_AUDIO_VOLUME;
+
+            // Clock expiry: stop and rewind immediately, but do not arm another play until
+            // Firebase publishes the reset state (clock=30, timer stopped).
+            if (clock <= 0) {
+                if (!audioEl.paused) audioEl.pause();
+                setRaidAudioPosition(0);
+                raidAudioState.started = false;
+                raidAudioState.armed = false;
+                raidAudioState.ended = false;
+                raidAudioState.playPending = false;
+                raidAudioState.playBlocked = false;
+                raidAudioState.isTicking = false;
+                raidAudioState.initialized = true;
+                raidAudioState.lastClock = clock;
+                return;
+            }
+
+            // A stopped clock at 30 is the explicit reset/ready state. Reset immediately,
+            // then wait for a later running signal before starting the next raid's music.
+            if (!ticking && clock >= RAID_AUDIO_DURATION_SECONDS) {
+                stopAndResetRaidAudio(true);
+                raidAudioState.isTicking = false;
+                raidAudioState.initialized = true;
+                raidAudioState.lastClock = clock;
+                return;
+            }
+
+            if (ticking) {
+                if (!raidAudioState.started) {
+                    // A page that attaches mid-raid starts at the matching elapsed position.
+                    // A normal start at 30 seconds starts from zero.
+                    if (!raidAudioState.armed) {
+                        raidAudioState.isTicking = true;
+                        raidAudioState.initialized = true;
+                        raidAudioState.lastClock = clock;
+                        return;
+                    }
+                    setRaidAudioPosition(targetTime);
+                    raidAudioState.started = true;
+                    raidAudioState.armed = false;
+                    raidAudioState.ended = false;
+                    raidAudioState.playBlocked = false;
+                } else if (wasTicking && !audioEl.paused && !raidAudioState.ended) {
+                    // Correct only substantial drift while the clock is continuously running.
+                    // On the first update after resume, the saved pause position is preserved.
+                    const drift = Math.abs(Number(audioEl.currentTime || 0) - targetTime);
+                    if (drift > 2.0) {
+                        setRaidAudioPosition(targetTime);
+                        window.__kabaddiLog('INFO', 'Raid audio drift corrected', { drift: drift.toFixed(2), targetTime });
+                    }
                 }
 
-                // Play the audio if it isn't playing already
-                if (audioEl.paused) {
-                    const p = audioEl.play();
-                    if (p !== undefined) {
-                        p.catch(e => window.__kabaddiLog('WARN', 'OBS Blocked Audio', e));
-                    }
-                }
-            } 
-            // ── CONDITION 3: Raid is Active, but PAUSED mid-raid ──
-            else {
-                // ANTI-JITTER: Wait 250ms before actually pausing. 
-                // If a 'true' (play) signal comes in immediately after, it cancels this pause!
-                if (!audioEl.paused && !audioPauseTimeout) {
-                    audioPauseTimeout = setTimeout(() => {
-                        audioEl.pause();
-                        // Secretly align the audio while paused so it resumes perfectly
-                        if (Math.abs(audioEl.currentTime - targetTime) > 0.5) {
-                            audioEl.currentTime = targetTime;
-                        }
-                        audioPauseTimeout = null;
-                    }, 250);
-                } else if (audioEl.paused) {
-                    // Already completely paused, just keep it perfectly aligned
-                    if (Math.abs(audioEl.currentTime - targetTime) > 0.5) {
-                        audioEl.currentTime = targetTime;
-                    }
-                }
+                raidAudioState.isTicking = true;
+                raidAudioState.initialized = true;
+                raidAudioState.lastClock = clock;
+                attemptRaidAudioPlayback();
+                return;
             }
+
+            // Clock is paused inside a raid. If this overlay first connects during that pause,
+            // seed the position once from the Firebase clock. Otherwise preserve the exact
+            // audio currentTime when pausing and leave it untouched until resume.
+            if (clock > 0 && clock < RAID_AUDIO_DURATION_SECONDS) {
+                if (firstSnapshot && !raidAudioState.started && raidAudioState.armed) {
+                    setRaidAudioPosition(targetTime);
+                    raidAudioState.started = true;
+                    raidAudioState.armed = false;
+                    raidAudioState.ended = false;
+                }
+                if (raidAudioState.started && !audioEl.paused) audioEl.pause();
+            }
+
+            raidAudioState.isTicking = false;
+            raidAudioState.initialized = true;
+            raidAudioState.lastClock = clock;
         }
 
         let lastL5TriggerBucket = 0;
