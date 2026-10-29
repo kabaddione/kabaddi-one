@@ -1369,6 +1369,31 @@
 .toss-winner-box.hidden {
     display: none !important;
 }
+
+
+        /* ============================================================
+           AUDIO DEBUG TEST BUTTON
+           ============================================================ */
+        .audio-test-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2147483647; /* Forces to the absolute top */
+            padding: 12px 24px;
+            background-color: #EF4444;
+            color: #FFFFFF;
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            border: 2px solid #FFFFFF;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            pointer-events: auto; /* Ensure it is clickable */
+        }
+        .audio-test-btn:hover {
+            background-color: #DC2626;
+        }
     </style>
 </head>
 <body>
@@ -1376,8 +1401,11 @@
     <body>
     <!-- NATIVE DOM AUDIO FOR OBS COMPATIBILITY -->
     <audio id="raid-audio-player" src="kabaddi-30.mp3" preload="auto" loop="false"></audio>
+        
 
     <!-- Permanent Top Right Channel Logo -->
+        <!-- DEBUG TEST BUTTON -->
+    <button id="audio-test-btn" class="audio-test-btn">TEST AUDIO</button>
 
     <!-- Permanent Top Right Channel Logo -->
     <div class="channel-logo-container">
@@ -1956,6 +1984,48 @@ let lastRemoteTossData = null;
         }
         
         setTimeout(unlockRaidAudio, 800);
+        // ------------------------------------------------------------
+        // 🛠️ DIAGNOSTIC AUDIO EVENT LISTENERS & TEST BUTTON
+        // ------------------------------------------------------------
+        const testBtn = document.getElementById('audio-test-btn');
+        const audioDebugEl = document.getElementById('raid-audio-player');
+
+        if (testBtn && audioDebugEl) {
+            // 1. Manual Toggle Button Logic
+            testBtn.addEventListener('click', () => {
+                if (audioDebugEl.paused) {
+                    audioDebugEl.volume = 0.5; // Force 50%
+                    window.__kabaddiLog('INFO', 'Test Button: Attempting Play...');
+                    audioDebugEl.play().then(() => {
+                        window.__kabaddiLog('OK', 'Test Button: Play Success!');
+                        testBtn.innerText = 'PAUSE AUDIO';
+                        testBtn.style.backgroundColor = '#22C55E'; // Green
+                    }).catch(err => {
+                        window.__kabaddiLog('ERR', 'Test Button: Play Blocked!', err);
+                    });
+                } else {
+                    audioDebugEl.pause();
+                    window.__kabaddiLog('OK', 'Test Button: Paused');
+                    testBtn.innerText = 'PLAY AUDIO';
+                    testBtn.style.backgroundColor = '#EF4444'; // Red
+                }
+            });
+
+            // 2. Comprehensive DOM Event Logging
+            const audioEvents = ['play', 'playing', 'pause', 'ended', 'error', 'waiting', 'stalled', 'volumechange'];
+            audioEvents.forEach(evt => {
+                audioDebugEl.addEventListener(evt, (e) => {
+                    let extra = '';
+                    if (evt === 'volumechange') {
+                        extra = ` | Current Vol: ${audioDebugEl.volume}`;
+                    } else if (evt === 'error') {
+                        const errObj = audioDebugEl.error;
+                        extra = ` | Error Code: ${errObj ? errObj.code : 'Unknown'} | Msg: ${errObj ? errObj.message : e.message}`;
+                    }
+                    window.__kabaddiLog('INFO', `[AUDIO EVENT] -> ${evt.toUpperCase()} at ${audioDebugEl.currentTime.toFixed(2)}s${extra}`);
+                });
+            });
+        }
         ['click','keydown','touchstart','pointerdown'].forEach(evt =>
             document.addEventListener(evt, unlockRaidAudio, { passive: true })
         );
