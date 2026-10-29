@@ -1224,11 +1224,8 @@ function tryPlayRaidAudio() {
 
 // ============================================================
 // RAID CLOCK AUDIO — Pure raid_clock driven sync
-// ============================================================
-// ============================================================
-// RAID CLOCK AUDIO — Pure raid_clock driven sync (No Jitter)
-// ============================================================
 let lastRaidClock = null;
+let audioPauseTimeout = null;
 
 function syncRaidAudio(clock) {
     const el = getRaidAudioEl();
@@ -1238,44 +1235,52 @@ function syncRaidAudio(clock) {
 
     // 1. RESET STATE: Clock is 30 (start) or 0 (end) -> Pause and reset to 0s
     if (safeClock === 30 || safeClock === 0) {
+        if (audioPauseTimeout) {
+            clearTimeout(audioPauseTimeout);
+            audioPauseTimeout = null;
+        }
         if (!el.paused) {
             el.pause();
-            window.__kabaddiLog('INFO', 'syncAudio: Paused & Reset (Clock at ' + safeClock + ')');
         }
         try { el.currentTime = 0; } catch(e) {}
         lastRaidClock = safeClock;
         return;
     }
 
-    // 2. FIRST SNAPSHOT MID-RAID: Page loaded while raid was already paused/running
-    if (lastRaidClock === null || lastRaidClock === 30 || lastRaidClock === 0) {
-        try { el.currentTime = 30 - safeClock; } catch(e) {}
-        lastRaidClock = safeClock;
-        return;
-    }
+    // 2. CLOCK CHANGED: The raid is ticking down
+    if (safeClock !== lastRaidClock) {
+        if (audioPauseTimeout) {
+            clearTimeout(audioPauseTimeout);
+            audioPauseTimeout = null;
+        }
 
-    // 3. TICKING (Clock Decreased): Raid is running
-    if (safeClock < lastRaidClock) {
-        // ** DRIFT CORRECTION REMOVED HERE TO PREVENT JITTERING **
+        // Sync position ONLY once at the very beginning of the raid
+        if (lastRaidClock === null || lastRaidClock === 30 || lastRaidClock === 0) {
+            try { el.currentTime = 30 - safeClock; } catch(e) {}
+        }
 
-        // Resume playback if it was paused
+        // Resume/Play audio seamlessly without seeking
         if (el.paused) {
-            el.play().then(() => {
-                window.__kabaddiLog('OK', 'syncAudio: Playing (Clock ticking down to ' + safeClock + ')');
-            }).catch(err => {
+            el.play().catch(err => {
                 window.__kabaddiLog('WARN', 'syncAudio: Play blocked', err);
             });
         }
+
+        lastRaidClock = safeClock;
     } 
-    // 4. PAUSED (Clock Unchanged): Raid clock is paused
-    else if (safeClock === lastRaidClock) {
-        if (!el.paused) {
-            el.pause();
-            window.__kabaddiLog('INFO', 'syncAudio: Paused mid-raid at ' + el.currentTime);
+    // 3. CLOCK UNCHANGED: Firebase sent a duplicate update (score, etc) OR the app paused the clock.
+    else {
+        if (!audioPauseTimeout && !el.paused) {
+            // Set a 1-second timeout. If the clock doesn't change within 1 second, the app truly paused the raid.
+            audioPauseTimeout = setTimeout(() => {
+                if (!el.paused) {
+                    el.pause();
+                    window.__kabaddiLog('INFO', 'syncAudio: Paused due to clock stop');
+                }
+                audioPauseTimeout = null;
+            }, 1000);
         }
     }
-
-    lastRaidClock = safeClock;
 }
 
         // TEST AUDIO button — grants autoplay permission once per session.
