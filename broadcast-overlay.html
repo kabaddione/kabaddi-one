@@ -1140,156 +1140,164 @@
         let lastRemoteTossData = null;
 
         // ============================================================
-        // RAID CLOCK AUDIO — bulletproof OBS-friendly sync
-        // ============================================================
-        const RAID_AUDIO_DURATION = 30;   // seconds — must match the MP3 length
-        const RAID_AUDIO_VOLUME   = 0.5;
+// RAID CLOCK AUDIO — bulletproof OBS-friendly sync
+// ============================================================
+const RAID_AUDIO_DURATION = 30;   // seconds
+const RAID_AUDIO_VOLUME   = 0.5;
 
-        const raidAudio = {
-            el:          null,
-            armed:       true,    // ready to start a NEW raid
-            started:     false,   // play() has been called for the current raid
-            ended:       false,   // MP3 finished naturally
-            paused:      false,   // clock paused it
-            savedTime:   0,       // exact position to resume from
-            unlocked:    false,   // autoplay permission granted
-            lastClock:   null,
-            playPending: false
-        };
+const raidAudio = {
+    el:          null,
+    armed:       true,
+    started:     false,
+    ended:       false,
+    paused:      false,
+    savedTime:   0,
+    unlocked:    false,
+    playPending: false
+};
 
-        function getRaidAudioEl() {
-            if (!raidAudio.el) {
-                raidAudio.el = document.getElementById('raid-audio-player');
-                if (raidAudio.el) {
-                    raidAudio.el.loop   = false;
-                    raidAudio.el.volume = RAID_AUDIO_VOLUME;
+function getRaidAudioEl() {
+    if (!raidAudio.el) {
+        raidAudio.el = document.getElementById('raid-audio-player');
+        if (raidAudio.el) {
+            raidAudio.el.loop   = false;
+            raidAudio.el.volume = RAID_AUDIO_VOLUME;
+            raidAudio.el.muted  = false;
 
-                    raidAudio.el.addEventListener('ended', () => {
-                        raidAudio.ended   = true;
-                        raidAudio.started = false;
-                        raidAudio.paused  = false;
-                        window.__kabaddiLog('INFO', 'Raid audio ended naturally');
-                    });
+            raidAudio.el.addEventListener('ended', () => {
+                raidAudio.ended   = true;
+                raidAudio.started = false;
+                raidAudio.paused  = false;
+                window.__kabaddiLog('INFO', 'Raid audio ended naturally');
+            });
 
-                    raidAudio.el.addEventListener('error', () => {
-                        window.__kabaddiLog('ERR', 'Raid audio element error', raidAudio.el.error);
-                    });
-                }
+            raidAudio.el.addEventListener('error', () => {
+                window.__kabaddiLog('ERR', 'Raid audio element error', raidAudio.el.error);
+            });
+
+            // Log when the file is successfully loaded
+            raidAudio.el.addEventListener('loadedmetadata', () => {
+                window.__kabaddiLog('OK', 'Audio loaded! Duration: ' + raidAudio.el.duration + 's');
+            });
+        }
+    }
+    return raidAudio.el;
+}
+
+function tryPlayRaidAudio() {
+    const el = getRaidAudioEl();
+    if (!el) return;
+    
+    if (raidAudio.ended) {
+        window.__kabaddiLog('WARN', 'tryPlay aborted: audio ended');
+        return;
+    }
+    if (raidAudio.playPending) {
+        window.__kabaddiLog('WARN', 'tryPlay aborted: playPending is true');
+        return;
+    }
+
+    if (el.readyState < 2) {
+        window.__kabaddiLog('INFO', 'tryPlay waiting for metadata (readyState=' + el.readyState + ')');
+        el.addEventListener('loadedmetadata', () => tryPlayRaidAudio(), { once: true });
+        return;
+    }
+
+    window.__kabaddiLog('INFO', 'tryPlay: Calling el.play() at ' + el.currentTime);
+    raidAudio.playPending = true;
+    const p = el.play();
+    
+    if (p && typeof p.then === 'function') {
+        p.then(() => {
+            raidAudio.playPending = false;
+            raidAudio.unlocked    = true;
+            window.__kabaddiLog('OK', 'Raid audio playing at', el.currentTime.toFixed(2));
+        }).catch(err => {
+            raidAudio.playPending = false;
+            raidAudio.unlocked    = false;
+            window.__kabaddiLog('ERR', 'Raid audio play blocked', err);
+        });
+    } else {
+        raidAudio.playPending = false;
+    }
+}
+
+function syncRaidAudio(isTicking, clockStr) {
+    const el = getRaidAudioEl();
+    if (!el) return;
+
+    const clock = Number.parseInt(clockStr, 10);
+    const safeClock = Number.isFinite(clock) ? Math.max(0, Math.min(RAID_AUDIO_DURATION, clock)) : RAID_AUDIO_DURATION;
+    const ticking = isTicking === true || isTicking === 'true' || isTicking === 1 || isTicking === '1';
+
+    window.__kabaddiLog('INFO', `syncAudio: tick=${ticking}, clk=${safeClock}, armed=${raidAudio.armed}, started=${raidAudio.started}, paused=${raidAudio.paused}`);
+
+    // 1. FULL RESET
+    if (!ticking && safeClock >= RAID_AUDIO_DURATION) {
+        if (!el.paused) el.pause();
+        try { el.currentTime = 0; } catch(e) {}
+        raidAudio.armed     = true;
+        raidAudio.started   = false;
+        raidAudio.ended     = false;
+        raidAudio.paused    = false;
+        raidAudio.savedTime = 0;
+        raidAudio.playPending = false;
+        return;
+    }
+
+    // 2. CLOCK EXPIRED
+    if (safeClock <= 0) {
+        if (!el.paused) el.pause();
+        try { el.currentTime = 0; } catch(e) {}
+        raidAudio.started   = false;
+        raidAudio.armed     = false;
+        raidAudio.ended     = false;
+        raidAudio.paused    = false;
+        raidAudio.savedTime = 0;
+        raidAudio.playPending = false;
+        return;
+    }
+
+    // 3. TICKING
+    if (ticking) {
+        if (!raidAudio.started) {
+            if (!raidAudio.armed) {
+                window.__kabaddiLog('INFO', 'syncAudio: Ignored, armed is false');
+                return;
             }
-            return raidAudio.el;
+            try { el.currentTime = RAID_AUDIO_DURATION - safeClock; } catch(e) {}
+            raidAudio.started   = true;
+            raidAudio.armed     = false;
+            raidAudio.ended     = false;
+            raidAudio.paused    = false;
+            raidAudio.savedTime = el.currentTime;
+        } else if (raidAudio.paused) {
+            try { el.currentTime = raidAudio.savedTime; } catch(e) {}
+            raidAudio.paused = false;
         }
 
-        function tryPlayRaidAudio() {
-            const el = getRaidAudioEl();
-            if (!el || raidAudio.ended || raidAudio.playPending) return;
-
-            if (el.readyState < 2) {
-                // Metadata not loaded yet — wait once for it before trying to play.
-                el.addEventListener('loadedmetadata', () => tryPlayRaidAudio(), { once: true });
-                return;
+        const expected = RAID_AUDIO_DURATION - safeClock;
+        try {
+            if (Math.abs(el.currentTime - expected) > 1.5) {
+                el.currentTime = expected;
             }
+        } catch(e) {}
 
-            raidAudio.playPending = true;
-            const p = el.play();
-            if (p && typeof p.then === 'function') {
-                p.then(() => {
-                    raidAudio.playPending = false;
-                    raidAudio.unlocked    = true;
-                    window.__kabaddiLog('OK', 'Raid audio playing at', el.currentTime.toFixed(2));
-                }).catch(err => {
-                    raidAudio.playPending = false;
-                    raidAudio.unlocked    = false;
-                    window.__kabaddiLog('WARN', 'Raid audio play blocked — click TEST AUDIO once in OBS Interact', err);
-                });
-            } else {
-                raidAudio.playPending = false;
-            }
-        }
+        tryPlayRaidAudio();
+        return;
+    }
 
-        function syncRaidAudio(isTicking, clockStr) {
-            const el = getRaidAudioEl();
-            if (!el) return;
-
-            const clock = Number.parseInt(clockStr, 10);
-            const safeClock = Number.isFinite(clock)
-                ? Math.max(0, Math.min(RAID_AUDIO_DURATION, clock))
-                : RAID_AUDIO_DURATION;
-
-            const ticking =
-                isTicking === true  || isTicking === 1 || isTicking === '1' ||
-                isTicking === 'true';
-
-            // ── 1. FULL RESET — clock is back to 30 and the timer is stopped ──
-            if (!ticking && safeClock >= RAID_AUDIO_DURATION) {
-                el.pause();
-                el.currentTime      = 0;
-                raidAudio.armed     = true;
-                raidAudio.started   = false;
-                raidAudio.ended     = false;
-                raidAudio.paused    = false;
-                raidAudio.savedTime = 0;
-                raidAudio.lastClock = safeClock;
-                return;
-            }
-
-            // ── 2. CLOCK EXPIRED — stop, but do NOT arm until reset to 30 ──
-            if (safeClock <= 0) {
-                el.pause();
-                el.currentTime      = 0;
-                raidAudio.started   = false;
-                raidAudio.armed     = false;
-                raidAudio.ended     = false;
-                raidAudio.paused    = false;
-                raidAudio.savedTime = 0;
-                raidAudio.lastClock = safeClock;
-                return;
-            }
-
-            // ── 3. TICKING (clock between 1 and 29) ──
-            if (ticking) {
-                if (!raidAudio.started) {
-                    if (!raidAudio.armed) {
-                        // MP3 already played once this raid — do not replay.
-                        raidAudio.lastClock = safeClock;
-                        return;
-                    }
-                    el.currentTime = RAID_AUDIO_DURATION - safeClock;
-                    raidAudio.started   = true;
-                    raidAudio.armed     = false;
-                    raidAudio.ended     = false;
-                    raidAudio.paused    = false;
-                    raidAudio.savedTime = el.currentTime;
-                } else if (raidAudio.paused) {
-                    // RESUME — restore the exact pause position
-                    el.currentTime = raidAudio.savedTime;
-                    raidAudio.paused = false;
-                }
-
-                // Light drift correction — only if the audio slipped more than 1.5 s.
-                const expected = RAID_AUDIO_DURATION - safeClock;
-                if (Math.abs(el.currentTime - expected) > 1.5) {
-                    el.currentTime = expected;
-                }
-
-                tryPlayRaidAudio();
-                raidAudio.lastClock = safeClock;
-                return;
-            }
-
-            // ── 4. PAUSED (ticking false, clock 1–29) ──
-            if (raidAudio.started && !raidAudio.paused) {
-                el.pause();
-                raidAudio.savedTime = el.currentTime;
-                raidAudio.paused    = true;
-                window.__kabaddiLog('INFO', 'Raid audio paused at', raidAudio.savedTime.toFixed(2));
-            } else if (!raidAudio.started && raidAudio.armed) {
-                // First snapshot arrives while clock is paused mid-raid.
-                // Record position without starting playback.
-                el.currentTime = RAID_AUDIO_DURATION - safeClock;
-                raidAudio.savedTime = el.currentTime;
-            }
-            raidAudio.lastClock = safeClock;
-        }
+    // 4. PAUSED
+    if (raidAudio.started && !raidAudio.paused) {
+        el.pause();
+        raidAudio.savedTime = el.currentTime;
+        raidAudio.paused    = true;
+        window.__kabaddiLog('INFO', 'syncAudio: Paused at ' + raidAudio.savedTime);
+    } else if (!raidAudio.started && raidAudio.armed) {
+        try { el.currentTime = RAID_AUDIO_DURATION - safeClock; } catch(e) {}
+        raidAudio.savedTime = el.currentTime;
+    }
+}
 
         // TEST AUDIO button — grants autoplay permission once per session.
         (function setupRaidAudioTestButton() {
@@ -2398,9 +2406,14 @@
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
 
-            const rawRun = state.raidTimerRunning;
-            const isTicking = (rawRun === true || rawRun === 'true' || rawRun === 1 || rawRun === '1');
-
+                        let isTicking = false;
+            if (state.raidTimerRunning === true || state.raidTimerRunning === 'true' || state.raidTimerRunning === 1 || state.raidTimerRunning === '1') {
+                isTicking = true;
+            } else if (state.raidTimerRunning === undefined && raidActive) {
+                // Fallback: If the app forgets to send 'running', assume it is ticking if the clock is moving
+                isTicking = true;
+            }
+            
             syncRaidAudio(isTicking, displayTime);
 
             updateRaidClockVisual(raidActive);
