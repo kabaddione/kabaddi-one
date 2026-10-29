@@ -1326,8 +1326,8 @@
    REMOTE TOSS MODE — COIN ANIMATION & HIDDEN WINNER BOX
    ============================================================ */
 .toss-coin-gif {
-    width: 42px;
-    height: 42px;
+    width: 62px;
+    height: 62px;
     object-fit: contain;
     margin-right: 14px;
     display: none;
@@ -1335,7 +1335,7 @@
     filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
 }
 .toss-coin-gif.show {
-    display: inline-block;
+    display: inline-block !important;
     animation: tossCoinPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes tossCoinPop {
@@ -1897,6 +1897,34 @@ let remoteTossConfirmed = false;
 let remoteTossConfirmTimer = null;
 let remoteTossSavedCycle = null;
 let lastRemoteTossData = null;
+
+                // ── Raid Clock Audio (kabaddi-30.mp3) ──
+        const raidClockAudio = new Audio('kabaddi-30.mp3');
+        raidClockAudio.volume = 0.5;          // 50% volume only
+        raidClockAudio.preload = 'auto';
+        raidClockAudio.loop = false;
+        let raidAudioIsPlaying = false;
+
+        function syncRaidAudio(raidActive) {
+            // Raid just STARTED → reset to 0 and play from the top
+            if (raidActive && !raidAudioIsPlaying) {
+                try {
+                    raidClockAudio.currentTime = 0;
+                    const p = raidClockAudio.play();
+                    if (p && typeof p.catch === 'function') {
+                        p.catch(e => window.__kabaddiLog('WARN', 'Raid audio play failed', e));
+                    }
+                } catch (e) {
+                    window.__kabaddiLog('WARN', 'Raid audio error', e);
+                }
+                raidAudioIsPlaying = true;
+            }
+            // Raid PAUSED / ENDED → pause the sound right where it is
+            else if (!raidActive && raidAudioIsPlaying) {
+                try { raidClockAudio.pause(); } catch (e) {}
+                raidAudioIsPlaying = false;
+            }
+        }
 
         let lastL5TriggerBucket = 0;
         window.pendingLeftScore = undefined;
@@ -2993,6 +3021,7 @@ function handleRemoteToss(data) {
 
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
+            syncRaidAudio(raidActive);          // 🔊 sync the raid-countdown sound
 
             updateRaidClockVisual(raidActive);
 
