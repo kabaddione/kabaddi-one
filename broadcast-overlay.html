@@ -1320,6 +1320,31 @@
             object-fit: contain;
             filter: drop-shadow(0 6px 12px rgba(0,0,0,0.65));
         }
+
+
+        /* ============================================================
+   REMOTE TOSS MODE — COIN ANIMATION & HIDDEN WINNER BOX
+   ============================================================ */
+.toss-coin-gif {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    margin-right: 14px;
+    display: none;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+}
+.toss-coin-gif.show {
+    display: inline-block;
+    animation: tossCoinPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes tossCoinPop {
+    from { transform: scale(0) rotate(-180deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);    opacity: 1; }
+}
+.toss-winner-box.hidden {
+    display: none !important;
+}
     </style>
 </head>
 <body>
@@ -1792,14 +1817,15 @@
                     <span id="toss-winner-text" class="toss-text-dark">TOSS WON BY PATNA PIRATES</span>
                 </div>
                 <div class="toss-choice-box" id="toss-choice-box">
-                    <span id="toss-choice-text" class="toss-text-light">BENGAL WARRIORS TO RAID FIRST</span>
-                </div>
+    <img id="toss-coin-gif" class="toss-coin-gif" src="images/coin-animation.gif" alt="" style="display: none;">
+    <span id="toss-choice-text" class="toss-text-light">BENGAL WARRIORS TO RAID FIRST</span>
+</div>
             </div>
             <!-- Bottom Sub Bar -->
             <div class="toss-sub-bar-wrapper">
                 <div class="toss-sub-bar">
-                    MATCH WILL START SOON...
-                </div>
+    <span id="toss-sub-text">MATCH WILL START SOON...</span>
+</div>
             </div>
         </div>
     </div>
@@ -1863,6 +1889,14 @@
         };
 
         let marqueeRafId = null;
+
+        // ── Remote Toss Mode State ──
+const TOSS_TIME_CONFIRM_MS = 3000;   // 3s stability check before showing "TOSS TIME NOW" (set 0 for instant)
+let remoteTossActive = false;
+let remoteTossConfirmed = false;
+let remoteTossConfirmTimer = null;
+let remoteTossSavedCycle = null;
+let lastRemoteTossData = null;
 
         let lastL5TriggerBucket = 0;
         window.pendingLeftScore = undefined;
@@ -1990,6 +2024,193 @@
             // Safely check if any other screen (like Starting 7) is open before showing the scoreboard
             updateMainStageVisibility(); 
         }
+
+        // ============================================================
+// 🪙 REMOTE TOSS MODE — advanced flow
+//   • Normal pre-match auto cycle : Intro ↔ Toss ("TOSS COMING UP NEXT")
+//   • Mobile opens toss dialog    : screen jumps to toss instantly,
+//                                   3 s stability check → "TOSS TIME NOW" + coin
+//   • Winner & choice set         : real result shown immediately
+//   • Dialog closed               : result stays in the auto cycle until match starts
+// ============================================================
+function tossHasData(data) {
+    if (!data) return false;
+    const winner = String(data.toss_winner || '').trim();
+    const choice = String(data.toss_choice || '').trim();
+    return winner.length > 0 && choice.length > 0;
+}
+
+/**
+ * mode:
+ *   'cycle'            → auto pre-match toss slot (placeholder or real result)
+ *   'remote-pending'   → dialog just opened, waiting for 3 s stability check
+ *   'remote-confirmed' → dialog stayed open, toss is happening NOW
+ */
+function updateTossScreenContent(data, mode) {
+    const winnerBox  = document.getElementById('toss-winner-box');
+    const coinGif    = document.getElementById('toss-coin-gif');
+    const choiceText = document.getElementById('toss-choice-text');
+    const subText    = document.getElementById('toss-sub-text');
+    const hasData    = tossHasData(data);
+
+    if (hasData) {
+        if (winnerBox) winnerBox.classList.remove('hidden');
+        if (coinGif)   coinGif.classList.remove('show');
+        renderTossScreen(data);              // existing function — fills winner + choice + accent
+        if (subText) subText.innerText = 'MATCH WILL START SOON...';
+        return;
+    }
+
+    // No toss data
+    if (winnerBox) winnerBox.classList.add('hidden');
+
+    if (mode === 'remote-confirmed') {
+        if (coinGif)    coinGif.classList.add('show');
+        if (choiceText) choiceText.innerText = 'TOSS TIME NOW';
+        if (subText)    subText.innerText    = 'TOSS IS HAPPENING RIGHT NOW';
+    } else {
+        if (coinGif)    coinGif.classList.remove('show');
+        if (choiceText) choiceText.innerText = 'TOSS COMING UP NEXT';
+        if (subText)    subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
+    }
+}
+
+function handleRemoteToss(data) {
+    if (!data) return;
+
+    const overlayScreen = String(data.overlay_screen || '').trim().toLowerCase();
+    const isTossScreen  = overlayScreen === 'toss';
+    const hasData       = tossHasData(data);
+    const tossOverlay   = document.getElementById('toss-result-overlay');
+
+    const matchStarted = !miIsMatchNotStarted(data, null);
+
+    // ── Match started while toss mode active → clean up ──
+    if (matchStarted) {
+        if (remoteTossActive) {
+            remoteTossActive = false;
+            remoteTossConfirmed = false;
+            remoteTossSavedCycle = null;
+            if (remoteTossConfirmTimer) { clearTimeout(remoteTossConfirmTimer); remoteTossConfirmTimer = null; }
+            if (tossOverlay && tossOverlay.classList.contains('show')) hideTossScreen();
+        }
+        return;
+    }
+
+    // ── ENTER / STAY IN TOSS DIALOG MODE ──
+    if (isTossScreen) {
+        lastRemoteTossData = data;
+
+        if (!remoteTossActive) {
+            remoteTossActive = true;
+            remoteTossConfirmed = false;
+
+            // Remember where the auto cycle was, so an accidental open can be undone
+            remoteTossSavedCycle = {
+                currentState: preMatchCycle.currentState,
+                timeRemaining: preMatchCycle.timeRemaining
+            };
+
+            // Pause the auto cycle immediately
+            preMatchCycle.active = false;
+            if (preMatchCycle.rafId) { cancelAnimationFrame(preMatchCycle.rafId); preMatchCycle.rafId = null; }
+
+            // Interrupt intro if it is showing, then bring up the toss overlay instantly
+            if (matchIntroState.active) hideMatchIntro();
+            if (tossOverlay && !tossOverlay.classList.contains('show')) {
+                tossOverlay.classList.remove('exit');
+                void tossOverlay.offsetWidth;
+                tossOverlay.classList.add('show');
+                updateMainStageVisibility();
+            }
+
+            // 3-second stability check → only then reveal "TOSS TIME NOW"
+            if (remoteTossConfirmTimer) clearTimeout(remoteTossConfirmTimer);
+            remoteTossConfirmTimer = setTimeout(() => {
+                remoteTossConfirmTimer = null;
+                remoteTossConfirmed = true;
+                if (!remoteTossActive) return;
+                if (lastRemoteTossData) updateTossScreenContent(lastRemoteTossData, 'remote-confirmed');
+            }, TOSS_TIME_CONFIRM_MS);
+        }
+
+        updateTossScreenContent(data, remoteTossConfirmed ? 'remote-confirmed' : 'remote-pending');
+        return;
+    }
+
+    // ── EXIT TOSS DIALOG MODE (overlay_screen is no longer "toss") ──
+    if (!remoteTossActive) return;
+
+    remoteTossActive = false;
+    remoteTossConfirmed = false;
+    if (remoteTossConfirmTimer) { clearTimeout(remoteTossConfirmTimer); remoteTossConfirmTimer = null; }
+
+    // If another fullscreen overlay took over, let handleOverlayScreens manage it
+    if (overlayScreen === 'starting7' || overlayScreen === 'team_stats' || overlayScreen === 'player_performance') {
+        if (hasData) updateTossScreenContent(data, 'cycle');
+        hideTossScreen();
+        remoteTossSavedCycle = null;
+        return;
+    }
+
+    if (matchIntroState.matchStarted) {
+        hideTossScreen();
+        remoteTossSavedCycle = null;
+        return;
+    }
+
+    if (hasData) {
+        // Real toss result → show it, and continue the set Intro ↔ Toss auto switching
+        updateTossScreenContent(data, 'cycle');
+        if (tossOverlay && !tossOverlay.classList.contains('show')) {
+            tossOverlay.classList.remove('exit');
+            void tossOverlay.offsetWidth;
+            tossOverlay.classList.add('show');
+            updateMainStageVisibility();
+        }
+
+        preMatchCycle.active        = true;
+        preMatchCycle.currentState  = 'toss';
+        preMatchCycle.timeRemaining = 120000;              // full toss slot
+        preMatchCycle.lastTickTime  = performance.now();
+        if (preMatchCycle.rafId) cancelAnimationFrame(preMatchCycle.rafId);
+        preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
+    } else {
+        // No data → accidental open or cancelled toss → quietly restore the cycle
+        updateTossScreenContent(data, 'cycle');
+
+        const saved = remoteTossSavedCycle;
+        remoteTossSavedCycle = null;
+
+        preMatchCycle.active       = true;
+        preMatchCycle.lastTickTime = performance.now();
+
+        if (saved && saved.currentState === 'toss') {
+            preMatchCycle.currentState  = 'toss';
+            preMatchCycle.timeRemaining = Math.max(5000, saved.timeRemaining);
+            if (tossOverlay && !tossOverlay.classList.contains('show')) {
+                tossOverlay.classList.remove('exit');
+                void tossOverlay.offsetWidth;
+                tossOverlay.classList.add('show');
+                updateMainStageVisibility();
+            }
+        } else {
+            preMatchCycle.currentState  = 'intro';
+            preMatchCycle.timeRemaining = Math.max(5000, saved ? saved.timeRemaining : 10000);
+            hideTossScreen();
+            const mi = document.getElementById('match-intro-overlay');
+            if (mi) {
+                mi.classList.remove('exit', 'show');
+                void mi.offsetWidth;
+                mi.classList.add('show');
+                matchIntroState.active = true;
+                updateMainStageVisibility();
+            }
+        }
+        if (preMatchCycle.rafId) cancelAnimationFrame(preMatchCycle.rafId);
+        preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
+    }
+}
 
         
         function ppSetText(id, value) {
@@ -2580,6 +2801,7 @@
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
 
                 handleOverlayScreens(data, state, leftColor, rightColor);
+                 handleRemoteToss(data);                // 🪙 REMOTE TOSS MODE
                 handleMatchIntroScreen(data, state);   // MATCH INTRO LOGIC
 
             }, (error) => {
@@ -3864,6 +4086,7 @@
 
         function handleMatchIntroScreen(data, state) {
             if (!data) return;
+            if (remoteTossActive) return;   // 🪙 Skip while remote toss mode is active
             const overlayScreen = String(data.overlay_screen || '').trim().toLowerCase();
             const overlayOpen = overlayScreen.length > 0 && overlayScreen !== 'none' && overlayScreen !== 'null';
             const notStarted = miIsMatchNotStarted(data, state);
@@ -3883,7 +4106,7 @@
             
             // Prepare data for rendering just in case
             miRender(data, state);
-            renderTossScreen(data);
+            updateTossScreenContent(data, 'cycle');   // 🪙 placeholder or real result, per toss slot
 
             if (overlayOpen) {
                 // User opened a fullscreen overlay (like Starting 7)
@@ -3893,8 +4116,8 @@
                 return;
             }
 
-            // Start or resume cycle
-            if (!preMatchCycle.active) {
+    // Start or resume cycle
+    if (!preMatchCycle.active) {
                 preMatchCycle.active = true;
                 preMatchCycle.currentState = 'intro';
                 preMatchCycle.timeRemaining = 20000; // 20s for the first run
