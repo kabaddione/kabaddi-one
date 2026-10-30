@@ -649,6 +649,7 @@
             background: #fff;
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
+            /* Explodes at 0.9s, takes 1.5s to fade */
             animation: burstOut 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) 0.9s forwards;
         }
 
@@ -665,8 +666,8 @@
 
         @keyframes burstOut {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; } /* Fast initial burst */
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; } /* Expands wide and fades */
         }
 
 
@@ -1444,25 +1445,34 @@
                 const spark = document.createElement('div');
                 spark.className = 'firework-spark';
                 
-                const numSparks = 16;
+                const numOuterSparks = Math.floor(Math.random() * 8) + 12; // Randomize between 12 and 20 streaks
                 const sparkColor = colors[Math.floor(Math.random() * colors.length)];
+                const sizeMultiplier = Math.random() * 0.9 + 0.6; // Randomize size (60% to 150%)
+                
                 let boxShadows = [];
                 
-                // Outer long sparks
-                for(let j=0; j<numSparks; j++) {
-                    const angle = (j / numSparks) * 360;
-                    const dist = 40 + Math.random() * 40;
+                // Outer long glowing streaks
+                for(let j=0; j<numOuterSparks; j++) {
+                    const angle = (j / numOuterSparks) * 360;
+                    // Increased base distance dramatically for visibility
+                    const baseDist = 100 + Math.random() * 100; 
+                    const dist = baseDist * sizeMultiplier;
                     const x = Math.cos(angle * Math.PI / 180) * dist;
                     const y = Math.sin(angle * Math.PI / 180) * dist;
-                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 0 2px ${sparkColor}`);
+                    
+                    // Thicker spread (4px) and blur (3px) to make it look like a glowing firecracker streak
+                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 4px 3px ${sparkColor}`);
                 }
+                
                 // Inner white hot core sparks
                 for(let j=0; j<8; j++) {
                     const angle = (j / 8) * 360;
-                    const dist = 15 + Math.random() * 15;
+                    const baseDist = 30 + Math.random() * 50;
+                    const dist = baseDist * sizeMultiplier;
                     const x = Math.cos(angle * Math.PI / 180) * dist;
                     const y = Math.sin(angle * Math.PI / 180) * dist;
-                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 0 1.5px #ffffff`);
+                    
+                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 2px 2px #ffffff`);
                 }
                 
                 spark.style.boxShadow = boxShadows.join(', ');
