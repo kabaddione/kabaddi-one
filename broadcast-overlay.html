@@ -670,6 +670,134 @@
             50% { transform: translate(-50%, -50%) scale(2.5); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
         }
+
+
+                /* --- SUPER 10 / HIGH FIVE CELEBRATION STYLES --- */
+        .main-row, .team-left-wrap, .team-right-wrap, .score-left-wrap, .score-right-wrap, .center-wrap, .dots-left-wrap, .dots-right-wrap, .info-box-left, .info-box-right {
+            transition: all 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+        }
+
+        /* LEFT CELEBRATION LAYOUT */
+        .main-row.celebrate-left .team-right-wrap,
+        .main-row.celebrate-left .score-right-wrap {
+            flex: 0; width: 0; opacity: 0; margin: 0; padding: 0; overflow: hidden; transform: translateX(100px);
+        }
+        .main-row.celebrate-left .team-left-wrap {
+            flex: 1; max-width: 900px; z-index: 5;
+        }
+        .main-row.celebrate-left .team-left-inner {
+            clip-path: polygon(0 0, 98% 0, 100% 100%, 2% 100%);
+        }
+        .main-row.celebrate-left .score-left-wrap {
+            margin-left: 0; transform: translateX(10px); z-index: 4;
+        }
+        .main-row.celebrate-left .center-wrap {
+            margin: 0 -10px; z-index: 3;
+        }
+
+        /* RIGHT CELEBRATION LAYOUT */
+        .main-row.celebrate-right .team-left-wrap,
+        .main-row.celebrate-right .score-left-wrap {
+            flex: 0; width: 0; opacity: 0; margin: 0; padding: 0; overflow: hidden; transform: translateX(-100px);
+        }
+        .main-row.celebrate-right .team-right-wrap {
+            flex: 1; max-width: 900px; z-index: 5;
+        }
+        .main-row.celebrate-right .team-right-inner {
+            clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+        }
+        .main-row.celebrate-right .score-right-wrap {
+            margin-left: 0; transform: translateX(-10px); z-index: 4;
+        }
+        .main-row.celebrate-right .center-wrap {
+            margin: 0 -10px; z-index: 3;
+        }
+
+        /* HIDE DOTS AND INFO BOXES */
+        .main-row.celebrate-left .dots-left-wrap, .main-row.celebrate-left .dots-right-wrap,
+        .main-row.celebrate-right .dots-left-wrap, .main-row.celebrate-right .dots-right-wrap,
+        .main-row.celebrate-left .info-box-left, .main-row.celebrate-left .info-box-right,
+        .main-row.celebrate-right .info-box-left, .main-row.celebrate-right .info-box-right {
+            opacity: 0 !important; pointer-events: none;
+        }
+
+        /* CELEBRATION CONTENT */
+        .celebration-content {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            gap: 25px;
+            opacity: 0;
+            transform: scale(0.7);
+            transition: all 0.5s cubic-bezier(0.34, 1.5, 0.64, 1);
+            z-index: 10;
+        }
+        .celebration-content.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .celebration-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .celebration-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(255,215,0,0.9);
+            background: #222;
+        }
+        .celebration-name {
+            font-family: 'Mukta', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            text-transform: uppercase;
+            margin-top: 6px;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.9);
+            white-space: nowrap;
+        }
+        .celebration-text {
+            font-family: 'Teko', sans-serif;
+            font-size: 75px;
+            font-weight: 700;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 0.8;
+            text-shadow: 
+                0 1px 0 #FFF3A3, 0 2px 0 #D4AF37, 0 3px 0 #AA7700, 
+                0 4px 0 #8B6508, 0 5px 0 #5C4300,
+                0 6px 1px rgba(0,0,0,0.2), 0 0 5px rgba(0,0,0,0.2),
+                0 1px 3px rgba(0,0,0,0.4), 0 3px 5px rgba(0,0,0,0.3),
+                0 5px 10px rgba(0,0,0,0.2), 0 10px 10px rgba(0,0,0,0.15);
+            animation: pulseText 1s infinite alternate;
+            transform: skewX(-5deg);
+        }
+        .right-layout .celebration-text {
+            transform: skewX(5deg);
+        }
+        @keyframes pulseText {
+            from { transform: scale(1) skewX(-5deg); }
+            to { transform: scale(1.08) skewX(-5deg); }
+        }
+        .right-layout @keyframes pulseText {
+            from { transform: scale(1) skewX(5deg); }
+            to { transform: scale(1.08) skewX(5deg); }
+        }
+        .main-row.celebrate-left .team-name-text,
+        .main-row.celebrate-left .raider-name-text,
+        .main-row.celebrate-right .team-name-text,
+        .main-row.celebrate-right .raider-name-text {
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -1197,6 +1325,10 @@
         let currentRightColor = '#0055ff';
         let previousRaidActive = null;
         let lastOverlayScreen = '';
+
+        let isCelebrationActive = false;
+        let celebratedPlayers = new Set(); // Keeps track of who already got a banner
+        
         let lastOverlayTeam = '';
         let lastOverlayPlayerId = '';
         let seenLogKeys = new Set();
@@ -2315,6 +2447,103 @@ function syncRaidAudio(clock) {
             initBroadcastEngine(matchId, matchCode);
         }
 
+                // ==========================================
+        // SUPER 10 / HIGH FIVE CELEBRATION
+        // ==========================================
+        function checkCelebrations(state, data) {
+            if (!state || isCelebrationActive) return;
+
+            let leftRoster = [], rightRoster = [];
+            try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
+            try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
+
+            // Check Left Team
+            for (const p of leftRoster) {
+                const raidPts = parseInt(p.raidPoints) || 0;
+                const tacklePts = parseInt(p.tacklePoints) || 0;
+                const id = String(p.id);
+                
+                if (raidPts >= 10 && !celebratedPlayers.has(id + '_raid')) {
+                    celebratedPlayers.add(id + '_raid');
+                    triggerCelebration('left', p, 'SUPER 10');
+                    return;
+                }
+                if (tacklePts >= 5 && !celebratedPlayers.has(id + '_tackle')) {
+                    celebratedPlayers.add(id + '_tackle');
+                    triggerCelebration('left', p, 'HIGH FIVE');
+                    return;
+                }
+            }
+
+            // Check Right Team
+            for (const p of rightRoster) {
+                const raidPts = parseInt(p.raidPoints) || 0;
+                const tacklePts = parseInt(p.tacklePoints) || 0;
+                const id = String(p.id);
+                
+                if (raidPts >= 10 && !celebratedPlayers.has(id + '_raid')) {
+                    celebratedPlayers.add(id + '_raid');
+                    triggerCelebration('right', p, 'SUPER 10');
+                    return;
+                }
+                if (tacklePts >= 5 && !celebratedPlayers.has(id + '_tackle')) {
+                    celebratedPlayers.add(id + '_tackle');
+                    triggerCelebration('right', p, 'HIGH FIVE');
+                    return;
+                }
+            }
+        }
+
+        function triggerCelebration(side, player, text) {
+            isCelebrationActive = true;
+            const mainRow = document.getElementById('main-row');
+            const teamInner = document.getElementById(side + '-team-bg');
+            const nameRotator = teamInner.querySelector('.name-rotator');
+            
+            // Prepare HTML (Profile Photo + Name + 3D Text)
+            const imgSrc = resolvePlayerImage(player);
+            const playerName = player.name || 'Player';
+            
+            const html = `
+                <div class="celebration-content ${side === 'right' ? 'right-layout' : ''}">
+                    <div class="celebration-player">
+                        <img src="${imgSrc}" class="celebration-img" alt="" onerror="this.src='${DEFAULT_PLAYER_IMG}'">
+                        <span class="celebration-name">${escapeHtml(playerName)}</span>
+                    </div>
+                    <div class="celebration-text">${text}</div>
+                </div>
+            `;
+
+            // 1. Shift Layout
+            mainRow.classList.add('celebrate-' + side);
+
+            // 2. Inject and Animate Content
+            setTimeout(() => {
+                const celDiv = document.createElement('div');
+                celDiv.innerHTML = html;
+                const content = celDiv.firstElementChild;
+                nameRotator.appendChild(content);
+                
+                void content.offsetWidth; // Force reflow
+                content.classList.add('active');
+            }, 300); // Wait for the box to expand
+
+            // 3. Hold for 7 seconds, then revert
+            setTimeout(() => {
+                // Fade out content
+                const content = nameRotator.querySelector('.celebration-content');
+                if (content) {
+                    content.classList.remove('active');
+                    setTimeout(() => content.remove(), 500);
+                }
+
+                // Revert Layout
+                mainRow.classList.remove('celebrate-' + side);
+
+                setTimeout(() => { isCelebrationActive = false; }, 800);
+            }, 7000); 
+        }
+
         function initBroadcastEngine(id, matchCode) {
             const matchRef = db.ref('live_matches/' + id);
 
@@ -2341,6 +2570,11 @@ function syncRaidAudio(clock) {
                 if (data.state_json) {
                     try {
                         state = JSON.parse(data.state_json);
+
+                        // Check for Super 10 / High Five
+                        checkCelebrations(state, data);
+                        
+                        renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
 
                         renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
                         renderDots('right-dot', state.rightOutIds, state.rightRosterJson, rightColor);
