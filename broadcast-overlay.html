@@ -593,7 +593,7 @@
         .audio-test-btn { position: fixed; top: 20px; left: 20px; z-index: 2147483647; padding: 12px 24px; background-color: #EF4444; color: #FFFFFF; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; border: 2px solid #FFFFFF; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8); pointer-events: auto; visibility: hidden;}
         .audio-test-btn:hover { background-color: #DC2626; }
 
-                 /* CONFETTI & FIREWORK ANIMATION */
+                         /* CONFETTI & FIREWORK ANIMATION */
         #confetti-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999; overflow: hidden; }
         
         /* Confetti: Soft edges, pops up, then naturally falls back down */
@@ -620,7 +620,7 @@
             height: 12px;
             background: #fff;
             border-radius: 2px;
-            box-shadow: 0 0 10px #fff, 0 0 25px #ffd700, 0 0 50px #ffd700; /* Bright glowing yellow */
+            box-shadow: 0 0 10px #fff, 0 0 25px #ffd700, 0 0 50px #ffd700;
             opacity: 0;
             animation: fireworkLaunch 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
         }
@@ -640,18 +640,16 @@
             animation: sparkFlicker 0.1s infinite alternate;
         }
 
-        /* The Explosion */
-        .firework::after {
-            content: '';
+        /* The Explosion (Radial Starburst) */
+        .firework-spark {
             position: absolute;
             top: 0; left: 50%;
-            width: 150px; height: 150px;
-            background: radial-gradient(circle, var(--exp-color, rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 40%, transparent 70%));
+            width: 4px; height: 4px;
             border-radius: 50%;
+            background: #fff;
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
-            /* Explodes at 0.9s and lasts 0.8s */
-            animation: fireworkBurst 0.8s ease-out 0.9s forwards;
+            animation: burstOut 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) 0.9s forwards;
         }
 
         @keyframes sparkFlicker {
@@ -665,10 +663,10 @@
             100% { transform: translateY(var(--travel, -60vh)) scaleY(0); opacity: 0; }
         }
 
-        @keyframes fireworkBurst {
+        @keyframes burstOut {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(2.5); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
 
 
@@ -1384,6 +1382,7 @@
             'background': new Audio('/audio/background.mp3'),
             'suspension_start': new Audio('/audio/suspension_start.mp3'), // <-- ADD THIS
             'suspension_end': new Audio('/audio/suspension_end.mp3'),      // <-- ADD THIS
+            'super-10': new Audio('/audio/super-10.mp3'), // <-- ADD THIS
         };
 
         // Pre-configure the background audio to loop
@@ -1410,7 +1409,7 @@
 
                         
         
-                function triggerConfetti() {
+                        function triggerConfetti() {
             const container = document.getElementById('confetti-container');
             if (!container) return;
             container.innerHTML = '';
@@ -1429,37 +1428,54 @@
                 container.appendChild(p);
             }
 
-            // 2. Launch Sky Firecrackers (Continuous throughout the 5 seconds)
-            for (let i = 0; i < 80; i++) {
+            // 2. Launch Firecrackers with Radial Starbursts
+            for (let i = 0; i < 30; i++) {
                 const f = document.createElement('div');
                 f.className = 'firework';
                 f.style.left = (Math.random() * 90 + 5) + 'vw';
                 
-                // Delay from 0s to 3.5s. Since the rocket takes ~2s to launch and burst,
-                // the last ones will burst right at the 5.5s mark, covering the whole show.
                 const randomDelay = Math.random() * 3.5;
                 f.style.animationDelay = randomDelay + 's';
                 
-                // Random Height between 15vh and 85vh from the bottom
                 const randomHeight = Math.floor(Math.random() * 70) + 15;
                 f.style.setProperty('--travel', `-${randomHeight}vh`);
                 
-                // Randomize explosion colors
-                const expColors = [
-                    'rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 40%, transparent 70%',
-                    'rgba(255,255,255,1) 0%, rgba(255,215,0,0.8) 40%, transparent 70%',
-                    'rgba(255,255,255,1) 0%, rgba(34,197,94,0.8) 40%, transparent 70%',
-                    'rgba(255,255,255,1) 0%, rgba(59,130,246,0.8) 40%, transparent 70%',
-                    'rgba(255,255,255,1) 0%, rgba(233,30,99,0.8) 40%, transparent 70%'
-                ];
-                f.style.setProperty('--exp-color', expColors[Math.floor(Math.random() * expColors.length)]);
+                // Generate the radial starburst
+                const spark = document.createElement('div');
+                spark.className = 'firework-spark';
                 
+                const numSparks = 16;
+                const sparkColor = colors[Math.floor(Math.random() * colors.length)];
+                let boxShadows = [];
+                
+                // Outer long sparks
+                for(let j=0; j<numSparks; j++) {
+                    const angle = (j / numSparks) * 360;
+                    const dist = 40 + Math.random() * 40;
+                    const x = Math.cos(angle * Math.PI / 180) * dist;
+                    const y = Math.sin(angle * Math.PI / 180) * dist;
+                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 0 2px ${sparkColor}`);
+                }
+                // Inner white hot core sparks
+                for(let j=0; j<8; j++) {
+                    const angle = (j / 8) * 360;
+                    const dist = 15 + Math.random() * 15;
+                    const x = Math.cos(angle * Math.PI / 180) * dist;
+                    const y = Math.sin(angle * Math.PI / 180) * dist;
+                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 0 1.5px #ffffff`);
+                }
+                
+                spark.style.boxShadow = boxShadows.join(', ');
+                spark.style.animationDelay = (randomDelay + 0.9) + 's';
+                
+                f.appendChild(spark);
                 container.appendChild(f);
             }
 
-            // Clear after 5 seconds
-            setTimeout(() => { container.innerHTML = ''; }, 5000);
+            setTimeout(() => { container.innerHTML = ''; }, 5500);
         }
+
+        
         // ============================================================
 // RAID CLOCK AUDIO — bulletproof OBS-friendly sync
 // ============================================================
@@ -2540,8 +2556,12 @@ function syncRaidAudio(clock) {
             if (scanTeam(rightRoster, 'right')) return;
         }
 
-        function triggerCelebration(side, player, text) {
+                function triggerCelebration(side, player, text) {
             isCelebrationActive = true;
+            
+            // 🎵 Play Sound Effect (Once)
+            playEventSound('super-10');
+            
             const mainRow = document.getElementById('main-row');
             const teamInner = document.getElementById(side + '-team-bg');
             const nameRotator = teamInner.querySelector('.name-rotator');
@@ -2612,23 +2632,28 @@ function syncRaidAudio(clock) {
                 const content = celDiv.firstElementChild;
                 nameRotator.appendChild(content);
                 
-                void content.offsetWidth; // Force reflow
+                void content.offsetWidth; 
                 content.classList.add('active');
             }, 400); 
 
-            // 3. Hold for 7 seconds, then revert
+            // 3. Hold for 7 seconds, then revert SMOOTHLY
             setTimeout(() => {
                 const content = nameRotator.querySelector('.celebration-content');
                 if (content) {
+                    // Fade out the text and confetti first
                     content.classList.remove('active');
-                    setTimeout(() => content.remove(), 500);
+                    
+                    // Wait for the fade out to finish BEFORE shifting the boxes back
+                    setTimeout(() => {
+                        content.remove();
+                        mainRow.classList.remove('celebrate-' + side);
+                        
+                        // Finally, unlock the flag after the layout finishes reverting
+                        setTimeout(() => { isCelebrationActive = false; }, 800);
+                    }, 500); // 500ms matches the CSS transition time for `.celebration-content`
                 }
-
-                mainRow.classList.remove('celebrate-' + side);
-                setTimeout(() => { isCelebrationActive = false; }, 800);
             }, 7000); 
         }
-
         
         function initBroadcastEngine(id, matchCode) {
             const matchRef = db.ref('live_matches/' + id);
