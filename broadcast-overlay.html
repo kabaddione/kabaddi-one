@@ -1160,7 +1160,9 @@
             'all-out': new Audio('/audio/all-out.mp3'),
             'event-slide-in': new Audio('/audio/event-slide-in.mp3'),
             'confetti': new Audio('/audio/confetti_1.mp3'),
-            'background': new Audio('/audio/background.mp3')
+            'background': new Audio('/audio/background.mp3'),
+            'suspension_start': new Audio('/audio/suspension_start.mp3'), // <-- ADD THIS
+            'suspension_end': new Audio('/audio/suspension_end.mp3'),      // <-- ADD THIS
         };
 
         // Pre-configure the background audio to loop
@@ -1934,6 +1936,8 @@ function syncRaidAudio(clock) {
         let localSuspensions = { left: null, right: null };
         let lastMainClockSeconds = -1;
         let lastParsedStateJson = null;
+        let wasLeftSuspended = false;  // <-- ADD THIS
+        let wasRightSuspended = false; // <-- ADD THIS
 
         function parseMainClock(clockStr) {
             if (!clockStr || !clockStr.includes(':')) return -1;
@@ -1986,27 +1990,57 @@ function syncRaidAudio(clock) {
                 }
             }
 
+            // --- LEFT SUSPENSION TIMER LOGIC ---
+            const isLeftActive = localSuspensions.left && localSuspensions.left.timeLeft > 0;
             const lTimer = document.getElementById('left-suspension-timer');
+            
             if (lTimer) {
-                if (localSuspensions.left && localSuspensions.left.timeLeft > 0) {
+                if (isLeftActive) {
                     document.getElementById('left-suspension-time').textContent = localSuspensions.left.timeLeft;
-                    document.getElementById('left-suspension-player').textContent =
+                    document.getElementById('left-suspension-player').textContent = 
                         `#${localSuspensions.left.jersey || ''} ${localSuspensions.left.name || 'Player'}`.trim();
                     lTimer.classList.add('show');
+                    
+                    // Play START sound if it just appeared
+                    if (!wasLeftSuspended) {
+                        playEventSound('suspension_start');
+                        wasLeftSuspended = true;
+                    }
                 } else {
                     lTimer.classList.remove('show');
+                    
+                    // Play END sound if it just disappeared
+                    if (wasLeftSuspended) {
+                        playEventSound('suspension_end');
+                        wasLeftSuspended = false;
+                    }
                 }
             }
 
+            // --- RIGHT SUSPENSION TIMER LOGIC ---
+            const isRightActive = localSuspensions.right && localSuspensions.right.timeLeft > 0;
             const rTimer = document.getElementById('right-suspension-timer');
+            
             if (rTimer) {
-                if (localSuspensions.right && localSuspensions.right.timeLeft > 0) {
+                if (isRightActive) {
                     document.getElementById('right-suspension-time').textContent = localSuspensions.right.timeLeft;
-                    document.getElementById('right-suspension-player').textContent =
+                    document.getElementById('right-suspension-player').textContent = 
                         `#${localSuspensions.right.jersey || ''} ${localSuspensions.right.name || 'Player'}`.trim();
                     rTimer.classList.add('show');
+
+                    // Play START sound if it just appeared
+                    if (!wasRightSuspended) {
+                        playEventSound('suspension_start');
+                        wasRightSuspended = true;
+                    }
                 } else {
                     rTimer.classList.remove('show');
+
+                    // Play END sound if it just disappeared
+                    if (wasRightSuspended) {
+                        playEventSound('suspension_end');
+                        wasRightSuspended = false;
+                    }
                 }
             }
         }
