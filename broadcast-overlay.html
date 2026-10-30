@@ -593,7 +593,7 @@
         .audio-test-btn { position: fixed; top: 20px; left: 20px; z-index: 2147483647; padding: 12px 24px; background-color: #EF4444; color: #FFFFFF; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; border: 2px solid #FFFFFF; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8); pointer-events: auto; visibility: hidden;}
         .audio-test-btn:hover { background-color: #DC2626; }
 
-                                /* CONFETTI & FIREWORK ANIMATION */
+         /* CONFETTI & FIREWORK ANIMATION */
         #confetti-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999; overflow: hidden; }
         
         /* Confetti: Soft edges, pops up, then naturally falls back down */
@@ -607,9 +607,20 @@
             animation: confettiArc linear forwards; 
         }
         @keyframes confettiArc {
-            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 1; }
-            40% { transform: translateY(-80vh) rotate(720deg) scale(1); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(1440deg) scale(1); opacity: 0; }
+            0% { 
+                transform: translateY(0) rotate(0deg) scale(0.8); 
+                opacity: 1; 
+                animation-timing-function: ease-out; /* Fast launch */
+            }
+            40% { 
+                transform: translateY(-80vh) rotate(720deg) scale(1); 
+                opacity: 1; 
+                animation-timing-function: ease-in; /* Gravity slows it at peak, then accelerates down */
+            }
+            100% { 
+                transform: translateY(100vh) rotate(1440deg) scale(1); 
+                opacity: 0; 
+            }
         }
 
         /* Firecracker Rocket */
@@ -638,7 +649,6 @@
             animation: fireworkBurst 0.6s ease-out 0.6s forwards;
         }
 
-        /* Random heights for different firecrackers */
         @keyframes fireworkLaunch {
             0% { transform: translateY(0) scaleY(1); opacity: 1; }
             70% { transform: translateY(var(--travel, -60vh)) scaleY(1.2); opacity: 1; }
@@ -1258,15 +1268,18 @@
                 container.appendChild(p);
             }
 
-            // 2. Launch Sky Firecrackers with Random Heights
-            for (let i = 0; i < 25; i++) {
+            // 2. Launch Sky Firecrackers (Random Timings & Random Heights)
+            for (let i = 0; i < 35; i++) {
                 const f = document.createElement('div');
                 f.className = 'firework';
                 f.style.left = (Math.random() * 90 + 5) + 'vw';
-                f.style.animationDelay = (Math.random() * 0.2) + 's';
                 
-                // 🔥 RANDOM HEIGHT: Travels between 40vh and 85vh up from the bottom
-                const randomHeight = Math.floor(Math.random() * 45) + 40;
+                // Random Launch Time between 0s and 3.5s (so it finishes bursting by 5s)
+                const randomDelay = Math.random() * 3.5;
+                f.style.animationDelay = randomDelay + 's';
+                
+                // Random Height between 10vh and 80vh from the bottom
+                const randomHeight = Math.floor(Math.random() * 70) + 10;
                 f.style.setProperty('--travel', `-${randomHeight}vh`);
                 
                 const expColors = [
@@ -1281,7 +1294,7 @@
                 container.appendChild(f);
             }
 
-            // Clear after 5 seconds
+            // Clear after 5 seconds as requested
             setTimeout(() => { container.innerHTML = ''; }, 5000);
         }
         // ============================================================
