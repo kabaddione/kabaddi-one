@@ -282,10 +282,10 @@
         .dots-right-inner { width: 100%; height: 100%; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); display: flex; align-items: center; justify-content: flex-start; padding-left: 45px; gap: 10px; padding-top: 5px; }
         .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #D4AF37; background: rgba(255,255,255,0.2); box-shadow: 0px 2px 4px rgba(0,0,0,0.8); transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease; }
         .dot.active { background: var(--dot-active-color, #00FF00); border-color: #FFFFFF; box-shadow: 0 0 10px var(--dot-active-color, #00FF00), 0 0 4px #FFFFFF inset; }
-        .dots-left-wrap.result-hidden, .dots-right-wrap.result-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .dots-left-wrap.result-hidden, .dots-right-wrap.result-hidden { opacity: 0 !important;  transform: translateY(20px); pointer-events: none; }
 
         .marquee-row { display: flex; justify-content: center; align-items: center; width: 100%; margin-top: -17px; z-index: 6; position: relative; transition: opacity 0.4s ease, transform 0.4s ease; }
-        .marquee-row.result-hidden { opacity: 0; transform: translateY(20px); }
+        .marquee-row.result-hidden { opacity: 0 !important;  transform: translateY(20px); }
         .marquee-box { width: 310px; height: 20px; border-radius: 3px; overflow: hidden; position: relative; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%); }
         .marquee-box.marquee-right { clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%); }
         .marquee-box.marquee-left  { clip-path: polygon(0 0, 97% 0, 100% 100%, 3% 100%); }
@@ -649,8 +649,8 @@
             background: #fff;
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
-            /* Explodes at 0.9s, takes 1.5s to fade */
-            animation: burstOut 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) 0.9s forwards;
+            /* Explodes at 0.9s, takes 1.8s to fade */
+            animation: burstOut 1.8s cubic-bezier(0.1, 0.8, 0.3, 1) 0.9s forwards;
         }
 
         @keyframes sparkFlicker {
@@ -666,8 +666,8 @@
 
         @keyframes burstOut {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            15% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; } /* Fast initial burst */
-            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; } /* Expands wide and fades */
+            15% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; } /* Bigger initial burst */
+            100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; } /* Expands massive and fades */
         }
 
 
@@ -1430,6 +1430,7 @@
             }
 
             // 2. Launch Firecrackers with Radial Starbursts
+                        // 2. Launch Firecrackers with Radial Starbursts
             for (let i = 0; i < 30; i++) {
                 const f = document.createElement('div');
                 f.className = 'firework';
@@ -1445,34 +1446,34 @@
                 const spark = document.createElement('div');
                 spark.className = 'firework-spark';
                 
-                const numOuterSparks = Math.floor(Math.random() * 8) + 12; // Randomize between 12 and 20 streaks
+                const numOuterSparks = Math.floor(Math.random() * 10) + 15; // 15 to 25 streaks
                 const sparkColor = colors[Math.floor(Math.random() * colors.length)];
-                const sizeMultiplier = Math.random() * 0.9 + 0.6; // Randomize size (60% to 150%)
+                const sizeMultiplier = Math.random() * 1.5 + 1.0; // 1.0x to 2.5x size
                 
                 let boxShadows = [];
                 
                 // Outer long glowing streaks
                 for(let j=0; j<numOuterSparks; j++) {
                     const angle = (j / numOuterSparks) * 360;
-                    // Increased base distance dramatically for visibility
-                    const baseDist = 100 + Math.random() * 100; 
+                    // Massively increased base distance (up to 450px before multiplier)
+                    const baseDist = 150 + Math.random() * 300; 
                     const dist = baseDist * sizeMultiplier;
                     const x = Math.cos(angle * Math.PI / 180) * dist;
                     const y = Math.sin(angle * Math.PI / 180) * dist;
                     
-                    // Thicker spread (4px) and blur (3px) to make it look like a glowing firecracker streak
-                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 4px 3px ${sparkColor}`);
+                    // Thicker spread (8px) and blur (6px) for massive glowing streaks
+                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 6px 6px ${sparkColor}`);
                 }
                 
                 // Inner white hot core sparks
-                for(let j=0; j<8; j++) {
-                    const angle = (j / 8) * 360;
-                    const baseDist = 30 + Math.random() * 50;
+                for(let j=0; j<12; j++) {
+                    const angle = (j / 12) * 360;
+                    const baseDist = 50 + Math.random() * 80;
                     const dist = baseDist * sizeMultiplier;
                     const x = Math.cos(angle * Math.PI / 180) * dist;
                     const y = Math.sin(angle * Math.PI / 180) * dist;
                     
-                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 2px 2px #ffffff`);
+                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 4px 4px #ffffff`);
                 }
                 
                 spark.style.boxShadow = boxShadows.join(', ');
