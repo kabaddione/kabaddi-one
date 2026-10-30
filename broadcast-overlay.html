@@ -593,7 +593,7 @@
         .audio-test-btn { position: fixed; top: 20px; left: 20px; z-index: 2147483647; padding: 12px 24px; background-color: #EF4444; color: #FFFFFF; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; border: 2px solid #FFFFFF; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8); pointer-events: auto; visibility: hidden;}
         .audio-test-btn:hover { background-color: #DC2626; }
 
-         /* CONFETTI & FIREWORK ANIMATION */
+                 /* CONFETTI & FIREWORK ANIMATION */
         #confetti-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999; overflow: hidden; }
         
         /* Confetti: Soft edges, pops up, then naturally falls back down */
@@ -607,58 +607,68 @@
             animation: confettiArc linear forwards; 
         }
         @keyframes confettiArc {
-            0% { 
-                transform: translateY(0) rotate(0deg) scale(0.8); 
-                opacity: 1; 
-                animation-timing-function: ease-out; /* Fast launch */
-            }
-            40% { 
-                transform: translateY(-80vh) rotate(720deg) scale(1); 
-                opacity: 1; 
-                animation-timing-function: ease-in; /* Gravity slows it at peak, then accelerates down */
-            }
-            100% { 
-                transform: translateY(100vh) rotate(1440deg) scale(1); 
-                opacity: 0; 
-            }
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 1; animation-timing-function: ease-out; }
+            40% { transform: translateY(-80vh) rotate(720deg) scale(1); opacity: 1; animation-timing-function: ease-in; }
+            100% { transform: translateY(100vh) rotate(1440deg) scale(1); opacity: 0; }
         }
 
-        /* Firecracker Rocket */
+        /* Firecracker Rocket with Glowing Yellow Trail */
         .firework {
             position: absolute;
             bottom: 0;
             width: 4px;
-            height: 18px;
+            height: 12px;
             background: #fff;
             border-radius: 2px;
-            box-shadow: 0 0 10px #fff, 0 0 20px #ffd700;
+            box-shadow: 0 0 10px #fff, 0 0 25px #ffd700, 0 0 50px #ffd700; /* Bright glowing yellow */
             opacity: 0;
-            animation: fireworkLaunch 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+            animation: fireworkLaunch 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
         }
 
-        /* Firecracker Explosion */
+        /* The Spark Trail behind the rocket */
+        .firework::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            width: 3px;
+            height: 50px;
+            background: linear-gradient(to top, #ffd700 0%, rgba(255, 215, 0, 0.5) 50%, transparent 100%);
+            transform: translateX(-50%);
+            border-radius: 50% 50% 0 0;
+            filter: blur(1px);
+            animation: sparkFlicker 0.1s infinite alternate;
+        }
+
+        /* The Explosion */
         .firework::after {
             content: '';
             position: absolute;
             top: 0; left: 50%;
-            width: 120px; height: 120px;
-            background: radial-gradient(circle, var(--exp-color, rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 30%, transparent 60%));
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, var(--exp-color, rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 40%, transparent 70%));
             border-radius: 50%;
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
-            animation: fireworkBurst 0.6s ease-out 0.6s forwards;
+            /* Explodes at 0.9s and lasts 0.8s */
+            animation: fireworkBurst 0.8s ease-out 0.9s forwards;
+        }
+
+        @keyframes sparkFlicker {
+            0% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
+            100% { opacity: 1; transform: translateX(-50%) scaleY(1.2); }
         }
 
         @keyframes fireworkLaunch {
             0% { transform: translateY(0) scaleY(1); opacity: 1; }
-            70% { transform: translateY(var(--travel, -60vh)) scaleY(1.2); opacity: 1; }
+            75% { transform: translateY(var(--travel, -60vh)) scaleY(1.2); opacity: 1; }
             100% { transform: translateY(var(--travel, -60vh)) scaleY(0); opacity: 0; }
         }
 
         @keyframes fireworkBurst {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(2.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
         }
     </style>
 </head>
@@ -1249,7 +1259,7 @@
 
                         
         
-        function triggerConfetti() {
+                function triggerConfetti() {
             const container = document.getElementById('confetti-container');
             if (!container) return;
             container.innerHTML = '';
@@ -1268,33 +1278,35 @@
                 container.appendChild(p);
             }
 
-            // 2. Launch Sky Firecrackers (Random Timings & Random Heights)
-            for (let i = 0; i < 35; i++) {
+            // 2. Launch Sky Firecrackers (Continuous throughout the 5 seconds)
+            for (let i = 0; i < 80; i++) {
                 const f = document.createElement('div');
                 f.className = 'firework';
                 f.style.left = (Math.random() * 90 + 5) + 'vw';
                 
-                // Random Launch Time between 0s and 3.5s (so it finishes bursting by 5s)
+                // Delay from 0s to 3.5s. Since the rocket takes ~2s to launch and burst,
+                // the last ones will burst right at the 5.5s mark, covering the whole show.
                 const randomDelay = Math.random() * 3.5;
                 f.style.animationDelay = randomDelay + 's';
                 
-                // Random Height between 10vh and 80vh from the bottom
-                const randomHeight = Math.floor(Math.random() * 70) + 10;
+                // Random Height between 15vh and 85vh from the bottom
+                const randomHeight = Math.floor(Math.random() * 70) + 15;
                 f.style.setProperty('--travel', `-${randomHeight}vh`);
                 
+                // Randomize explosion colors
                 const expColors = [
-                    'rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 30%, transparent 60%',
-                    'rgba(255,255,255,1) 0%, rgba(255,215,0,0.8) 30%, transparent 60%',
-                    'rgba(255,255,255,1) 0%, rgba(34,197,94,0.8) 30%, transparent 60%',
-                    'rgba(255,255,255,1) 0%, rgba(59,130,246,0.8) 30%, transparent 60%',
-                    'rgba(255,255,255,1) 0%, rgba(233,30,99,0.8) 30%, transparent 60%'
+                    'rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 40%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(255,215,0,0.8) 40%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(34,197,94,0.8) 40%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(59,130,246,0.8) 40%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(233,30,99,0.8) 40%, transparent 70%'
                 ];
                 f.style.setProperty('--exp-color', expColors[Math.floor(Math.random() * expColors.length)]);
                 
                 container.appendChild(f);
             }
 
-            // Clear after 5 seconds as requested
+            // Clear after 5 seconds
             setTimeout(() => { container.innerHTML = ''; }, 5000);
         }
         // ============================================================
