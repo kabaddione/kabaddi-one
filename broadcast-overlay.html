@@ -3181,10 +3181,15 @@ function syncRaidAudio(clock) {
             const s7 = document.getElementById('starting7-overlay');
             const mi = document.getElementById('match-intro-overlay');
             const toss = document.getElementById('toss-result-overlay');
+            const teamStats = document.getElementById('team-stats-overlay');
+            const playerPerf = document.getElementById('player-perf-overlay');
 
+            // 🎵 ADDED teamStats and playerPerf here so the background audio plays for them too
             const isAnyActive = (s7 && s7.classList.contains('show')) ||
                                 (mi && mi.classList.contains('show')) ||
-                                (toss && toss.classList.contains('show'));
+                                (toss && toss.classList.contains('show')) ||
+                                (teamStats && teamStats.classList.contains('show')) ||
+                                (playerPerf && playerPerf.classList.contains('show'));
 
             if (isAnyActive) {
                 document.body.classList.add('mi-active');
