@@ -672,7 +672,7 @@
         }
 
 
-                                /* --- SUPER 10 / HIGH FIVE CELEBRATION STYLES --- */
+                                        /* --- SUPER 10 / HIGH FIVE CELEBRATION STYLES --- */
         
         /* Lock the main-row width so it never stretches to the screen edges */
         .main-row {
@@ -682,19 +682,14 @@
             justify-content: center;
         }
 
-        .main-row, .team-left-wrap, .team-right-wrap, .score-left-wrap, .score-right-wrap, .center-wrap, .center-info-wrap {
+        .main-row, .team-left-wrap, .team-right-wrap, .score-left-wrap, .score-right-wrap, .center-wrap {
             transition: all 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
         }
 
-        /* HIDE OUTER ELEMENTS */
-        body.celebrate-left .top-raid-bars, body.celebrate-right .top-raid-bars,
-        body.celebrate-left .marquee-row, body.celebrate-right .marquee-row,
-        body.celebrate-left .dots-left-wrap, body.celebrate-left .dots-right-wrap,
-        body.celebrate-right .dots-left-wrap, body.celebrate-right .dots-right-wrap,
-        body.celebrate-left .info-box-left, body.celebrate-left .info-box-right,
-        body.celebrate-right .info-box-left, body.celebrate-right .info-box-right {
-            opacity: 0 !important;
-            pointer-events: none;
+        /* Ensure background elements remain visible and in place */
+        .top-raid-bars, .marquee-row, .dots-left-wrap, .dots-right-wrap, .center-info-wrap, .info-box {
+            opacity: 1 !important; 
+            pointer-events: auto;
         }
 
         /* LEFT CELEBRATION LAYOUT */
@@ -719,22 +714,6 @@
         }
         .main-row.celebrate-right .team-left-wrap { display: none; }
 
-        /* CENTER INFO WRAP ALIGNMENT & SHRINKING */
-        body.celebrate-left .center-info-wrap {
-            width: 140px !important; /* Shrink width */
-            transform: translateX(420px); /* Slide right to align under center clock */
-        }
-        body.celebrate-right .center-info-wrap {
-            width: 140px !important; /* Shrink width */
-            transform: translateX(-460px); /* Slide left to align under center clock */
-        }
-        body.celebrate-left .info-box-center, body.celebrate-right .info-box-center {
-            position: relative;
-            left: auto; top: auto; transform: none;
-            margin: 0 auto;
-            border: none; /* Remove the vertical divider lines */
-        }
-
         /* HIDE TEAM NAME TEXT */
         .main-row.celebrate-left .team-name-text, .main-row.celebrate-left .raider-name-text,
         .main-row.celebrate-right .team-name-text, .main-row.celebrate-right .raider-name-text {
@@ -754,23 +733,48 @@
             transform: scale(0.8);
             transition: all 0.5s cubic-bezier(0.34, 1.5, 0.64, 1);
             z-index: 10;
+            overflow: hidden;
         }
         .celebration-content.active {
             opacity: 1;
             transform: scale(1);
         }
         
+        /* LOCALIZED CONFETTI BACKGROUND */
+        .celeb-confetti-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .celeb-shape {
+            position: absolute;
+            top: -20px;
+            animation: fallInsideBar linear forwards;
+        }
+        @keyframes fallInsideBar {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
+        }
+
         .celebration-img {
             width: 65px;
             height: 65px;
             object-fit: contain;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+            position: relative;
+            z-index: 2;
         }
         
         .celebration-player {
             display: flex;
             align-items: center;
             gap: 10px;
+            position: relative;
+            z-index: 2;
         }
         .celebration-name {
             font-family: 'Mukta', sans-serif;
@@ -798,9 +802,10 @@
                 0 5px 10px rgba(0,0,0,0.2), 0 10px 10px rgba(0,0,0,0.15);
             animation: pulseText 1s infinite alternate;
             transform: skewX(-5deg);
+            position: relative;
+            z-index: 2;
         }
         
-        /* Right layout specific positioning */
         .right-layout .celebration-text { transform: skewX(5deg); }
 
         @keyframes pulseText {
@@ -1341,6 +1346,7 @@
 
         let isCelebrationActive = false;
         let celebratedPlayers = new Set(); // Keeps track of who already got a banner
+        let pendingCelebration = null; // <-- ADD THIS
         
         let lastOverlayTeam = '';
         let lastOverlayPlayerId = '';
@@ -2463,49 +2469,77 @@ function syncRaidAudio(clock) {
                 // ==========================================
         // SUPER 10 / HIGH FIVE CELEBRATION
         // ==========================================
+                // ==========================================
+        // SUPER 10 / HIGH FIVE CELEBRATION
+        // ==========================================
         function checkCelebrations(state, data) {
-            if (!state || isCelebrationActive) return;
+            if (!state) return;
+            
+            // 1. If a celebration is currently playing, do nothing.
+            if (isCelebrationActive) return;
+
+            // 2. Check Raid State
+            const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
+            let currentRaidIsLeft = true;
+            const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
+            if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
+
+            // 3. Process Pending Celebration (If we queued one earlier)
+            if (pendingCelebration) {
+                const p = pendingCelebration;
+                const isPlayerTeamRaiding = (p.side === 'left' && raidActive && currentRaidIsLeft) || 
+                                            (p.side === 'right' && raidActive && !currentRaidIsLeft);
+                
+                // If their team is no longer raiding, trigger it!
+                if (!isPlayerTeamRaiding) {
+                    triggerCelebration(p.side, p.player, p.text);
+                    pendingCelebration = null;
+                }
+                return; // Wait for pending to resolve before checking new ones
+            }
 
             let leftRoster = [], rightRoster = [];
             try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
             try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-            // Check Left Team
-            for (const p of leftRoster) {
-                const raidPts = parseInt(p.raidPoints) || 0;
-                const tacklePts = parseInt(p.tacklePoints) || 0;
-                const id = String(p.id);
-                
-                if (raidPts >= 10 && !celebratedPlayers.has(id + '_raid')) {
-                    celebratedPlayers.add(id + '_raid');
-                    triggerCelebration('left', p, 'SUPER 10');
-                    return;
-                }
-                if (tacklePts >= 5 && !celebratedPlayers.has(id + '_tackle')) {
-                    celebratedPlayers.add(id + '_tackle');
-                    triggerCelebration('left', p, 'HIGH FIVE');
-                    return;
-                }
-            }
+            // 4. Scan for New Celebrations
+            const scanTeam = (roster, side) => {
+                for (const p of roster) {
+                    const raidPts = parseInt(p.raidPoints) || 0;
+                    const tacklePts = parseInt(p.tacklePoints) || 0;
+                    const id = String(p.id);
+                    
+                    let text = '';
+                    if (raidPts >= 10 && !celebratedPlayers.has(id + '_raid')) {
+                        celebratedPlayers.add(id + '_raid');
+                        text = 'SUPER 10';
+                    } else if (tacklePts >= 5 && !celebratedPlayers.has(id + '_tackle')) {
+                        celebratedPlayers.add(id + '_tackle');
+                        text = 'HIGH FIVE';
+                    }
 
-            // Check Right Team
-            for (const p of rightRoster) {
-                const raidPts = parseInt(p.raidPoints) || 0;
-                const tacklePts = parseInt(p.tacklePoints) || 0;
-                const id = String(p.id);
-                
-                if (raidPts >= 10 && !celebratedPlayers.has(id + '_raid')) {
-                    celebratedPlayers.add(id + '_raid');
-                    triggerCelebration('right', p, 'SUPER 10');
-                    return;
+                    if (text) {
+                        // Check if their team is currently raiding
+                        const isPlayerTeamRaiding = (side === 'left' && raidActive && currentRaidIsLeft) || 
+                                                    (side === 'right' && raidActive && !currentRaidIsLeft);
+                        
+                        if (isPlayerTeamRaiding) {
+                            // Queue it for later
+                            pendingCelebration = { side, player: p, text };
+                        } else {
+                            // Trigger immediately
+                            triggerCelebration(side, p, text);
+                        }
+                        return true; // Found one, stop scanning
+                    }
                 }
-                if (tacklePts >= 5 && !celebratedPlayers.has(id + '_tackle')) {
-                    celebratedPlayers.add(id + '_tackle');
-                    triggerCelebration('right', p, 'HIGH FIVE');
-                    return;
-                }
-            }
+                return false;
+            };
+
+            if (scanTeam(leftRoster, 'left')) return;
+            if (scanTeam(rightRoster, 'right')) return;
         }
+
         function triggerCelebration(side, player, text) {
             isCelebrationActive = true;
             const mainRow = document.getElementById('main-row');
@@ -2517,11 +2551,37 @@ function syncRaidAudio(clock) {
             const jersey = player.jerseyNumber ? ` (${player.jerseyNumber})` : '';
             const displayName = `${playerName}${jersey}`;
             
+            // Generate localized confetti elements
+            let confettiHTML = '<div class="celeb-confetti-bg">';
+            const shapes = ['circle', 'ribbon', 'star'];
+            const colors = ['#FFD700', '#FF5E3A', '#22C55E', '#3B82F6', '#E91E63', '#ff99cc', '#b366ff'];
+            for(let i=0; i<30; i++) {
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = Math.random() * 15 + 10;
+                const left = Math.random() * 100;
+                const delay = Math.random() * 2;
+                const duration = Math.random() * 2 + 1.5;
+                
+                let style = `left: ${left}%; background: ${color}; width: ${size}px; height: ${size}px; animation-delay: ${delay}s; animation-duration: ${duration}s;`;
+                
+                if (shape === 'circle') {
+                    style += 'border-radius: 50%;';
+                } else if (shape === 'ribbon') {
+                    style = `left: ${left}%; border: 3px solid ${color}; width: ${size}px; height: ${size}px; animation-delay: ${delay}s; animation-duration: ${duration}s; border-radius: 50%; border-left-color: transparent; border-right-color: transparent;`;
+                } else if (shape === 'star') {
+                    style += `clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);`;
+                }
+                
+                confettiHTML += `<div class="celeb-shape" style="${style}"></div>`;
+            }
+            confettiHTML += '</div>';
+
             let html = '';
             if (side === 'left') {
-                // Left side order: Photo -> Name -> Text
                 html = `
                     <div class="celebration-content left-layout">
+                        ${confettiHTML}
                         <div class="celebration-player">
                             <img src="${imgSrc}" class="celebration-img" alt="" onerror="this.src='${DEFAULT_PLAYER_IMG}'">
                             <span class="celebration-name">${escapeHtml(displayName)}</span>
@@ -2530,9 +2590,9 @@ function syncRaidAudio(clock) {
                     </div>
                 `;
             } else {
-                // Right side order: Text -> Name -> Photo
                 html = `
                     <div class="celebration-content right-layout">
+                        ${confettiHTML}
                         <div class="celebration-text">${text}</div>
                         <div class="celebration-player">
                             <span class="celebration-name">${escapeHtml(displayName)}</span>
@@ -2542,8 +2602,7 @@ function syncRaidAudio(clock) {
                 `;
             }
 
-            // 1. Shift Layout & Hide Siblings
-            document.body.classList.add('celebrate-' + side);
+            // 1. Shift Layout
             mainRow.classList.add('celebrate-' + side);
 
             // 2. Inject and Animate Content
@@ -2555,25 +2614,22 @@ function syncRaidAudio(clock) {
                 
                 void content.offsetWidth; // Force reflow
                 content.classList.add('active');
-            }, 400); // Wait for the box to expand
+            }, 400); 
 
             // 3. Hold for 7 seconds, then revert
             setTimeout(() => {
-                // Fade out content
                 const content = nameRotator.querySelector('.celebration-content');
                 if (content) {
                     content.classList.remove('active');
                     setTimeout(() => content.remove(), 500);
                 }
 
-                // Revert Layout
-                document.body.classList.remove('celebrate-' + side);
                 mainRow.classList.remove('celebrate-' + side);
-
                 setTimeout(() => { isCelebrationActive = false; }, 800);
             }, 7000); 
         }
 
+        
         function initBroadcastEngine(id, matchCode) {
             const matchRef = db.ref('live_matches/' + id);
 
