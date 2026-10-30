@@ -612,27 +612,30 @@
             100% { transform: translateY(100vh) rotate(1440deg) scale(1); opacity: 0; }
         }
 
-        /* Firecracker Rocket with Glowing Yellow Trail */
+        /* Main container for a single firework */
         .firework {
             position: absolute;
             bottom: 0;
-            width: 4px;
-            height: 12px;
+            width: 0; height: 0; /* Zero size, acts as coordinate center */
+            animation: fireworkLaunch 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+        }
+        
+        /* Rocket projectile and its trail */
+        .firework-rocket {
+            position: absolute;
+            bottom: 0; left: -2px;
+            width: 4px; height: 15px;
             background: #fff;
             border-radius: 2px;
             box-shadow: 0 0 10px #fff, 0 0 25px #ffd700, 0 0 50px #ffd700;
             opacity: 0;
-            animation: fireworkLaunch 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+            animation: rocketFlight 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
         }
-
-        /* The Spark Trail behind the rocket */
-        .firework::before {
+        .firework-rocket::before {
             content: '';
             position: absolute;
-            bottom: 100%;
-            left: 50%;
-            width: 3px;
-            height: 50px;
+            bottom: 100%; left: 50%;
+            width: 3px; height: 60px;
             background: linear-gradient(to top, #ffd700 0%, rgba(255, 215, 0, 0.5) 50%, transparent 100%);
             transform: translateX(-50%);
             border-radius: 50% 50% 0 0;
@@ -640,34 +643,52 @@
             animation: sparkFlicker 0.1s infinite alternate;
         }
 
-        /* The Explosion (Radial Starburst) */
-        .firework-spark {
+        /* Radial Rays (The Starburst) */
+        .firework-ray {
             position: absolute;
-            top: 0; left: 50%;
-            width: 4px; height: 4px;
-            border-radius: 50%;
-            background: #fff;
-            transform: translate(-50%, -50%) scale(0);
+            top: 0; left: 0;
+            width: 3px;
+            background: var(--c);
+            border-radius: 50px;
+            box-shadow: 0 0 8px var(--c), 0 0 15px var(--c), 0 0 5px #fff;
+            transform-origin: 50% 0;
             opacity: 0;
-            /* Explodes at 0.9s, takes 1.8s to fade */
-            animation: burstOut 1.8s cubic-bezier(0.1, 0.8, 0.3, 1) 0.9s forwards;
         }
 
-        @keyframes sparkFlicker {
-            0% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
-            100% { opacity: 1; transform: translateX(-50%) scaleY(1.2); }
+        /* Central Bright Flash */
+        .firework-flash {
+            position: absolute;
+            top: 0; left: 0;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0.9) 10%, rgba(255,215,0,0.5) 30%, transparent 70%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            mix-blend-mode: screen;
         }
 
         @keyframes fireworkLaunch {
-            0% { transform: translateY(0) scaleY(1); opacity: 1; }
-            75% { transform: translateY(var(--travel, -60vh)) scaleY(1.2); opacity: 1; }
-            100% { transform: translateY(var(--travel, -60vh)) scaleY(0); opacity: 0; }
+            0% { transform: translateY(0); }
+            100% { transform: translateY(var(--travel, -60vh)); }
         }
-
-        @keyframes burstOut {
+        @keyframes rocketFlight {
+            0% { transform: scaleY(1); opacity: 1; }
+            75% { transform: scaleY(1.2); opacity: 1; }
+            90% { transform: scaleY(0); opacity: 0; }
+            100% { transform: scaleY(0); opacity: 0; }
+        }
+        @keyframes sparkFlicker {
+            0% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
+            100% { opacity: 1; transform: translateX(-50%) scaleY(1.3); }
+        }
+        @keyframes rayBurst {
+            0% { transform: rotate(var(--a)) translateY(0) scaleY(1); opacity: 1; }
+            60% { opacity: 1; }
+            100% { transform: rotate(var(--a)) translateY(var(--l)) scaleY(0.1); opacity: 0; }
+        }
+        @keyframes flashBurst {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            15% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; } /* Bigger initial burst */
-            100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; } /* Expands massive and fades */
+            15% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
         }
 
 
@@ -1410,13 +1431,15 @@
 
                         
         
-                        function triggerConfetti() {
+        function triggerConfetti() {
             const container = document.getElementById('confetti-container');
             if (!container) return;
             container.innerHTML = '';
-            const colors = ['#FFD700', '#FF5E3A', '#22C55E', '#3B82F6', '#EAB308', '#E91E63'];
             
-            // 1. Shoot Upward Confetti
+            // Expanded vibrant neon color palette
+            const colors = ['#FFD700', '#FF5E3A', '#22C55E', '#3B82F6', '#EAB308', '#E91E63', '#00FFFF', '#FF00FF', '#7C3AED'];
+            
+            // 1. Shoot Upward Background Confetti
             for (let i = 0; i < 150; i++) {
                 const p = document.createElement('div');
                 p.className = 'confetti-piece';
@@ -1429,9 +1452,8 @@
                 container.appendChild(p);
             }
 
-            // 2. Launch Firecrackers with Radial Starbursts
-                        // 2. Launch Firecrackers with Radial Starbursts
-            for (let i = 0; i < 30; i++) {
+            // 2. Launch Firecrackers (Rockets + Huge Starburst)
+            for (let i = 0; i < 22; i++) {
                 const f = document.createElement('div');
                 f.className = 'firework';
                 f.style.left = (Math.random() * 90 + 5) + 'vw';
@@ -1439,51 +1461,53 @@
                 const randomDelay = Math.random() * 3.5;
                 f.style.animationDelay = randomDelay + 's';
                 
-                const randomHeight = Math.floor(Math.random() * 70) + 15;
+                // Heights vary from mid-screen to the very top
+                const randomHeight = Math.floor(Math.random() * 70) + 20;
                 f.style.setProperty('--travel', `-${randomHeight}vh`);
                 
-                // Generate the radial starburst
-                const spark = document.createElement('div');
-                spark.className = 'firework-spark';
+                // The Rocket Projectile
+                const rocket = document.createElement('div');
+                rocket.className = 'firework-rocket';
+                rocket.style.animationDelay = randomDelay + 's';
+                f.appendChild(rocket);
+
+                // The Center Bright Flash
+                const flash = document.createElement('div');
+                flash.className = 'firework-flash';
+                flash.style.animation = `flashBurst 0.6s ease-out ${randomDelay + 0.9}s forwards`;
+                f.appendChild(flash);
                 
-                const numOuterSparks = Math.floor(Math.random() * 10) + 15; // 15 to 25 streaks
-                const sparkColor = colors[Math.floor(Math.random() * colors.length)];
-                const sizeMultiplier = Math.random() * 1.5 + 1.0; // 1.0x to 2.5x size
+                // Assign 1 or 2 base colors to this specific explosion to make it look cohesive
+                const color1 = colors[Math.floor(Math.random() * colors.length)];
+                const color2 = colors[Math.floor(Math.random() * colors.length)];
                 
-                let boxShadows = [];
+                // 35 to 65 individual bright rays per firework
+                const numRays = Math.floor(Math.random() * 30) + 35; 
                 
-                // Outer long glowing streaks
-                for(let j=0; j<numOuterSparks; j++) {
-                    const angle = (j / numOuterSparks) * 360;
-                    // Massively increased base distance (up to 450px before multiplier)
-                    const baseDist = 150 + Math.random() * 300; 
-                    const dist = baseDist * sizeMultiplier;
-                    const x = Math.cos(angle * Math.PI / 180) * dist;
-                    const y = Math.sin(angle * Math.PI / 180) * dist;
+                for(let j = 0; j < numRays; j++) {
+                    const ray = document.createElement('div');
+                    ray.className = 'firework-ray';
                     
-                    // Thicker spread (8px) and blur (6px) for massive glowing streaks
-                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 6px 6px ${sparkColor}`);
-                }
-                
-                // Inner white hot core sparks
-                for(let j=0; j<12; j++) {
-                    const angle = (j / 12) * 360;
-                    const baseDist = 50 + Math.random() * 80;
-                    const dist = baseDist * sizeMultiplier;
-                    const x = Math.cos(angle * Math.PI / 180) * dist;
-                    const y = Math.sin(angle * Math.PI / 180) * dist;
+                    // Distribute evenly in a circle, with a little randomness
+                    const angle = (j * 360 / numRays) + (Math.random() * 10 - 5); 
+                    const dist = Math.random() * 180 + 70; // Stretches out 70px to 250px!
+                    const rayColor = Math.random() > 0.4 ? color1 : color2;
                     
-                    boxShadows.push(`${x.toFixed(1)}px ${y.toFixed(1)}px 4px 4px #ffffff`);
+                    ray.style.setProperty('--a', angle + 'deg');
+                    ray.style.setProperty('--l', dist + 'px');
+                    ray.style.setProperty('--c', rayColor);
+                    ray.style.height = (Math.random() * 20 + 10) + 'px'; // 10 to 30px thick streaks
+                    
+                    // Trigger exactly when the rocket reaches its apex (0.9s into its 1.2s flight)
+                    ray.style.animation = `rayBurst 1.8s cubic-bezier(0.1, 0.8, 0.3, 1) ${randomDelay + 0.9}s forwards`;
+                    
+                    f.appendChild(ray);
                 }
-                
-                spark.style.boxShadow = boxShadows.join(', ');
-                spark.style.animationDelay = (randomDelay + 0.9) + 's';
-                
-                f.appendChild(spark);
                 container.appendChild(f);
             }
 
-            setTimeout(() => { container.innerHTML = ''; }, 5500);
+            // Cleanup container slightly after animations conclude
+            setTimeout(() => { container.innerHTML = ''; }, 7000);
         }
 
         
