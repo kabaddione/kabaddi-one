@@ -593,8 +593,8 @@
         .audio-test-btn { position: fixed; top: 20px; left: 20px; z-index: 2147483647; padding: 12px 24px; background-color: #EF4444; color: #FFFFFF; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; border: 2px solid #FFFFFF; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8); pointer-events: auto; visibility: hidden;}
         .audio-test-btn:hover { background-color: #DC2626; }
 
-                        /* CONFETTI & FIREWORK ANIMATION */
-        #confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 99999; overflow: hidden; }
+                                /* CONFETTI & FIREWORK ANIMATION */
+        #confetti-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999; overflow: hidden; }
         
         /* Confetti: Soft edges, pops up, then naturally falls back down */
         .confetti-piece { 
@@ -602,17 +602,17 @@
             bottom: -20px; 
             width: 10px; height: 10px; 
             opacity: 0; 
-            border-radius: 3px; /* Softens the hard rectangular corners */
-            filter: blur(0.5px); /* Blends the hard pixel edges into the background */
+            border-radius: 3px;
+            filter: blur(0.5px);
             animation: confettiArc linear forwards; 
         }
         @keyframes confettiArc {
             0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 1; }
-            40% { transform: translateY(-80vh) rotate(720deg) scale(1); opacity: 1; } /* Peak of the throw */
-            100% { transform: translateY(100vh) rotate(1440deg) scale(1); opacity: 0; } /* Falls to ground */
+            40% { transform: translateY(-80vh) rotate(720deg) scale(1); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(1440deg) scale(1); opacity: 0; }
         }
 
-        /* Firecracker Rocket (Fast Launch) */
+        /* Firecracker Rocket */
         .firework {
             position: absolute;
             bottom: 0;
@@ -635,14 +635,14 @@
             border-radius: 50%;
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
-            /* Explosion triggers at 0.6s (near the peak) and lasts 0.6s */
             animation: fireworkBurst 0.6s ease-out 0.6s forwards;
         }
 
+        /* Random heights for different firecrackers */
         @keyframes fireworkLaunch {
             0% { transform: translateY(0) scaleY(1); opacity: 1; }
-            70% { transform: translateY(-65vh) scaleY(1.2); opacity: 1; }
-            100% { transform: translateY(-70vh) scaleY(0); opacity: 0; }
+            70% { transform: translateY(var(--travel, -60vh)) scaleY(1.2); opacity: 1; }
+            100% { transform: translateY(var(--travel, -60vh)) scaleY(0); opacity: 0; }
         }
 
         @keyframes fireworkBurst {
@@ -1239,37 +1239,36 @@
 
                         
         
-                function triggerConfetti() {
+        function triggerConfetti() {
             const container = document.getElementById('confetti-container');
             if (!container) return;
             container.innerHTML = '';
             const colors = ['#FFD700', '#FF5E3A', '#22C55E', '#3B82F6', '#EAB308', '#E91E63'];
             
-            // 1. Shoot Upward Confetti (Pops up, then falls naturally)
+            // 1. Shoot Upward Confetti
             for (let i = 0; i < 150; i++) {
                 const p = document.createElement('div');
                 p.className = 'confetti-piece';
                 p.style.left = Math.random() * 100 + 'vw';
                 p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Duration 4-5s ensures they finish falling right as the container clears
                 p.style.animationDuration = (Math.random() * 1 + 4) + 's';
-                p.style.animationDelay = (Math.random() * 0.2) + 's'; // Almost instantly with slight stagger
+                p.style.animationDelay = (Math.random() * 0.2) + 's';
                 p.style.width = (Math.random() * 8 + 6) + 'px';
                 p.style.height = (Math.random() * 8 + 6) + 'px';
                 container.appendChild(p);
             }
 
-            // 2. Launch Sky Firecrackers (Starts immediately with confetti)
+            // 2. Launch Sky Firecrackers with Random Heights
             for (let i = 0; i < 25; i++) {
                 const f = document.createElement('div');
                 f.className = 'firework';
                 f.style.left = (Math.random() * 90 + 5) + 'vw';
-                
-                // Starts instantly (0s to 0.2s delay) so they are visible right away
                 f.style.animationDelay = (Math.random() * 0.2) + 's';
                 
-                // Randomize explosion colors
+                // 🔥 RANDOM HEIGHT: Travels between 40vh and 85vh up from the bottom
+                const randomHeight = Math.floor(Math.random() * 45) + 40;
+                f.style.setProperty('--travel', `-${randomHeight}vh`);
+                
                 const expColors = [
                     'rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 30%, transparent 60%',
                     'rgba(255,255,255,1) 0%, rgba(255,215,0,0.8) 30%, transparent 60%',
@@ -1282,10 +1281,9 @@
                 container.appendChild(f);
             }
 
-            // Clear the container after 5 seconds as requested
+            // Clear after 5 seconds
             setTimeout(() => { container.innerHTML = ''; }, 5000);
         }
-
         // ============================================================
 // RAID CLOCK AUDIO — bulletproof OBS-friendly sync
 // ============================================================
