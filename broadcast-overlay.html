@@ -716,10 +716,10 @@
         .main-row.celebrate-left { justify-content: flex-start; }
         .main-row.celebrate-left .team-left-wrap {
             flex: 1;
-            clip-path: polygon(0 0, calc(100% - 40px) 0, 100% 100%, 40px 100%);
+            clip-path: polygon(0 0, calc(100% - 44px) 0, 100% 100%, 44px 100%);
         }
         .main-row.celebrate-left .team-left-inner {
-            clip-path: polygon(0 0, calc(100% - 40px) 0, 100% 100%, 40px 100%);
+            clip-path: polygon(4px 0, calc(100% - 43px) 0, calc(100% - 3px) 100%, 43px 100%);
         }
         .main-row.celebrate-left .team-right-wrap { display: none; }
 
@@ -2690,7 +2690,7 @@ function syncRaidAudio(clock) {
                         setTimeout(() => { isCelebrationActive = false; }, 800);
                     }, 500); // 500ms matches the CSS transition time for `.celebration-content`
                 }
-            }, 700); 
+            }, 7000); 
         }
         
         function initBroadcastEngine(id, matchCode) {
