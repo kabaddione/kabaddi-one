@@ -592,6 +592,14 @@
 
         .audio-test-btn { position: fixed; top: 20px; left: 20px; z-index: 2147483647; padding: 12px 24px; background-color: #EF4444; color: #FFFFFF; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; border: 2px solid #FFFFFF; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8); pointer-events: auto; }
         .audio-test-btn:hover { background-color: #DC2626; }
+
+                /* CONFETTI ANIMATION */
+        #confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 99999; overflow: hidden; }
+        .confetti-piece { position: absolute; width: 10px; height: 10px; background: #ffd700; opacity: 0; animation: confettiFall linear forwards; }
+        @keyframes confettiFall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -599,6 +607,9 @@
     <audio id="raid-audio-player" src="/audio/kabaddi-30.mp3" preload="auto"></audio>
 
     <button id="audio-test-btn" class="audio-test-btn">TEST AUDIO</button>
+
+        <!-- Confetti Container for Match End -->
+    <div id="confetti-container"></div>
 
     <div class="channel-logo-container">
         <img src="images/top-channel-logo.webp" alt="Channel Logo">
@@ -1138,6 +1149,61 @@
         let remoteTossConfirmTimer = null;
         let remoteTossSavedCycle = null;
         let lastRemoteTossData = null;
+
+                // ============================================================
+        // EVENT AUDIO MANAGER (Super Raid, All Out, Background, etc.)
+        // ============================================================
+        const eventAudio = {
+            'super-tackle': new Audio('/audio/super-tackle.mp3'),
+            'super-raid': new Audio('/audio/super-raid.mp3'),
+            'do-or-die': new Audio('/audio/do-or-die.mp3'),
+            'all-out': new Audio('/audio/all-out.mp3'),
+            'event-slide-in': new Audio('/audio/event-slide-in.mp3'),
+            'confetti': new Audio('/audio/confetti_1.mp3'),
+            'background': new Audio('/audio/background.mp3')
+        };
+
+        // Pre-configure the background audio to loop
+        eventAudio['background'].loop = true;
+
+        let dodAudioPlaying = false;
+        let allOutLoops = 0;
+
+        function playEventSound(key, isLoop = false) {
+            const audio = eventAudio[key];
+            if (!audio) return;
+            audio.loop = isLoop;
+            audio.currentTime = 0;
+            audio.play().catch(e => window.__kabaddiLog('WARN', `Audio blocked: ${key}`, e));
+        }
+
+        function stopEventSound(key) {
+            const audio = eventAudio[key];
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        }
+
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const colors = ['#FFD700', '#FF5E3A', '#22C55E', '#3B82F6', '#EAB308', '#E91E63'];
+            for (let i = 0; i < 120; i++) {
+                const p = document.createElement('div');
+                p.className = 'confetti-piece';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+                p.style.animationDelay = (Math.random() * 0.5) + 's';
+                p.style.width = (Math.random() * 8 + 6) + 'px';
+                p.style.height = (Math.random() * 8 + 6) + 'px';
+                container.appendChild(p);
+            }
+            // Clear confetti after 5 seconds
+            setTimeout(() => { container.innerHTML = ''; }, 5000);
+        }
 
         // ============================================================
 // RAID CLOCK AUDIO — bulletproof OBS-friendly sync
@@ -2223,6 +2289,12 @@ function syncRaidAudio(clock) {
                 leftDotsWrap.classList.add('result-hidden');
                 rightDotsWrap.classList.add('result-hidden');
                 marqueeRow.classList.add('result-hidden');
+
+                // 🎉 CONFETTI & SOUND (ONLY IF NOT TIED) 🎉
+                if (ls !== rs) {
+                    playEventSound('confetti');
+                    triggerConfetti();
+                }
             } else if (!isOver && lastMatchOver) {
                 mainRow.style.display = '';
                 topBars.style.display = '';
@@ -2669,6 +2741,19 @@ function syncRaidAudio(clock) {
                 rightBar.classList.remove('dod-active');
                 rightWrap.classList.remove('dod-active');
             }
+
+            // 🚨 DO-OR-DIE AUDIO LOGIC 🚨
+            if (leftDOD || rightDOD) {
+                if (!dodAudioPlaying) {
+                    playEventSound('do-or-die', true);
+                    dodAudioPlaying = true;
+                }
+            } else {
+                if (dodAudioPlaying) {
+                    stopEventSound('do-or-die');
+                    dodAudioPlaying = false;
+                }
+            }
         }
 
         // ==========================================
@@ -2676,6 +2761,7 @@ function syncRaidAudio(clock) {
         // ==========================================
         let subBannerTimeoutIds = [];
         function triggerSubstitutionGraphic(descText, isLeftTeam) {
+            playEventSound('event-slide-in'); // <--- ADD THIS LINE
             const banner = document.getElementById('side-banner');
             const outNameEl = document.getElementById('sub-out-name');
             const inNameEl  = document.getElementById('sub-in-name');
@@ -2750,6 +2836,7 @@ function syncRaidAudio(clock) {
         }
 
         function triggerCardBanner(log) {
+            playEventSound('event-slide-in'); // <--- ADD THIS LINE
             const banner     = document.getElementById('card-side-banner');
             const playerEl   = document.getElementById('card-side-player-name');
             const badgeText  = document.getElementById('card-side-badge-text');
@@ -2887,6 +2974,26 @@ function syncRaidAudio(clock) {
                 const eventText = document.getElementById('epic-event-text');
                 if (!overlay || !eventText) return;
 
+                // --- ADD THIS AUDIO LOGIC ---
+                const aoAudio = eventAudio['all-out'];
+                aoAudio.pause();
+                aoAudio.currentTime = 0;
+                aoAudio.loop = false;
+                allOutLoops = 1;
+                aoAudio.play().catch(e => {});
+                
+                if (!aoAudio.dataset.hasListener) {
+                    aoAudio.addEventListener('ended', () => {
+                        if (allOutLoops < 3) {
+                            allOutLoops++;
+                            aoAudio.currentTime = 0;
+                            aoAudio.play().catch(e => {});
+                        }
+                    });
+                    aoAudio.dataset.hasListener = 'true';
+                }
+                // ----------------------------
+
                 eventText.innerText = 'ALL OUT';
 
                 overlay.classList.remove('entry', 'hold', 'exit', 'visible');
@@ -2945,9 +3052,11 @@ function syncRaidAudio(clock) {
                 const cacheBuster = isLocal ? '' : ('?t=' + Date.now());
 
                 if (eventType === 'super_raid') {
+                    playEventSound('super-raid'); // <--- ADD THIS LINE
                     textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">RAID</div>';
                     overlay.classList.add('animate-raid');
                 } else if (eventType === 'super_tackle') {
+                    playEventSound('super-tackle'); // <--- ADD THIS LINE
                     textWrap.innerHTML = '<div class="epic-text epic-text-super">SUPER</div><div class="epic-text epic-text-event">TACKLE</div>';
                     overlay.classList.add('animate-tackle');
                 }
@@ -3079,8 +3188,19 @@ function syncRaidAudio(clock) {
 
             if (isAnyActive) {
                 document.body.classList.add('mi-active');
+                // 🎵 Play Background Audio
+                const bgAudio = eventAudio['background'];
+                if (bgAudio && bgAudio.paused) {
+                    bgAudio.play().catch(e => window.__kabaddiLog('WARN', 'Background audio blocked', e));
+                }
             } else {
                 document.body.classList.remove('mi-active');
+                // 🎵 Stop Background Audio
+                const bgAudio = eventAudio['background'];
+                if (bgAudio && !bgAudio.paused) {
+                    bgAudio.pause();
+                    bgAudio.currentTime = 0;
+                }
             }
         }
 
