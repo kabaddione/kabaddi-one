@@ -672,8 +672,17 @@
         }
 
 
-                        /* --- SUPER 10 / HIGH FIVE CELEBRATION STYLES --- */
-        .main-row, .team-left-wrap, .team-right-wrap, .score-left-wrap, .score-right-wrap, .center-wrap, .dots-left-wrap, .dots-right-wrap, .info-box-left, .info-box-right {
+                                /* --- SUPER 10 / HIGH FIVE CELEBRATION STYLES --- */
+        
+        /* Lock the main-row width so it never stretches to the screen edges */
+        .main-row {
+            width: 1250px !important;
+            max-width: 1250px !important;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        .main-row, .team-left-wrap, .team-right-wrap, .score-left-wrap, .score-right-wrap, .center-wrap, .center-info-wrap {
             transition: all 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
         }
 
@@ -710,13 +719,29 @@
         }
         .main-row.celebrate-right .team-left-wrap { display: none; }
 
+        /* CENTER INFO WRAP ALIGNMENT & SHRINKING */
+        body.celebrate-left .center-info-wrap {
+            width: 140px !important; /* Shrink width */
+            transform: translateX(420px); /* Slide right to align under center clock */
+        }
+        body.celebrate-right .center-info-wrap {
+            width: 140px !important; /* Shrink width */
+            transform: translateX(-460px); /* Slide left to align under center clock */
+        }
+        body.celebrate-left .info-box-center, body.celebrate-right .info-box-center {
+            position: relative;
+            left: auto; top: auto; transform: none;
+            margin: 0 auto;
+            border: none; /* Remove the vertical divider lines */
+        }
+
         /* HIDE TEAM NAME TEXT */
         .main-row.celebrate-left .team-name-text, .main-row.celebrate-left .raider-name-text,
         .main-row.celebrate-right .team-name-text, .main-row.celebrate-right .raider-name-text {
             opacity: 0 !important;
         }
 
-        /* CELEBRATION CONTENT (Profile + Name + 3D Text) */
+        /* CELEBRATION CONTENT */
         .celebration-content {
             position: absolute;
             display: flex;
@@ -735,7 +760,6 @@
             transform: scale(1);
         }
         
-        /* Profile Image: No border, no radius, just image */
         .celebration-img {
             width: 65px;
             height: 65px;
@@ -743,7 +767,6 @@
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
         }
         
-        /* Player Name next to image */
         .celebration-player {
             display: flex;
             align-items: center;
@@ -759,7 +782,6 @@
             white-space: nowrap;
         }
 
-        /* 3D Text */
         .celebration-text {
             font-family: 'Teko', sans-serif;
             font-size: 85px;
@@ -776,11 +798,10 @@
                 0 5px 10px rgba(0,0,0,0.2), 0 10px 10px rgba(0,0,0,0.15);
             animation: pulseText 1s infinite alternate;
             transform: skewX(-5deg);
-            margin-right: 15px;
         }
         
-        /* Flip text placement for right side */
-        .right-layout .celebration-text { order: -1; margin-right: 0; margin-left: 15px; transform: skewX(5deg); }
+        /* Right layout specific positioning */
+        .right-layout .celebration-text { transform: skewX(5deg); }
 
         @keyframes pulseText {
             from { transform: scale(1) skewX(-5deg); }
@@ -2485,26 +2506,41 @@ function syncRaidAudio(clock) {
                 }
             }
         }
-
-                function triggerCelebration(side, player, text) {
+        function triggerCelebration(side, player, text) {
             isCelebrationActive = true;
             const mainRow = document.getElementById('main-row');
             const teamInner = document.getElementById(side + '-team-bg');
             const nameRotator = teamInner.querySelector('.name-rotator');
             
-            // Prepare HTML: Text -> Profile Photo -> Player Name
             const imgSrc = resolvePlayerImage(player);
             const playerName = player.name || 'Player';
+            const jersey = player.jerseyNumber ? ` (${player.jerseyNumber})` : '';
+            const displayName = `${playerName}${jersey}`;
             
-            const html = `
-                <div class="celebration-content ${side === 'right' ? 'right-layout' : ''}">
-                    <div class="celebration-text">${text}</div>
-                    <div class="celebration-player">
-                        <img src="${imgSrc}" class="celebration-img" alt="" onerror="this.src='${DEFAULT_PLAYER_IMG}'">
-                        <span class="celebration-name">${escapeHtml(playerName)}</span>
+            let html = '';
+            if (side === 'left') {
+                // Left side order: Photo -> Name -> Text
+                html = `
+                    <div class="celebration-content left-layout">
+                        <div class="celebration-player">
+                            <img src="${imgSrc}" class="celebration-img" alt="" onerror="this.src='${DEFAULT_PLAYER_IMG}'">
+                            <span class="celebration-name">${escapeHtml(displayName)}</span>
+                        </div>
+                        <div class="celebration-text">${text}</div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // Right side order: Text -> Name -> Photo
+                html = `
+                    <div class="celebration-content right-layout">
+                        <div class="celebration-text">${text}</div>
+                        <div class="celebration-player">
+                            <span class="celebration-name">${escapeHtml(displayName)}</span>
+                            <img src="${imgSrc}" class="celebration-img" alt="" onerror="this.src='${DEFAULT_PLAYER_IMG}'">
+                        </div>
+                    </div>
+                `;
+            }
 
             // 1. Shift Layout & Hide Siblings
             document.body.classList.add('celebrate-' + side);
@@ -2535,7 +2571,7 @@ function syncRaidAudio(clock) {
                 mainRow.classList.remove('celebrate-' + side);
 
                 setTimeout(() => { isCelebrationActive = false; }, 800);
-            }, 700000); 
+            }, 7000); 
         }
 
         function initBroadcastEngine(id, matchCode) {
