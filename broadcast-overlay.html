@@ -593,12 +593,56 @@
         .audio-test-btn { position: fixed; top: 20px; left: 20px; z-index: 2147483647; padding: 12px 24px; background-color: #EF4444; color: #FFFFFF; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; border: 2px solid #FFFFFF; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8); pointer-events: auto; visibility: hidden;}
         .audio-test-btn:hover { background-color: #DC2626; }
 
-                /* CONFETTI ANIMATION */
+        /* CONFETTI ANIMATION - SHOOTING UP */
         #confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 99999; overflow: hidden; }
-        .confetti-piece { position: absolute; width: 10px; height: 10px; background: #ffd700; opacity: 0; animation: confettiFall linear forwards; }
-        @keyframes confettiFall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        
+        /* Upward Shooting Confetti */
+        .confetti-piece { 
+            position: absolute; 
+            bottom: -20px; 
+            width: 10px; height: 10px; 
+            opacity: 0; 
+            animation: confettiShootUp linear forwards; 
+        }
+        @keyframes confettiShootUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Sky Firecrackers */
+        .firework {
+            position: absolute;
+            bottom: -20px;
+            width: 6px;
+            height: 15px;
+            background: #fff;
+            border-radius: 3px;
+            box-shadow: 0 0 10px #fff, 0 0 20px #ffd700;
+            opacity: 0;
+            animation: fireworkLaunch 1.2s ease-out forwards;
+        }
+        .firework::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, var(--exp-color, rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 30%, transparent 70%));
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            animation: fireworkExplode 0.5s ease-out var(--exp-delay, 1.0s) forwards;
+        }
+
+        @keyframes fireworkLaunch {
+            0% { transform: translateY(0); opacity: 1; }
+            80% { transform: translateY(-60vh); opacity: 1; }
+            100% { transform: translateY(-80vh); opacity: 0; }
+        }
+
+        @keyframes fireworkExplode {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
         }
     </style>
 </head>
@@ -1187,23 +1231,49 @@
             }
         }
 
-        function triggerConfetti() {
+                function triggerConfetti() {
             const container = document.getElementById('confetti-container');
             if (!container) return;
             container.innerHTML = '';
             const colors = ['#FFD700', '#FF5E3A', '#22C55E', '#3B82F6', '#EAB308', '#E91E63'];
+            
+            // 1. Shoot Upward Confetti (120 pieces)
             for (let i = 0; i < 120; i++) {
                 const p = document.createElement('div');
                 p.className = 'confetti-piece';
                 p.style.left = Math.random() * 100 + 'vw';
                 p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                p.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+                p.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
                 p.style.animationDelay = (Math.random() * 0.5) + 's';
                 p.style.width = (Math.random() * 8 + 6) + 'px';
                 p.style.height = (Math.random() * 8 + 6) + 'px';
                 container.appendChild(p);
             }
-            // Clear confetti after 5 seconds
+
+            // 2. Launch Sky Firecrackers (15 rockets)
+            for (let i = 0; i < 15; i++) {
+                const f = document.createElement('div');
+                f.className = 'firework';
+                f.style.left = (Math.random() * 80 + 10) + 'vw'; // Keep away from edges
+                
+                // Stagger the launch times so they don't all fire at once
+                const delay = Math.random() * 1.5;
+                f.style.animationDelay = delay + 's';
+                f.style.setProperty('--exp-delay', (delay + 1.0) + 's'); // Explode near the peak
+                
+                // Randomize explosion colors
+                const expColors = [
+                    'rgba(255,255,255,1) 0%, rgba(255,100,0,0.8) 30%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(255,215,0,0.8) 30%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(34,197,94,0.8) 30%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(59,130,246,0.8) 30%, transparent 70%',
+                    'rgba(255,255,255,1) 0%, rgba(233,30,99,0.8) 30%, transparent 70%'
+                ];
+                f.style.setProperty('--exp-color', expColors[Math.floor(Math.random() * expColors.length)]);
+                container.appendChild(f);
+            }
+
+            // Clear the container after 5 seconds (keeps the same length as before)
             setTimeout(() => { container.innerHTML = ''; }, 5000);
         }
 
