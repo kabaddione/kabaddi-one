@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head>e
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/favicon.png">
@@ -2115,13 +2115,14 @@ function syncRaidAudio(clock) {
         // ==========================================
         let lastProcessedL5Clock = null;
         let lastKnownHalfNum = 1;
+        let pendingL5Data = null; // <-- ADD THIS
 
-        function handleLast5MinutesUpdate(data, existingState) {
+                function handleLast5MinutesUpdate(data, existingState) {
             if (!data || !data.match_duration_mins) return;
 
             const breakTitle = (data.break_clock_title || '').trim();
             const breakTime  = (data.break_clock_time  || '').trim();
-            if (breakTitle.length > 0 && breakTime.length > 0 && breakTime !== '00:00') return;
+            const hasBreak   = breakTitle.length > 0 && breakTime.length > 0 && breakTime !== '00:00';
 
             const currentClock = (data.main_clock || '').trim();
             if (!currentClock || !currentClock.includes(':')) return;
@@ -2162,8 +2163,17 @@ function syncRaidAudio(clock) {
             }
             const elapsed  = halfMins - minsLeft;
             const absMinute = (currentHalfNum === 1) ? elapsed : (halfMins + elapsed);
-
             const bucket = Math.floor(absMinute / 5);
+
+            // IF WE HAVE A PENDING BANNER AND THE BREAK IS OVER, SHOW IT NOW
+            if (pendingL5Data) {
+                if (!hasBreak) {
+                    showLast5MinBanner(...pendingL5Data);
+                    pendingL5Data = null;
+                }
+                return; // Do not process new ones while one is pending
+            }
+
             if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
                 if (bucket > lastL5TriggerBucket + 1) {
                     lastL5TriggerBucket = bucket;
@@ -2172,15 +2182,23 @@ function syncRaidAudio(clock) {
                 lastL5TriggerBucket = bucket;
                 let logs = [];
                 try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
-                showLast5MinBanner(
-                    absMinute,
-                    parseInt(data.left_score)  || 0,
-                    parseInt(data.right_score) || 0,
-                    halfMins,
-                    logs,
-                    data.left_color,
+                
+                const args = [
+                    absMinute, 
+                    parseInt(data.left_score) || 0, 
+                    parseInt(data.right_score) || 0, 
+                    halfMins, 
+                    logs, 
+                    data.left_color, 
                     data.right_color
-                );
+                ];
+
+                // IF BREAK IS ACTIVE OR IT'S THE EXACT HALF TIME MARK (20 MINS), QUEUE IT
+                if (hasBreak || (currentHalfNum === 1 && absMinute >= halfMins - 0.1)) {
+                    pendingL5Data = args;
+                } else {
+                    showLast5MinBanner(...args);
+                }
             }
         }
         function showLast5MinBanner(absMinute, currentL, currentR, halfMins, logs, leftColor, rightColor) {
@@ -2528,24 +2546,30 @@ function syncRaidAudio(clock) {
         // ==========================================
         function checkCelebrations(state, data) {
             if (!state) return;
-            
-            // 1. If a celebration is currently playing, do nothing.
             if (isCelebrationActive) return;
 
-            // 2. Check Raid State
-            const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
-            let currentRaidIsLeft = true;
-            const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
-            if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
+            // 1. Check if blocked by animations, overlays, or intro screens
+            const isOverlayActive = document.querySelector('.fs-overlay.show') !== null || 
+                                    document.querySelector('.mi-overlay.show') !== null || 
+                                    matchIntroState.active || 
+                                    remoteTossActive;
+            
+            const isBlocked = epicIsPlaying || isOverlayActive;
 
-            // 3. Process Pending Celebration (If we queued one earlier)
+            // 2. Process Pending Celebration (If we queued one earlier)
             if (pendingCelebration) {
                 const p = pendingCelebration;
+                
+                const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
+                let currentRaidIsLeft = true;
+                const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
+                if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
+                
                 const isPlayerTeamRaiding = (p.side === 'left' && raidActive && currentRaidIsLeft) || 
                                             (p.side === 'right' && raidActive && !currentRaidIsLeft);
-                
-                // If their team is no longer raiding, trigger it!
-                if (!isPlayerTeamRaiding) {
+
+                // If their team is no longer raiding AND we are not blocked by animation/overlay
+                if (!isPlayerTeamRaiding && !isBlocked) {
                     triggerCelebration(p.side, p.player, p.text);
                     pendingCelebration = null;
                 }
@@ -2556,7 +2580,7 @@ function syncRaidAudio(clock) {
             try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
             try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-            // 4. Scan for New Celebrations
+            // 3. Scan for New Celebrations
             const scanTeam = (roster, side) => {
                 for (const p of roster) {
                     const raidPts = parseInt(p.raidPoints) || 0;
@@ -2573,15 +2597,18 @@ function syncRaidAudio(clock) {
                     }
 
                     if (text) {
-                        // Check if their team is currently raiding
+                        const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
+                        let currentRaidIsLeft = true;
+                        const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
+                        if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
+                        
                         const isPlayerTeamRaiding = (side === 'left' && raidActive && currentRaidIsLeft) || 
                                                     (side === 'right' && raidActive && !currentRaidIsLeft);
                         
-                        if (isPlayerTeamRaiding) {
-                            // Queue it for later
+                        // If their team is currently raiding OR we are blocked by animation/overlay
+                        if (isPlayerTeamRaiding || isBlocked) {
                             pendingCelebration = { side, player: p, text };
                         } else {
-                            // Trigger immediately
                             triggerCelebration(side, p, text);
                         }
                         return true; // Found one, stop scanning
@@ -2594,7 +2621,9 @@ function syncRaidAudio(clock) {
             if (scanTeam(rightRoster, 'right')) return;
         }
 
-                function triggerCelebration(side, player, text) {
+        
+
+        function triggerCelebration(side, player, text) {
             isCelebrationActive = true;
             
             // 🎵 Play Sound Effect (Once)
