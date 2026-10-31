@@ -363,9 +363,18 @@
         @keyframes alloutHold { from{transform:scale(1)} to{transform:scale(1.05)} }
         @keyframes alloutContainerExit { 0%{transform:scale(1.05);opacity:1} 100%{transform:scale(25);opacity:0} }
 
-        .fs-overlay { position: fixed; inset: 0; z-index: 9990; display: none; justify-content: center; align-items: center; overflow: hidden; }
-        .fs-overlay.show { display: flex; animation: fsFadeIn 0.35s ease-out; }
-        @keyframes fsFadeIn { from{opacity:0} to{opacity:1} }
+        /* ============================================================
+           BASE FULL-SCREEN OVERLAY (SMOOTH FADE IN/OUT)
+           ============================================================ */
+        .fs-overlay { 
+            position: fixed; inset: 0; z-index: 9990; 
+            display: flex; justify-content: center; align-items: center; overflow: hidden; 
+            visibility: hidden; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .fs-overlay.show { 
+            visibility: visible; opacity: 1; pointer-events: auto; 
+        }
         .fs-powered-by { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 24px; background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9)); border: 2px solid rgb(253, 241, 159); font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; color: #FFF; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); margin-top: 20px; scale: 1.4;}
         .fs-powered-by .fp-label { color: rgb(185,185,185); font-size: 12px; font-weight: 600; letter-spacing: 1.1px; }
         .fs-powered-by .fp-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 20px rgba(255,215,0,0.4); }
@@ -421,6 +430,38 @@
         #team-stats-overlay .ts-teams-row { display: flex; align-items: center; justify-content: center; gap: 40px; margin-top: 25px; }
         #team-stats-overlay .ts-team-label { font-family: 'Segoe UI', sans-serif; font-weight: 700; font-size: 28px; color: #FFF; text-shadow: 3px 3px 5px #000; text-transform: uppercase; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #team-stats-overlay .ts-vs { font-family: 'Segoe UI', sans-serif; font-weight: 900; font-size: 44px; color: #9C27B0; text-shadow: 4px 4px 8px #000; }
+        /* ============================================================
+           TEAM STATS ANIMATIONS (INTRO & OUTRO)
+           ============================================================ */
+        /* 1. Base Hidden States (Where elements go during Outro) */
+        #team-stats-overlay .ts-main-score { transform: translateY(-40px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #team-stats-overlay .ts-match-status { transform: translateY(-30px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s; }
+        #team-stats-overlay .ts-divider { transform: scaleX(0); opacity: 0; transition: all 0.4s ease 0.1s; }
+        #team-stats-overlay .ts-teams-row { transform: translateY(30px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s; }
+
+        /* Table Rows (Slide in sequentially) */
+        #team-stats-overlay .ts-table-row { transform: translateY(30px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #team-stats-overlay .ts-table-row:nth-child(1) { transition-delay: 0.1s; }
+        #team-stats-overlay .ts-table-row:nth-child(2) { transition-delay: 0.15s; }
+        #team-stats-overlay .ts-table-row:nth-child(3) { transition-delay: 0.2s; }
+        #team-stats-overlay .ts-table-row:nth-child(4) { transition-delay: 0.25s; }
+
+        /* Pie Charts (Pop and scale sequentially) */
+        #team-stats-overlay .ts-pie-item { transform: scale(0.6) translateY(30px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #team-stats-overlay .ts-pie-col:first-child .ts-pie-item:nth-child(1) { transition-delay: 0.15s; }
+        #team-stats-overlay .ts-pie-col:first-child .ts-pie-item:nth-child(2) { transition-delay: 0.25s; }
+        #team-stats-overlay .ts-pie-col:last-child .ts-pie-item:nth-child(1) { transition-delay: 0.15s; }
+        #team-stats-overlay .ts-pie-col:last-child .ts-pie-item:nth-child(2) { transition-delay: 0.25s; }
+
+        /* 2. Active States (Triggered automatically by .show on parent) */
+        #team-stats-overlay.show .ts-main-score,
+        #team-stats-overlay.show .ts-match-status,
+        #team-stats-overlay.show .ts-table-row,
+        #team-stats-overlay.show .ts-teams-row { transform: translateY(0); opacity: 1; }
+        #team-stats-overlay.show .ts-divider { transform: scaleX(1); opacity: 1; }
+        #team-stats-overlay.show .ts-pie-item { transform: scale(1) translateY(0); opacity: 1; }
+
+        
 
         #player-perf-overlay { background: transparent; }
         #player-perf-overlay .pp-bg { position: absolute; inset: 0; background: url('/images/performance_bg.jpg') center/cover no-repeat; background-color: #0B0B18; z-index: 1;}
@@ -485,6 +526,60 @@
         #player-perf-overlay .pp-rate-ring::before { content: ''; position: absolute; inset: 10px; border-radius: 50%; background: #FFF; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); }
         #player-perf-overlay .pp-rate-value { position: relative; z-index: 2; font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 800; color: #110A20; font-variant-numeric: tabular-nums; }
         #player-perf-overlay .pp-rate-label { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; line-height: 1.3; }
+        /* ============================================================
+           PLAYER PERFORMANCE ANIMATIONS (INTRO & OUTRO)
+           ============================================================ */
+        /* 1. Base Hidden States (Where elements go during Outro) */
+        #player-perf-overlay .pp-title { transform: translateY(-30px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #player-perf-overlay .pp-underline { transform: scaleX(0); opacity: 0; transition: all 0.4s ease 0.1s; }
+        #player-perf-overlay .pp-card { transform: scale(0.95) translateY(30px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s; }
+        
+        /* Layout Columns */
+        #player-perf-overlay .pp-col-profile { transform: translateX(-40px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s; }
+        #player-perf-overlay .pp-col-rates { transform: translateX(40px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s; }
+        
+        /* Summary Grid Boxes */
+        #player-perf-overlay .pp-summary-card { transform: translateY(20px) scale(0.9); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #player-perf-overlay .pp-summary-card:nth-child(1) { transition-delay: 0.25s; }
+        #player-perf-overlay .pp-summary-card:nth-child(2) { transition-delay: 0.30s; }
+        #player-perf-overlay .pp-summary-card:nth-child(3) { transition-delay: 0.35s; }
+        #player-perf-overlay .pp-summary-card:nth-child(4) { transition-delay: 0.40s; }
+
+        /* Detail Breakdown Panels */
+        #player-perf-overlay .pp-detail-card { transform: translateY(30px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #player-perf-overlay .pp-detail-card:nth-child(1) { transition-delay: 0.45s; }
+        #player-perf-overlay .pp-detail-card:nth-child(2) { transition-delay: 0.50s; }
+
+        /* Circular Donut & Rate items */
+        #player-perf-overlay .pp-donut-item, 
+        #player-perf-overlay .pp-rate-item { transform: scale(0.5) translateY(20px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        /* Delaying the right column strike rate rings */
+        #player-perf-overlay .pp-rate-item:nth-child(2) { transition-delay: 0.4s; }
+        #player-perf-overlay .pp-rate-item:nth-child(3) { transition-delay: 0.5s; }
+
+        /* Delaying the individual donut rings inside the detail panels */
+        #player-perf-overlay .pp-detail-card:nth-child(1) .pp-donut-item:nth-child(1) { transition-delay: 0.50s; }
+        #player-perf-overlay .pp-detail-card:nth-child(1) .pp-donut-item:nth-child(2) { transition-delay: 0.55s; }
+        #player-perf-overlay .pp-detail-card:nth-child(1) .pp-donut-item:nth-child(3) { transition-delay: 0.60s; }
+        #player-perf-overlay .pp-detail-card:nth-child(2) .pp-donut-item:nth-child(1) { transition-delay: 0.55s; }
+        #player-perf-overlay .pp-detail-card:nth-child(2) .pp-donut-item:nth-child(2) { transition-delay: 0.60s; }
+        #player-perf-overlay .pp-detail-card:nth-child(2) .pp-donut-item:nth-child(3) { transition-delay: 0.65s; }
+
+        /* 2. Active States (Triggered automatically by .show on parent) */
+        #player-perf-overlay.show .pp-title,
+        #player-perf-overlay.show .pp-card,
+        #player-perf-overlay.show .pp-col-profile,
+        #player-perf-overlay.show .pp-summary-card,
+        #player-perf-overlay.show .pp-detail-card,
+        #player-perf-overlay.show .pp-col-rates,
+        #player-perf-overlay.show .pp-rate-item,
+        #player-perf-overlay.show .pp-donut-item { transform: translate(0, 0) scale(1); opacity: 1; }
+        
+        #player-perf-overlay.show .pp-underline { transform: scaleX(1); opacity: 1; }
+
+
+        
 
         .l5-banner { display: flex; align-items: center; justify-content: center; gap: 18px; height: 42px; padding: 0 30px; margin-bottom: 5px; background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 8px 25px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.1); opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; z-index: 5; clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%); }
         .l5-banner.show { opacity: 1; transform: translateY(0); }
