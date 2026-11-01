@@ -934,6 +934,93 @@
             from { transform: scale(1) skewX(5deg); }
             to { transform: scale(1.08) skewX(5deg); }
         }
+
+
+        /* ============================================================
+           APP PROMO BANNER CSS (ROTATES WITH TOSS PENDING)
+           ============================================================ */
+        .promo-banner-wrapper {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, #1A1A1A, #050505);
+            border-radius: 20px;
+            padding: 10px 30px 10px 110px; /* Left padding makes room for the overlapping phone */
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            height: 105px;
+            margin-left: 60px; /* Push in to accommodate the ring offset */
+            margin-bottom: 25px; /* Aligns visually with the toss banner position */
+        }
+        
+        .promo-glow-ring {
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            /* Creates the hollow ring effect */
+            background: conic-gradient(#8b5cf6, #3b82f6, #8b5cf6); 
+            mask-image: radial-gradient(transparent 58%, black 59%);
+            -webkit-mask-image: radial-gradient(transparent 58%, black 59%);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+            z-index: 1;
+        }
+
+        .promo-phone {
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-12deg);
+            width: 90px;
+            height: 170px;
+            background: linear-gradient(135deg, #777, #333);
+            border-radius: 14px;
+            border: 2px solid #555;
+            box-shadow: -10px 15px 25px rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            z-index: 2;
+        }
+
+        .promo-phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .promo-phone-screen img { width: 45px; height: 45px; border-radius: 8px; margin-top: 5px; }
+        .promo-phone-screen span { color: #FFF; font-family: 'Mukta', sans-serif; font-size: 11px; text-align: center; line-height: 1.1; font-weight: 700; }
+
+        .promo-text-area {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-right: 35px;
+        }
+
+        .promo-sub { font-family: 'Mukta', sans-serif; font-size: 22px; color: #CCC; font-weight: 600; margin-bottom: -6px; }
+        .promo-main { font-family: 'Mukta', sans-serif; font-size: 38px; color: #FFF; font-weight: 800; letter-spacing: 0.5px; }
+
+        .promo-qr-area {
+            width: 85px;
+            height: 85px;
+            background: #FFF;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .promo-qr-area img { width: 100%; height: 100%; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -1398,22 +1485,45 @@
     </div>
 
     <div id="toss-result-overlay" class="toss-overlay">
-        <div class="toss-container">
-            <div class="toss-main-bar-wrapper">
-                <div class="toss-winner-box" id="toss-winner-box">
-                    <div class="toss-accent-color" id="toss-accent-left"></div>
-                    <span id="toss-winner-text" class="toss-text-dark">TOSS WON BY PATNA PIRATES</span>
+        <div class="toss-container" id="toss-container-wrap">
+            
+            <!-- ORIGINAL TOSS CONTENT -->
+            <div id="toss-main-content" style="display:flex; flex-direction:column; transition: opacity 0.4s ease; width: 100%;">
+                <div class="toss-main-bar-wrapper">
+                    <div class="toss-winner-box" id="toss-winner-box">
+                        <div class="toss-accent-color" id="toss-accent-left"></div>
+                        <span id="toss-winner-text" class="toss-text-dark">TOSS WON BY PATNA PIRATES</span>
+                    </div>
+                    <div class="toss-choice-box" id="toss-choice-box">
+                        <img id="toss-coin-gif" class="toss-coin-gif" src="images/coin-animation.gif" alt="" style="display: none;">
+                        <span id="toss-choice-text" class="toss-text-light">BENGAL WARRIORS TO RAID FIRST</span>
+                    </div>
                 </div>
-                <div class="toss-choice-box" id="toss-choice-box">
-                    <img id="toss-coin-gif" class="toss-coin-gif" src="images/coin-animation.gif" alt="" style="display: none;">
-                    <span id="toss-choice-text" class="toss-text-light">BENGAL WARRIORS TO RAID FIRST</span>
+                <div class="toss-sub-bar-wrapper">
+                    <div class="toss-sub-bar">
+                        <span id="toss-sub-text">MATCH WILL START SOON...</span>
+                    </div>
                 </div>
             </div>
-            <div class="toss-sub-bar-wrapper">
-                <div class="toss-sub-bar">
-                    <span id="toss-sub-text">MATCH WILL START SOON...</span>
+
+            <!-- NEW APP PROMO CONTENT (Hides/Shows via JS rotation) -->
+            <div id="app-promo-content" class="promo-banner-wrapper" style="display:none; opacity:0; transition: opacity 0.4s ease;">
+                <div class="promo-glow-ring"></div>
+                <div class="promo-phone">
+                    <div class="promo-phone-screen">
+                        <img src="images/kabaddione_logo.png" alt="App">
+                        <span>KabaddiOne<br>Scoreboard<br>App</span>
+                    </div>
+                </div>
+                <div class="promo-text-area">
+                    <div class="promo-sub">Download the App Now! From</div>
+                    <div class="promo-main">Google Play Store or Scan this QR Code</div>
+                </div>
+                <div class="promo-qr-area">
+                    <img src="images/qr-code.png" alt="QR">
                 </div>
             </div>
+            
         </div>
     </div>
 
@@ -1503,6 +1613,7 @@
             'suspension_start': new Audio('/audio/suspension_start.mp3'), // <-- ADD THIS
             'suspension_end': new Audio('/audio/suspension_end.mp3'),      // <-- ADD THIS
             'super-10': new Audio('/audio/super-10.mp3'), // <-- ADD THIS
+            'toss_coin': new Audio('/audio/toss_coin.mp3'), // <-- ADDED TOSS COIN
         };
 
         // Pre-configure the background audio to loop
@@ -1920,24 +2031,49 @@ function syncRaidAudio(clock) {
             return winner.length > 0 && choice.length > 0;
         }
 
+        let promoCycleInterval = null;
+        let showingPromo = false;
+
         function updateTossScreenContent(data, mode) {
             const winnerBox  = document.getElementById('toss-winner-box');
             const coinGif    = document.getElementById('toss-coin-gif');
             const choiceText = document.getElementById('toss-choice-text');
             const subText    = document.getElementById('toss-sub-text');
-            const hasData    = tossHasData(data);
+            
+            const tossContent  = document.getElementById('toss-main-content');
+            const promoContent = document.getElementById('app-promo-content');
+
+            // Clear any active rotation interval
+            if (promoCycleInterval) { clearInterval(promoCycleInterval); promoCycleInterval = null; }
+
+            const hasData = tossHasData(data);
 
             if (hasData) {
+                // Ensure Toss content is fully visible and promo is hidden
+                tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
+                promoContent.style.display = 'none'; promoContent.style.opacity = '0';
+                
                 if (winnerBox) winnerBox.classList.remove('hidden');
                 if (coinGif)   coinGif.classList.remove('show');
                 renderTossScreen(data);
                 if (subText) subText.innerText = 'MATCH WILL START SOON...';
+                window._tossCoinPlayed = false; // Reset audio guard
                 return;
             }
 
             if (winnerBox) winnerBox.classList.add('hidden');
 
             if (mode === 'remote-confirmed') {
+                // 🪙 TOSS CONFIRMED MODE 🪙
+                tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
+                promoContent.style.display = 'none'; promoContent.style.opacity = '0';
+                
+                // Play Audio exactly once
+                if (!window._tossCoinPlayed) {
+                    playEventSound('toss_coin');
+                    window._tossCoinPlayed = true;
+                }
+
                 if (coinGif) {
                     if (window.epicGifBlobs && window.epicGifBlobs.coin && !coinGif.dataset.blobReady) {
                         if (coinGif.dataset.blobUrl) URL.revokeObjectURL(coinGif.dataset.blobUrl);
@@ -1950,10 +2086,43 @@ function syncRaidAudio(clock) {
                 }
                 if (choiceText) choiceText.innerText = 'TOSS TIME NOW';
                 if (subText)    subText.innerText    = 'TOSS IS HAPPENING RIGHT NOW';
+                
             } else {
+                // 🔄 PENDING ROTATION MODE (Toss / Promo) 🔄
+                window._tossCoinPlayed = false; // Reset audio guard
+
+                const rotateBanners = () => {
+                    if (showingPromo) {
+                        promoContent.style.opacity = '0';
+                        setTimeout(() => {
+                            promoContent.style.display = 'none';
+                            tossContent.style.display = 'flex';
+                            setTimeout(() => tossContent.style.opacity = '1', 50);
+                        }, 400); // 400ms matches CSS transition
+                    } else {
+                        tossContent.style.opacity = '0';
+                        setTimeout(() => {
+                            tossContent.style.display = 'none';
+                            promoContent.style.display = 'flex';
+                            setTimeout(() => promoContent.style.opacity = '1', 50);
+                        }, 400);
+                    }
+                    showingPromo = !showingPromo;
+                };
+
+                // Initial layout set
+                if (!showingPromo) {
+                    tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
+                    promoContent.style.display = 'none'; promoContent.style.opacity = '0';
+                }
+                
+                // Restore generic pending text
                 if (coinGif)    coinGif.classList.remove('show');
                 if (choiceText) choiceText.innerText = 'TOSS COMING UP NEXT';
                 if (subText)    subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
+
+                // Rotate every 10 seconds
+                promoCycleInterval = setInterval(rotateBanners, 10000);
             }
         }
 
@@ -2745,7 +2914,8 @@ function syncRaidAudio(clock) {
                 const delay = Math.random() * 2;
                 const duration = Math.random() * 2 + 1.5;
                 
-                let style = `left: ${left}%; background: ${color}; width: ${size}px; height: ${size}px; animation-delay: ${delay}s; animation-duration: ${duration}s;`;
+                // Added "animation-iteration-count: infinite;" so they continuously fall
+                let style = `left: ${left}%; background: ${color}; width: ${size}px; height: ${size}px; animation-delay: ${delay}s; animation-duration: ${duration}s; animation-iteration-count: infinite;`;
                 
                 if (shape === 'circle') {
                     style += 'border-radius: 50%;';
