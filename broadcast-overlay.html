@@ -26,7 +26,7 @@
     <link rel="preload" as="image" href="images/raid-mat.png">
     <link rel="preload" as="image" href="images/tackle-mat.png">
     <link rel="preload" as="image" href="images/thigh-five.webp">
-    <link rel="preload" as="image" href="images/super-tackle.gif">
+    <link rel="preload" as="image" href="images/super-tackle.webp">
     <link rel="preload" as="image" href="/images/kabaddione_bg.jpg">
     <link rel="preload" as="image" href="images/starting7-mat.png">
     <script>
@@ -70,7 +70,7 @@
             try {
                 const results = await Promise.allSettled([
                     loadLocalBlob('images/thigh-five.webp'),
-                    loadLocalBlob('images/super-tackle.gif'),
+                    loadLocalBlob('images/super-tackle.webp'),
                     loadLocalBlob('images/coin-animation.gif')
                 ]);
                 if (results[0].status === 'fulfilled') window.epicGifBlobs.raid   = results[0].value;
@@ -3891,7 +3891,7 @@ function syncRaidAudio(clock) {
                             gifEl.src = newUrl;
                             gifEl.dataset.blobUrl = newUrl;
                         } else {
-                            gifEl.src = 'images/super-tackle.gif' + cacheBuster;
+                            gifEl.src = 'images/super-tackle.webp' + cacheBuster;
                         }
                     }
                 }, 1250));
