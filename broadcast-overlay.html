@@ -940,86 +940,65 @@
            APP PROMO BANNER CSS (ROTATES WITH TOSS PENDING)
            ============================================================ */
         .promo-banner-wrapper {
-            display: flex;
-            align-items: center;
-            background: linear-gradient(to right, #1A1A1A, #050505);
-            border-radius: 20px;
-            padding: 10px 30px 10px 110px; /* Left padding makes room for the overlapping phone */
+            display: flex; align-items: center;
+            background: linear-gradient(to right, #1f1f1f, #050505);
+            border-radius: 16px;
+            padding: 10px 25px 10px 100px; /* Room for overlapping phone */
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            height: 105px;
-            margin-left: 60px; /* Push in to accommodate the ring offset */
-            margin-bottom: 25px; /* Aligns visually with the toss banner position */
+            height: 95px; margin-left: 60px; margin-bottom: 25px; 
         }
         
-        .promo-glow-ring {
-            position: absolute;
-            left: -60px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            /* Creates the hollow ring effect */
-            background: conic-gradient(#8b5cf6, #3b82f6, #8b5cf6); 
-            mask-image: radial-gradient(transparent 58%, black 59%);
-            -webkit-mask-image: radial-gradient(transparent 58%, black 59%);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
-            z-index: 1;
+        /* THE NEON RING (Back & Front layers for 3D intersection) */
+        .promo-ring-base {
+            position: absolute; left: -65px; top: 50%; transform: translateY(-50%);
+            width: 170px; height: 170px; border-radius: 50%; z-index: 1;
+        }
+        .promo-ring-base::before {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            padding: 14px; /* Ring thickness */
+            background: linear-gradient(135deg, #a855f7, #3b82f6, #60a5fa);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            box-shadow: 0 0 20px 2px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* The front slice of the ring perfectly overlays, but is clipped to show OVER the phone */
+        .promo-ring-front {
+            z-index: 3; 
+            clip-path: polygon(0 35%, 55% 35%, 55% 100%, 0 100%); 
         }
 
+        /* 3D SMARTPHONE USING CSS TRANSFORMS */
         .promo-phone {
-            position: absolute;
-            left: -35px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-12deg);
-            width: 90px;
-            height: 170px;
-            background: linear-gradient(135deg, #777, #333);
-            border-radius: 14px;
-            border: 2px solid #555;
-            box-shadow: -10px 15px 25px rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            z-index: 2;
+            position: absolute; left: -40px; top: 50%;
+            transform: translateY(-50%) perspective(800px) rotateY(25deg) rotateX(10deg) rotateZ(-12deg);
+            width: 100px; height: 195px;
+            background: linear-gradient(135deg, #e0e0e0 0%, #888 100%); /* Silver edge */
+            border-radius: 18px; border: 2px solid #ccc;
+            box-shadow: -15px 20px 25px rgba(0,0,0,0.8), inset 2px 2px 4px rgba(255,255,255,0.9), inset -4px -4px 8px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            padding: 5px; z-index: 2; /* Sandwiched between rings */
         }
-
         .promo-phone-screen {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            width: 100%; height: 100%;
+            background: #111; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding-top: 25px; gap: 8px; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
         }
-
-        .promo-phone-screen img { width: 45px; height: 45px; border-radius: 8px; margin-top: 5px; }
-        .promo-phone-screen span { color: #FFF; font-family: 'Mukta', sans-serif; font-size: 11px; text-align: center; line-height: 1.1; font-weight: 700; }
-
-        .promo-text-area {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-right: 35px;
+        .promo-phone-screen::before {
+            content: ''; position: absolute; top: 6px; width: 32px; height: 9px;
+            background: #000; border-radius: 10px; box-shadow: 0 0 2px rgba(255,255,255,0.1);
         }
+        .promo-phone-screen img { width: 50px; height: 50px; border-radius: 8px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+        .promo-phone-screen span { color: #FFF; font-family: 'Mukta', sans-serif; font-size: 11.5px; text-align: center; line-height: 1.1; font-weight: 700; letter-spacing: 0.5px;}
 
-        .promo-sub { font-family: 'Mukta', sans-serif; font-size: 22px; color: #CCC; font-weight: 600; margin-bottom: -6px; }
-        .promo-main { font-family: 'Mukta', sans-serif; font-size: 38px; color: #FFF; font-weight: 800; letter-spacing: 0.5px; }
-
-        .promo-qr-area {
-            width: 85px;
-            height: 85px;
-            background: #FFF;
-            padding: 5px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            flex-shrink: 0;
-        }
+        /* TEXT AND QR STYLING */
+        .promo-text-area { display: flex; flex-direction: column; justify-content: center; margin-right: 35px; }
+        .promo-sub { font-family: 'Mukta', sans-serif; font-size: 20px; color: #DDD; font-weight: 600; margin-bottom: -8px; letter-spacing: 0.5px;}
+        .promo-main { font-family: 'Mukta', sans-serif; font-size: 34px; color: #FFF; font-weight: 800; letter-spacing: 0.5px; }
+        .promo-qr-area { width: 75px; height: 75px; background: #FFF; padding: 4px; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex-shrink: 0; }
         .promo-qr-area img { width: 100%; height: 100%; object-fit: contain; }
     </style>
 </head>
