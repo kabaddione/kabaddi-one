@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
     <link rel="shortcut icon" href="/favicon.png" type="image/png">
-    <title>KabaddiOne Professional Broadcast Overlay</etitle>
+    <title>KabaddiOne Professional Broadcast Overlay</title>
 
     <script>
         if (window.top !== window.self) {
@@ -69,7 +69,7 @@
 
             try {
                 const results = await Promise.allSettled([
-                    loadLocalBlob('images/thigh-five.gif'),
+                    loadLocalBlob('images/thigh-five.webp'),
                     loadLocalBlob('images/super-tackle.gif'),
                     loadLocalBlob('images/coin-animation.gif')
                 ]);
@@ -3883,7 +3883,7 @@ function syncRaidAudio(clock) {
                             gifEl.src = newUrl;
                             gifEl.dataset.blobUrl = newUrl;
                         } else {
-                            gifEl.src = 'images/thigh-five.gif' + cacheBuster;
+                            gifEl.src = 'images/thigh-five.webp' + cacheBuster;
                         }
                     } else if (eventType === 'super_tackle') {
                         if (window.epicGifBlobs.tackle) {
