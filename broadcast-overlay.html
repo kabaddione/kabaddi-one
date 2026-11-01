@@ -712,7 +712,7 @@
         .mi-overlay.exit .mi-sub-bar { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.24s ease, transform 0.24s ease; }
 
         .toss-overlay { position: fixed; bottom: 20px; left: 0; z-index: 9998; display: flex; align-items: flex-end; visibility: hidden; pointer-events: none; overflow: hidden; width: 100%; padding-left: 140px; }
-        .toss-overlay.show { visibility: visible; }
+        .toss-overlay.show { visibility: visible; height: 100%; width: 100%;}
         .toss-container { display: flex; flex-direction: column; align-items: flex-start; gap: 0px; transform: translateX(-150%); opacity: 0; transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease; will-change: transform, opacity; }
         .toss-overlay.show .toss-container { transform: translateX(0); opacity: 1; }
         .toss-overlay.exit .toss-container { transform: translateX(-150%); opacity: 0; transition: transform 0.65s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.4s ease; }
@@ -1523,7 +1523,9 @@
             </div>
 
                         <!-- NEW APP PROMO CONTENT (Hides/Shows via JS rotation) -->
-            <div id="app-promo-content" class="promo-banner-wrapper" style="display:none; opacity:0; transition: opacity 0.4s ease;">
+            <div id="app-promo-content" class="promo-banner-wrapper" style="display:none; opacity:0; transition: opacity 0.4s ease;" filter: drop-shadow(rgb(0, 0, 0) 10px 15px 10px);
+scale: 1.5;
+margin-bottom: 60px;>
                 <img src="images/app-promo.webp" alt="Download App" style="height: 100%; width: auto; object-fit: contain; display: block;">
             </div>
             
