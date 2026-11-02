@@ -145,7 +145,7 @@
         .broadcast-stage { position: absolute; bottom: 30px; left: 0; width: 1920px; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0px 15px 10px rgba(0,0,0,1)); transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.34, 1.2, 0.64, 1); }
         .gold-bg { background: linear-gradient(to bottom, #FFF3A3 0%, #D4AF37 40%, #AA7700 60%, #FFD700 100%); }
 
-        .logo-bar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 30px; background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9)); border: 2px solid rgb(253, 241, 159); margin-bottom: -13px; font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; z-index: 6; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%); }
+        .logo-bar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 30px; background: linear-gradient(to bottom, rgba(20,20,40,1), rgba(0,0,0,1)); border: 2px solid rgb(253, 241, 159); margin-bottom: -13px; font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; z-index: 6; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); clip-path: polygon(10% 0,90% 0, 100% 100%, 0 100%); }
         .logo-bar .logo-powered { color: rgb(185, 185, 185); font-size: 14px; letter-spacing: 1.1px; font-weight: 600; }
         .logo-bar .logo-icon { width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 20px rgba(255,215,0,0.4); animation: logoPulse 3s ease-in-out infinite; }
         .logo-bar .logo-text { color: #FFF; font-weight: 700; font-size: 20px; letter-spacing: 0.7px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
@@ -2800,51 +2800,62 @@ function syncRaidAudio(clock) {
             initBroadcastEngine(matchId, matchCode);
         }
 
-                // ==========================================
-        // SUPER 10 / HIGH FIVE CELEBRATION
         // ==========================================
-                // ==========================================
-        // SUPER 10 / HIGH FIVE CELEBRATION
+        // SUPER 10 / HIGH FIVE CELEBRATION (SMART QUEUE)
         // ==========================================
-        function checkCelebrations(state, data) {
-            if (!state) return;
-            if (isCelebrationActive) return;
+        
+        // This monitor runs completely independently of Firebase.
+        // It checks twice a second. If a celebration is queued, it waits 
+        // patiently for all animations, epics, and overlays to clear before firing.
+        setInterval(() => {
+            if (!pendingCelebration || isCelebrationActive) return;
 
-            // 1. Check if blocked by animations, overlays, or intro screens
+            // 1. Is there ANY overlay, intro, toss, or epic animation playing?
             const isOverlayActive = document.querySelector('.fs-overlay.show') !== null || 
                                     document.querySelector('.mi-overlay.show') !== null || 
+                                    document.querySelector('.toss-overlay.show') !== null ||
                                     matchIntroState.active || 
                                     remoteTossActive;
-            
+                                    
             const isBlocked = epicIsPlaying || isOverlayActive;
+            
+            // If the screen is blocked, abort and keep waiting.
+            if (isBlocked) return; 
 
-            // 2. Process Pending Celebration (If we queued one earlier)
-            if (pendingCelebration) {
-                const p = pendingCelebration;
-                
-                const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
-                let currentRaidIsLeft = true;
-                const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
-                if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
-                
-                const isPlayerTeamRaiding = (p.side === 'left' && raidActive && currentRaidIsLeft) || 
-                                            (p.side === 'right' && raidActive && !currentRaidIsLeft);
+            // 2. Screen is clear! Ensure their team is not currently raiding.
+            const state = window.latestMatchState;
+            const data = window.latestMatchData;
+            if (!state || !data) return;
 
-                // If their team is no longer raiding AND we are not blocked by animation/overlay
-                if (!isPlayerTeamRaiding && !isBlocked) {
-                    triggerCelebration(p.side, p.player, p.text);
-                    pendingCelebration = null;
-                }
-                return; // Wait for pending to resolve before checking new ones
+            const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
+            let currentRaidIsLeft = true;
+            const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
+            if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
+
+            const isPlayerTeamRaiding = (pendingCelebration.side === 'left' && raidActive && currentRaidIsLeft) || 
+                                        (pendingCelebration.side === 'right' && raidActive && !currentRaidIsLeft);
+
+            // 3. Perfect condition met. Fire the celebration!
+            if (!isPlayerTeamRaiding) {
+                triggerCelebration(pendingCelebration.side, pendingCelebration.player, pendingCelebration.text);
+                pendingCelebration = null;
             }
+        }, 500);
+
+        function checkCelebrations(state, data) {
+            if (!state) return;
+            
+            // If a celebration is currently active or one is already in the waiting room, stop scanning.
+            if (isCelebrationActive || pendingCelebration) return;
 
             let leftRoster = [], rightRoster = [];
             try { leftRoster = JSON.parse(state.leftRosterJson || '[]'); } catch(e){}
             try { rightRoster = JSON.parse(state.rightRosterJson || '[]'); } catch(e){}
 
-            // 3. Scan for New Celebrations
+            // Scan for New Celebrations
             const scanTeam = (roster, side) => {
                 for (const p of roster) {
+                    if (!p) continue;
                     const raidPts = parseInt(p.raidPoints) || 0;
                     const tacklePts = parseInt(p.tacklePoints) || 0;
                     const id = String(p.id);
@@ -2859,21 +2870,10 @@ function syncRaidAudio(clock) {
                     }
 
                     if (text) {
-                        const raidActive = state.raidTimerRunning === true || (!isNaN(parseInt(data.raid_clock)) && parseInt(data.raid_clock) > 0 && parseInt(data.raid_clock) < 30);
-                        let currentRaidIsLeft = true;
-                        const raw = state.currentRaidTeamIsLeft !== undefined ? state.currentRaidTeamIsLeft : state.currentRaidTeamsLeft;
-                        if (raw === false || raw === 0 || raw === '0' || raw === 'false') currentRaidIsLeft = false;
-                        
-                        const isPlayerTeamRaiding = (side === 'left' && raidActive && currentRaidIsLeft) || 
-                                                    (side === 'right' && raidActive && !currentRaidIsLeft);
-                        
-                        // If their team is currently raiding OR we are blocked by animation/overlay
-                        if (isPlayerTeamRaiding || isBlocked) {
-                            pendingCelebration = { side, player: p, text };
-                        } else {
-                            triggerCelebration(side, p, text);
-                        }
-                        return true; // Found one, stop scanning
+                        // Immediately place it in the queue. 
+                        // The setInterval monitor above will handle perfectly timing the release.
+                        pendingCelebration = { side, player: p, text };
+                        return true; 
                     }
                 }
                 return false;
@@ -3012,6 +3012,11 @@ function syncRaidAudio(clock) {
                     try {
                         state = JSON.parse(data.state_json);
 
+                        
+
+                        // Keep global track of state for the background celebration monitor
+                window.latestMatchState = state;
+                window.latestMatchData = data;
                         // Check for Super 10 / High Five
                         checkCelebrations(state, data);
                         
