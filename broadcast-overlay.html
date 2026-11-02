@@ -28,107 +28,79 @@
     <link rel="preload" as="image" href="images/thigh-five.webp">
     <link rel="preload" as="image" href="images/super-tackle.webp">
     <link rel="preload" as="image" href="/images/kabaddione_bg.jpg">
-    <link rel="preload" as="image" href="images/starting7-mat.png">
+    <link rel="preload" as="image" href="images/starting7-mat.webp">
         <script>
         window.epicGifBlobs = { raid: null, tackle: null, coin: null };
 
-        // --- ASSET LOADING TRACKER ---
-        window.totalAssetsToLoad = 0;
-        window.loadedAssetsCount = 0;
-        window.assetsFinished = false;
-
-        function trackAsset() {
-            window.totalAssetsToLoad++;
-        }
-
-        function assetLoaded() {
-            window.loadedAssetsCount++;
-            updateLoaderUI();
-        }
-
-        function updateLoaderUI() {
-            const pctEl = document.getElementById('loader-percentage');
-            if (!pctEl) return; 
-            
-            let pct = Math.floor((window.loadedAssetsCount / window.totalAssetsToLoad) * 100);
-            if (pct > 99 && window.loadedAssetsCount < window.totalAssetsToLoad) pct = 99; 
-            pctEl.innerText = pct + '%';
-
-            if (window.loadedAssetsCount >= window.totalAssetsToLoad && window.totalAssetsToLoad > 0 && !window.assetsFinished) {
-                window.assetsFinished = true;
-                setTimeout(() => {
-                    const ls = document.getElementById('loading-screen');
-                    if (ls) { 
-                        ls.style.opacity = '0'; 
-                        setTimeout(() => ls.remove(), 600); 
-                    }
-                }, 800); // Short delay to let the user see 100%
-            }
-        }
-
-        function loadLocalBlob(url) {
-            return new Promise((resolve, reject) => {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', url, true);
-                xhr.responseType = 'blob';
-                xhr.onload = function() {
-                    if (this.status === 200 || this.status === 0) {
-                        resolve(this.response);
-                    } else {
-                        reject('Failed with status: ' + this.status);
-                    }
-                };
-                xhr.onerror = function() { reject('Network error'); };
-                xhr.send();
-            });
-        }
-
-        (function preloadEpicAssets() {
-            // 1. Track and Load Images
-            const imagesToLoad = [
-                'images/app-promo.webp',
-                'images/raid-mat.png',
-                'images/tackle-mat.png',
-                '/images/kabaddione_bg.jpg',
-                'images/starting7-mat.webp',
-                '/images/kabaddione_logo.png',
-                '/images/ic_splash_logo1.png',
-                '/images/performance_bg.jpg',
-                '/images/player_profile_starting.png',
-                'images/top-channel-logo.webp',
-                'images/qr-code.png',
-                'images/coin-animation.gif'
+        document.addEventListener('DOMContentLoaded', () => {
+            const assetsToLoad = [
+                // ALL IMAGES
+                'images/app-promo.webp', 'images/raid-mat.png', 'images/tackle-mat.png', 
+                '/images/kabaddione_bg.jpg', 'images/starting7-mat.webp', '/images/kabaddione_logo.png',
+                '/images/ic_splash_logo1.png', '/images/performance_bg.jpg', '/images/player_profile_starting.png',
+                'images/top-channel-logo.webp', 'images/qr-code.png',
+                
+                // ALL AUDIO FILES (Forces them into browser cache before broadcast starts)
+                '/audio/kabaddi-30.mp3', '/audio/super-tackle.mp3', '/audio/super-raid.mp3',
+                '/audio/do-or-die.mp3', '/audio/all-out.mp3', '/audio/event-slide-in.mp3',
+                '/audio/victory.mp3', '/audio/background.mp3', '/audio/suspension_start.mp3',
+                '/audio/suspension_end.mp3', '/audio/super-10.mp3', '/audio/toss_coin.mp3'
             ];
 
-            imagesToLoad.forEach(function (src) {
-                trackAsset();
-                var img = new Image();
-                img.onload = assetLoaded;
-                img.onerror = assetLoaded; // Count as loaded on fail so it doesn't hang forever
-                img.src = src;
-            });
-
-            // 2. Track and Load GIF Blobs
             const gifsToLoad = [
                 { key: 'raid', url: 'images/thigh-five.webp' },
                 { key: 'tackle', url: 'images/super-tackle.webp' },
                 { key: 'coin', url: 'images/coin-animation.gif' }
             ];
 
-            gifsToLoad.forEach(function (gif) {
-                trackAsset();
-                loadLocalBlob(gif.url).then(function(blob) {
-                    window.epicGifBlobs[gif.key] = blob;
-                    assetLoaded();
-                }).catch(function(err) {
-                    window.__kabaddiLog('WARN', 'Failed to preload GIF: ' + gif.url, err);
-                    assetLoaded();
-                });
+            let loadedCount = 0;
+            const totalAssets = assetsToLoad.length + gifsToLoad.length;
+
+            function updateProgress() {
+                loadedCount++;
+                let pct = Math.floor((loadedCount / totalAssets) * 100);
+                if (pct > 99 && loadedCount < totalAssets) pct = 99;
+                
+                const pctEl = document.getElementById('loader-percentage');
+                if (pctEl) pctEl.innerText = pct + '%';
+
+                if (loadedCount >= totalAssets) {
+                    setTimeout(() => {
+                        const ls = document.getElementById('loading-screen');
+                        if (ls) { 
+                            ls.style.opacity = '0'; 
+                            setTimeout(() => ls.remove(), 600); 
+                        }
+                        // ONLY START THE BROADCAST ENGINE ONCE 100% LOADED
+                        if (typeof window.startAppAfterLoad === 'function') {
+                            window.startAppAfterLoad();
+                        }
+                    }, 800);
+                }
+            }
+
+            // Preload normal assets (Images & Audio)
+            assetsToLoad.forEach(src => {
+                fetch(src, { mode: 'no-cors' })
+                    .then(updateProgress)
+                    .catch(updateProgress); // Counts as loaded even on fail to prevent permanent freeze
             });
-            
-            // Fallback: If DOM isn't ready when this runs, ensure UI updates once it is
-            document.addEventListener('DOMContentLoaded', updateLoaderUI);
-        })();
+
+            // Preload GIFs as Blobs
+            gifsToLoad.forEach(gif => {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', gif.url, true);
+                xhr.responseType = 'blob';
+                xhr.onload = function() {
+                    if (this.status === 200 || this.status === 0) {
+                        window.epicGifBlobs[gif.key] = this.response;
+                    }
+                    updateProgress();
+                };
+                xhr.onerror = updateProgress;
+                xhr.send();
+            });
+        });
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
@@ -1000,36 +972,31 @@
         }
 
 
-                /* ============================================================
-           LOADING SCREEN CSS
+        /* ============================================================
+           MASTER LOADING SCREEN (CENTERED, WHITE, DROP SHADOW)
            ============================================================ */
         #loading-screen {
             position: fixed; inset: 0; z-index: 999999;
-            background: #0a0a1a; /* Dark background to hide OBS blank screen */
+            background: #0B0B18; /* Solid dark background to hide everything behind it */
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.6s ease;
         }
         
         .loader-spinner {
-            width: 120px; height: 120px;
-            border: 8px solid rgba(255, 255, 255, 0.05);
-            border-top: 8px solid #FFD700; /* KabaddiOne Gold */
+            width: 90px; height: 90px;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-top: 8px solid #FFFFFF; 
             border-radius: 50%;
             animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.2);
-            position: relative;
-        }
-
-        /* Inner spinner glow effect */
-        .loader-spinner::before {
-            content: ''; position: absolute; inset: -8px; border-radius: 50%;
-            border: 2px solid transparent; border-bottom: 2px solid #FF5E3A;
-            animation: spin 2s linear infinite reverse;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
         }
         
         .loader-text {
-            margin-top: 30px; font-family: 'Teko', sans-serif; font-size: 48px; font-weight: 700;
-            color: #FFF; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.5);
+            margin-top: 25px; 
+            font-family: 'Teko', sans-serif; 
+            font-size: 55px; font-weight: 700;
+            color: #FFFFFF; 
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.5);
             letter-spacing: 2px;
         }
         
@@ -1040,6 +1007,11 @@
     </style>
 </head>
 <body>
+
+    <div id="loading-screen">
+        <div class="loader-spinner"></div>
+        <div class="loader-text" id="loader-percentage">0%</div>
+    </div>
 
     <audio id="raid-audio-player" src="/audio/kabaddi-30.mp3" preload="auto"></audio>
 
@@ -1553,16 +1525,19 @@ margin-bottom: 60px;>
             window.__kabaddiLog(s.val() ? 'OK' : 'WARN', '[RTDB] Connected: ' + s.val());
         });
 
-        firebase.auth().signInAnonymously()
-            .then(() => {
-                window.__kabaddiLog('OK', '✅ Anonymous Auth Successful!');
-                startBroadcastEngine();
-            })
-            .catch((error) => {
-                window.__kabaddiLog('ERR', '❌ Secure Connection Auth Failed', error);
-                document.getElementById('left-name').innerText = "AUTH ERROR";
-                document.getElementById('right-name').innerText = "SECURE DB BLOCKED";
-            });
+        // Wraps the engine start command so it waits for the preloader to finish
+        window.startAppAfterLoad = function() {
+            firebase.auth().signInAnonymously()
+                .then(() => {
+                    window.__kabaddiLog('OK', '✅ Anonymous Auth Successful!');
+                    startBroadcastEngine(); // Now safely started ONLY after all assets are 100% downloaded
+                })
+                .catch((error) => {
+                    window.__kabaddiLog('ERR', '❌ Secure Connection Auth Failed', error);
+                    document.getElementById('left-name').innerText = "AUTH ERROR";
+                    document.getElementById('right-name').innerText = "SECURE DB BLOCKED";
+                });
+        };
 
         // ==========================================
         // STATE
