@@ -23,8 +23,8 @@
         }
     </script>
 
-    <link rel="preload" as="image" href="images/raid-mat.png">
-    <link rel="preload" as="image" href="images/tackle-mat.png">
+    <link rel="preload" as="image" href="images/raid-mat.webp">
+    <link rel="preload" as="image" href="images/tackle-mat.webp">
     <link rel="preload" as="image" href="images/thigh-five.webp">
     <link rel="preload" as="image" href="images/super-tackle.webp">
     <link rel="preload" as="image" href="/images/kabaddione_bg.jpg">
@@ -35,7 +35,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const assetsToLoad = [
                 // ALL IMAGES
-                'images/app-promo.webp', 'images/raid-mat.png', 'images/tackle-mat.png', 
+                'images/app-promo.webp', 'images/raid-mat.webp', 'images/tackle-mat.webp', 
                 '/images/kabaddione_bg.jpg', 'images/starting7-mat.webp', '/images/kabaddione_logo.png',
                 '/images/ic_splash_logo1.png', '/images/performance_bg.jpg', '/images/player_profile_starting.png',
                 'images/top-channel-logo.webp', 'images/qr-code.png',
@@ -50,7 +50,7 @@
             const gifsToLoad = [
                 { key: 'raid', url: 'images/thigh-five.webp' },
                 { key: 'tackle', url: 'images/super-tackle.webp' },
-                { key: 'coin', url: 'images/coin-animation.gif' }
+                { key: 'coin', url: 'images/coin-animation.webp' }
             ];
 
             let loadedCount = 0;
@@ -328,8 +328,8 @@
         @keyframes epicSlideDown { from { transform: translateY(0); } to { transform: translateY(105%); } }
 
         .epic-mat { position: absolute; left: 0; right: 0; bottom: 0; height: 240px; background: linear-gradient(to top, #16002C 0%, #3E1260 25%, #5C1B8A 50%, #7B2FBE 75%, #B14AE8 100%); background-size: 100% 100%; background-repeat: no-repeat; background-position: bottom center; box-shadow: 0 -12px 45px rgba(150,60,230,0.7), inset 0 4px 0 rgba(255,255,255,0.06); transform: translateY(100%); z-index: 1; overflow: hidden; }
-        .epic-overlay.animate-raid .epic-mat { background-image: url('images/raid-mat.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: bottom center; background-color: transparent; box-shadow: none; }
-        .epic-overlay.animate-tackle .epic-mat { background-image: url('images/tackle-mat.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: bottom center; background-color: transparent; box-shadow: none; }
+        .epic-overlay.animate-raid .epic-mat { background-image: url('images/raid-mat.webp'); background-size: 100% 100%; background-repeat: no-repeat; background-position: bottom center; background-color: transparent; box-shadow: none; }
+        .epic-overlay.animate-tackle .epic-mat { background-image: url('images/tackle-mat.webp'); background-size: 100% 100%; background-repeat: no-repeat; background-position: bottom center; background-color: transparent; box-shadow: none; }
         .epic-overlay.animate-allout .epic-mat { background-image: none; background: linear-gradient(to top, #16002C 0%, #3E1260 25%, #5C1B8A 50%, #7B2FBE 75%, #B14AE8 100%); }
         .epic-mat::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 120px), linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%); pointer-events: none; }
         .epic-overlay.animate-raid .epic-mat::before, .epic-overlay.animate-tackle .epic-mat::before { background: linear-gradient(to top, rgba(0,0,0,0.18) 0%, transparent 45%); }
@@ -1483,7 +1483,7 @@
                         <span id="toss-winner-text" class="toss-text-dark">TOSS WON BY PATNA PIRATES</span>
                     </div>
                     <div class="toss-choice-box" id="toss-choice-box">
-                        <img id="toss-coin-gif" class="toss-coin-gif" src="images/coin-animation.gif" alt="" style="display: none;">
+                        <img id="toss-coin-gif" class="toss-coin-gif" src="images/coin-animation.webp" alt="" style="display: none;">
                         <span id="toss-choice-text" class="toss-text-light">BENGAL WARRIORS TO RAID FIRST</span>
                     </div>
                 </div>
