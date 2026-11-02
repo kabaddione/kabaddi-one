@@ -966,7 +966,7 @@
             align-items: center; 
             justify-content: center;
             padding: 40px;
-            margin-left: 0px; 
+            margin-left: -50px; 
             margin-bottom: 20px; /* Extra space to prevent bottom shadow cut */
             margin-right: 50px;  /* Extra space to prevent right shadow cut */
             height: 230px; 
@@ -2034,6 +2034,7 @@ function syncRaidAudio(clock) {
             const promoContent = document.getElementById('app-promo-content');
 
             const hasData = tossHasData(data);
+            const isTossHappening = (!hasData && mode === 'remote-confirmed');
 
             // 1. UPDATE TEXT & CONTENT BASED ON CURRENT TOSS STATE
             if (hasData) {
@@ -2043,7 +2044,7 @@ function syncRaidAudio(clock) {
                 renderTossScreen(data);
                 if (subText) subText.innerText = 'MATCH WILL START SOON...';
                 window._tossCoinPlayed = false; 
-            } else if (mode === 'remote-confirmed') {
+            } else if (isTossHappening) {
                 // --- Toss Happening Now ---
                 if (winnerBox) winnerBox.classList.add('hidden');
                 
@@ -2074,36 +2075,52 @@ function syncRaidAudio(clock) {
                 if (subText)    subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
             }
 
-            // 2. START OR MAINTAIN THE CONTINUOUS ROTATION LOOP
-            if (!promoCycleInterval) {
-                // Setup initial visibility: show toss, hide promo
+            // 2. MANAGE THE ROTATION LOOP
+            if (isTossHappening) {
+                // 🚨 TOSS IS HAPPENING: Force screen to Toss, hide Promo, pause rotation
+                if (promoCycleInterval) { 
+                    clearInterval(promoCycleInterval); 
+                    promoCycleInterval = null; 
+                }
+                
                 showingPromo = false;
-                tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
-                promoContent.style.display = 'none'; promoContent.style.opacity = '0';
+                promoContent.style.opacity = '0';
+                promoContent.style.display = 'none';
+                tossContent.style.display = 'flex';
+                setTimeout(() => tossContent.style.opacity = '1', 50);
 
-                const rotateBanners = () => {
-                    if (showingPromo) {
-                        // Hide Promo, Show Toss
-                        promoContent.style.opacity = '0';
-                        setTimeout(() => {
-                            promoContent.style.display = 'none';
-                            tossContent.style.display = 'flex';
-                            setTimeout(() => tossContent.style.opacity = '1', 50);
-                        }, 400); // Wait for CSS transition
-                    } else {
-                        // Hide Toss, Show Promo
-                        tossContent.style.opacity = '0';
-                        setTimeout(() => {
-                            tossContent.style.display = 'none';
-                            promoContent.style.display = 'flex';
-                            setTimeout(() => promoContent.style.opacity = '1', 50);
-                        }, 400);
-                    }
-                    showingPromo = !showingPromo;
-                };
+            } else {
+                // 🔄 START OR MAINTAIN ROTATION (For Pending or Result)
+                if (!promoCycleInterval) {
+                    // Setup initial visibility if it was killed
+                    showingPromo = false;
+                    tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
+                    promoContent.style.display = 'none'; promoContent.style.opacity = '0';
 
-                // Cycle every 10 seconds uninterrupted, no matter the state
-                promoCycleInterval = setInterval(rotateBanners, 10000);
+                    const rotateBanners = () => {
+                        if (showingPromo) {
+                            // Hide Promo, Show Toss
+                            promoContent.style.opacity = '0';
+                            setTimeout(() => {
+                                promoContent.style.display = 'none';
+                                tossContent.style.display = 'flex';
+                                setTimeout(() => tossContent.style.opacity = '1', 50);
+                            }, 400); // Wait for CSS transition
+                        } else {
+                            // Hide Toss, Show Promo
+                            tossContent.style.opacity = '0';
+                            setTimeout(() => {
+                                tossContent.style.display = 'none';
+                                promoContent.style.display = 'flex';
+                                setTimeout(() => promoContent.style.opacity = '1', 50);
+                            }, 400);
+                        }
+                        showingPromo = !showingPromo;
+                    };
+
+                    // Cycle every 10 seconds uninterrupted
+                    promoCycleInterval = setInterval(rotateBanners, 10000);
+                }
             }
         }
 
