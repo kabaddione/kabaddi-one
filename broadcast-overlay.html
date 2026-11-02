@@ -957,7 +957,8 @@
         }
 
 
-                /* ============================================================
+         
+        /* ============================================================
            APP PROMO BANNER CSS (ROTATES WITH TOSS PENDING)
            ============================================================ */
         .promo-banner-wrapper {
@@ -966,9 +967,12 @@
             justify-content: center;
             padding: 20px;
             margin-left: 0px; 
-            margin-bottom: 10px; 
-            height: 230px; /* Adjust height to fit your custom image */
-            filter: drop-shadow(rgba(0, 0, 0, 1) 10px 15px 10px); /* Adds a nice shadow to the image */
+            margin-bottom: 60px; /* Extra space to prevent bottom shadow cut */
+            margin-right: 50px;  /* Extra space to prevent right shadow cut */
+            height: 230px; 
+            transform: scale(1.5); /* Scales the banner up */
+            transform-origin: left bottom; /* Keeps it aligned correctly */
+            filter: drop-shadow(10px 15px 10px rgba(0, 0, 0, 1)); 
         }
 
 
@@ -1495,9 +1499,8 @@
             </div>
 
                         <!-- NEW APP PROMO CONTENT (Hides/Shows via JS rotation) -->
-            <div id="app-promo-content" class="promo-banner-wrapper" style="display:none; opacity:0; transition: opacity 0.4s ease;" filter: drop-shadow(rgb(0, 0, 0) 10px 15px 10px);
-scale: 1.5;
-margin-bottom: 60px;>
+            <!-- NEW APP PROMO CONTENT (Hides/Shows via JS rotation) -->
+            <div id="app-promo-content" class="promo-banner-wrapper" style="display:none; opacity:0; transition: opacity 0.4s ease;">
                 <img src="images/app-promo.webp" alt="Download App" style="height: 100%; width: auto; object-fit: contain; display: block;">
             </div>
             
@@ -1999,9 +2002,16 @@ function syncRaidAudio(clock) {
         function hideTossScreen() {
             const overlay = document.getElementById('toss-result-overlay');
             if (!overlay || !overlay.classList.contains('show')) return;
+            
             overlay.classList.remove('show');
             overlay.classList.add('exit');
             updateMainStageVisibility();
+            
+            // Kill the rotation safely when the screen goes away
+            if (promoCycleInterval) { 
+                clearInterval(promoCycleInterval); 
+                promoCycleInterval = null; 
+            }
         }
 
         function tossHasData(data) {
@@ -2025,25 +2035,18 @@ function syncRaidAudio(clock) {
 
             const hasData = tossHasData(data);
 
-            // 1. If Toss Result is completed (Data exists), kill rotation and show static result
+            // 1. UPDATE TEXT & CONTENT BASED ON CURRENT TOSS STATE
             if (hasData) {
-                if (promoCycleInterval) { clearInterval(promoCycleInterval); promoCycleInterval = null; }
-                tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
-                promoContent.style.display = 'none'; promoContent.style.opacity = '0';
-                
+                // --- Toss Completed ---
                 if (winnerBox) winnerBox.classList.remove('hidden');
                 if (coinGif)   coinGif.classList.remove('show');
                 renderTossScreen(data);
                 if (subText) subText.innerText = 'MATCH WILL START SOON...';
-                window._tossCoinPlayed = false; // Reset audio guard for next match
-                return;
-            }
-
-            // 2. Hide Winner box while waiting/happening
-            if (winnerBox) winnerBox.classList.add('hidden');
-
-            // 3. Update Text and Audio based on Confirmed vs Pending
-            if (mode === 'remote-confirmed') {
+                window._tossCoinPlayed = false; 
+            } else if (mode === 'remote-confirmed') {
+                // --- Toss Happening Now ---
+                if (winnerBox) winnerBox.classList.add('hidden');
+                
                 if (!window._tossCoinPlayed) {
                     playEventSound('toss_coin');
                     window._tossCoinPlayed = true;
@@ -2061,30 +2064,34 @@ function syncRaidAudio(clock) {
                 }
                 if (choiceText) choiceText.innerText = 'TOSS TIME NOW';
                 if (subText)    subText.innerText    = 'TOSS IS HAPPENING RIGHT NOW';
-                
             } else {
-                window._tossCoinPlayed = false; // Reset guard
+                // --- Toss Pending ---
+                if (winnerBox) winnerBox.classList.add('hidden');
+                window._tossCoinPlayed = false;
+                
                 if (coinGif)    coinGif.classList.remove('show');
                 if (choiceText) choiceText.innerText = 'TOSS COMING UP NEXT';
                 if (subText)    subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
             }
 
-            // 4. Start Continuous 10-Second Rotation (If not already running)
+            // 2. START OR MAINTAIN THE CONTINUOUS ROTATION LOOP
             if (!promoCycleInterval) {
-                // Set initial active state
+                // Setup initial visibility: show toss, hide promo
                 showingPromo = false;
                 tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
                 promoContent.style.display = 'none'; promoContent.style.opacity = '0';
 
                 const rotateBanners = () => {
                     if (showingPromo) {
+                        // Hide Promo, Show Toss
                         promoContent.style.opacity = '0';
                         setTimeout(() => {
                             promoContent.style.display = 'none';
                             tossContent.style.display = 'flex';
                             setTimeout(() => tossContent.style.opacity = '1', 50);
-                        }, 400); // 400ms matches CSS transition
+                        }, 400); // Wait for CSS transition
                     } else {
+                        // Hide Toss, Show Promo
                         tossContent.style.opacity = '0';
                         setTimeout(() => {
                             tossContent.style.display = 'none';
@@ -2095,7 +2102,7 @@ function syncRaidAudio(clock) {
                     showingPromo = !showingPromo;
                 };
 
-                // Cycle every 10 seconds uninterrupted
+                // Cycle every 10 seconds uninterrupted, no matter the state
                 promoCycleInterval = setInterval(rotateBanners, 10000);
             }
         }
