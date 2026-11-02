@@ -2023,13 +2023,11 @@ function syncRaidAudio(clock) {
             const tossContent  = document.getElementById('toss-main-content');
             const promoContent = document.getElementById('app-promo-content');
 
-            // Clear any active rotation interval
-            if (promoCycleInterval) { clearInterval(promoCycleInterval); promoCycleInterval = null; }
-
             const hasData = tossHasData(data);
 
+            // 1. If Toss Result is completed (Data exists), kill rotation and show static result
             if (hasData) {
-                // Ensure Toss content is fully visible and promo is hidden
+                if (promoCycleInterval) { clearInterval(promoCycleInterval); promoCycleInterval = null; }
                 tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
                 promoContent.style.display = 'none'; promoContent.style.opacity = '0';
                 
@@ -2037,18 +2035,15 @@ function syncRaidAudio(clock) {
                 if (coinGif)   coinGif.classList.remove('show');
                 renderTossScreen(data);
                 if (subText) subText.innerText = 'MATCH WILL START SOON...';
-                window._tossCoinPlayed = false; // Reset audio guard
+                window._tossCoinPlayed = false; // Reset audio guard for next match
                 return;
             }
 
+            // 2. Hide Winner box while waiting/happening
             if (winnerBox) winnerBox.classList.add('hidden');
 
+            // 3. Update Text and Audio based on Confirmed vs Pending
             if (mode === 'remote-confirmed') {
-                // 🪙 TOSS CONFIRMED MODE 🪙
-                tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
-                promoContent.style.display = 'none'; promoContent.style.opacity = '0';
-                
-                // Play Audio exactly once
                 if (!window._tossCoinPlayed) {
                     playEventSound('toss_coin');
                     window._tossCoinPlayed = true;
@@ -2068,8 +2063,18 @@ function syncRaidAudio(clock) {
                 if (subText)    subText.innerText    = 'TOSS IS HAPPENING RIGHT NOW';
                 
             } else {
-                // 🔄 PENDING ROTATION MODE (Toss / Promo) 🔄
-                window._tossCoinPlayed = false; // Reset audio guard
+                window._tossCoinPlayed = false; // Reset guard
+                if (coinGif)    coinGif.classList.remove('show');
+                if (choiceText) choiceText.innerText = 'TOSS COMING UP NEXT';
+                if (subText)    subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
+            }
+
+            // 4. Start Continuous 10-Second Rotation (If not already running)
+            if (!promoCycleInterval) {
+                // Set initial active state
+                showingPromo = false;
+                tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
+                promoContent.style.display = 'none'; promoContent.style.opacity = '0';
 
                 const rotateBanners = () => {
                     if (showingPromo) {
@@ -2090,18 +2095,7 @@ function syncRaidAudio(clock) {
                     showingPromo = !showingPromo;
                 };
 
-                // Initial layout set
-                if (!showingPromo) {
-                    tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
-                    promoContent.style.display = 'none'; promoContent.style.opacity = '0';
-                }
-                
-                // Restore generic pending text
-                if (coinGif)    coinGif.classList.remove('show');
-                if (choiceText) choiceText.innerText = 'TOSS COMING UP NEXT';
-                if (subText)    subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
-
-                // Rotate every 10 seconds
+                // Cycle every 10 seconds uninterrupted
                 promoCycleInterval = setInterval(rotateBanners, 10000);
             }
         }
@@ -3359,7 +3353,14 @@ function syncRaidAudio(clock) {
             const defSide  = actualLeftRaid ? 'right' : 'left';
             const defDOD   = actualLeftRaid ? rightDOD : leftDOD;
 
-            if (raiderName) {
+            // 🚨 Strict confirmation check: Block unconfirmed auto-guessed names
+            let raiderConfirmed = true;
+            if (state && state.isRaiderConfirmed === false) raiderConfirmed = false;
+            if (data.is_raider_confirmed === false || String(data.is_raider_confirmed) === 'false') raiderConfirmed = false;
+            if (data.raider_confirmed === false || String(data.raider_confirmed) === 'false') raiderConfirmed = false;
+
+            // Only start the raider animation if we have a name AND it is confirmed
+            if (raiderName && raiderConfirmed) {
                 startRaiderRotation(raidSide, raiderName);
             } else {
                 stopRaiderRotation(raidSide);
