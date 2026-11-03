@@ -2402,7 +2402,9 @@ function syncRaidAudio(clock) {
         let lastKnownHalfNum = 1;
         let pendingL5Data = null; // <-- ADD THIS
 
-                function handleLast5MinutesUpdate(data, existingState) {
+                        
+        
+        function handleLast5MinutesUpdate(data, existingState) {
             if (!data || !data.match_duration_mins) return;
 
             const breakTitle = (data.break_clock_title || '').trim();
@@ -2459,11 +2461,8 @@ function syncRaidAudio(clock) {
                 return; // Do not process new ones while one is pending
             }
 
+            // Trigger when we enter a new 5-minute bucket
             if (bucket > lastL5TriggerBucket && bucket > 0 && absMinute < (halfMins * 2)) {
-                if (bucket > lastL5TriggerBucket + 1) {
-                    lastL5TriggerBucket = bucket;
-                    return;
-                }
                 lastL5TriggerBucket = bucket;
                 let logs = [];
                 try { logs = JSON.parse(state.logsJson); } catch (e) { return; }
@@ -2486,6 +2485,8 @@ function syncRaidAudio(clock) {
                 }
             }
         }
+
+        
         function showLast5MinBanner(absMinute, currentL, currentR, halfMins, logs, leftColor, rightColor) {
             const targetMin = absMinute - 5;
             let pastL = 0, pastR = 0;
