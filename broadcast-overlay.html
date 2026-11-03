@@ -1010,7 +1010,7 @@
         }
 
 
-                /* ============================================================
+                  /* ============================================================
            RECENT SCORE FLASH ANIMATIONS
            ============================================================ */
         .recent-score-text {
@@ -3379,7 +3379,7 @@ function syncRaidAudio(clock) {
             el.classList.remove('below');
         }
 
-        function handleRaiderNameRotation(state, data, leftColor, rightColor) {
+                function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
@@ -3410,18 +3410,32 @@ function syncRaidAudio(clock) {
             const defSide  = actualLeftRaid ? 'right' : 'left';
             const defDOD   = actualLeftRaid ? rightDOD : leftDOD;
 
-            // 🚨 Strict confirmation check: Block unconfirmed auto-guessed names
-            let raiderConfirmed = true;
-            if (state && state.isRaiderConfirmed === false) raiderConfirmed = false;
-            if (data.is_raider_confirmed === false || String(data.is_raider_confirmed) === 'false') raiderConfirmed = false;
-            if (data.raider_confirmed === false || String(data.raider_confirmed) === 'false') raiderConfirmed = false;
+            // 🚨 STRICT CONFIRMATION: Default is FALSE. Only show if explicitly true.
+            let raiderConfirmed = false;
+            if (data.is_raider_confirmed === true || String(data.is_raider_confirmed) === 'true') raiderConfirmed = true;
+            if (data.raider_confirmed === true || String(data.raider_confirmed) === 'true') raiderConfirmed = true;
+            if (state && state.isRaiderConfirmed === true) raiderConfirmed = true;
 
-            // Only start the raider animation if we have a name AND it is confirmed
             if (raiderName && raiderConfirmed) {
                 startRaiderRotation(raidSide, raiderName);
             } else {
                 stopRaiderRotation(raidSide);
                 raiderRotationState[raidSide].currentRaider = null;
+                
+                // Force team name to show if it was previously hidden
+                const teamBg = document.getElementById(raidSide + '-team-bg');
+                if (teamBg && !window.isRecentScoreActive) {
+                    const nameEl = teamBg.querySelector('.team-name-text');
+                    const raiderEl = teamBg.querySelector('.raider-name-text');
+                    if (nameEl && !nameEl.classList.contains('show')) {
+                        nameEl.classList.remove('out', 'below');
+                        nameEl.classList.add('below');
+                        void nameEl.offsetWidth;
+                        nameEl.classList.remove('below');
+                        nameEl.classList.add('show');
+                        if (raiderEl) raiderEl.classList.add('out');
+                    }
+                }
             }
 
             if (defDOD) {
@@ -3442,10 +3456,11 @@ function syncRaidAudio(clock) {
             const nameEl   = container.querySelector('.team-name-text');
             const raiderEl = container.querySelector('.raider-name-text');
             
-            // If recent score is playing, just update the data but don't touch the DOM yet
+            // If recent score is playing, just update the state data quietly
             if (window.isRecentScoreActive) {
                 st.currentRaider = raiderName;
                 raiderEl.innerText = raiderName;
+                st.active = true;
                 return;
             }
 
@@ -3469,13 +3484,11 @@ function syncRaidAudio(clock) {
             const tick = () => {
                 if (!st.active) return;
                 
-                // If recent score is active, just wait and check again shortly
                 if (window.isRecentScoreActive) {
                     st.timer = setTimeout(tick, 500);
                     return;
                 }
 
-                // If we just resumed from recent score, ensure the current active one snaps up from the bottom
                 if (showingRaider) {
                     if (!raiderEl.classList.contains('show')) {
                         snapBelow(raiderEl);
@@ -3505,22 +3518,7 @@ function syncRaidAudio(clock) {
             st.timer = setTimeout(tick, 3000);
         }
 
-        function stopRaiderRotation(side) {
-            const st = raiderRotationState[side];
-            if (st.timer) { clearTimeout(st.timer); st.timer = null; }
-            st.active = false;
-            const container = document.querySelector(`#${side}-team-bg .name-rotator`);
-            if (!container) return;
-            const nameEl   = container.querySelector('.team-name-text');
-            const raiderEl = container.querySelector('.raider-name-text');
-            raiderEl.classList.remove('show', 'out', 'below');
-            nameEl.classList.remove('out', 'below');
-        }
-
-        // ==========================================
-        // 🚨 DOD TEAM-NAME ROTATION
-        // ==========================================
-                function startDodRotation(side) {
+        function startDodRotation(side) {
             const st = dodRotationState[side];
             if (st.active) return;
 
@@ -3530,30 +3528,28 @@ function syncRaidAudio(clock) {
             const raiderEl = container.querySelector('.raider-name-text');
 
             if (window.isRecentScoreActive) {
-                // Queue it but don't start yet
                 st.active = true;
                 raiderEl.innerText = 'NEXT DO OR DIE';
                 raiderEl.classList.add('dod-text');
-                // The tick will handle the rest
-            } else {
-                stopRaiderRotation(side);
-                raiderRotationState[side].currentRaider = null;
-
-                st.active = true;
-                raiderEl.innerText = 'NEXT DO OR DIE';
-                raiderEl.classList.add('dod-text');
-
-                nameEl.classList.add('out');
-                snapBelow(raiderEl);
-                raiderEl.classList.add('show');
+                return; // The tick will handle resuming
             }
+
+            stopRaiderRotation(side);
+            raiderRotationState[side].currentRaider = null;
+
+            st.active = true;
+            raiderEl.innerText = 'NEXT DO OR DIE';
+            raiderEl.classList.add('dod-text');
+
+            nameEl.classList.add('out');
+            snapBelow(raiderEl);
+            raiderEl.classList.add('show');
 
             let showingDod = true;
 
             const tick = () => {
                 if (!st.active) return;
                 
-                // If recent score is active, just wait
                 if (window.isRecentScoreActive) {
                     st.timer = setTimeout(tick, 500);
                     return;
@@ -3586,6 +3582,23 @@ function syncRaidAudio(clock) {
                 }
             };
             st.timer = setTimeout(tick, 3000);
+        }
+
+        function stopRaiderRotation(side) {
+            const st = raiderRotationState[side];
+            if (st.timer) { clearTimeout(st.timer); st.timer = null; }
+            st.active = false;
+            const container = document.querySelector(`#${side}-team-bg .name-rotator`);
+            if (!container) return;
+            const nameEl   = container.querySelector('.team-name-text');
+            const raiderEl = container.querySelector('.raider-name-text');
+            
+            // Safely skip DOM manipulation if the recent score is currently handling the animation
+            if (window.isRecentScoreActive) return;
+
+            raiderEl.classList.remove('show', 'out', 'below');
+            nameEl.classList.remove('out', 'below');
+            nameEl.classList.add('show');
         }
 
         function stopDodRotation(side) {
@@ -3870,7 +3883,7 @@ function syncRaidAudio(clock) {
 
         
 
-        function playRecentScoreAnimation(leftText, rightText) {
+                function playRecentScoreAnimation(leftText, rightText) {
             window.isRecentScoreActive = true;
             
             const lRot = document.querySelector('#left-team-bg .name-rotator');
@@ -3878,65 +3891,92 @@ function syncRaidAudio(clock) {
             const lText = document.getElementById('left-recent-score');
             const rText = document.getElementById('right-recent-score');
 
-            // Helper: Find what's currently showing and force it to slide UP
+            // 1. OUTRO: Slide UP whatever is currently showing (Team Name, Raider Name, or DOD)
             const hideCurrent = (rotator) => {
-                if (!rotator) return [];
-                const hidden = [];
-                // Target both team names and raider names
+                if (!rotator) return;
                 rotator.querySelectorAll('.team-name-text, .raider-name-text').forEach(child => {
-                    // Check if it is currently visible in the center
-                    if (child.classList.contains('show') || (!child.classList.contains('out') && !child.classList.contains('below'))) {
+                    if (!child.classList.contains('out') && !child.classList.contains('below')) {
                         child.classList.remove('show', 'below');
-                        child.classList.add('out'); // Slide UP
-                        hidden.push(child);
+                        child.classList.add('out');
                     }
                 });
-                return hidden;
             };
+            
+            if (leftText) hideCurrent(lRot);
+            if (rightText) hideCurrent(rRot);
 
-            const lHidden = leftText ? hideCurrent(lRot) : [];
-            const rHidden = rightText ? hideCurrent(rRot) : [];
-
-            // Slide IN recent score from BOTTOM
-            if (leftText && lText) {
-                lText.innerText = leftText;
-                lText.classList.remove('show', 'out');
-                lText.classList.add('below');
-                void lText.offsetWidth;
-                lText.classList.remove('below');
-                lText.classList.add('show'); // Slide up to center
-            }
-            if (rightText && rText) {
-                rText.innerText = rightText;
-                rText.classList.remove('show', 'out');
-                rText.classList.add('below');
-                void rText.offsetWidth;
-                rText.classList.remove('below');
-                rText.classList.add('show');
-            }
-
-            // Hold for 1.5s, then exit smoothly
+            // 2. INTRO: Slide IN the Recent Score from the bottom after a brief delay
             setTimeout(() => {
-                // Slide recent score UP
+                if (leftText && lText) {
+                    lText.innerText = leftText;
+                    lText.classList.remove('show', 'out');
+                    lText.classList.add('below');
+                    void lText.offsetWidth; // force reflow
+                    lText.classList.remove('below');
+                    lText.classList.add('show');
+                }
+                if (rightText && rText) {
+                    rText.innerText = rightText;
+                    rText.classList.remove('show', 'out');
+                    rText.classList.add('below');
+                    void rText.offsetWidth; // force reflow
+                    rText.classList.remove('below');
+                    rText.classList.add('show');
+                }
+            }, 200);
+
+            // 3. HOLD: Keep it on screen
+            setTimeout(() => {
+                // 4. OUTRO: Slide UP the Recent Score
                 if (leftText && lText) { lText.classList.remove('show'); lText.classList.add('out'); }
                 if (rightText && rText) { rText.classList.remove('show'); rText.classList.add('out'); }
 
-                // Wait 0.55s (for the exit animation to finish), then bring original text from BOTTOM
+                // 5. INTRO: Bring back the correct element (Team Name or Confirmed Raider Name)
                 setTimeout(() => {
-                    // We don't manually restore here. We just set the flag to false.
-                    // The rotation ticks in startRaiderRotation and startDodRotation 
-                    // will automatically see the flag is false and bring the correct 
-                    // text back from the bottom seamlessly.
+                    if (lText) lText.classList.add('below');
+                    if (rText) rText.classList.add('below');
                     
-                    // Reset the recent score text to bottom ready for next time
-                    if (lText) { lText.classList.remove('out'); lText.classList.add('below'); }
-                    if (rText) { rText.classList.remove('out'); rText.classList.add('below'); }
+                    const restoreText = (rotator, side) => {
+                        if (!rotator) return;
+                        const nameEl = rotator.querySelector('.team-name-text');
+                        const raiderEl = rotator.querySelector('.raider-name-text');
+                        
+                        // Strict Confirmation Check
+                        let isRaiderConfirmed = false;
+                        if (window.latestMatchData) {
+                            if (window.latestMatchData.is_raider_confirmed === true || String(window.latestMatchData.is_raider_confirmed) === 'true') isRaiderConfirmed = true;
+                            if (window.latestMatchData.raider_confirmed === true || String(window.latestMatchData.raider_confirmed) === 'true') isRaiderConfirmed = true;
+                            if (window.latestMatchState && window.latestMatchState.isRaiderConfirmed === true) isRaiderConfirmed = true;
+                        }
+                        
+                        const state = raiderRotationState[side];
+                        let targetEl = nameEl;
+                        
+                        // Only target raider name if confirmed
+                        if (state.active && state.currentRaider && isRaiderConfirmed) {
+                            targetEl = raiderEl;
+                        }
+
+                        // Snap to bottom and slide up
+                        targetEl.classList.remove('out', 'below', 'show');
+                        targetEl.classList.add('below');
+                        void targetEl.offsetWidth;
+                        targetEl.classList.remove('below');
+                        targetEl.classList.add('show');
+
+                        // Hide the other element
+                        const otherEl = (targetEl === nameEl) ? raiderEl : nameEl;
+                        otherEl.classList.remove('show');
+                        otherEl.classList.add('out');
+                    };
+                    
+                    if (leftText) restoreText(lRot, 'left');
+                    if (rightText) restoreText(rRot, 'right');
                     
                     window.isRecentScoreActive = false; 
-                }, 550); 
-            }, 1500); 
+                }, 550); // Wait for recent score outro to finish
+            }, 1700); 
         }
-
         // ==========================================
         // EPIC ANIMATION
         // ==========================================
