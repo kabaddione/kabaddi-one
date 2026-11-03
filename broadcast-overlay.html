@@ -3379,7 +3379,9 @@ function syncRaidAudio(clock) {
             el.classList.remove('below');
         }
 
-                function handleRaiderNameRotation(state, data, leftColor, rightColor) {
+        
+        
+        function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
@@ -3410,32 +3412,13 @@ function syncRaidAudio(clock) {
             const defSide  = actualLeftRaid ? 'right' : 'left';
             const defDOD   = actualLeftRaid ? rightDOD : leftDOD;
 
-            // 🚨 STRICT CONFIRMATION: Default is FALSE. Only show if explicitly true.
-            let raiderConfirmed = false;
-            if (data.is_raider_confirmed === true || String(data.is_raider_confirmed) === 'true') raiderConfirmed = true;
-            if (data.raider_confirmed === true || String(data.raider_confirmed) === 'true') raiderConfirmed = true;
-            if (state && state.isRaiderConfirmed === true) raiderConfirmed = true;
-
-            if (raiderName && raiderConfirmed) {
+            // 🚨 APP-DRIVEN CONFIRMATION: 
+            // If the app has sent a name in active_raider_name, it is confirmed.
+            if (raiderName.length > 0) {
                 startRaiderRotation(raidSide, raiderName);
             } else {
                 stopRaiderRotation(raidSide);
                 raiderRotationState[raidSide].currentRaider = null;
-                
-                // Force team name to show if it was previously hidden
-                const teamBg = document.getElementById(raidSide + '-team-bg');
-                if (teamBg && !window.isRecentScoreActive) {
-                    const nameEl = teamBg.querySelector('.team-name-text');
-                    const raiderEl = teamBg.querySelector('.raider-name-text');
-                    if (nameEl && !nameEl.classList.contains('show')) {
-                        nameEl.classList.remove('out', 'below');
-                        nameEl.classList.add('below');
-                        void nameEl.offsetWidth;
-                        nameEl.classList.remove('below');
-                        nameEl.classList.add('show');
-                        if (raiderEl) raiderEl.classList.add('out');
-                    }
-                }
             }
 
             if (defDOD) {
@@ -3883,7 +3866,7 @@ function syncRaidAudio(clock) {
 
         
 
-                function playRecentScoreAnimation(leftText, rightText) {
+        function playRecentScoreAnimation(leftText, rightText) {
             window.isRecentScoreActive = true;
             
             const lRot = document.querySelector('#left-team-bg .name-rotator');
@@ -3936,24 +3919,17 @@ function syncRaidAudio(clock) {
                     if (lText) lText.classList.add('below');
                     if (rText) rText.classList.add('below');
                     
-                    const restoreText = (rotator, side) => {
+                                        const restoreText = (rotator, side) => {
                         if (!rotator) return;
                         const nameEl = rotator.querySelector('.team-name-text');
                         const raiderEl = rotator.querySelector('.raider-name-text');
                         
-                        // Strict Confirmation Check
-                        let isRaiderConfirmed = false;
-                        if (window.latestMatchData) {
-                            if (window.latestMatchData.is_raider_confirmed === true || String(window.latestMatchData.is_raider_confirmed) === 'true') isRaiderConfirmed = true;
-                            if (window.latestMatchData.raider_confirmed === true || String(window.latestMatchData.raider_confirmed) === 'true') isRaiderConfirmed = true;
-                            if (window.latestMatchState && window.latestMatchState.isRaiderConfirmed === true) isRaiderConfirmed = true;
-                        }
-                        
                         const state = raiderRotationState[side];
                         let targetEl = nameEl;
                         
-                        // Only target raider name if confirmed
-                        if (state.active && state.currentRaider && isRaiderConfirmed) {
+                        // If the rotation state is active and has a raider name, restore the raider name.
+                        // Otherwise, fallback to the team name.
+                        if (state.active && state.currentRaider && state.currentRaider.length > 0) {
                             targetEl = raiderEl;
                         }
 
