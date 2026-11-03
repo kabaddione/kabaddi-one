@@ -1010,14 +1010,14 @@
         }
 
 
-        /* ============================================================
+                /* ============================================================
            RECENT SCORE FLASH ANIMATIONS
            ============================================================ */
         .recent-score-text {
             position: absolute; width: 100%; text-align: center;
             font-family: 'Mukta', sans-serif;
-            font-size: 32px; font-weight: 900; text-transform: uppercase;
-            color: #FFD700; /* Gold */
+            font-size: 38px; font-weight: 900; text-transform: uppercase;
+            color: #FFF; /* Gold */
             text-shadow: 2px 2px 6px rgba(0,0,0,0.95);
             transform: translateY(130%); 
             opacity: 0;
@@ -3433,7 +3433,7 @@ function syncRaidAudio(clock) {
             }
         }
 
-        function startRaiderRotation(side, raiderName) {
+                function startRaiderRotation(side, raiderName) {
             const st = raiderRotationState[side];
             if (st.active && st.currentRaider === raiderName) return;
 
@@ -3441,6 +3441,14 @@ function syncRaidAudio(clock) {
             if (!container) return;
             const nameEl   = container.querySelector('.team-name-text');
             const raiderEl = container.querySelector('.raider-name-text');
+            
+            // If recent score is playing, just update the data but don't touch the DOM yet
+            if (window.isRecentScoreActive) {
+                st.currentRaider = raiderName;
+                raiderEl.innerText = raiderName;
+                return;
+            }
+
             raiderEl.innerText = raiderName;
             raiderEl.classList.remove('dod-text');
 
@@ -3460,24 +3468,38 @@ function syncRaidAudio(clock) {
 
             const tick = () => {
                 if (!st.active) return;
-                // Pause rotation ticks if recent score is currently taking over the box
+                
+                // If recent score is active, just wait and check again shortly
                 if (window.isRecentScoreActive) {
                     st.timer = setTimeout(tick, 500);
                     return;
                 }
-                
+
+                // If we just resumed from recent score, ensure the current active one snaps up from the bottom
                 if (showingRaider) {
-                    raiderEl.classList.remove('show');
-                    raiderEl.classList.add('out');
-                    snapBelow(nameEl);
-                    showingRaider = false;
-                    st.timer = setTimeout(tick, 5000);
+                    if (!raiderEl.classList.contains('show')) {
+                        snapBelow(raiderEl);
+                        raiderEl.classList.add('show');
+                        nameEl.classList.add('out');
+                    }
+                    st.timer = setTimeout(() => {
+                        raiderEl.classList.remove('show');
+                        raiderEl.classList.add('out');
+                        snapBelow(nameEl);
+                        showingRaider = false;
+                        tick();
+                    }, 5000);
                 } else {
-                    nameEl.classList.add('out');
-                    snapBelow(raiderEl);
-                    raiderEl.classList.add('show');
-                    showingRaider = true;
-                    st.timer = setTimeout(tick, 3000);
+                    if (!nameEl.classList.contains('show') && !nameEl.classList.contains('out')) {
+                        snapBelow(nameEl);
+                    }
+                    st.timer = setTimeout(() => {
+                        nameEl.classList.add('out');
+                        snapBelow(raiderEl);
+                        raiderEl.classList.add('show');
+                        showingRaider = true;
+                        tick();
+                    }, 3000);
                 }
             };
             st.timer = setTimeout(tick, 3000);
@@ -3498,7 +3520,7 @@ function syncRaidAudio(clock) {
         // ==========================================
         // 🚨 DOD TEAM-NAME ROTATION
         // ==========================================
-        function startDodRotation(side) {
+                function startDodRotation(side) {
             const st = dodRotationState[side];
             if (st.active) return;
 
@@ -3507,39 +3529,60 @@ function syncRaidAudio(clock) {
             const nameEl   = container.querySelector('.team-name-text');
             const raiderEl = container.querySelector('.raider-name-text');
 
-            stopRaiderRotation(side);
-            raiderRotationState[side].currentRaider = null;
+            if (window.isRecentScoreActive) {
+                // Queue it but don't start yet
+                st.active = true;
+                raiderEl.innerText = 'NEXT DO OR DIE';
+                raiderEl.classList.add('dod-text');
+                // The tick will handle the rest
+            } else {
+                stopRaiderRotation(side);
+                raiderRotationState[side].currentRaider = null;
 
-            st.active = true;
-            raiderEl.innerText = 'NEXT DO OR DIE';
-            raiderEl.classList.add('dod-text');
+                st.active = true;
+                raiderEl.innerText = 'NEXT DO OR DIE';
+                raiderEl.classList.add('dod-text');
 
-            nameEl.classList.add('out');
-            snapBelow(raiderEl);
-            raiderEl.classList.add('show');
+                nameEl.classList.add('out');
+                snapBelow(raiderEl);
+                raiderEl.classList.add('show');
+            }
 
             let showingDod = true;
 
             const tick = () => {
                 if (!st.active) return;
-                // Pause rotation ticks if recent score is currently taking over the box
+                
+                // If recent score is active, just wait
                 if (window.isRecentScoreActive) {
                     st.timer = setTimeout(tick, 500);
                     return;
                 }
 
                 if (showingDod) {
-                    raiderEl.classList.remove('show');
-                    raiderEl.classList.add('out');
-                    snapBelow(nameEl);
-                    showingDod = false;
-                    st.timer = setTimeout(tick, 5000);
+                    if (!raiderEl.classList.contains('show')) {
+                        snapBelow(raiderEl);
+                        raiderEl.classList.add('show');
+                        nameEl.classList.add('out');
+                    }
+                    st.timer = setTimeout(() => {
+                        raiderEl.classList.remove('show');
+                        raiderEl.classList.add('out');
+                        snapBelow(nameEl);
+                        showingDod = false;
+                        tick();
+                    }, 5000);
                 } else {
-                    nameEl.classList.add('out');
-                    snapBelow(raiderEl);
-                    raiderEl.classList.add('show');
-                    showingDod = true;
-                    st.timer = setTimeout(tick, 3000);
+                    if (!nameEl.classList.contains('show') && !nameEl.classList.contains('out')) {
+                        snapBelow(nameEl);
+                    }
+                    st.timer = setTimeout(() => {
+                        nameEl.classList.add('out');
+                        snapBelow(raiderEl);
+                        raiderEl.classList.add('show');
+                        showingDod = true;
+                        tick();
+                    }, 3000);
                 }
             };
             st.timer = setTimeout(tick, 3000);
@@ -3824,6 +3867,9 @@ function syncRaidAudio(clock) {
         }
 
 
+
+        
+
         function playRecentScoreAnimation(leftText, rightText) {
             window.isRecentScoreActive = true;
             
@@ -3836,7 +3882,8 @@ function syncRaidAudio(clock) {
             const hideCurrent = (rotator) => {
                 if (!rotator) return [];
                 const hidden = [];
-                rotator.querySelectorAll('span:not(.recent-score-text)').forEach(child => {
+                // Target both team names and raider names
+                rotator.querySelectorAll('.team-name-text, .raider-name-text').forEach(child => {
                     // Check if it is currently visible in the center
                     if (child.classList.contains('show') || (!child.classList.contains('out') && !child.classList.contains('below'))) {
                         child.classList.remove('show', 'below');
@@ -3853,12 +3900,18 @@ function syncRaidAudio(clock) {
             // Slide IN recent score from BOTTOM
             if (leftText && lText) {
                 lText.innerText = leftText;
-                snapBelow(lText); // Instant teleport to bottom
+                lText.classList.remove('show', 'out');
+                lText.classList.add('below');
+                void lText.offsetWidth;
+                lText.classList.remove('below');
                 lText.classList.add('show'); // Slide up to center
             }
             if (rightText && rText) {
                 rText.innerText = rightText;
-                snapBelow(rText);
+                rText.classList.remove('show', 'out');
+                rText.classList.add('below');
+                void rText.offsetWidth;
+                rText.classList.remove('below');
                 rText.classList.add('show');
             }
 
@@ -3870,64 +3923,18 @@ function syncRaidAudio(clock) {
 
                 // Wait 0.55s (for the exit animation to finish), then bring original text from BOTTOM
                 setTimeout(() => {
-                    const restoreHidden = (elements) => {
-                        elements.forEach(el => {
-                            snapBelow(el); // Instantly teleport the hidden text to the bottom invisibly
-                            // If it's a raider name, it needs .show to come back up.
-                            if (el.classList.contains('raider-name-text') || el.classList.contains('dod-text')) {
-                                el.classList.add('show'); 
-                            }
-                        });
-                    };
+                    // We don't manually restore here. We just set the flag to false.
+                    // The rotation ticks in startRaiderRotation and startDodRotation 
+                    // will automatically see the flag is false and bring the correct 
+                    // text back from the bottom seamlessly.
                     
-                    restoreHidden(lHidden);
-                    restoreHidden(rHidden);
+                    // Reset the recent score text to bottom ready for next time
+                    if (lText) { lText.classList.remove('out'); lText.classList.add('below'); }
+                    if (rText) { rText.classList.remove('out'); rText.classList.add('below'); }
                     
-                    window.isRecentScoreActive = false; // Queue is unblocked
+                    window.isRecentScoreActive = false; 
                 }, 550); 
             }, 1500); 
-        }
-
-        
-
-        function playRecentScoreAnimation(leftText, rightText) {
-            isRecentScoreActive = true;
-            
-            const lRot = document.querySelector('#left-team-bg .name-rotator');
-            const rRot = document.querySelector('#right-team-bg .name-rotator');
-            const lText = document.getElementById('left-recent-score');
-            const rText = document.getElementById('right-recent-score');
-
-            // Slide in the texts (forces the team name to vanish via CSS)
-            if (leftText && lText && lRot) {
-                lText.innerText = leftText;
-                lText.classList.remove('show', 'out');
-                lText.classList.add('below');
-                void lText.offsetWidth;
-                lRot.classList.add('showing-recent-score');
-                lText.classList.add('show');
-            }
-            if (rightText && rText && rRot) {
-                rText.innerText = rightText;
-                rText.classList.remove('show', 'out');
-                rText.classList.add('below');
-                void rText.offsetWidth;
-                rRot.classList.add('showing-recent-score');
-                rText.classList.add('show');
-            }
-
-            // Hold for 1.5s, then exit smoothly
-            setTimeout(() => {
-                if (leftText && lText) { lText.classList.remove('show'); lText.classList.add('out'); }
-                if (rightText && rText) { rText.classList.remove('show'); rText.classList.add('out'); }
-
-                // Wait 450ms for slide-up exit to complete before restoring original names
-                setTimeout(() => {
-                    if (leftText && lRot) lRot.classList.remove('showing-recent-score');
-                    if (rightText && rRot) rRot.classList.remove('showing-recent-score');
-                    isRecentScoreActive = false; // Opens queue for next item
-                }, 450);
-            }, 1900); // ~400ms entry + 1500ms hold
         }
 
         // ==========================================
