@@ -3863,13 +3863,17 @@ function syncRaidAudio(clock) {
                         triggerCardBanner(log);
                     }
 
-                    // 2. Extract Recent Point Data
+                    // 2. Extract Recent Point Data (Strictly checking for actual points or explicit Empty Raid)
                     let rText = null;
                     if (pts > 0) {
                         rText = `+${pts} POINT${pts > 1 ? 'S' : ''}`;
-                    } else if (type === 'EMPTY_RAID' || type === 'EMPTY' || title.includes('empty') || title.includes('एम्प्टी') || desc.includes('empty')) {
-                        rText = 'EMPTY RAID';
-                    } else if ((type === 'RAID' || title.includes('raid') || title.includes('रेड')) && pts === 0) {
+                    } else if (
+                        type === 'EMPTY_RAID' || 
+                        title.includes('empty') || 
+                        title.includes('एम्प्टी') || 
+                        desc.includes('empty') || 
+                        desc.includes('एम्प्टी')
+                    ) {
                         rText = 'EMPTY RAID';
                     }
 
