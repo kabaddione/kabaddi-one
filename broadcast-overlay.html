@@ -3381,7 +3381,7 @@ function syncRaidAudio(clock) {
 
         
         
-        function handleRaiderNameRotation(state, data, leftColor, rightColor) {
+                function handleRaiderNameRotation(state, data, leftColor, rightColor) {
             const timeInt = parseInt(data.raid_clock);
             const raidActive = state.raidTimerRunning === true
                 || (!isNaN(timeInt) && timeInt > 0 && timeInt < 30);
@@ -3395,6 +3395,7 @@ function syncRaidAudio(clock) {
             }
 
             const raiderName = (data.active_raider_name || '').trim();
+            const activeRaiderTeam = String(data.active_raider_team || '').trim().toLowerCase();
 
             let actualLeftRaid = true;
             const raw = state.currentRaidTeamIsLeft !== undefined
@@ -3411,14 +3412,36 @@ function syncRaidAudio(clock) {
             const raidSide = actualLeftRaid ? 'left' : 'right';
             const defSide  = actualLeftRaid ? 'right' : 'left';
             const defDOD   = actualLeftRaid ? rightDOD : leftDOD;
+            const currentRaidSideStr = actualLeftRaid ? 'left' : 'right';
 
-            // 🚨 APP-DRIVEN CONFIRMATION: 
-            // If the app has sent a name in active_raider_name, it is confirmed.
-            if (raiderName.length > 0) {
+            // 🚨 STRICT MATCH: Only show raider name if the app's team matches the current raiding side
+            const isTeamMatch = (activeRaiderTeam === currentRaidSideStr);
+
+            // DEBUG LOG
+            if (raiderName) {
+                window.__kabaddiLog('INFO', `Raid Side: ${currentRaidSideStr} | App Team: ${activeRaiderTeam} | Match: ${isTeamMatch}`);
+            }
+
+            if (raiderName.length > 0 && isTeamMatch) {
                 startRaiderRotation(raidSide, raiderName);
             } else {
                 stopRaiderRotation(raidSide);
                 raiderRotationState[raidSide].currentRaider = null;
+                
+                // Force team name to show if it was previously hidden (due to old data)
+                const teamBg = document.getElementById(raidSide + '-team-bg');
+                if (teamBg && !window.isRecentScoreActive) {
+                    const nameEl = teamBg.querySelector('.team-name-text');
+                    const raiderEl = teamBg.querySelector('.raider-name-text');
+                    if (nameEl && !nameEl.classList.contains('show')) {
+                        nameEl.classList.remove('out', 'below');
+                        nameEl.classList.add('below');
+                        void nameEl.offsetWidth;
+                        nameEl.classList.remove('below');
+                        nameEl.classList.add('show');
+                        if (raiderEl) raiderEl.classList.add('out');
+                    }
+                }
             }
 
             if (defDOD) {
@@ -3430,7 +3453,9 @@ function syncRaidAudio(clock) {
             }
         }
 
-                function startRaiderRotation(side, raiderName) {
+        
+        
+        function startRaiderRotation(side, raiderName) {
             const st = raiderRotationState[side];
             if (st.active && st.currentRaider === raiderName) return;
 
@@ -3919,7 +3944,7 @@ function syncRaidAudio(clock) {
                     if (lText) lText.classList.add('below');
                     if (rText) rText.classList.add('below');
                     
-                                        const restoreText = (rotator, side) => {
+                    const restoreText = (rotator, side) => {
                         if (!rotator) return;
                         const nameEl = rotator.querySelector('.team-name-text');
                         const raiderEl = rotator.querySelector('.raider-name-text');
@@ -3927,8 +3952,8 @@ function syncRaidAudio(clock) {
                         const state = raiderRotationState[side];
                         let targetEl = nameEl;
                         
-                        // If the rotation state is active and has a raider name, restore the raider name.
-                        // Otherwise, fallback to the team name.
+                        // If the rotation state is active, it means the team matched and we have a valid raider.
+                        // Otherwise, it safely falls back to the team name.
                         if (state.active && state.currentRaider && state.currentRaider.length > 0) {
                             targetEl = raiderEl;
                         }
