@@ -355,7 +355,7 @@
         }
         .join-btn:hover { transform: scale(1.02); box-shadow: 0 8px 32px rgba(57, 255, 20, 0.5); }
         .join-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
-        .join-btn.disabled { background: linear-gradient(to right, rgba(57, 255, 20, 0.5), rgba(0, 255, 255, 0.5)); border-color: rgba(58, 0, 74, 0.5); color: rgba(58, 0, 74, 0.8); font-size: 18px; }
+        .-btn.disabled { background: linear-gradient(to right, rgba(57, 255, 20, 0.5), rgba(0, 255, 255, 0.5)); border-color: rgba(58, 0, 74, 0.5); color: rgba(58, 0, 74, 0.8); font-size: 18px; }
 
         /* Responsive for giveaway banner */
         @media (max-width: 768px) {
@@ -380,7 +380,7 @@
             .worth-text { font-size: 18px; }
             .timer-box { width: 48px; height: 44px; font-size: 20px; }
             .timer-label { font-size: 11px; }
-            .join-btn { font-size: 18px; padding: 14px 16px; }
+            .-btn { font-size: 18px; padding: 14px 16px; }
         }
 
         /* ============ PRO PACKAGE SECTION (new) ============ */
@@ -1517,7 +1517,7 @@ z-index: 5 }
     </section>
 
     <!-- ============ PRO PACKAGE SECTION ============ -->
-    <section class="giveaway-hero pro-package" aria-labelledby="pro-heading">
+    <section class="giveaway-hero pro-package" id="pro" aria-labelledby="pro-heading">
         <div class="container">
             <div class="section-header reveal" style="margin-bottom: 120px;">
                 <span class="section-tag" style="color: #CA962F;">Kabaddione pro</span>
