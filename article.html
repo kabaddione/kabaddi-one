@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Article | KabaddiOne</title>
+    <meta name="description" content="Read the full article on KabaddiOne.">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f24;
+            --glass-bg: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.1);
+            --neon-green: #39FF14;
+            --neon-cyan: #00FFFF;
+            --neon-gradient: linear-gradient(to right, #39FF14, #00FFFF);
+            --accent: #FF5E3A;
+            --text-primary: #fff;
+            --text-secondary: #b0b0c8;
+            --text-muted: #7a7a95;
+            --border-subtle: rgba(255,255,255,0.08);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --transition-fast: 0.2s cubic-bezier(0.4,0,0.2,1);
+            --transition-smooth: 0.4s cubic-bezier(0.4,0,0.2,1);
+            --transition-bounce: 0.5s cubic-bezier(0.34,1.56,0.64,1);
+            --font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --max-width: 820px;
+            --nav-height: 72px;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;font-size:16px;-webkit-font-smoothing:antialiased}
+        body{font-family:var(--font-body);background-color:var(--bg-primary);color:var(--text-primary);line-height:1.7;overflow-x:hidden;min-height:100vh}
+
+        /* Progress bar */
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--neon-gradient); width: 0%; z-index: 2000; transition: width 0.1s linear; }
+
+        /* Orbs */
+        .bg-orbs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+        .bg-orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.12}
+        .bg-orb:nth-child(1){width:600px;height:600px;background:var(--accent);top:-15%;left:-10%}
+        .bg-orb:nth-child(2){width:450px;height:450px;background:#6C3CE0;top:50%;right:-12%}
+
+        /* NAV */
+        .nav{position:fixed;top:0;left:0;width:100%;z-index:1000;height:var(--nav-height);transition:var(--transition-smooth);background:rgba(10,10,26,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle)}
+        .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:100%}
+        .nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-heading);font-weight:800;font-size:1.5rem;color:#fff;text-decoration:none;letter-spacing:-0.5px}
+        .nav-logo .logo-icon{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 20px rgba(255,94,58,0.35)}
+        .nav-logo .logo-icon img{width:100%;height:100%;object-fit:contain}
+        .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+        .nav-links a{color:#fff;text-decoration:none;font-weight:500;font-size:0.9rem;transition:var(--transition-fast)}
+        .nav-links a:hover{color:var(--neon-cyan)}
+        .nav-cta-btn{background:var(--neon-gradient);color:#3A004A!important;padding:10px 22px;border-radius:50px;font-weight:700!important;font-size:0.9rem!important;text-decoration:none;box-shadow:0 4px 18px rgba(57,255,20,0.3)}
+        .nav-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(57,255,20,0.5)}
+        .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:1001;background:none;border:none;padding:8px}
+        .hamburger span{width:26px;height:2.5px;background:#fff;border-radius:2px;display:block;transition:var(--transition-smooth)}
+
+        /* ARTICLE */
+        .article-wrap{max-width:var(--max-width);margin:0 auto;padding:calc(var(--nav-height) + 40px) 24px 60px;position:relative;z-index:1}
+        .breadcrumb{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--text-secondary);text-decoration:none;transition:var(--transition-fast)}
+        .breadcrumb a:hover{color:var(--neon-cyan)}
+        .breadcrumb i{font-size:0.6rem}
+        .art-category{display:inline-block;padding:6px 16px;background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.3);border-radius:50px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--neon-cyan);margin-bottom:16px}
+        .art-title{font-family:var(--font-heading);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;line-height:1.15;letter-spacing:-1px;margin-bottom:20px}
+        .art-meta{display:flex;flex-wrap:wrap;gap:20px;align-items:center;padding:16px 0;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);margin-bottom:32px;font-size:0.9rem;color:var(--text-secondary)}
+        .art-meta span{display:inline-flex;align-items:center;gap:6px}
+        .art-meta i{color:var(--neon-cyan)}
+        .author{display:flex;align-items:center;gap:10px;margin-left:auto}
+        .author-avatar{width:36px;height:36px;border-radius:50%;background:var(--neon-gradient);display:flex;align-items:center;justify-content:center;color:#3A004A;font-weight:800;font-size:0.85rem}
+        .art-hero{height:340px;border-radius:var(--radius-lg);margin-bottom:36px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+        .art-hero i{font-size:6rem;color:rgba(255,255,255,0.9);z-index:2}
+        .art-content{font-size:1.05rem;line-height:1.8;color:#d8d8e8}
+        .art-content p{margin-bottom:20px}
+        .art-content h2{font-family:var(--font-heading);font-size:1.6rem;font-weight:800;color:#fff;margin:36px 0 16px;letter-spacing:-0.5px}
+        .art-content h3{font-family:var(--font-heading);font-size:1.25rem;font-weight:800;color:#fff;margin:28px 0 12px}
+        .art-content ul,.art-content ol{margin:0 0 20px 24px}
+        .art-content li{margin-bottom:8px}
+        .art-content strong{color:#fff}
+        .art-content a{color:var(--neon-cyan);text-decoration:none;border-bottom:1px solid rgba(0,255,255,0.3)}
+        .art-content em{color:var(--text-muted);font-style:italic}
+        .art-tags{display:flex;flex-wrap:wrap;gap:10px;margin:40px 0 24px}
+        .art-tag{padding:6px 14px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;font-size:0.8rem;color:var(--text-secondary);text-decoration:none;transition:var(--transition-fast)}
+        .art-tag:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+        .art-share{display:flex;gap:12px;align-items:center;margin:32px 0 48px;padding:20px 0;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);flex-wrap:wrap}
+        .art-share span{font-weight:700;color:var(--text-secondary);font-size:0.9rem;margin-right:8px}
+        .share-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-secondary);text-decoration:none;transition:var(--transition-fast)}
+        .share-btn:hover{background:var(--neon-gradient);color:#3A004A;border-color:transparent;transform:translateY(-2px)}
+
+        .related{padding:40px 0}
+        .related h2{font-family:var(--font-heading);font-size:1.5rem;font-weight:800;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+        .related h2 i{color:var(--neon-cyan)}
+        .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+        .related-card{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;text-decoration:none;color:inherit;transition:var(--transition-smooth);display:flex;flex-direction:column}
+        .related-card:hover{transform:translateY(-4px);border-color:var(--neon-cyan)}
+        .related-card .rc-img{height:120px;display:flex;align-items:center;justify-content:center}
+        .related-card .rc-img i{font-size:2rem;color:rgba(255,255,255,0.9)}
+        .related-card .rc-body{padding:14px}
+        .related-card .rc-tag{font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--neon-cyan);letter-spacing:1px;margin-bottom:6px}
+        .related-card h3{font-size:0.95rem;font-weight:700;line-height:1.3;margin-bottom:6px}
+        .related-card .rc-date{font-size:0.75rem;color:var(--text-muted)}
+
+        .back-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;color:#fff;text-decoration:none;font-weight:600;font-size:0.9rem;transition:var(--transition-fast);margin-bottom:24px}
+        .back-btn:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+
+        .loading{text-align:center;padding:100px 20px;color:var(--text-muted)}
+        .loading i{font-size:2rem;margin-bottom:16px;animation:pulse 1.5s ease-in-out infinite}
+        @keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+
+        /* FOOTER */
+        .footer{background:var(--bg-secondary);border-top:1px solid var(--border-subtle);padding:40px 24px 24px;position:relative;z-index:1;margin-top:60px}
+        .footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:20px}
+        .footer-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.2rem;color:#fff;font-family:var(--font-heading)}
+        .footer-logo .logo-icon{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .footer-logo .logo-icon img{width:100%;height:100%;object-fit:contain}
+        .footer-links{display:flex;gap:20px;flex-wrap:wrap}
+        .footer-links a{color:var(--text-muted);text-decoration:none;font-size:0.85rem;transition:var(--transition-fast)}
+        .footer-links a:hover{color:var(--neon-cyan)}
+        .footer-copy{color:var(--text-muted);font-size:0.8rem;text-align:center;width:100%;margin-top:16px}
+
+        @media(max-width:768px){
+            .nav-links{position:fixed;top:0;right:-100%;width:75%;max-width:320px;height:100vh;background:rgba(15,15,36,0.97);backdrop-filter:blur(20px);flex-direction:column;justify-content:center;gap:28px;transition:var(--transition-smooth);padding:40px;border-left:1px solid var(--border-subtle)}
+            .nav-links.active{right:0}
+            .hamburger{display:flex}
+            .art-hero{height:220px}
+            .art-hero i{font-size:4rem}
+            .author{margin-left:0;width:100%}
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="bg-orbs" aria-hidden="true"><div class="bg-orb"></div><div class="bg-orb"></div></div>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><img src="images/kabaddione_logo.png" alt="KabaddiOne Logo"></div>
+                <span>KabaddiOne</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="matches.html">Live Score</a></li>
+                <li><a href="overlay.html">Overlay</a></li>
+                <li><a href="news.html">News</a></li>
+                <li><a href="index.html#pro">KabaddiOne Pro</a></li>
+                <li><a href="download.html" class="nav-cta-btn">Download</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="article-wrap" id="articleContainer">
+        <div class="loading"><i class="fa-solid fa-spinner"></i><p>Loading article...</p></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-logo">
+                <div class="logo-icon"><img src="images/kabaddione_logo.png" alt="KabaddiOne"></div>
+                <span>KabaddiOne</span>
+            </div>
+            <div class="footer-links">
+                <a href="index.html#features">Features</a>
+                <a href="matches.html">Live Score</a>
+                <a href="overlay.html">Overlay</a>
+                <a href="news.html">News</a>
+                <a href="download.html">Download</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <p class="footer-copy">© 2026 KabaddiOne. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="articles-data.js"></script>
+    <script>
+        const ARTICLES = window.ARTICLES || [];
+        const CATEGORY_INFO = window.CATEGORY_INFO || {};
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const article = ARTICLES.find(a => a.id === id);
+
+        function formatDate(iso) {
+            return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        function getMeta(cat) {
+            return CATEGORY_INFO[cat] || { label: cat, icon: 'fa-newspaper', gradient: 'linear-gradient(135deg,#4A0E4E,#6C3CE0)' };
+        }
+        function initials(name) {
+            return name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+        }
+
+        if (!article) {
+            document.getElementById('articleContainer').innerHTML = `
+                <a href="news.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to News</a>
+                <div class="empty-state" style="text-align:center;padding:80px 20px;">
+                    <i class="fa-regular fa-file-lines" style="font-size:3rem;color:var(--text-muted);margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:12px;">Article Not Found</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:24px;">The article you're looking for doesn't exist or has been moved.</p>
+                    <a href="news.html" class="back-btn"><i class="fa-solid fa-newspaper"></i> Browse All Articles</a>
+                </div>
+            `;
+        } else {
+            const meta = getMeta(article.category);
+            document.title = article.title + ' | KabaddiOne';
+            document.querySelector('meta[name="description"]').setAttribute('content', article.excerpt);
+
+            const related = ARTICLES.filter(a => a.id !== article.id && (a.category === article.category || (a.tags||[]).some(t => (article.tags||[]).includes(t)))).slice(0, 3);
+
+            let relatedHtml = '';
+            if (related.length) {
+                relatedHtml = `
+                    <section class="related">
+                        <h2><i class="fa-solid fa-newspaper"></i> Related Articles</h2>
+                        <div class="related-grid">
+                            ${related.map(r => {
+                                const m = getMeta(r.category);
+                                return `
+                                    <a href="article.html?id=${encodeURIComponent(r.id)}" class="related-card">
+                                        <div class="rc-img" style="background:${m.gradient}"><i class="fa-solid ${m.icon}"></i></div>
+                                        <div class="rc-body">
+                                            <div class="rc-tag">${m.label}</div>
+                                            <h3>${r.title}</h3>
+                                            <div class="rc-date">${formatDate(r.date)} · ${r.readTime}</div>
+                                        </div>
+                                    </a>
+                                `;
+                            }).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+
+            document.getElementById('articleContainer').innerHTML = `
+                <a href="news.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to News</a>
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <a href="news.html">News</a>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span style="color:var(--text-secondary);">${meta.label}</span>
+                </div>
+
+                <span class="art-category">${meta.label}</span>
+                <h1 class="art-title">${article.title}</h1>
+
+                <div class="art-meta">
+                    <span><i class="fa-regular fa-calendar"></i> ${formatDate(article.date)}</span>
+                    <span><i class="fa-regular fa-clock"></i> ${article.readTime} read</span>
+                    <span class="author">
+                        <span class="author-avatar">${initials(article.author)}</span>
+                        ${article.author}
+                    </span>
+                </div>
+
+                <div class="art-hero" style="background:${meta.gradient}">
+                    <i class="fa-solid ${meta.icon}"></i>
+                </div>
+
+                <div class="art-content">${article.content}</div>
+
+                <div class="art-tags">
+                    ${(article.tags || []).map(t => `<span class="art-tag">#${t}</span>`).join('')}
+                </div>
+
+                <div class="art-share">
+                    <span>Share this article:</span>
+                    <a class="share-btn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(location.href)}" aria-label="Share on X"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a class="share-btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" aria-label="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a class="share-btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(article.title + ' ' + location.href)}" aria-label="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    <button class="share-btn" id="copyLinkBtn" aria-label="Copy link" style="cursor:pointer;"><i class="fa-solid fa-link"></i></button>
+                </div>
+
+                ${relatedHtml}
+            `;
+
+            document.getElementById('copyLinkBtn').addEventListener('click', () => {
+                navigator.clipboard.writeText(location.href).then(() => {
+                    const btn = document.getElementById('copyLinkBtn');
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    btn.style.background = 'var(--neon-gradient)';
+                    btn.style.color = '#3A004A';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fa-solid fa-link"></i>';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                    }, 1500);
+                });
+            });
+        }
+
+        /* Progress + Nav */
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement;
+            const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+        });
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', () => {
+            const active = navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            document.body.style.overflow = active ? 'hidden' : '';
+        });
+    </script>
+</body>
+</html>
