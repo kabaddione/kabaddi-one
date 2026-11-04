@@ -176,121 +176,85 @@
         /* ============================================================
            HERO SECTION
            ============================================================ */
-        .hero-section {
-            padding-top: calc(var(--nav-height) + 60px);
-            padding-bottom: 60px;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 40px; flex-wrap: wrap;
-        }
+        .hero-section { padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
         .hero-content { flex: 1; min-width: 300px; }
-        .hero-content h1 {
-            font-family: var(--font-heading); font-size: clamp(2.2rem, 4vw, 3.5rem);
-            font-weight: 900; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px;
-        }
+        .hero-content h1 { font-family: var(--font-heading); font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
         .hero-content h1 span { display: block; background: var(--neon-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .hero-content p { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 30px; max-width: 500px; }
         .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
         
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 10px; background: var(--neon-gradient);
-            color: var(--app-dark-purple); padding: 14px 30px; border-radius: 50px; font-weight: 700;
-            font-size: 1rem; text-decoration: none; transition: var(--transition-bounce);
-            box-shadow: 0 6px 24px rgba(57, 255, 20, 0.35); border: none; cursor: pointer;
-        }
+        .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--neon-gradient); color: var(--app-dark-purple); padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: var(--transition-bounce); box-shadow: 0 6px 24px rgba(57, 255, 20, 0.35); border: none; cursor: pointer; }
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(57, 255, 20, 0.5); }
         
-        .btn-secondary {
-            display: inline-flex; align-items: center; gap: 10px; background: transparent;
-            color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 700;
-            font-size: 1rem; text-decoration: none; transition: var(--transition-smooth);
-            border: 2px solid var(--glass-border); cursor: pointer;
-        }
+        .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: #fff; padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: var(--transition-smooth); border: 2px solid var(--glass-border); cursor: pointer; }
         .btn-secondary:hover { border-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
 
-        /* ============================================================
-           HERO MOCKUP (CSS Broadcast UI)
-           ============================================================ */
-        .hero-mockup-wrapper {
-            flex: 1; min-width: 300px;
-            position: relative;
-            perspective: 1000px;
-        }
-        .broadcast-mock-frame {
-            width: 100%; aspect-ratio: 16/9;
-            background: #111 url('https://images.unsplash.com/photo-1541532713592-79a0317b6b77?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') center/cover;
-            border: 4px solid #2a2a40; border-radius: 16px; position: relative; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0, 255, 255, 0.1);
-            transform: rotateY(-5deg) rotateX(5deg);
-            transition: transform 0.5s ease;
-        }
+        .hero-mockup-wrapper { flex: 1; min-width: 300px; position: relative; perspective: 1000px; }
+        .broadcast-mock-frame { width: 100%; aspect-ratio: 16/9; background: #111 url('https://images.unsplash.com/photo-1541532713592-79a0317b6b77?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') center/cover; border: 4px solid #2a2a40; border-radius: 16px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0, 255, 255, 0.1); transform: rotateY(-5deg) rotateX(5deg); transition: transform 0.5s ease; }
         .broadcast-mock-frame:hover { transform: rotateY(0) rotateX(0); }
         
-        /* Overlay Scoreboard CSS Mockup */
-        .mock-scoreboard {
-            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
-            display: flex; align-items: center; justify-content: center;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.9));
-            font-family: 'Oswald', sans-serif;
-        }
-        .mock-team-left, .mock-team-right {
-            width: 180px; height: 40px; display: flex; align-items: center; padding: 0 15px;
-            color: white; font-weight: 700; font-size: 14px; text-transform: uppercase;
-            position: relative;
-        }
+        .mock-scoreboard { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.9)); font-family: 'Oswald', sans-serif; }
+        .mock-team-left, .mock-team-right { width: 180px; height: 40px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; font-size: 14px; text-transform: uppercase; position: relative; }
         .mock-team-left { background: linear-gradient(to right, #4A0000, #D32F2F); clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%); justify-content: flex-end; padding-right: 25px; }
         .mock-team-right { background: linear-gradient(to left, #00004A, #0000D3); clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); justify-content: flex-start; padding-left: 25px; margin-left: -15px;}
         
-        .mock-score-box {
-            width: 60px; height: 40px; background: linear-gradient(to bottom, #FFF, #CCC);
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Teko', sans-serif; font-size: 32px; color: #000; font-weight: 700;
-            clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%); z-index: 2; margin: 0 -10px;
-        }
-        .mock-timer-box {
-            width: 70px; height: 50px; background: linear-gradient(to bottom, #6A1B9A, #1A0033);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%); z-index: 3; color: #FFD700; font-family: 'Teko', sans-serif; margin-top: -10px;
-        }
+        .mock-score-box { width: 60px; height: 40px; background: linear-gradient(to bottom, #FFF, #CCC); display: flex; align-items: center; justify-content: center; font-family: 'Teko', sans-serif; font-size: 32px; color: #000; font-weight: 700; clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%); z-index: 2; margin: 0 -10px; }
+        .mock-timer-box { width: 70px; height: 50px; background: linear-gradient(to bottom, #6A1B9A, #1A0033); display: flex; flex-direction: column; align-items: center; justify-content: center; clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%); z-index: 3; color: #FFD700; font-family: 'Teko', sans-serif; margin-top: -10px; }
         .mock-timer-box span:first-child { font-size: 28px; line-height: 0.9; }
         .mock-timer-box span:last-child { font-size: 10px; color: #FFF; }
 
         /* ============================================================
            FEATURES GRID
            ============================================================ */
-        .features-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;
-        }
-        .feature-card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg); padding: 32px 24px;
-            transition: var(--transition-smooth); position: relative; overflow: hidden;
-        }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .feature-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 32px 24px; transition: var(--transition-smooth); position: relative; overflow: hidden; }
         .feature-card:hover { transform: translateY(-5px); border-color: rgba(0, 255, 255, 0.3); box-shadow: 0 15px 30px rgba(0,0,0,0.5); background: rgba(255,255,255,0.06); }
-        .feature-icon {
-            width: 56px; height: 56px; border-radius: 16px; background: rgba(0, 255, 255, 0.1);
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--neon-cyan);
-            margin-bottom: 20px; transition: var(--transition-bounce);
-        }
+        .feature-icon { width: 56px; height: 56px; border-radius: 16px; background: rgba(0, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 20px; transition: var(--transition-bounce); }
         .feature-card:hover .feature-icon { transform: scale(1.1) rotate(5deg); background: var(--neon-gradient); color: var(--app-dark-purple); }
         .feature-card h3 { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin-bottom: 10px; color: #fff; }
         .feature-card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
 
         /* ============================================================
+           PACKAGE SHOWCASE (NEW SECTION)
+           ============================================================ */
+        .package-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .package-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; transition: var(--transition-smooth); display: flex; flex-direction: column; }
+        .package-card:hover { transform: translateY(-8px); border-color: var(--neon-cyan); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        
+        .package-preview { height: 180px; background: #14142B; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-subtle); }
+        .package-info { padding: 20px 24px; flex: 1; }
+        .package-info h3 { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .package-info h3 i { color: var(--neon-cyan); font-size: 1rem; }
+        .package-info p { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* CSS Mockups for each screen */
+        .mock-intro { width: 80%; height: 60px; background: linear-gradient(135deg, #4A0E4E, #000); border-radius: 8px; display: flex; align-items: center; justify-content: space-around; border: 1px solid var(--gold); }
+        .mock-intro-circle { width: 30px; height: 30px; border-radius: 50%; background: #fff; opacity: 0.8; }
+        .mock-intro-vs { font-family: 'Teko'; font-size: 24px; color: var(--gold); }
+
+        .mock-toss { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(to right, #FFD700, #F57F17); border: 3px solid #FFF; display: flex; align-items: center; justify-content: center; font-family: 'Teko'; font-size: 20px; color: #000; animation: spinCoin 2s linear infinite; }
+        @keyframes spinCoin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+
+        .mock-s7 { display: flex; gap: 10px; }
+        .mock-s7-player { display: flex; flex-direction: column; align-items: center; }
+        .mock-s7-avatar { width: 40px; height: 40px; border-radius: 50%; background: #333; border: 2px solid #E91E63; }
+        .mock-s7-bar { width: 40px; height: 6px; background: #E91E63; margin-top: 4px; }
+
+        .mock-stats { display: flex; gap: 20px; }
+        .mock-donut { width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#22C55E 0deg 140deg, rgba(255,255,255,0.1) 140deg 360deg); position: relative; display: flex; align-items: center; justify-content: center; }
+        .mock-donut::after { content: ''; position: absolute; inset: 10px; border-radius: 50%; background: #14142B; }
+        
+        .mock-winner { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .mock-trophy { font-size: 40px; color: var(--gold); text-shadow: 0 0 20px rgba(240,192,64,0.8); }
+        .mock-winner-text { font-family: 'Teko'; color: #FFF; font-size: 20px; letter-spacing: 2px; }
+
+        /* ============================================================
            HOW IT WORKS (Steps)
            ============================================================ */
         .steps-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 40px; }
-        .step-card {
-            background: var(--bg-card); border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md); padding: 30px 24px; text-align: center;
-            position: relative; transition: var(--transition-smooth);
-        }
+        .step-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 30px 24px; text-align: center; position: relative; transition: var(--transition-smooth); }
         .step-card:hover { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.03); }
-        .step-number {
-            position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
-            width: 36px; height: 36px; background: var(--neon-gradient); color: var(--app-dark-purple);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(57, 255, 20, 0.4);
-        }
+        .step-number { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--neon-gradient); color: var(--app-dark-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(57, 255, 20, 0.4); }
         .step-card h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; margin: 15px 0 10px; color: #fff; }
         .step-card p { color: var(--text-secondary); font-size: 0.9rem; }
 
@@ -298,16 +262,9 @@
            FAQ SECTION
            ============================================================ */
         .faq-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-        details {
-            background: var(--glass-bg); border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-sm); padding: 20px; cursor: pointer;
-            transition: var(--transition-smooth);
-        }
+        details { background: var(--glass-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 20px; cursor: pointer; transition: var(--transition-smooth); }
         details[open] { border-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.02); }
-        summary {
-            font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem;
-            color: #fff; list-style: none; display: flex; justify-content: space-between; align-items: center;
-        }
+        summary { font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; color: #fff; list-style: none; display: flex; justify-content: space-between; align-items: center; }
         summary::-webkit-details-marker { display: none; }
         summary::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--neon-cyan); transition: transform 0.3s ease; }
         details[open] summary::after { transform: rotate(180deg); }
@@ -426,7 +383,7 @@
         </div>
     </section>
 
-    <!-- FEATURES SECTION -->
+    <!-- FEATURES SECTION (Expanded) -->
     <section class="section" id="features">
         <div class="container">
             <div class="section-header reveal">
@@ -466,12 +423,147 @@
                     <h3>Dynamic Team Colors</h3>
                     <p>The overlay automatically adopts the colors of the competing teams, ensuring your broadcast always looks perfectly branded.</p>
                 </div>
+                <!-- NEW FEATURES ADDED -->
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon"><i class="fa-solid fa-star"></i></div>
+                    <h3>Super 10 & High Five</h3>
+                    <p>Celebrate individual player milestones automatically with custom celebratory banners and confetti when a player hits 10 raid points or 5 tackle points.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon"><i class="fa-solid fa-id-card"></i></div>
+                    <h3>Foul & Card Issues</h3>
+                    <p>Instantly display Yellow, Red, or Green cards on screen with the offending player's name, keeping the audience informed of penalties.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon"><i class="fa-solid fa-right-left"></i></div>
+                    <h3>Substitutions</h3>
+                    <p>Automatically show a sleek slide-in graphic when a player is substituted in or out of the match, showing both names and jersey numbers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: PACKAGE SHOWCASE SECTION -->
+    <section class="section" id="package-showcase" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">💎 Premium Package</span>
+                <h2>More Than Just a <span class="highlight">Scoreboard</span></h2>
+                <p>We don't just show the score. We provide a complete, broadcast-grade visual package that looks like it was designed for television.</p>
+            </div>
+
+            <div class="package-grid">
+                <!-- 1. Team Intro -->
+                <div class="package-card reveal reveal-delay-1">
+                    <div class="package-preview">
+                        <div class="mock-intro">
+                            <div class="mock-intro-circle"></div>
+                            <div class="mock-intro-vs">VS</div>
+                            <div class="mock-intro-circle"></div>
+                        </div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-shield-halved"></i> Team Intro Screen</h3>
+                        <p>Build hype before the match starts with a full-screen VS graphic featuring both team logos, colors, and player portraits.</p>
+                    </div>
+                </div>
+
+                <!-- 2. Toss Screen -->
+                <div class="package-card reveal reveal-delay-1">
+                    <div class="package-preview">
+                        <div class="mock-toss">🪙</div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-coins"></i> Toss Screen</h3>
+                        <p>A professional toss animation with a spinning coin, showing who won the toss and whether they chose to raid or defend first.</p>
+                    </div>
+                </div>
+
+                <!-- 3. Starting 7 -->
+                <div class="package-card reveal reveal-delay-2">
+                    <div class="package-preview">
+                        <div class="mock-s7">
+                            <div class="mock-s7-player"><div class="mock-s7-avatar"></div><div class="mock-s7-bar"></div></div>
+                            <div class="mock-s7-player"><div class="mock-s7-avatar"></div><div class="mock-s7-bar"></div></div>
+                            <div class="mock-s7-player"><div class="mock-s7-avatar"></div><div class="mock-s7-bar"></div></div>
+                            <div class="mock-s7-player"><div class="mock-s7-avatar"></div><div class="mock-s7-bar"></div></div>
+                        </div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-users-rectangle"></i> Starting 7 Lineup</h3>
+                        <p>Display the starting 7 players for both teams in their actual mat positions, complete with player photos and jersey numbers.</p>
+                    </div>
+                </div>
+
+                <!-- 4. Main Scoreboard -->
+                <div class="package-card reveal reveal-delay-2">
+                    <div class="package-preview">
+                        <div style="transform: scale(0.6); margin-top: 20px;">
+                            <div class="mock-scoreboard">
+                                <div class="mock-team-left" style="width: 140px;">TEAM A</div>
+                                <div class="mock-score-box">42</div>
+                                <div class="mock-timer-box"><span>18</span><span>2ND HALF</span></div>
+                                <div class="mock-score-box">38</div>
+                                <div class="mock-team-right" style="width: 140px;">TEAM B</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-tv"></i> Main Scoreboard</h3>
+                        <p>The core overlay. Highly polished, animated score updates, live raid timers, and player dot trackers for who is in and out.</p>
+                    </div>
+                </div>
+
+                <!-- 5. Team Stats -->
+                <div class="package-card reveal reveal-delay-3">
+                    <div class="package-preview">
+                        <div class="mock-stats">
+                            <div class="mock-donut"></div>
+                            <div class="mock-donut" style="background: conic-gradient(#E91E63 0deg 100deg, rgba(255,255,255,0.1) 100deg 360deg);"></div>
+                        </div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-chart-line"></i> Team Stats Screen</h3>
+                        <p>Full-screen broadcast breakdown of Raid and Tackle strike rates, All-Out points, and Extra points for both teams.</p>
+                    </div>
+                </div>
+
+                <!-- 6. Player Performance -->
+                <div class="package-card reveal reveal-delay-3">
+                    <div class="package-preview">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="width: 50px; height: 50px; border-radius: 50%; background: #333; border: 2px solid #E91E63;"></div>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <div style="width: 60px; height: 8px; background: #555; border-radius: 4px;"></div>
+                                <div style="width: 40px; height: 8px; background: #444; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-user-gear"></i> Player Spotlight</h3>
+                        <p>Deep dive into individual player stats, showing raid success donuts, tackle rates, and time spent on the mat.</p>
+                    </div>
+                </div>
+
+                <!-- 7. Winner Screen -->
+                <div class="package-card reveal reveal-delay-4">
+                    <div class="package-preview">
+                        <div class="mock-winner">
+                            <div class="mock-trophy"><i class="fa-solid fa-trophy"></i></div>
+                            <div class="mock-winner-text">TEAM A WINS</div>
+                        </div>
+                    </div>
+                    <div class="package-info">
+                        <h3><i class="fa-solid fa-champagne-glasses"></i> Match End / Winner</h3>
+                        <p>A spectacular finale. Full-screen confetti, fireworks, and a customized winner banner showing the final score and winning team.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- HOW IT WORKS SECTION -->
-    <section class="section" id="how-it-works" style="background: var(--bg-secondary);">
+    <section class="section" id="how-it-works">
         <div class="container">
             <div class="section-header reveal">
                 <span class="section-tag">🚀 3 Steps to Live</span>
@@ -500,7 +592,7 @@
     </section>
 
     <!-- FAQ SECTION -->
-    <section class="section" id="faq">
+    <section class="section" id="faq" style="background: var(--bg-secondary);">
         <div class="container">
             <div class="section-header reveal">
                 <span class="section-tag">❓ Got Questions?</span>
