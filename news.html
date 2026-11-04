@@ -336,31 +336,80 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-up-long"></i></button>
 
     <!-- Load article data -->
-    <script src="articles-data.js"></script>
+        <script src="articles-data.js"></script>
     <script>
         /* =========================================================
-           NEWS PAGE RENDERER
+           NEWS PAGE RENDERER (with pretty URLs + view counts)
            ========================================================= */
         const ARTICLES = window.ARTICLES || [];
         const CATEGORY_INFO = window.CATEGORY_INFO || {};
         const currentFilter = { value: 'all', query: '' };
-
         const $ = (sel) => document.querySelector(sel);
 
         function formatDate(iso) {
-            const d = new Date(iso);
-            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
-
         function getCategoryMeta(cat) {
             return CATEGORY_INFO[cat] || { label: cat, icon: 'fa-newspaper', gradient: 'linear-gradient(135deg, #4A0E4E, #6C3CE0)' };
         }
+        function articleUrl(article) {
+            const d = new Date(article.date);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const slug = article.slug || article.id;
+            return `/news/${y}/${m}/${day}/${slug}.html`;
+        }
 
+        /* ---------- VIEW COUNTER (read-only, lazy-loaded) ---------- */
+        const COUNTER_NS = 'kabaddione';
+        const viewCache = {};
+
+        function formatViews(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0','') + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1).replace('.0','') + 'K';
+            return String(n);
+        }
+
+        async function loadViewsForCard(el) {
+            const slug = el.dataset.viewsSlug;
+            if (!slug) return;
+            if (viewCache[slug] !== undefined) {
+                el.textContent = viewCache[slug];
+                return;
+            }
+            try {
+                const r = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/${encodeURIComponent(slug)}/`, { cache: 'no-store' });
+                let n = 0;
+                if (r.ok) { const d = await r.json(); n = Number(d.count) || 0; }
+                else if (r.status === 404) { n = 0; }
+                el.textContent = formatViews(n);
+                viewCache[slug] = el.textContent;
+            } catch {
+                el.textContent = '0';
+            }
+        }
+
+        const viewObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    loadViewsForCard(e.target);
+                    viewObserver.unobserve(e.target);
+                }
+            });
+        }, { rootMargin: '100px' });
+
+        function observeViewBadges() {
+            document.querySelectorAll('[data-views-slug]').forEach(el => viewObserver.observe(el));
+        }
+
+        /* ---------- CARD ---------- */
         function renderCard(article) {
             const meta = getCategoryMeta(article.category);
+            const url = articleUrl(article);
             return `
                 <article class="news-card fade-up">
-                    <a href="article.html?id=${encodeURIComponent(article.id)}" class="card-link">
+                    <a href="${url}" class="card-link">
                         <div class="card-image" style="background: ${meta.gradient}">
                             <i class="fa-solid ${meta.icon}"></i>
                             <span class="card-category">${meta.label}</span>
@@ -369,6 +418,7 @@
                             <div class="card-meta">
                                 <span><i class="fa-regular fa-calendar"></i> ${formatDate(article.date)}</span>
                                 <span><i class="fa-regular fa-clock"></i> ${article.readTime}</span>
+                                <span class="card-views"><i class="fa-regular fa-eye"></i> <span data-views-slug="${article.id}">—</span></span>
                             </div>
                             <h3>${article.title}</h3>
                             <p class="card-excerpt">${article.excerpt}</p>
@@ -388,10 +438,11 @@
             const main = featured[0];
             const side = featured.slice(1, 4);
             const meta = getCategoryMeta(main.category);
+            const mainUrl = articleUrl(main);
 
             let html = '<div class="featured-hero">';
             html += `
-                <a href="article.html?id=${encodeURIComponent(main.id)}" class="featured-main fade-up">
+                <a href="${mainUrl}" class="featured-main fade-up">
                     <div class="feat-image" style="background: ${meta.gradient}">
                         <i class="fa-solid ${meta.icon}"></i>
                         <span class="feat-tag">${meta.label}</span>
@@ -400,7 +451,7 @@
                         <div class="feat-meta">
                             <span><i class="fa-regular fa-calendar"></i> ${formatDate(main.date)}</span>
                             <span><i class="fa-regular fa-clock"></i> ${main.readTime}</span>
-                            <span><i class="fa-regular fa-user"></i> ${main.author}</span>
+                            <span><i class="fa-regular fa-eye"></i> <span data-views-slug="${main.id}">—</span> views</span>
                         </div>
                         <h2>${main.title}</h2>
                         <p>${main.excerpt}</p>
@@ -412,14 +463,14 @@
             side.forEach(a => {
                 const m = getCategoryMeta(a.category);
                 html += `
-                    <a href="article.html?id=${encodeURIComponent(a.id)}" class="featured-small fade-up">
+                    <a href="${articleUrl(a)}" class="featured-small fade-up">
                         <div class="small-image" style="background: ${m.gradient}">
                             <i class="fa-solid ${m.icon}"></i>
                         </div>
                         <div class="small-body">
                             <div class="small-tag">${m.label}</div>
                             <h3>${a.title}</h3>
-                            <div class="small-date">${formatDate(a.date)} · ${a.readTime}</div>
+                            <div class="small-date">${formatDate(a.date)} · <i class="fa-regular fa-eye"></i> <span data-views-slug="${a.id}">—</span></div>
                         </div>
                     </a>
                 `;
@@ -436,7 +487,7 @@
                 if (!items.length) return;
                 const meta = CATEGORY_INFO[cat];
                 html += `
-                    <section class="section" style="padding: 20px 0;">
+                    <section class="section" id="${cat}" style="padding: 20px 0;">
                         <div class="row-head">
                             <h2><i class="fa-solid ${meta.icon}"></i> ${meta.label}</h2>
                         </div>
@@ -456,6 +507,7 @@
                 return;
             }
             $('#allArticles').innerHTML = list.map(renderCard).join('');
+            observeViewBadges();
         }
 
         function renderFilters() {
@@ -468,7 +520,6 @@
                     <i class="fa-solid ${f.icon}"></i> ${f.label}
                 </button>
             `).join('');
-
             document.querySelectorAll('.filter-pill').forEach(pill => {
                 pill.addEventListener('click', () => {
                     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
@@ -482,10 +533,7 @@
         function applyFilter() {
             const q = currentFilter.query.toLowerCase().trim();
             let list = ARTICLES;
-
-            if (currentFilter.value !== 'all') {
-                list = list.filter(a => a.category === currentFilter.value);
-            }
+            if (currentFilter.value !== 'all') list = list.filter(a => a.category === currentFilter.value);
             if (q) {
                 list = list.filter(a =>
                     a.title.toLowerCase().includes(q) ||
@@ -494,15 +542,12 @@
                     (a.tags || []).some(t => t.toLowerCase().includes(q))
                 );
             }
-
-            // Scroll to all articles section when filtering
             if (currentFilter.value !== 'all' || q) {
                 document.getElementById('all-articles').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
             renderAllArticles(list);
         }
 
-        /* Search */
         const searchInput = $('#searchInput');
         let searchTimer;
         searchInput.addEventListener('input', (e) => {
@@ -518,7 +563,6 @@
         const hamburger = $('#hamburger');
         const navLinks = $('#navLinks');
         const backToTop = $('#backToTop');
-
         hamburger.addEventListener('click', () => {
             const active = navLinks.classList.toggle('active');
             hamburger.classList.toggle('active');
@@ -536,6 +580,7 @@
             renderFeatured();
             renderCategoryRows();
             renderAllArticles();
+            observeViewBadges();
         });
     </script>
 </body>
