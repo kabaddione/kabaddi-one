@@ -2,6 +2,7 @@
 title: "How to Use the Bonus Point Alert System"
 excerpt: "Get the most out of KabaddiOne's automatic bonus point alerts. Here's a quick walkthrough for streamers."
 category: tutorial
+image: https://etimg.etb2bimg.com/photo/60183928.cms?mod=473034
 tags: [tutorial, product]
 author: KabaddiOne Support
 read_time: "3 min"
