@@ -1,0 +1,278 @@
+---
+layout: default
+title: Kabaddi News, Tutorials & Analysis
+description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, and expert analysis — all in one place.
+---
+
+<style>
+    .news-hero{padding-top:calc(var(--nav-height) + 60px);padding-bottom:40px;text-align:center;position:relative;z-index:1}
+    .news-hero .section-tag{display:inline-block;font-size:0.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:16px;background:rgba(0,255,255,0.1);padding:6px 18px;border-radius:50px;border:1px solid rgba(0,255,255,0.15)}
+    .news-hero h1{font-family:var(--font-heading);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;line-height:1.1;margin-bottom:16px;letter-spacing:-1.5px}
+    .news-hero h1 span{background:var(--neon-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .news-hero p{font-size:1.1rem;color:var(--text-secondary);max-width:640px;margin:0 auto 28px}
+    .search-wrap{max-width:560px;margin:0 auto;position:relative}
+    .search-wrap i{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1rem}
+    .search-wrap input{width:100%;padding:16px 20px 16px 52px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;color:#fff;font-size:1rem;outline:none;transition:var(--transition-fast);font-family:inherit}
+    .search-wrap input:focus{border-color:var(--neon-cyan);box-shadow:0 0 0 3px rgba(0,255,255,0.1)}
+
+    .filter-bar{display:flex;gap:10px;overflow-x:auto;padding:20px 0;position:relative;z-index:1}
+    .filter-bar::-webkit-scrollbar{display:none}
+    .filter-bar-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;gap:10px;width:100%}
+    .filter-pill{flex-shrink:0;padding:10px 20px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-secondary);font-weight:600;font-size:0.85rem;cursor:pointer;transition:var(--transition-fast);font-family:inherit;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+    .filter-pill:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+    .filter-pill.active{background:var(--neon-gradient);color:#3A004A;border-color:transparent;box-shadow:0 4px 15px rgba(57,255,20,0.3)}
+    .filter-pill i{font-size:0.8rem}
+
+    .row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:0 4px}
+    .row-head h2{font-family:var(--font-heading);font-size:1.5rem;font-weight:800;display:flex;align-items:center;gap:10px;letter-spacing:-0.5px}
+    .row-head h2 i{font-size:1.2rem;color:var(--neon-cyan)}
+
+    .featured-hero{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-bottom:40px}
+    .featured-main{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition-smooth);text-decoration:none;color:inherit;display:flex;flex-direction:column}
+    .featured-main:hover{transform:translateY(-5px);border-color:var(--neon-cyan);box-shadow:0 20px 50px rgba(0,0,0,0.6)}
+    .featured-main .feat-image{height:300px;position:relative;display:flex;align-items:center;justify-content:center}
+    .featured-main .feat-image i{font-size:5rem;color:rgba(255,255,255,0.85)}
+    .featured-main .feat-image .feat-tag{position:absolute;top:20px;left:20px;padding:6px 14px;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);border-radius:50px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--neon-cyan);border:1px solid rgba(0,255,255,0.3)}
+    .featured-main .feat-body{padding:24px}
+    .featured-main .feat-meta{display:flex;gap:16px;font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;flex-wrap:wrap}
+    .featured-main .feat-meta span{display:inline-flex;align-items:center;gap:5px}
+    .featured-main h2{font-family:var(--font-heading);font-size:1.6rem;font-weight:800;line-height:1.2;margin-bottom:12px}
+    .featured-main p{color:var(--text-secondary);font-size:0.95rem;margin-bottom:16px}
+    .feat-read{display:inline-flex;align-items:center;gap:8px;color:var(--neon-cyan);font-weight:700;font-size:0.9rem}
+
+    .featured-side{display:flex;flex-direction:column;gap:20px}
+    .featured-small{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;transition:var(--transition-smooth);text-decoration:none;color:inherit;display:flex;flex:1}
+    .featured-small:hover{transform:translateY(-3px);border-color:var(--neon-cyan)}
+    .featured-small .small-image{width:140px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .featured-small .small-image i{font-size:2.2rem;color:rgba(255,255,255,0.85)}
+    .featured-small .small-body{padding:16px;flex:1;display:flex;flex-direction:column;justify-content:center}
+    .featured-small .small-tag{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--neon-cyan);margin-bottom:6px}
+    .featured-small h3{font-size:0.95rem;font-weight:700;line-height:1.3;margin-bottom:6px}
+    .featured-small .small-date{font-size:0.75rem;color:var(--text-muted)}
+
+    .scroll-row{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 4px 24px}
+    .scroll-row::-webkit-scrollbar{display:none}
+
+    .news-card{flex:0 0 320px;scroll-snap-align:start;background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;transition:var(--transition-smooth);display:flex;flex-direction:column}
+    .news-card:hover{transform:translateY(-6px);border-color:var(--neon-cyan);box-shadow:0 15px 40px rgba(0,0,0,0.6)}
+    .news-card .card-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;height:100%}
+    .news-card .card-image{height:170px;display:flex;align-items:center;justify-content:center;position:relative}
+    .news-card .card-image i{font-size:3rem;color:rgba(255,255,255,0.9)}
+    .news-card .card-category{position:absolute;top:14px;left:14px;padding:4px 12px;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);border-radius:50px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--neon-cyan);border:1px solid rgba(0,255,255,0.3)}
+    .news-card .card-body{padding:18px;display:flex;flex-direction:column;flex:1}
+    .news-card .card-meta{display:flex;gap:12px;font-size:0.75rem;color:var(--text-muted);margin-bottom:10px;flex-wrap:wrap}
+    .news-card .card-meta span{display:inline-flex;align-items:center;gap:4px}
+    .news-card h3{font-family:var(--font-heading);font-size:1.05rem;font-weight:800;line-height:1.3;margin-bottom:8px;color:#fff;transition:var(--transition-fast)}
+    .news-card:hover h3{color:var(--neon-cyan)}
+    .news-card .card-excerpt{font-size:0.85rem;color:var(--text-secondary);line-height:1.5;margin-bottom:14px;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .news-card .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border-subtle);font-size:0.78rem}
+    .news-card .card-author{color:var(--text-muted);display:inline-flex;align-items:center;gap:5px}
+    .news-card .card-read-more{color:var(--neon-cyan);font-weight:700;display:inline-flex;align-items:center;gap:4px;transition:var(--transition-fast)}
+    .news-card:hover .card-read-more i{transform:translateX(4px)}
+
+    .empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);width:100%}
+    .empty-state i{font-size:3rem;margin-bottom:16px;opacity:0.5}
+    .empty-state h3{font-size:1.3rem;margin-bottom:8px;color:var(--text-secondary)}
+
+    @media(max-width:900px){
+        .featured-hero{grid-template-columns:1fr}
+        .featured-main .feat-image{height:220px}
+        .featured-main h2{font-size:1.35rem}
+    }
+    @media(max-width:768px){
+        .section{padding:40px 16px}
+        .news-card{flex:0 0 280px}
+        .featured-small .small-image{width:100px}
+    }
+</style>
+
+<!-- HERO -->
+<section class="news-hero">
+    <div class="container">
+        <span class="section-tag">📰 KabaddiOne Newsroom</span>
+        <h1>Latest <span>Kabaddi</span> News & Insights</h1>
+        <p>Pro Kabaddi coverage, tutorials, match analysis, live scores, and the stories shaping the sport.</p>
+        <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search articles, tutorials, teams...">
+        </div>
+    </div>
+</section>
+
+<!-- FILTER PILLS -->
+<div class="filter-bar">
+    <div class="filter-bar-inner" id="filterBar">
+        <button class="filter-pill active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All</button>
+        {% for category in site.data.categories %}
+            {% unless category.slug == "featured" %}
+                <button class="filter-pill" data-filter="{{ category.slug }}">
+                    <i class="fa-solid {{ category.icon }}"></i> {{ category.label }}
+                </button>
+            {% endunless %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- FEATURED SECTION -->
+{% assign featured_posts = site.posts | where: "featured", true %}
+{% if featured_posts.size > 0 %}
+<section class="section" data-category-section="featured">
+    <div class="container">
+        <div class="row-head">
+            <h2><i class="fa-solid fa-star"></i> Featured Stories</h2>
+        </div>
+        <div class="featured-hero">
+            {% assign main = featured_posts.first %}
+            {% assign main_cat = site.data.categories | where: "slug", main.category | first %}
+            <a href="{{ main.url | relative_url }}" class="featured-main">
+                <div class="feat-image" style="background: {{ main_cat.gradient | default: 'linear-gradient(135deg,#4A0E4E,#6C3CE0)' }}">
+                    <i class="fa-solid {{ main_cat.icon | default: 'fa-newspaper' }}"></i>
+                    <span class="feat-tag">{{ main_cat.label | default: main.category }}</span>
+                </div>
+                <div class="feat-body">
+                    <div class="feat-meta">
+                        <span><i class="fa-regular fa-calendar"></i> {{ main.date | date: "%b %d, %Y" }}</span>
+                        <span><i class="fa-regular fa-clock"></i> {{ main.read_time | default: "5 min" }}</span>
+                        <span><i class="fa-regular fa-user"></i> {{ main.author }}</span>
+                    </div>
+                    <h2>{{ main.title }}</h2>
+                    <p>{{ main.excerpt | strip_html | truncate: 160 }}</p>
+                    <span class="feat-read">Read Full Story <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </a>
+            <div class="featured-side">
+                {% for post in featured_posts limit: 3 offset: 1 %}
+                    {% assign pcat = site.data.categories | where: "slug", post.category | first %}
+                    <a href="{{ post.url | relative_url }}" class="featured-small">
+                        <div class="small-image" style="background: {{ pcat.gradient | default: 'linear-gradient(135deg,#4A0E4E,#6C3CE0)' }}">
+                            <i class="fa-solid {{ pcat.icon | default: 'fa-newspaper' }}"></i>
+                        </div>
+                        <div class="small-body">
+                            <div class="small-tag">{{ pcat.label | default: post.category }}</div>
+                            <h3>{{ post.title }}</h3>
+                            <div class="small-date">{{ post.date | date: "%b %d, %Y" }} · {{ post.read_time | default: "5 min" }}</div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CATEGORY ROWS (auto-generated from _posts) -->
+{% for category in site.data.categories %}
+    {% unless category.slug == "featured" %}
+        {% assign cat_posts = site.categories[category.slug] %}
+        {% if cat_posts.size > 0 %}
+        <section class="section" data-category-section="{{ category.slug }}">
+            <div class="container">
+                <div class="row-head">
+                    <h2><i class="fa-solid {{ category.icon }}"></i> {{ category.label }}</h2>
+                </div>
+                <div class="scroll-row">
+                    {% for post in cat_posts limit: 15 %}
+                    <article class="news-card" data-cat="{{ post.category }}">
+                        <a href="{{ post.url | relative_url }}" class="card-link">
+                            <div class="card-image" style="background: {{ category.gradient }}">
+                                <i class="fa-solid {{ category.icon }}"></i>
+                                <span class="card-category">{{ category.label }}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span><i class="fa-regular fa-calendar"></i> {{ post.date | date: "%b %d, %Y" }}</span>
+                                    <span><i class="fa-regular fa-clock"></i> {{ post.read_time | default: "5 min" }}</span>
+                                </div>
+                                <h3>{{ post.title }}</h3>
+                                <p class="card-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</p>
+                                <div class="card-footer">
+                                    <span class="card-author"><i class="fa-regular fa-user"></i> {{ post.author }}</span>
+                                    <span class="card-read-more">Read <i class="fa-solid fa-arrow-right"></i></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    {% endunless %}
+{% endfor %}
+
+<!-- Empty state (shown when search finds nothing) -->
+<div id="emptyState" style="display:none;">
+    <section class="section">
+        <div class="container">
+            <div class="empty-state">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No articles found</h3>
+                <p>Try a different category or search term.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    /* =========================================================
+       CLIENT-SIDE FILTER + SEARCH
+       (Jekyll renders all posts server-side; this just hides/shows)
+       ========================================================= */
+    const filterPills = document.querySelectorAll('.filter-pill');
+    const searchInput = document.getElementById('searchInput');
+    const sections = document.querySelectorAll('[data-category-section]');
+    const emptyState = document.getElementById('emptyState');
+
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function applyFilters() {
+        let anyVisible = false;
+
+        sections.forEach(section => {
+            const cat = section.dataset.categorySection;
+            const matchesFilter = activeFilter === 'all' || activeFilter === cat;
+
+            if (!matchesFilter) {
+                section.style.display = 'none';
+                return;
+            }
+
+            // Filter cards within the section by search
+            let visibleCards = 0;
+            section.querySelectorAll('.news-card, .featured-main, .featured-small').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                const matchesSearch = !searchQuery || text.includes(searchQuery);
+                card.style.display = matchesSearch ? '' : 'none';
+                if (matchesSearch) visibleCards++;
+            });
+
+            if (visibleCards > 0) {
+                section.style.display = '';
+                anyVisible = true;
+            } else {
+                section.style.display = 'none';
+            }
+        });
+
+        emptyState.style.display = anyVisible ? 'none' : 'block';
+    }
+
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            filterPills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            activeFilter = pill.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    let searchTimer;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            applyFilters();
+        }, 250);
+    });
+</script>
