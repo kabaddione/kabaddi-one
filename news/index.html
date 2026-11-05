@@ -174,10 +174,12 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                     {% for post in cat_posts limit: 15 %}
                     <article class="news-card" data-cat="{{ post.category }}">
                         <a href="{{ post.url | relative_url }}" class="card-link">
-                            <div class="card-image" style="background: {{ category.gradient }}">
-                                <i class="fa-solid {{ category.icon }}"></i>
-                                <span class="card-category">{{ category.label }}</span>
-                            </div>
+                            <div class="card-image" style="{% if post.image %}background-image: linear-gradient(135deg, rgba(74,14,78,0.65), rgba(0,255,255,0.15)), url('{{ post.image | relative_url }}'); background-size: cover; background-position: center;{% else %}background: {{ category.gradient }};{% endif %}">
+    {% unless post.image %}
+    <i class="fa-solid {{ category.icon }}"></i>
+    {% endunless %}
+    <span class="card-category">{{ category.label }}</span>
+</div>
                             <div class="card-body">
                                 <div class="card-meta">
                                     <span><i class="fa-regular fa-calendar"></i> {{ post.date | date: "%b %d, %Y" }}</span>
