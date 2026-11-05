@@ -184,6 +184,7 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                                 <div class="card-meta">
                                     <span><i class="fa-regular fa-calendar"></i> {{ post.date | date: "%b %d, %Y" }}</span>
                                     <span><i class="fa-regular fa-clock"></i> {{ post.read_time | default: "5 min" }}</span>
+                                    <span><i class="fa-regular fa-eye"></i> <span data-view-slug="{{ post.slug }}">—</span></span>
                                 </div>
                                 <h3>{{ post.title }}</h3>
                                 <p class="card-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</p>
@@ -277,4 +278,34 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
             applyFilters();
         }, 250);
     });
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+    firebase.initializeApp({
+        /* same config as above */
+    });
+    const db = firebase.firestore();
+
+    function formatViews(n) {
+        if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+        return String(n);
+    }
+
+    /* Lazy-load counts only when a card scrolls into view */
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            observer.unobserve(el);
+            db.collection('article_views').doc(el.dataset.slug).get()
+                .then(snap => {
+                    el.textContent = snap.exists ? formatViews(snap.data().count || 0) : '0';
+                })
+                .catch(() => { el.textContent = '0'; });
+        });
+    }, { rootMargin: '100px' });
+
+    document.querySelectorAll('[data-view-slug]').forEach(el => observer.observe(el));
 </script>
