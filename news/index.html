@@ -289,14 +289,14 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
 (function () {
     'use strict';
 
-    /* ---------- Guard: SDK blocked by ad blocker / CDN ---------- */
+    /* 1. SDK guard */
     if (typeof firebase === 'undefined') {
-        console.warn('[Views] Firebase SDK not loaded — cards will show "—"');
+        console.warn('[Views] Firebase SDK not loaded');
         document.querySelectorAll('[data-view-slug]').forEach(el => el.textContent = '—');
         return;
     }
 
-    /* ---------- YOUR REAL CONFIG (same as post page) ---------- */
+    /* 2. Real config */
     const firebaseConfig = {
         apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
         authDomain: "kabaddione-posts.firebaseapp.com",
@@ -306,15 +306,26 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         appId: "1:145975001123:web:d9ac46f68f00d5b6557196"
     };
 
+    /* 3. ⭐ FORCE-CLEAN any broken app from default.html ⭐ */
     try {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        if (firebase.apps && firebase.apps.length > 0) {
+            firebase.apps.slice().forEach(app => {
+                try { app.delete(); } catch (e) { /* ignore */ }
+            });
+        }
+    } catch (e) { /* ignore */ }
+
+    /* 4. Init fresh with real config */
+    let app;
+    try {
+        app = firebase.initializeApp(firebaseConfig);
     } catch (e) {
         console.error('[Views] Firebase init failed:', e);
         document.querySelectorAll('[data-view-slug]').forEach(el => el.textContent = '—');
         return;
     }
 
-    const db = firebase.firestore();
+    const db = app.firestore();
 
     function formatViews(n) {
         if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
@@ -333,7 +344,6 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         }
     }
 
-    /* Lazy-load: only fetch when the card scrolls into view */
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
@@ -342,10 +352,8 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                 loadViews(entry.target);
             });
         }, { rootMargin: '100px' });
-
         document.querySelectorAll('[data-view-slug]').forEach(el => observer.observe(el));
     } else {
-        /* Fallback: just load them all */
         document.querySelectorAll('[data-view-slug]').forEach(loadViews);
     }
 })();
