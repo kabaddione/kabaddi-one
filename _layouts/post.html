@@ -144,7 +144,10 @@ layout: default
                     <div class="rc-body">
                         <div class="rc-tag">{{ pcat.label | default: post.category }}</div>
                         <h3>{{ post.title }}</h3>
-                        <div class="rc-date">{{ post.date | date: "%b %d, %Y" }} · {{ post.read_time | default: "5 min" }}</div>
+                        <div class="rc-date">
+    {{ post.date | date: "%b %d, %Y" }} · {{ post.read_time | default: "5 min" }} ·
+    <i class="fa-regular fa-eye"></i> <span data-view-slug="{{ post.slug }}">—</span>
+</div>
                     </div>
                 </a>
             {% endfor %}
