@@ -1,0 +1,49 @@
+# ============================================
+# Site Settings
+# ============================================
+title: KabaddiOne
+description: Professional Kabaddi Broadcast & News
+author: KabaddiOne Team
+
+# Your live domain (from GitHub Pages custom domain)
+url: https://kabaddione.com
+baseurl: ""
+
+# ============================================
+# SEO-Friendly Post URLs
+# ============================================
+# Turns _posts/2026-11-05-slug.md
+# into → /news/2026/11/05/slug.html
+permalink: /news/:year/:month/:day/:title.html
+
+# ============================================
+# Defaults applied to every post automatically
+# ============================================
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "KabaddiOne Team"
+      read_time: "5 min"
+      category: "news"       # fallback category
+      featured: false        # override per-post with: featured: true
+
+# ============================================
+# Markdown & Build Settings
+# ============================================
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Files Jekyll should ignore when building
+exclude:
+  - README.md
+  - node_modules
+  - package.json
