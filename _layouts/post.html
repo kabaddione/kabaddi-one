@@ -184,48 +184,80 @@ layout: default
     /* =====================================================
        VIEW COUNTER (CounterAPI.dev — free, no setup)
        ===================================================== */
-    const ARTICLE_ID = {{ page.slug | jsonify }};
-    const COUNTER_NS = 'kabaddione';
-    const VIEW_CACHE_KEY = 'kabaddione_views_' + ARTICLE_ID;
-    const VIEW_SESSION_KEY = 'kabaddione_viewed_' + ARTICLE_ID;
+    <!-- Firebase SDK (compat build — works without a bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
+<script>
+(function () {
+    /* =====================================================
+       1. FIREBASE CONFIG — paste your own values here
+       ===================================================== */
+    const firebaseConfig = {
+  apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
+  authDomain: "kabaddione-posts.firebaseapp.com",
+  projectId: "kabaddione-posts",
+  storageBucket: "kabaddione-posts.firebasestorage.app",
+  messagingSenderId: "145975001123",
+  appId: "1:145975001123:web:d9ac46f68f00d5b6557196",
+  measurementId: "G-68L5DGYF2D"
+};
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const viewsRef = db.collection('article_views');
+
+    const ARTICLE_ID = {{ page.slug | jsonify }};
+    const SESSION_KEY = 'kabaddione_viewed_' + ARTICLE_ID;
+
+    /* =====================================================
+       2. FORMAT (1.2K / 3.4M)
+       ===================================================== */
     function formatViews(n) {
         if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
-        if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+        if (n >= 1000)   return (n / 1000).toFixed(1).replace('.0', '') + 'K';
         return String(n);
     }
 
-    async function fetchViews(increment) {
-        const base = `https://api.counterapi.dev/v1/${COUNTER_NS}/${encodeURIComponent(ARTICLE_ID)}`;
-        const url = increment ? base + '/up' : base + '/';
-        try {
-            const res = await fetch(url, { cache: 'no-store' });
-            if (res.status === 404 && increment) return 0;
-            if (!res.ok) throw new Error('failed');
-            const data = await res.json();
-            return Number(data.count) || 0;
-        } catch (e) { return null; }
-    }
-
-    async function initViewCounter() {
+    /* =====================================================
+       3. INCREMENT OR READ
+       Uses FieldValue.increment(1) → atomic server-side math,
+       no race conditions even with 100 simultaneous readers.
+       ===================================================== */
+    async function trackAndDisplayView() {
         const el = document.querySelector('.vc-num');
         if (!el) return;
-        const cached = localStorage.getItem(VIEW_CACHE_KEY);
-        if (cached) {
-            const { count, ts } = JSON.parse(cached);
+
+        const docRef = viewsRef.doc(ARTICLE_ID);
+        const alreadyViewed = sessionStorage.getItem(SESSION_KEY);
+
+        try {
+            if (!alreadyViewed) {
+                /* First visit this session → increment */
+                await docRef.set(
+                    { count: firebase.firestore.FieldValue.increment(1), lastViewed: firebase.firestore.FieldValue.serverTimestamp() },
+                    { merge: true }
+                );
+                sessionStorage.setItem(SESSION_KEY, '1');
+            }
+
+            /* Read the latest count (works whether we just incremented or not) */
+            const snap = await docRef.get();
+            const count = snap.exists ? (snap.data().count || 0) : 0;
             el.textContent = formatViews(count);
-            if (Date.now() - ts < 5 * 60 * 1000) return;
+
+        } catch (err) {
+            console.warn('View counter unavailable:', err.message);
+            el.textContent = '—';
         }
-        const alreadyViewed = sessionStorage.getItem(VIEW_SESSION_KEY);
-        const shouldIncrement = !alreadyViewed;
-        const count = await fetchViews(shouldIncrement);
-        if (count === null) {
-            el.textContent = cached ? JSON.parse(cached).count : '0';
-            return;
-        }
-        if (shouldIncrement) sessionStorage.setItem(VIEW_SESSION_KEY, '1');
-        localStorage.setItem(VIEW_CACHE_KEY, JSON.stringify({ count, ts: Date.now() }));
-        el.textContent = formatViews(count);
     }
-    initViewCounter();
+
+    /* Kick off as soon as the DOM is ready */
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', trackAndDisplayView);
+    } else {
+        trackAndDisplayView();
+    }
+})();
+</script>
 </script>
