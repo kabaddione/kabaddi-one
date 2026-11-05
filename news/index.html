@@ -134,6 +134,7 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                         <span><i class="fa-regular fa-calendar"></i> {{ main.date | date: "%b %d, %Y" }}</span>
                         <span><i class="fa-regular fa-clock"></i> {{ main.read_time | default: "5 min" }}</span>
                         <span><i class="fa-regular fa-user"></i> {{ main.author }}</span>
+                        <span><i class="fa-regular fa-eye"></i> <span data-view-slug="{{ main.slug }}">—</span>
                     </div>
                     <h2>{{ main.title }}</h2>
                     <p>{{ main.excerpt | strip_html | truncate: 160 }}</p>
@@ -150,7 +151,10 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                         <div class="small-body">
                             <div class="small-tag">{{ pcat.label | default: post.category }}</div>
                             <h3>{{ post.title }}</h3>
-                            <div class="small-date">{{ post.date | date: "%b %d, %Y" }} · {{ post.read_time | default: "5 min" }}</div>
+                            <div class="small-date">
+    {{ post.date | date: "%b %d, %Y" }} · {{ post.read_time | default: "5 min" }} ·
+    <i class="fa-regular fa-eye"></i> <span data-view-slug="{{ post.slug }}">—</span>
+</div>
                         </div>
                     </a>
                 {% endfor %}
@@ -279,33 +283,70 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         }, 250);
     });
 </script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" crossorigin="anonymous"></script>
 <script>
-    firebase.initializeApp({
-        /* same config as above */
-    });
+(function () {
+    'use strict';
+
+    /* ---------- Guard: SDK blocked by ad blocker / CDN ---------- */
+    if (typeof firebase === 'undefined') {
+        console.warn('[Views] Firebase SDK not loaded — cards will show "—"');
+        document.querySelectorAll('[data-view-slug]').forEach(el => el.textContent = '—');
+        return;
+    }
+
+    /* ---------- YOUR REAL CONFIG (same as post page) ---------- */
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
+        authDomain: "kabaddione-posts.firebaseapp.com",
+        projectId: "kabaddione-posts",
+        storageBucket: "kabaddione-posts.firebasestorage.app",
+        messagingSenderId: "145975001123",
+        appId: "1:145975001123:web:d9ac46f68f00d5b6557196"
+    };
+
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+        console.error('[Views] Firebase init failed:', e);
+        document.querySelectorAll('[data-view-slug]').forEach(el => el.textContent = '—');
+        return;
+    }
+
     const db = firebase.firestore();
 
     function formatViews(n) {
         if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
-        if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+        if (n >= 1000)    return (n / 1000).toFixed(1).replace('.0', '') + 'K';
         return String(n);
     }
 
-    /* Lazy-load counts only when a card scrolls into view */
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const el = entry.target;
-            observer.unobserve(el);
-            db.collection('article_views').doc(el.dataset.slug).get()
-                .then(snap => {
-                    el.textContent = snap.exists ? formatViews(snap.data().count || 0) : '0';
-                })
-                .catch(() => { el.textContent = '0'; });
-        });
-    }, { rootMargin: '100px' });
+    async function loadViews(el) {
+        const slug = el.dataset.viewSlug;
+        if (!slug) return;
+        try {
+            const snap = await db.collection('article_views').doc(slug).get();
+            el.textContent = snap.exists ? formatViews(snap.data().count || 0) : '0';
+        } catch (e) {
+            el.textContent = '0';
+        }
+    }
 
-    document.querySelectorAll('[data-view-slug]').forEach(el => observer.observe(el));
+    /* Lazy-load: only fetch when the card scrolls into view */
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                observer.unobserve(entry.target);
+                loadViews(entry.target);
+            });
+        }, { rootMargin: '100px' });
+
+        document.querySelectorAll('[data-view-slug]').forEach(el => observer.observe(el));
+    } else {
+        /* Fallback: just load them all */
+        document.querySelectorAll('[data-view-slug]').forEach(loadViews);
+    }
+})();
 </script>
