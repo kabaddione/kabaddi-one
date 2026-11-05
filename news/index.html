@@ -125,10 +125,10 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
             {% assign main = featured_posts.first %}
             {% assign main_cat = site.data.categories | where: "slug", main.category | first %}
             <a href="{{ main.url | relative_url }}" class="featured-main">
-                <div class="feat-image" style="background: {{ main_cat.gradient | default: 'linear-gradient(135deg,#4A0E4E,#6C3CE0)' }}">
-                    <i class="fa-solid {{ main_cat.icon | default: 'fa-newspaper' }}"></i>
-                    <span class="feat-tag">{{ main_cat.label | default: main.category }}</span>
-                </div>
+                <div class="feat-image" style="{% if main.image %}background-image: linear-gradient(135deg, rgba(74,14,78,0.7), rgba(0,255,255,0.2)), url('{{ main.image | relative_url }}'); background-size: cover; background-position: center;{% else %}background: {{ main_cat.gradient }};{% endif %}">
+    {% unless main.image %}<i class="fa-solid {{ main_cat.icon }}"></i>{% endunless %}
+    <span class="feat-tag">{{ main_cat.label }}</span>
+</div>
                 <div class="feat-body">
                     <div class="feat-meta">
                         <span><i class="fa-regular fa-calendar"></i> {{ main.date | date: "%b %d, %Y" }}</span>
