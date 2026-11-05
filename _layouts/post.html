@@ -184,15 +184,18 @@ layout: default
     /* =====================================================
        VIEW COUNTER (CounterAPI.dev — free, no setup)
        ===================================================== */
-    <!-- Firebase SDK (compat build — works without a bundler) -->
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-
-<script>
 (function () {
-    /* =====================================================
-       1. FIREBASE CONFIG — paste your own values here
-       ===================================================== */
+    'use strict';
+
+    /* ---------- 1. Guard: SDK might have failed to load ---------- */
+    if (typeof firebase === 'undefined') {
+        console.warn('[Counter] Firebase SDK not loaded. View count disabled.');
+        const el = document.querySelector('.vc-num');
+        if (el) el.textContent = '—';
+        return;
+    }
+
+    /* ---------- 2. Your Firebase config (paste your own values) ---------- */
     const firebaseConfig = {
   apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
   authDomain: "kabaddione-posts.firebaseapp.com",
@@ -203,61 +206,61 @@ layout: default
   measurementId: "G-68L5DGYF2D"
 };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const viewsRef = db.collection('article_views');
+    /* ---------- 3. Init once ---------- */
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+        console.error('[Counter] Firebase init failed:', e);
+        const el = document.querySelector('.vc-num');
+        if (el) el.textContent = '—';
+        return;
+    }
 
+    const db = firebase.firestore();
     const ARTICLE_ID = {{ page.slug | jsonify }};
     const SESSION_KEY = 'kabaddione_viewed_' + ARTICLE_ID;
 
-    /* =====================================================
-       2. FORMAT (1.2K / 3.4M)
-       ===================================================== */
     function formatViews(n) {
         if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
-        if (n >= 1000)   return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+        if (n >= 1000)    return (n / 1000).toFixed(1).replace('.0', '') + 'K';
         return String(n);
     }
 
-    /* =====================================================
-       3. INCREMENT OR READ
-       Uses FieldValue.increment(1) → atomic server-side math,
-       no race conditions even with 100 simultaneous readers.
-       ===================================================== */
     async function trackAndDisplayView() {
         const el = document.querySelector('.vc-num');
         if (!el) return;
 
-        const docRef = viewsRef.doc(ARTICLE_ID);
+        const docRef = db.collection('article_views').doc(ARTICLE_ID);
         const alreadyViewed = sessionStorage.getItem(SESSION_KEY);
 
         try {
+            /* ---- Increment (only if this session hasn't) ---- */
             if (!alreadyViewed) {
-                /* First visit this session → increment */
                 await docRef.set(
-                    { count: firebase.firestore.FieldValue.increment(1), lastViewed: firebase.firestore.FieldValue.serverTimestamp() },
+                    {
+                        count: firebase.firestore.FieldValue.increment(1),
+                        lastViewed: firebase.firestore.FieldValue.serverTimestamp()
+                    },
                     { merge: true }
                 );
                 sessionStorage.setItem(SESSION_KEY, '1');
             }
 
-            /* Read the latest count (works whether we just incremented or not) */
+            /* ---- Read latest value ---- */
             const snap = await docRef.get();
             const count = snap.exists ? (snap.data().count || 0) : 0;
             el.textContent = formatViews(count);
 
         } catch (err) {
-            console.warn('View counter unavailable:', err.message);
+            console.error('[Counter] Firestore error:', err.code || err.message);
             el.textContent = '—';
         }
     }
 
-    /* Kick off as soon as the DOM is ready */
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', trackAndDisplayView);
     } else {
         trackAndDisplayView();
     }
 })();
-</script>
 </script>
