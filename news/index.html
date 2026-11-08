@@ -25,6 +25,11 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     padding: 4px 24px 16px;
     display: none; /* hidden by default — shown by JS only if matches exist */
 }
+
+/* ⭐ THE MISSING RULE — makes the section visible when JS adds .is-visible */
+.live-now-section.is-visible {
+    display: block;
+}
     
 .live-now-section.is-visible .row-head h2 {
     animation: fadeInSlide 0.4s ease;
@@ -743,9 +748,8 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                 })));
             }
 
-            const ongoing = matches.filter(m =>
-                m.status === 'live' || m.status === 'break' || m.status === 'paused'
-            );
+            // ⭐ Only truly live matches (no paused / break)
+            const ongoing = matches.filter(m => m.status === 'live');
 
             if (ongoing.length === 0) {
                 // Hide section completely
@@ -753,13 +757,10 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                 return;
             }
 
-            // Sort: live → break → paused, then by last_updated desc
-            const order = { live: 0, break: 1, paused: 2 };
-            ongoing.sort((a, b) => {
-                const s = (order[a.status] ?? 9) - (order[b.status] ?? 9);
-                if (s !== 0) return s;
-                return (Number(b.data.last_updated) || 0) - (Number(a.data.last_updated) || 0);
-            });
+            // Sort: newest-updated first
+            ongoing.sort((a, b) =>
+              (Number(b.data.last_updated) || 0) - (Number(a.data.last_updated) || 0)
+            );
 
             countEl.textContent = ongoing.length;
             row.innerHTML = ongoing.map(renderCard).join('');
