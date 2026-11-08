@@ -25,6 +25,15 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     padding: 4px 24px 16px;
     display: none; /* hidden by default — shown by JS only if matches exist */
 }
+    
+.live-now-section.is-visible .row-head h2 {
+    animation: fadeInSlide 0.4s ease;
+}
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+    
 .live-now-section .container {
     max-width: var(--max-width);
     margin: 0 auto;
@@ -598,9 +607,11 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
 
 <script>
 /* =========================================================
-   ⚡ LIVE MATCHES WIDGET
-   Fetches from your Cloudflare worker, shows only ongoing
-   matches, auto-hides if none, refreshes every 30 seconds.
+   ⚡ LIVE MATCHES WIDGET — Fixed version
+   ✓ Uses class toggle (not inline style) to show/hide
+   ✓ Doesn't mark just-started matches as "resulted"
+   ✓ Logs status detection so you can debug
+   ✓ Auto-hides if no ongoing matches exist
    ========================================================= */
 (function () {
     'use strict';
@@ -612,7 +623,10 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     const row     = document.getElementById('liveMatchesRow');
     const countEl = document.getElementById('liveMatchCount');
 
-    if (!section || !row || !countEl) return;
+    if (!section || !row || !countEl) {
+        console.warn('[LiveMatches] Section elements not found in DOM');
+        return;
+    }
 
     /* ---------- HELPERS ---------- */
     function escapeHtml(str) {
@@ -622,23 +636,36 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
+    /* ---------- FIXED STATUS DETECTION ---------- */
     function getMatchStatus(d) {
         if (!d) return 'resulted';
-        const halfStatus  = String(d.half_status || '').toLowerCase();
+
+        const halfStatus  = String(d.half_status || '').toLowerCase().trim();
         const matchResult = String(d.match_result || '').trim();
         const breakTitle  = String(d.break_clock_title || '').trim();
         const breakTime   = String(d.break_clock_time  || '').trim();
-        const mainClock   = String(d.main_clock || '').trim();
 
+        // 1) Explicit result text → match over
         if (matchResult) return 'resulted';
-        if (halfStatus.includes('ended early')) return 'early';
+
+        // 2) Half status says "ended" → match over (covers both "Ended Early" and "Ended")
+        if (halfStatus.includes('ended')) return 'resulted';
+
+        // 3) Half status says "full time" or "over" → match over
+        if (halfStatus.includes('full time') || halfStatus === 'over') return 'resulted';
+
+        // 4) Half status says "paused" → paused
         if (halfStatus.includes('paused')) return 'paused';
-        if (halfStatus.includes('over') || halfStatus.includes('full time')) return 'resulted';
-        if (mainClock === '00:00' && halfStatus.length > 0) return 'resulted';
+
+        // 5) There's an active break timer → break
         if (breakTitle && breakTime && breakTime !== '00:00') return 'break';
+
+        // 6) ⭐ EVERYTHING ELSE = LIVE
+        //    (includes just-started matches with clock at 00:00)
         return 'live';
     }
 
+    /* ---------- RENDER A CARD ---------- */
     function renderCard(m) {
         const d = m.data;
         const ls = parseInt(d.left_score)  || 0;
@@ -650,13 +677,10 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         const location   = escapeHtml(d.match_location || '');
         const matchId    = escapeHtml(m.id);
 
-        /* Status pill */
-        let statusLabel = 'LIVE';
-        let statusClass = 'live';
+        let statusLabel = 'LIVE',  statusClass = 'live';
         if (m.status === 'break')  { statusLabel = 'BREAK';  statusClass = 'break';  }
         if (m.status === 'paused') { statusLabel = 'PAUSED'; statusClass = 'paused'; }
 
-        /* Status line (half / clock / break timer) */
         let statusInfo = '';
         if (m.status === 'live') {
             statusInfo = `${escapeHtml(d.half_status || 'Live')} · ${escapeHtml(d.main_clock || '00:00')}`;
@@ -699,7 +723,7 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     async function refreshLiveMatches() {
         try {
             const res = await fetch(WORKER_URL, { cache: 'no-store' });
-            if (!res.ok) throw new Error('Network error: ' + res.status);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
 
             const matches = Object.entries(data || {}).map(([id, value]) => ({
@@ -708,37 +732,49 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
                 status: getMatchStatus(value)
             }));
 
-            /* Only ongoing matches */
+            // 🔍 DEBUG: log every match's detected status
+            if (window.KABADDI_DEBUG !== false) {
+                console.table(matches.map(m => ({
+                    id: m.id,
+                    detected: m.status,
+                    half: m.data.half_status || '',
+                    result: m.data.match_result || '',
+                    break: m.data.break_clock_title || ''
+                })));
+            }
+
             const ongoing = matches.filter(m =>
                 m.status === 'live' || m.status === 'break' || m.status === 'paused'
             );
 
             if (ongoing.length === 0) {
-                /* No ongoing matches → hide the whole section */
-                section.style.display = 'none';
+                // Hide section completely
+                section.classList.remove('is-visible');
                 return;
             }
 
-            /* Sort: live first, then break, then paused; newest-updated first within each */
+            // Sort: live → break → paused, then by last_updated desc
             const order = { live: 0, break: 1, paused: 2 };
             ongoing.sort((a, b) => {
-                const s = (order[a.status] || 9) - (order[b.status] || 9);
+                const s = (order[a.status] ?? 9) - (order[b.status] ?? 9);
                 if (s !== 0) return s;
                 return (Number(b.data.last_updated) || 0) - (Number(a.data.last_updated) || 0);
             });
 
             countEl.textContent = ongoing.length;
             row.innerHTML = ongoing.map(renderCard).join('');
-            section.style.display = '';  /* show it */
+
+            // ⭐ THE FIX: use class toggle, not inline style
+            section.classList.add('is-visible');
+
         } catch (err) {
-            /* Silent fail — hide section, don't show error on news page */
             console.warn('[LiveMatches] Fetch failed:', err.message);
-            section.style.display = 'none';
+            section.classList.remove('is-visible');
         }
     }
 
     /* ---------- INIT ---------- */
     refreshLiveMatches();
-    setInterval(refreshLiveMatches, 30000); /* every 30 seconds */
+    setInterval(refreshLiveMatches, 30000); // refresh every 30s
 })();
 </script>
