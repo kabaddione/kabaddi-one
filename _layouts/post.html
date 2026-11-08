@@ -192,30 +192,27 @@ layout: default
 
     /* ---------- 1. Guard: SDK might have failed to load ---------- */
     if (typeof firebase === 'undefined') {
-        console.warn('[Counter] Firebase SDK not loaded. View count disabled.');
-        const el = document.querySelector('.vc-num');
-        if (el) el.textContent = '—';
+        console.warn('[Counter] Firebase SDK not loaded.');
+        document.querySelectorAll('.vc-num, [data-view-slug]').forEach(el => el.textContent = '—');
         return;
     }
 
-    /* ---------- 2. Your Firebase config (paste your own values) ---------- */
+    /* ---------- 2. Your Firebase config ---------- */
     const firebaseConfig = {
-  apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
-  authDomain: "kabaddione-posts.firebaseapp.com",
-  projectId: "kabaddione-posts",
-  storageBucket: "kabaddione-posts.firebasestorage.app",
-  messagingSenderId: "145975001123",
-  appId: "1:145975001123:web:d9ac46f68f00d5b6557196",
-  measurementId: "G-68L5DGYF2D"
-};
+        apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
+        authDomain: "kabaddione-posts.firebaseapp.com",
+        projectId: "kabaddione-posts",
+        storageBucket: "kabaddione-posts.firebasestorage.app",
+        messagingSenderId: "145975001123",
+        appId: "1:145975001123:web:d9ac46f68f00d5b6557196"
+    };
 
-    /* ---------- 3. Init once ---------- */
+    /* ---------- 3. Init ---------- */
     try {
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     } catch (e) {
         console.error('[Counter] Firebase init failed:', e);
-        const el = document.querySelector('.vc-num');
-        if (el) el.textContent = '—';
+        document.querySelectorAll('.vc-num, [data-view-slug]').forEach(el => el.textContent = '—');
         return;
     }
 
@@ -229,7 +226,10 @@ layout: default
         return String(n);
     }
 
-    async function trackAndDisplayView() {
+    /* ====================================================
+       A. CURRENT ARTICLE — increment + display
+       ==================================================== */
+    async function trackCurrentArticle() {
         const el = document.querySelector('.vc-num');
         if (!el) return;
 
@@ -237,33 +237,64 @@ layout: default
         const alreadyViewed = sessionStorage.getItem(SESSION_KEY);
 
         try {
-            /* ---- Increment (only if this session hasn't) ---- */
             if (!alreadyViewed) {
-                await docRef.set(
-                    {
-                        count: firebase.firestore.FieldValue.increment(1),
-                        lastViewed: firebase.firestore.FieldValue.serverTimestamp()
-                    },
-                    { merge: true }
-                );
+                await docRef.set({
+                    count: firebase.firestore.FieldValue.increment(1),
+                    lastViewed: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
                 sessionStorage.setItem(SESSION_KEY, '1');
             }
-
-            /* ---- Read latest value ---- */
             const snap = await docRef.get();
             const count = snap.exists ? (snap.data().count || 0) : 0;
             el.textContent = formatViews(count);
-
         } catch (err) {
             console.error('[Counter] Firestore error:', err.code || err.message);
             el.textContent = '—';
         }
     }
 
+    /* ====================================================
+       B. ⭐ RELATED CARDS — read-only display ⭐
+       (This was the missing piece!)
+       ==================================================== */
+    function loadRelatedView(el) {
+        const slug = el.dataset.viewSlug;
+        if (!slug) return;
+        db.collection('article_views').doc(slug).get()
+            .then(snap => {
+                el.textContent = snap.exists ? formatViews(snap.data().count || 0) : '0';
+            })
+            .catch(() => { el.textContent = '0'; });
+    }
+
+    function initRelatedViews() {
+        const els = document.querySelectorAll('[data-view-slug]');
+        if (!els.length) return;
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    observer.unobserve(entry.target);
+                    loadRelatedView(entry.target);
+                });
+            }, { rootMargin: '100px' });
+            els.forEach(el => observer.observe(el));
+        } else {
+            els.forEach(loadRelatedView);
+        }
+    }
+
+    /* ---------- Kick off ---------- */
+    function start() {
+        trackCurrentArticle();   // current article's view count
+        initRelatedViews();      // related cards' view counts
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', trackAndDisplayView);
+        document.addEventListener('DOMContentLoaded', start);
     } else {
-        trackAndDisplayView();
+        start();
     }
 })();
 </script>
