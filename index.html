@@ -278,11 +278,11 @@
         .feature-card { background-color: #1a1a1a; background-image: url('https://github.com/kabaddione/kabaddi-one/blob/main/images/feature-background-round.png?raw=true'); background-position: 150px 150px; background-repeat: no-repeat; background-size: 250px auto; border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 28px 24px; transition: var(--transition-smooth); position: relative; overflow: hidden; cursor: default; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0); }
         .feature-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: var(--transition-smooth); }
         .feature-card:hover { transform: translate3d(0, -6px, 0); box-shadow: var(--shadow-card), 0 0 40px rgba(0, 255, 255, 0.1); border-color: var(--border-glow); } .feature-card:hover::before { opacity: 1; }
-        .feature-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; color: #ddb5fc; transition: var(--transition-smooth); border: 2px solid; }
+        .feature-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; color: var(--accent); transition: var(--transition-smooth); border: 2px solid; }
         .feature-card:hover .feature-icon { background: rgba(0, 255, 255, 0.2); box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
         .feature-card h3 { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; }
         .feature-card p { font-size: 0.9rem; color: #8c8a8d; line-height: 1.5; }
-        .feature-card .feature-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; color: #ddb5fc; margin-top: 10px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid #ffffff85; }
+        .feature-card .feature-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; color: var(--accent-secondary); margin-top: 10px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid rgba(57, 255, 20, 0.4); }
 
         /* ============ DEDICATED AUTO FEATURE SECTIONS ============ */
         .auto-feature-section { position: relative; z-index: 1; padding: 70px 24px; overflow: hidden; }
@@ -988,7 +988,7 @@
                     <span class="feature-badge">Critical</span>
                 </div>
                 <div class="feature-card reveal reveal-delay-1">
-                    <div class="feature-icon"><i class="fas fa-circle" style="color:#ddb5fc;"></i></div>
+                    <div class="feature-icon"><i class="fas fa-circle"></i></div>
                     <h3>All Out Detection</h3>
                     <p>Instant All Out detection when a team loses all players, with +2 bonus points applied automatically.</p>
                     <span class="feature-badge">Auto</span>
@@ -1006,7 +1006,7 @@
                     <span class="feature-badge">Essential</span>
                 </div>
                 <div class="feature-card reveal reveal-delay-4">
-                    <div class="feature-icon"><i class="fas fa-square" style="color:#ddb5fc;"></i></div>
+                    <div class="feature-icon"><i class="fas fa-square"></i></div>
                     <h3>Foul & Card Counter</h3>
                     <p>Track fouls, yellow cards, and red cards — keep full disciplinary records on the scoreboard.</p>
                     <span class="feature-badge">Pro</span>
