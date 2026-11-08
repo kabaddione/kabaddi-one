@@ -15,6 +15,227 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     .search-wrap input{width:100%;padding:16px 20px 16px 52px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;color:#fff;font-size:1rem;outline:none;transition:var(--transition-fast);font-family:inherit}
     .search-wrap input:focus{border-color:var(--neon-cyan);box-shadow:0 0 0 3px rgba(0,255,255,0.1)}
 
+
+    /* =========================================================
+   ⚡ LIVE MATCHES SECTION
+   ========================================================= */
+.live-now-section {
+    position: relative;
+    z-index: 1;
+    padding: 4px 24px 16px;
+    display: none; /* hidden by default — shown by JS only if matches exist */
+}
+.live-now-section .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+.live-now-section .row-head h2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.live-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #FF3B30;
+    box-shadow: 0 0 12px #FF3B30;
+    display: inline-block;
+    animation: liveDotPulse 1.5s ease-in-out infinite;
+}
+@keyframes liveDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(1.35); }
+}
+.lmc-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    background: linear-gradient(135deg, #FF3B30, #B71C1C);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #fff;
+    margin-left: 4px;
+    animation: badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.6); }
+    50%      { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
+}
+
+/* Match card */
+.live-match-card {
+    flex: 0 0 320px;
+    scroll-snap-align: start;
+    background: linear-gradient(165deg, #1a1d33 0%, #131629 55%, #0f1122 100%);
+    border: 1px solid rgba(255,59,48,0.28);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    cursor: pointer;
+}
+.live-match-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255,59,48,0.55);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,59,48,0.25);
+}
+.live-match-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #FF3B30, transparent);
+    animation: liveTopLine 2s ease-in-out infinite;
+}
+@keyframes liveTopLine {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+}
+
+.lmc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 8px;
+    gap: 8px;
+}
+.lmc-id {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.lmc-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+.lmc-status.live {
+    background: linear-gradient(135deg, #FF3B30, #B71C1C);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(255,59,48,0.4);
+}
+.lmc-status.break {
+    background: linear-gradient(135deg, #FBC02D, #F57F17);
+    color: #000;
+    box-shadow: 0 4px 12px rgba(251,192,45,0.3);
+}
+.lmc-status.paused {
+    background: linear-gradient(135deg, #2196F3, #0D47A1);
+    color: #fff;
+}
+.lmc-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    animation: liveDotPulse 1.5s ease-in-out infinite;
+}
+
+.lmc-teams {
+    padding: 4px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.lmc-team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.lmc-color {
+    width: 4px;
+    height: 30px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px currentColor;
+}
+.lmc-name {
+    flex: 1;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+.lmc-score {
+    font-family: 'Teko', 'Segoe UI', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    min-width: 44px;
+    text-align: right;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.lmc-meta {
+    padding: 10px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+.lmc-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.lmc-meta i {
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.lmc-arrow {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #FF3B30;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+.live-match-card:hover .lmc-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+    .live-match-card { flex: 0 0 280px; }
+}
+
+    
+
     .filter-bar{display:flex;gap:10px;overflow-x:auto;padding:20px 0;position:relative;z-index:1}
     .filter-bar::-webkit-scrollbar{display:none}
     .filter-bar-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;gap:10px;width:100%}
@@ -96,6 +317,22 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="searchInput" placeholder="Search articles, tutorials, teams...">
         </div>
+    </div>
+</section>
+
+
+<!-- ⚡ LIVE MATCHES (auto-shows only when matches are ongoing) -->
+<section class="live-now-section" id="liveMatchesSection" aria-live="polite">
+    <div class="container">
+        <div class="row-head">
+            <h2>
+                <span class="live-dot" aria-hidden="true"></span>
+                Live Now
+                <span class="lmc-count-badge" id="liveMatchCount">0</span>
+            </h2>
+            <a href="/matches.html">View All Matches <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="scroll-row" id="liveMatchesRow"></div>
     </div>
 </section>
 
@@ -356,5 +593,152 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     } else {
         document.querySelectorAll('[data-view-slug]').forEach(loadViews);
     }
+})();
+</script>
+
+<script>
+/* =========================================================
+   ⚡ LIVE MATCHES WIDGET
+   Fetches from your Cloudflare worker, shows only ongoing
+   matches, auto-hides if none, refreshes every 30 seconds.
+   ========================================================= */
+(function () {
+    'use strict';
+
+    const WORKER_URL      = "https://kabaddione-matches.art-gauravkumar.workers.dev/";
+    const LIVE_MATCH_PAGE = '/match/id/index.html?match=';
+
+    const section = document.getElementById('liveMatchesSection');
+    const row     = document.getElementById('liveMatchesRow');
+    const countEl = document.getElementById('liveMatchCount');
+
+    if (!section || !row || !countEl) return;
+
+    /* ---------- HELPERS ---------- */
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function getMatchStatus(d) {
+        if (!d) return 'resulted';
+        const halfStatus  = String(d.half_status || '').toLowerCase();
+        const matchResult = String(d.match_result || '').trim();
+        const breakTitle  = String(d.break_clock_title || '').trim();
+        const breakTime   = String(d.break_clock_time  || '').trim();
+        const mainClock   = String(d.main_clock || '').trim();
+
+        if (matchResult) return 'resulted';
+        if (halfStatus.includes('ended early')) return 'early';
+        if (halfStatus.includes('paused')) return 'paused';
+        if (halfStatus.includes('over') || halfStatus.includes('full time')) return 'resulted';
+        if (mainClock === '00:00' && halfStatus.length > 0) return 'resulted';
+        if (breakTitle && breakTime && breakTime !== '00:00') return 'break';
+        return 'live';
+    }
+
+    function renderCard(m) {
+        const d = m.data;
+        const ls = parseInt(d.left_score)  || 0;
+        const rs = parseInt(d.right_score) || 0;
+        const leftColor  = d.left_color  || '#4CAF50';
+        const rightColor = d.right_color || '#2196F3';
+        const leftName   = escapeHtml(d.left_name  || 'Team A');
+        const rightName  = escapeHtml(d.right_name || 'Team B');
+        const location   = escapeHtml(d.match_location || '');
+        const matchId    = escapeHtml(m.id);
+
+        /* Status pill */
+        let statusLabel = 'LIVE';
+        let statusClass = 'live';
+        if (m.status === 'break')  { statusLabel = 'BREAK';  statusClass = 'break';  }
+        if (m.status === 'paused') { statusLabel = 'PAUSED'; statusClass = 'paused'; }
+
+        /* Status line (half / clock / break timer) */
+        let statusInfo = '';
+        if (m.status === 'live') {
+            statusInfo = `${escapeHtml(d.half_status || 'Live')} · ${escapeHtml(d.main_clock || '00:00')}`;
+        } else if (m.status === 'break') {
+            statusInfo = `${escapeHtml(d.break_clock_title || 'Break')} · ${escapeHtml(d.break_clock_time || '00:00')}`;
+        } else if (m.status === 'paused') {
+            statusInfo = 'Match Paused';
+        }
+
+        const dotSpan = statusClass === 'live' ? '<span class="lmc-dot"></span>' : '';
+
+        return `
+            <a href="${LIVE_MATCH_PAGE}${encodeURIComponent(m.id)}" class="live-match-card" data-match-id="${matchId}">
+                <div class="lmc-top">
+                    <span class="lmc-id">#${matchId.toUpperCase()}</span>
+                    <span class="lmc-status ${statusClass}">${dotSpan}${statusLabel}</span>
+                </div>
+                <div class="lmc-teams">
+                    <div class="lmc-team">
+                        <span class="lmc-color" style="background:${leftColor};color:${leftColor}"></span>
+                        <span class="lmc-name">${leftName}</span>
+                        <span class="lmc-score">${ls}</span>
+                    </div>
+                    <div class="lmc-team">
+                        <span class="lmc-color" style="background:${rightColor};color:${rightColor}"></span>
+                        <span class="lmc-name">${rightName}</span>
+                        <span class="lmc-score">${rs}</span>
+                    </div>
+                </div>
+                <div class="lmc-meta">
+                    <span>${statusInfo}</span>
+                    ${location ? `<span><i class="fa-solid fa-location-dot"></i> ${location}</span>` : ''}
+                </div>
+                <span class="lmc-arrow">Watch Live <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+        `;
+    }
+
+    /* ---------- FETCH + RENDER ---------- */
+    async function refreshLiveMatches() {
+        try {
+            const res = await fetch(WORKER_URL, { cache: 'no-store' });
+            if (!res.ok) throw new Error('Network error: ' + res.status);
+            const data = await res.json();
+
+            const matches = Object.entries(data || {}).map(([id, value]) => ({
+                id,
+                data: value || {},
+                status: getMatchStatus(value)
+            }));
+
+            /* Only ongoing matches */
+            const ongoing = matches.filter(m =>
+                m.status === 'live' || m.status === 'break' || m.status === 'paused'
+            );
+
+            if (ongoing.length === 0) {
+                /* No ongoing matches → hide the whole section */
+                section.style.display = 'none';
+                return;
+            }
+
+            /* Sort: live first, then break, then paused; newest-updated first within each */
+            const order = { live: 0, break: 1, paused: 2 };
+            ongoing.sort((a, b) => {
+                const s = (order[a.status] || 9) - (order[b.status] || 9);
+                if (s !== 0) return s;
+                return (Number(b.data.last_updated) || 0) - (Number(a.data.last_updated) || 0);
+            });
+
+            countEl.textContent = ongoing.length;
+            row.innerHTML = ongoing.map(renderCard).join('');
+            section.style.display = '';  /* show it */
+        } catch (err) {
+            /* Silent fail — hide section, don't show error on news page */
+            console.warn('[LiveMatches] Fetch failed:', err.message);
+            section.style.display = 'none';
+        }
+    }
+
+    /* ---------- INIT ---------- */
+    refreshLiveMatches();
+    setInterval(refreshLiveMatches, 30000); /* every 30 seconds */
 })();
 </script>
