@@ -390,18 +390,162 @@
         .super-3d-mockup .lm-screen { top: 8px; left: 8px; right: 8px; bottom: 8px; border-radius: 20px; background: #000; overflow: hidden; }
         .super-3d-mockup .lm-screen img {scale: .26;}
 
-        /* ============ FOOTER ============ */
-        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px 24px; position: relative; z-index: 1; }
-        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; }
-        .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: #fff; font-family: var(--font-heading); }
-        .footer-logo img { height: 30px; width: auto; }
-        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; transition: var(--transition-fast); }
-        .footer-links a:hover { color: #fff; }
-        .social-links { display: flex; gap: 16px; align-items: center; }
-        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: var(--transition-fast); text-decoration: none; }
-        .social-links a:hover { color: var(--accent); }
-        .footer-copy { color: var(--text-muted); font-size: 0.8rem; text-align: center; width: 100%; margin-top: 16px; }
+                /* ============ FOOTER (5-COLUMN GRID) ============ */
+        .footer { 
+            background: var(--bg-secondary); 
+            border-top: 1px solid var(--border-subtle); 
+            padding: 60px 24px 24px; 
+            position: relative; 
+            z-index: 1; 
+        }
+        .footer-inner { 
+            max-width: var(--max-width); 
+            margin: 0 auto; 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr; 
+            gap: 40px; 
+            margin-bottom: 40px;
+        }
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .brand-col {
+            padding-right: 20px;
+        }
+        .footer-logo { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-weight: 800; 
+            font-size: 1.4rem; 
+            color: #fff; 
+            font-family: var(--font-heading); 
+            text-decoration: none;
+            margin-bottom: 16px;
+        }
+        .footer-logo .logo-icon { 
+            width: 38px; 
+            height: 38px; 
+            border-radius: var(--radius-sm); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.35); 
+        }
+        .footer-logo .logo-icon img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+        }
+        .footer-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            max-width: 280px;
+        }
+        
+        /* Social Icons */
+        .social-links { display: flex; gap: 12px; align-items: center; }
+        .social-links a { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.04); 
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1rem; 
+            transition: var(--transition-fast); 
+            text-decoration: none; 
+        }
+        .social-links a:hover { 
+            background: var(--neon-gradient); 
+            color: var(--app-dark-purple); 
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Links Columns */
+        .footer-heading {
+            color: #fff;
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+        .footer-links { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0;
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        .footer-links a { 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            transition: var(--transition-fast); 
+            text-decoration: none;
+            display: inline-block;
+        }
+        .footer-links a:hover { 
+            color: var(--neon-cyan); 
+            transform: translateX(4px);
+        }
+
+        /* Footer Bottom Bar */
+        .footer-bottom {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 24px;
+            text-align: center;
+        }
+        .footer-copy { 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            margin: 0;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .footer-inner { 
+                grid-template-columns: repeat(3, 1fr); 
+            }
+            .brand-col { 
+                grid-column: 1 / -1; 
+                text-align: center; 
+                padding-right: 0;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            .footer-desc { margin: 0 auto 20px auto; }
+        }
+        
+        @media (max-width: 600px) {
+            .footer-inner { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 30px 20px;
+            }
+            .footer-col:not(.brand-col) {
+                align-items: center;
+                text-align: center;
+            }
+            .footer-links a:hover { transform: none; }
+        }
+
+        @media (max-width: 380px) {
+            .footer-inner { 
+                grid-template-columns: 1fr; 
+            }
+        }
 
         /* ============ REVEAL ANIMATIONS ============ */
         .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
@@ -1456,35 +1600,72 @@
         </div>
     </section>
 
-    <footer class="footer" role="contentinfo">
+        <footer class="footer" role="contentinfo">
         <div class="footer-inner">
-            <div class="footer-logo">
-                <div class="logo-icon">
-                    <img src="images/kabaddione_logo.png" alt="KabaddiOne">
+            
+            <!-- Column 1: Logo & Socials -->
+            <div class="footer-col brand-col">
+                <a href="index.html" class="footer-logo">
+                    <div class="logo-icon">
+                        <img src="images/kabaddione_logo.png" alt="KabaddiOne">
+                    </div>
+                    <span>KabaddiOne</span>
+                </a>
+                <p class="footer-desc">The premium all-in-one kabaddi scoreboard app & live streaming solution.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://instagram.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com/@kabaddioneapp" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 </div>
-                <span>KabaddiOne</span>
             </div>
-            <div class="footer-links">
-                <a href="#features">Features</a>
-                <a href="#auto-super-tackle">Live Score</a>
-                <a href="#sounds">Overlay</a>
-                <a href="#languages">KabaddiOne Pro</a>
-                <a href="/giveaway.html">Giveaway</a>
-                <a href="/giveaway-winners.html">Winners</a>
-                <a href="/download.html">Download</a>
-                <a href="about.html">About Us</a>
-                <a href="disclaimer.html">Disclaimer</a>
-                <a href="privacy.html">Privacy Policy</a>
-                <a href="terms.html">Terms & Conditions</a>
-                <a href="sitemap.xml">Sitemap</a>
-                <a href="contact.html">Contact Us</a>
+
+            <!-- Column 2: Product -->
+            <div class="footer-col">
+                <h4 class="footer-heading">Product</h4>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="/matches.html">Live Score</a></li>
+                    <li><a href="/news/">News</a></li>
+                    <li><a href="/overlay.html">Overlay</a></li>
+                </ul>
             </div>
-            <div class="social-links">
-                <a href="https://facebook.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://twitter.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                <a href="https://instagram.com/kabaddioneapp" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://youtube.com/@kabaddioneapp" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+
+            <!-- Column 3: Explore -->
+            <div class="footer-col">
+                <h4 class="footer-heading">Explore</h4>
+                <ul class="footer-links">
+                    <li><a href="#pro">KabaddiOne Pro</a></li>
+                    <li><a href="/giveaway.html">Giveaway</a></li>
+                    <li><a href="/giveaway-winners.html">Winners</a></li>
+                    <li><a href="/download.html">Download</a></li>
+                </ul>
             </div>
+
+            <!-- Column 4: Company -->
+            <div class="footer-col">
+                <h4 class="footer-heading">Company</h4>
+                <ul class="footer-links">
+                    <li><a href="/about.html">About Us</a></li>
+                    <li><a href="/disclaimer.html">Disclaimer</a></li>
+                    <li><a href="/privacy.html">Privacy Policy</a></li>
+                    <li><a href="/terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 5: Support -->
+            <div class="footer-col">
+                <h4 class="footer-heading">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="/sitemap.xml">Sitemap</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+        </div>
+        
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
             <p class="footer-copy">© 2026 KabaddiOne. All rights reserved. The premium all-in-one kabaddi scoreboard app.</p>
         </div>
     </footer>
