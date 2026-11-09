@@ -54,9 +54,6 @@
     <meta name="theme-color" content="#0a0a1a">
     <title>Live Kabaddi Score, commentary, stats, player performace | KabaddiOne.com</title>
 
-    <!-- 🚨 ADSTERRA POPUNDER CODE -->
-    <script data-cfasync="false" src="https://capitalhospitals.org/1/590e46694d2e0e2ffaaf4da30db67888"></script>
-
     <!-- 🚨 ANTI-IFRAME DEFENSE: allow only KabaddiOne-owned parent pages -->
     <script>
       (function protectAgainstUnauthorizedEmbedding() {
@@ -157,6 +154,8 @@
         .bg-orb:nth-child(2){width:450px;height:450px;background:#6C3CE0;top:50%;right:-12%;animation-delay:-6s;animation-duration:20s}
         .bg-orb:nth-child(3){width:350px;height:350px;background:var(--accent-secondary);bottom:-10%;left:20%;animation-delay:-12s}
         @keyframes orbFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}25%{transform:translate3d(60px,-40px,0) scale(1.15)}50%{transform:translate3d(-30px,50px,0) scale(.9)}75%{transform:translate3d(-50px,-30px,0) scale(1.1)}}
+        
+        /* --- NAVIGATION FIXED --- */
         .nav{position:fixed;top:0;left:0;width:100%;z-index:1000;height:var(--nav-height);transition:var(--transition-smooth);background:rgba(10,10,26,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle)}
         .nav-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;height:100%;gap:12px}
         .nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-heading);font-weight:800;font-size:1.5rem;color:#fff;letter-spacing:-.5px;z-index:1001;flex-shrink:0}
@@ -170,10 +169,30 @@
         .nav-cta-btn{background:linear-gradient(135deg,var(--accent),var(--accent-glow));color:#fff!important;padding:10px 22px;border-radius:50px;font-weight:600!important;font-size:.9rem!important;transition:.3s!important;box-shadow:0 4px 18px rgba(255,94,58,0.35)}
         .nav-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,94,58,0.5)}
         .nav-cta-btn::after{display:none!important}
-        .mobile-get-app-btn{display:none;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,var(--accent),var(--accent-glow));color:#fff;border-radius:50px;font-weight:600;font-size:.8rem;box-shadow:0 4px 18px rgba(255,94,58,0.35);margin-left:auto;z-index:1001;white-space:nowrap}
-        .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:1001;background:none;border:none;padding:8px;margin-left:8px}
+        
+        /* Grouping mobile elements ensures they stick to the right side */
+        .nav-mobile-actions {
+            display: none;
+            margin-left: auto;
+            align-items: center;
+            gap: 8px;
+            z-index: 1001;
+        }
+
+        .mobile-get-app-btn{display:none;align-items:center;gap:6px;padding:8px 14px;background:linear-gradient(135deg,var(--accent),var(--accent-glow));color:#fff;border-radius:50px;font-weight:600;font-size:.8rem;box-shadow:0 4px 18px rgba(255,94,58,0.35);white-space:nowrap}
+        .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:1001;background:none;border:none;padding:8px}
         .hamburger span{width:26px;height:2.5px;background:#fff;border-radius:2px;transition:var(--transition-smooth);display:block}
-        @media(max-width:768px){.nav-links{position:fixed;top:0;right:-100%;width:75%;max-width:320px;height:100vh;background:rgba(15,15,36,0.97);backdrop-filter:blur(20px);flex-direction:column;justify-content:center;gap:28px;transition:var(--transition-smooth);padding:40px;border-left:1px solid var(--border-subtle);margin-left:0}.nav-links.active{right:0}.nav-links a{font-size:1.1rem}.nav-links a::after{display:none}.mobile-get-app-btn{display:inline-flex}.hamburger{display:flex}}
+        
+        @media(max-width:768px){
+            .nav-links{position:fixed;top:0;right:-100%;width:75%;max-width:320px;height:100vh;background:rgba(15,15,36,0.97);backdrop-filter:blur(20px);flex-direction:column;justify-content:center;gap:28px;transition:var(--transition-smooth);padding:40px;border-left:1px solid var(--border-subtle);margin-left:0}
+            .nav-links.active{right:0}
+            .nav-links a{font-size:1.1rem}
+            .nav-links a::after{display:none}
+            .nav-mobile-actions { display: flex; }
+            .mobile-get-app-btn { display: inline-flex; }
+            .hamburger { display: flex; }
+        }
+        
         .footer{background:var(--bg-secondary);border-top:1px solid var(--border-subtle);padding:40px 24px 24px;position:relative;z-index:1;margin-top:auto}
         .footer-inner{max-width:var(--max-width);margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:20px}
         .footer-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.2rem;color:#fff;font-family:var(--font-heading)}
@@ -432,8 +451,12 @@
                 <li><a href="/giveaway-winners.html">Winners</a></li>
                 <li><a href="/download.html" class="nav-cta-btn">Download</a></li>
             </ul>
-            <a href="/download.html" class="mobile-get-app-btn" aria-label="Get App"><i class="fa-brands fa-google-play"></i> Get App</a>
-            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+            
+            <!-- Mobile Buttons Grouped for Perfect Right Alignment -->
+            <div class="nav-mobile-actions">
+                <a href="/download.html" class="mobile-get-app-btn" aria-label="Get App"><i class="fa-brands fa-google-play"></i> Get App</a>
+                <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+            </div>
         </div>
     </nav>
     <div class="live-wrapper">
@@ -600,9 +623,6 @@
         </script>
         <script src="https://czernik.org/22/2554d3858262cd1fa0804f4e811ccfde"></script>
     </div>
-
-    <!-- ADSTERRA SOCIAL BAR -->
-    <script data-cfasync="false" src="https://czernik.org/14/805e4e049cc5d1e75a447bba8be0022f"></script>
 
     <script>
         (function(){const navbar=document.getElementById('navbar');const hamburger=document.getElementById('hamburger');const navLinks=document.getElementById('navLinks');const backToTop=document.getElementById('backToTop');const allNavLinks=navLinks.querySelectorAll('a');hamburger.addEventListener('click',function(){const isActive=navLinks.classList.toggle('active');hamburger.classList.toggle('active');hamburger.setAttribute('aria-expanded',isActive);document.body.style.overflow=isActive?'hidden':''});allNavLinks.forEach(link=>link.addEventListener('click',()=>{navLinks.classList.remove('active');hamburger.classList.remove('active');hamburger.setAttribute('aria-expanded','false');document.body.style.overflow=''}));function updateNavbar(){if(window.scrollY>50)navbar.classList.add('scrolled');else navbar.classList.remove('scrolled')}window.addEventListener('scroll',updateNavbar,{passive:true});updateNavbar();function updateBackToTop(){if(window.scrollY>600)backToTop.classList.add('visible');else backToTop.classList.remove('visible')}window.addEventListener('scroll',updateBackToTop,{passive:true});backToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));updateBackToTop()})();
