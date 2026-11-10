@@ -1283,7 +1283,7 @@
         <div class="ts-overlay"></div>
         <div class="ts-content">
             <div class="ts-main-score" id="ts-main-score">0 - 0</div>
-            <div class="ts-match-status" id="ts-match-status">1ST HALF</div>
+            <div class="ts-match-status" id="ts-match-status">STATS</div>
             <div class="ts-divider"></div>
             <div class="ts-row-wrap">
                 <div class="ts-pie-col">
@@ -4341,7 +4341,7 @@ function syncRaidAudio(clock) {
             const ls = data.left_score || 0;
             const rs = data.right_score || 0;
             document.getElementById('ts-main-score').innerText = `${ls} - ${rs}`;
-            document.getElementById('ts-match-status').innerText = (data.half_status || '1st Half').toUpperCase();
+            document.getElementById('ts-match-status').innerText = 'STATS';
             document.getElementById('ts-left-team-name').innerText = leftName;
             document.getElementById('ts-right-team-name').innerText = rightName;
 
