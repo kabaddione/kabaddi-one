@@ -38,7 +38,7 @@
                 '/images/ic_splash_logo1.png', '/images/player_profile_starting.png',
 
                 '/audio/kabaddi-30.mp3', '/audio/super-tackle.mp3', '/audio/super-raid.mp3',
-                '/audio/do-or-die.mp3', '/audio/all-out.mp3',
+                '/audio/do-or-die.mp3', '/audio/all-out.mp3', '/audio/event-slide-in.mp3',
                 '/audio/victory.mp3', '/audio/background.mp3', '/audio/toss_coin.mp3'
             ];
 
@@ -148,6 +148,7 @@
         .track-right .raid-spark::after { bottom: 2px; right: 50%; animation: sparkFloat 0.5s infinite ease-out 0.25s; }
         @keyframes sparkFloat { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-8px) scale(0.3);opacity:0} }
 
+        /* DO-OR-DIE BANNER */
         .dod-banner { position: absolute; bottom: calc(100% - 84px); display: flex; align-items: center; justify-content: center; gap: 12px; padding: 3px 40px; font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 3px; color: #FFFFFF; background: linear-gradient(to bottom, #D32F2F, #8B0000); border-radius: 6px; text-shadow: 0 0 12px rgba(255,0,0,0.9), 2px 2px 4px rgba(0,0,0,0.8); box-shadow: 0 0 25px rgba(255, 0, 0, 0.7), 0 8px 20px rgba(0,0,0,0.6); opacity: 0; transform: translateY(15px) scale(0.9); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; z-index: 20; overflow: hidden; }
         .dod-banner.show { opacity: 1; transform: translateY(0) scale(1); animation: dodSiren 1s infinite alternate; }
         .dod-banner.dod-left { left: 308px; clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%); }
@@ -169,6 +170,32 @@
         @keyframes boltStrikeB { 0%,9%{stroke-dashoffset:1200;opacity:0} 13%,16%{stroke-dashoffset:0;opacity:1} 19%{stroke-dashoffset:0;opacity:.3} 22%{stroke-dashoffset:0;opacity:1} 26%,100%{stroke-dashoffset:-1200;opacity:0} }
         @keyframes dodSiren { from{box-shadow:0 0 15px rgba(255,0,0,.5),0 8px 20px rgba(0,0,0,.6)} to{box-shadow:0 0 40px rgba(255,0,0,1),0 8px 20px rgba(0,0,0,.6)} }
         @keyframes sirenRotate { from{transform:scale(1)} to{transform:scale(1.15)} }
+
+        /* ============================================================
+           SIDE ALERT BANNER (EXACT SAME STYLE AS FOUL CARD BANNER)
+           Used for Substitution & Time Out alerts
+           ============================================================ */
+        .side-banner { position: absolute; bottom: calc(100% - 78px); display: flex; align-items: stretch; height: 54px; opacity: 0; transform: translateY(30px); transition: opacity 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1); filter: drop-shadow(0 10px 14px rgba(0,0,0,0.85)) drop-shadow(0 0 6px rgba(212,175,55,0.75)) drop-shadow(0 0 14px rgba(212,175,55,0.45)); z-index: 25; white-space: nowrap; pointer-events: none; background: #0F1730; overflow: hidden; isolation: isolate; }
+        .side-banner.pos-right { right: 210px; left: auto; flex-direction: row; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); -webkit-clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); }
+        .side-banner.pos-left { left: 210px; right: auto; flex-direction: row-reverse; clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); -webkit-clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); }
+        .side-banner.show { opacity: 1; transform: translateY(0); }
+        .side-banner.hide { opacity: 0; transform: translateY(30px); }
+
+        .card-track { position: relative; width: 340px; overflow: hidden; }
+        .card-row { position: absolute; top: 0; left: 0; right: 0; height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 36px; z-index: 1; }
+        .pos-left .card-row { flex-direction: row-reverse; }
+        .sub-name { font-family: 'Mukta', 'Oswald', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 1px; color: #FFFFFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left; text-transform: uppercase; }
+        .pos-left .sub-name { text-align: right; }
+
+        .sub-badge { background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); border: none; display: flex; align-items: center; justify-content: center; padding: 0 26px; color: #000; font-family: 'Mukta', 'Oswald', sans-serif; font-weight: 900; letter-spacing: 1px; font-size: 17px; text-transform: uppercase; flex-shrink: 0; position: relative; }
+        .sub-badge::before { content: ''; position: absolute; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.75), transparent); }
+        .pos-right .sub-badge::before { left: 0; }
+        .pos-left  .sub-badge::before { right: 0; }
+        .pos-right .sub-badge { clip-path: polygon(17% 0, 100% 0, 92% 100%, 0 100%); padding-left: 32px; padding-right: 32px; }
+        .pos-left  .sub-badge { clip-path: polygon(0 0, 80% 0, 100% 100%, 17% 100%); padding-right: 32px; padding-left: 32px; }
+        .sub-badge-text { position: relative; z-index: 1; }
+        .side-banner.timeout .sub-badge { background: linear-gradient(to bottom, #FFEB3B, #F57F17); color: #000; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); }
+        .side-banner.substitution .sub-badge { background: linear-gradient(to bottom, #FFFFFF, #D0D0D0); color: #000; }
 
         .main-row { display: flex; align-items: flex-start; justify-content: center; z-index: 10; height: 85px; width: 1250px !important; max-width: 1250px !important; margin: 0 auto; position: relative; }
         .team-left-wrap { width: 460px; height: 80px; clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%); padding: 4px; padding-right: 5px; z-index: 1; transition: filter 0.4s ease; }
@@ -213,14 +240,14 @@
         .me-final-score { font-family: 'Teko', sans-serif; font-size: 46px; font-weight: 700; color: #FFD700; text-shadow: 0 0 22px rgba(255,215,0,0.85), 1px 1px 4px rgba(0,0,0,0.9); letter-spacing: 6px; line-height: 1; white-space: nowrap; padding-top: 15px; }
         .me-result-text { font-family: 'Mukta', sans-serif; font-size: 40px; font-weight: 700; color: #FFFFFF; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 6px rgba(0,0,0,0.95); white-space: nowrap; margin-top: -20px; }
 
+        /* 2-COLUMN CENTER INFO BAR (NO EMPTY MIDDLE GAP) */
         .bottom-row { display: flex; align-items: flex-start; justify-content: center; width: 100%; margin-top: -12px; z-index: 0; }
         .dots-left-wrap { width: 310px; height: 38px; clip-path: polygon(0 0, 93% 0, 100% 100%, 7% 100%); padding: 4px; margin-right: 0px; position: relative; overflow: visible; transition: opacity 0.4s ease, transform 0.4s ease; }
         .dots-left-inner { width: 100%; height: 100%; clip-path: polygon(0 0, 94% 0, 100% 100%, 6% 100%); display: flex; align-items: center; justify-content: flex-end; padding-right: 45px; gap: 10px; padding-top: 5px; }
-        .center-info-wrap { width: 500px; height: 45px; clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); padding: 4px; z-index: 4; margin-top: 8px; }
-        .center-info-inner { position: relative; width: 100%; height: 100%; background: linear-gradient(to bottom, #6A1B9A, #1A0033); clip-path: polygon(3px 0px, 99.3% 0px, 95% 100%, 5% 100%); display: flex; align-items: center; justify-content: space-between; padding: 0 55px; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 16px; transition: background 0.4s ease; }
-        .info-box { display: flex; align-items: center; justify-content: center; height: 26px; white-space: nowrap; color: #FFFFFF; }
-        .info-box-left  { justify-self: flex-start; }
-        .info-box-right { justify-self: flex-end; }
+        .center-info-wrap { width: 420px; height: 45px; clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); padding: 4px; z-index: 4; margin-top: 8px; }
+        .center-info-inner { position: relative; width: 100%; height: 100%; background: linear-gradient(to bottom, #6A1B9A, #1A0033); clip-path: polygon(3px 0px, 99.3% 0px, 95% 100%, 5% 100%); display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 0 24px; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 15px; transition: background 0.4s ease; }
+        .info-box { display: flex; align-items: center; justify-content: center; height: 24px; white-space: nowrap; color: #FFFFFF; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
+        .info-box-left { border-right: 2px solid rgba(255, 255, 255, 0.35); }
         .center-info-inner.final-mode { background: linear-gradient(to bottom, #37474F, #212121); }
         .dots-right-wrap { width: 310px; height: 38px; clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%); padding: 4px; margin-left: 0px; position: relative; overflow: visible; transition: opacity 0.4s ease, transform 0.4s ease; }
         .dots-right-inner { width: 100%; height: 100%; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); display: flex; align-items: center; justify-content: flex-start; padding-left: 45px; gap: 10px; padding-top: 5px; }
@@ -236,7 +263,7 @@
         .marquee-content { position: absolute; top: 0; left: 100%; height: 100%; display: inline-flex; align-items: center; white-space: nowrap; font-family: "Segoe UI", system-ui, sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 0.7px; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.95); padding: 0 10px; animation: marqueeScroll 22s linear infinite; }
         .marquee-box.marquee-right .marquee-content { animation-delay: 0.4s; }
         @keyframes marqueeScroll { from{transform:translateX(0)} to{transform:translateX(calc(-100% - 310px))} }
-        .marquee-spacer { width: 500px; height: 1px; flex-shrink: 0; }
+        .marquee-spacer { width: 420px; height: 1px; flex-shrink: 0; }
 
         @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.2);color:#FFD700;text-shadow:0px 0px 20px #FFD700} 100%{transform:scale(1)} }
         .score-pop { animation: pop 0.6s ease-in-out; }
@@ -301,12 +328,7 @@
         @keyframes alloutContainerExit { 0%{transform:scale(1.05);opacity:1} 100%{transform:scale(25);opacity:0} }
 
         /* FULL-SCREEN TEAM STATS OVERLAY */
-        .fs-overlay {
-            position: fixed; inset: 0; z-index: 9990;
-            display: flex; justify-content: center; align-items: center; overflow: hidden;
-            visibility: hidden; opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
+        .fs-overlay { position: fixed; inset: 0; z-index: 9990; display: flex; justify-content: center; align-items: center; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.4s ease, visibility 0.4s ease; }
         .fs-overlay.show { visibility: visible; opacity: 1; pointer-events: auto; }
         .fs-powered-by { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 24px; background: linear-gradient(to bottom, rgba(20,20,40,0.95), rgba(0,0,0,0.9)); border: 2px solid rgb(253, 241, 159); font-family: "Segoe UI", system-ui, sans-serif; font-size: 11px; letter-spacing: 1.2px; font-weight: 600; color: #FFF; box-shadow: 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,215,0,0.15); margin-top: 20px; scale: 1.4; }
         .fs-powered-by .fp-label { color: rgb(185,185,185); font-size: 12px; font-weight: 600; letter-spacing: 1.1px; }
@@ -544,6 +566,18 @@
             <span class="siren-icon">🚨</span>
         </div>
 
+        <!-- SIDE ALERT BANNER (SUBSTITUTION & TIME OUT) -->
+        <div id="alert-side-banner" class="side-banner pos-right">
+            <div class="card-track">
+                <div class="card-row">
+                    <div class="sub-name" id="alert-side-text">TEAM MAKES SUBSTITUTION</div>
+                </div>
+            </div>
+            <div class="sub-badge" id="alert-side-badge">
+                <span class="sub-badge-text" id="alert-side-badge-text">SUBSTITUTION</span>
+            </div>
+        </div>
+
         <div class="top-raid-bars" id="top-raid-bars">
             <div id="raid-track-left" class="raid-track track-left">
                 <div id="raid-bar-left" class="raid-fill"><div class="raid-spark"></div></div>
@@ -609,7 +643,7 @@
                 </div>
             </div>
 
-            <!-- NO MAIN BOTTOM MATCH CLOCK -->
+            <!-- 2-COLUMN INFO BAR -->
             <div class="center-info-wrap gold-bg">
                 <div class="center-info-inner" id="center-info-inner">
                     <div class="info-box info-box-left"><span id="half-status">1st HALF</span></div>
@@ -786,7 +820,6 @@
     <script>
         // ============================================================
         // FIREBASE INIT (kabaddione-basic-db)
-        // Replace with your exact Web App config after registering Web App in Firebase Console
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyBULsBJnsVjmpdLLi4XbbJo8jzSR-CeU_c",
@@ -808,7 +841,7 @@
                     startBroadcastEngine();
                 })
                 .catch((error) => {
-                    window.__kabaddiLog('ERR', 'Auth Failed (trying direct read if public)', error);
+                    window.__kabaddiLog('WARN', 'Auth Failed, attempting direct read', error);
                     startBroadcastEngine();
                 });
         };
@@ -824,7 +857,6 @@
         let currentLeftColor = '#228B22';
         let currentRightColor = '#1976D2';
         let previousRaidActive = null;
-        let lastOverlayScreen = '';
 
         let initialLoadDone = false;
         let prevMetrics = {
@@ -832,7 +864,9 @@
             lRaidPts: 0, rRaidPts: 0,
             lAllOutPts: 0, rAllOutPts: 0,
             lSuperTackles: 0, rSuperTackles: 0,
-            lEmptyTotal: 0, rEmptyTotal: 0
+            lEmptyTotal: 0, rEmptyTotal: 0,
+            lSubs: 0, rSubs: 0,
+            lTimeouts: 0, rTimeouts: 0
         };
 
         let preMatchCycle = {
@@ -843,6 +877,13 @@
             rafId: null
         };
         let marqueeRafId = null;
+
+        const TOSS_TIME_CONFIRM_MS = 1500;
+        let remoteTossActive = false;
+        let remoteTossConfirmed = false;
+        let remoteTossConfirmTimer = null;
+        let remoteTossSavedCycle = null;
+        let lastRemoteTossData = null;
 
         const DEFAULT_TEAM_IMG = '/images/player_profile_starting.png';
         window.pendingLeftScore = undefined;
@@ -859,13 +900,14 @@
         // EVENT AUDIO MANAGER
         // ============================================================
         const eventAudio = {
-            'super-tackle': new Audio('/audio/super-tackle.mp3'),
-            'super-raid':   new Audio('/audio/super-raid.mp3'),
-            'do-or-die':    new Audio('/audio/do-or-die.mp3'),
-            'all-out':      new Audio('/audio/all-out.mp3'),
-            'confetti':     new Audio('/audio/victory.mp3'),
-            'background':   new Audio('/audio/background.mp3'),
-            'toss_coin':    new Audio('/audio/toss_coin.mp3')
+            'super-tackle':   new Audio('/audio/super-tackle.mp3'),
+            'super-raid':     new Audio('/audio/super-raid.mp3'),
+            'do-or-die':      new Audio('/audio/do-or-die.mp3'),
+            'all-out':        new Audio('/audio/all-out.mp3'),
+            'event-slide-in': new Audio('/audio/event-slide-in.mp3'),
+            'confetti':       new Audio('/audio/victory.mp3'),
+            'background':     new Audio('/audio/background.mp3'),
+            'toss_coin':      new Audio('/audio/toss_coin.mp3')
         };
         eventAudio['background'].loop = true;
 
@@ -1032,13 +1074,53 @@
         }
 
         // ============================================================
+        // SIDE ALERT BANNER (SUBSTITUTION & TIME OUT)
+        // ============================================================
+        let alertBannerTimeoutIds = [];
+
+        function triggerSideAlertBanner(type, isLeftTeam, teamName) {
+            playEventSound('event-slide-in');
+            const banner    = document.getElementById('alert-side-banner');
+            const textEl    = document.getElementById('alert-side-text');
+            const badgeText = document.getElementById('alert-side-badge-text');
+            if (!banner || !textEl || !badgeText) return;
+
+            const safeTeam = (teamName || (isLeftTeam ? 'TEAM A' : 'TEAM B')).toUpperCase();
+
+            if (type === 'timeout') {
+                badgeText.innerText = 'TIME OUT';
+                textEl.innerText    = `${safeTeam} TAKES TIME OUT`;
+            } else {
+                badgeText.innerText = 'SUBSTITUTION';
+                textEl.innerText    = `${safeTeam} MAKES SUBSTITUTION`;
+            }
+
+            const teamColor = isLeftTeam ? currentLeftColor : currentRightColor;
+            const darkColor = darkenColor(teamColor, 60);
+            banner.style.background = isLeftTeam
+                ? `linear-gradient(to right, ${darkColor}, ${teamColor})`
+                : `linear-gradient(to left, ${darkColor}, ${teamColor})`;
+
+            alertBannerTimeoutIds.forEach(id => clearTimeout(id));
+            alertBannerTimeoutIds = [];
+
+            banner.className = 'side-banner ' + (isLeftTeam ? 'pos-left' : 'pos-right') + ' ' + type;
+            void banner.offsetWidth;
+            banner.classList.add('show');
+
+            alertBannerTimeoutIds.push(setTimeout(() => { banner.classList.add('hide'); }, 3500));
+            alertBannerTimeoutIds.push(setTimeout(() => { banner.classList.remove('show', 'hide'); }, 4200));
+        }
+
+        // ============================================================
         // RECENT SCORE QUEUE MONITOR
         // ============================================================
         setInterval(() => {
             const isOverlayActive = document.querySelector('.fs-overlay.show') !== null ||
                                     document.querySelector('.mi-overlay.show') !== null ||
                                     document.querySelector('.toss-overlay.show') !== null ||
-                                    matchIntroState.active;
+                                    matchIntroState.active ||
+                                    remoteTossActive;
             if (window.recentScoreQueue.length > 0 && !window.isRecentScoreActive && !epicIsPlaying && !isOverlayActive) {
                 const scoreData = window.recentScoreQueue.shift();
                 playRecentScoreAnimation(scoreData.left, scoreData.right);
@@ -1077,7 +1159,6 @@
                     return;
                 }
 
-                // Normalize BasicScoreboardActivity fields
                 const leftName   = data.left_name  || "TEAM A";
                 const rightName  = data.right_name || "TEAM B";
                 const leftColor  = data.leftColor  || data.left_color  || "#228B22";
@@ -1110,8 +1191,8 @@
                     lastRightColor = rightColor;
                 }
 
-                // Detect Epics & Recent Scores from Basic DB metrics
-                detectBasicEvents(data, leftScore, rightScore);
+                // Detect Epics, Subs, Timeouts & Recent Scores
+                detectBasicEvents(data, leftName, rightName, leftScore, rightScore);
 
                 // Dots, Raid Timer, Do-or-Die, Bonus/Super Tackle Popup
                 renderBasicDots('left-dot',  leftActive,  leftColor,  true);
@@ -1139,6 +1220,7 @@
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
 
                 handleOverlayScreens(data, leftName, rightName, leftColor, rightColor, leftScore, rightScore);
+                handleRemoteToss(data, leftScore, rightScore, raidClockStr);
                 handleMatchIntroScreen(data, leftScore, rightScore, raidClockStr);
 
             }, (error) => {
@@ -1147,9 +1229,9 @@
         }
 
         // ============================================================
-        // BASIC EVENT DETECTOR (ALL OUT, SUPER RAID, SUPER TACKLE, +PTS)
+        // BASIC EVENT DETECTOR (EPICS, SUBS, TIMEOUTS, +POINTS)
         // ============================================================
-        function detectBasicEvents(data, leftScore, rightScore) {
+        function detectBasicEvents(data, leftName, rightName, leftScore, rightScore) {
             const lStats = data.team_stats_left  || {};
             const rStats = data.team_stats_right || {};
 
@@ -1163,7 +1245,11 @@
                 lSuperTackles: parseInt(lStats.superTackles ?? 0, 10) || 0,
                 rSuperTackles: parseInt(rStats.superTackles ?? 0, 10) || 0,
                 lEmptyTotal: parseInt(lStats.emptyRaids ?? lStats.totalEmptyRaids ?? 0, 10) || 0,
-                rEmptyTotal: parseInt(rStats.emptyRaids ?? rStats.totalEmptyRaids ?? 0, 10) || 0
+                rEmptyTotal: parseInt(rStats.emptyRaids ?? rStats.totalEmptyRaids ?? 0, 10) || 0,
+                lSubs: parseInt(data.leftSubs ?? data.left_subs ?? 0, 10) || 0,
+                rSubs: parseInt(data.rightSubs ?? data.right_subs ?? 0, 10) || 0,
+                lTimeouts: parseInt(data.leftTimeouts ?? data.left_timeouts ?? 0, 10) || 0,
+                rTimeouts: parseInt(data.rightTimeouts ?? data.right_timeouts ?? 0, 10) || 0
             };
 
             if (!initialLoadDone) {
@@ -1181,7 +1267,21 @@
                 playEpicAnimation('super_raid');
             }
 
-            // 2. Recent Score Flash
+            // 2. Substitution Alerts
+            if (cur.lSubs > prevMetrics.lSubs) {
+                triggerSideAlertBanner('substitution', true, leftName);
+            } else if (cur.rSubs > prevMetrics.rSubs) {
+                triggerSideAlertBanner('substitution', false, rightName);
+            }
+
+            // 3. Time Out Alerts
+            if (cur.lTimeouts > prevMetrics.lTimeouts) {
+                triggerSideAlertBanner('timeout', true, leftName);
+            } else if (cur.rTimeouts > prevMetrics.rTimeouts) {
+                triggerSideAlertBanner('timeout', false, rightName);
+            }
+
+            // 4. Recent Score Flash
             const lDiff = cur.lScore - prevMetrics.lScore;
             const rDiff = cur.rScore - prevMetrics.rScore;
             let lText = null, rText = null;
@@ -1200,7 +1300,7 @@
         }
 
         // ============================================================
-        // DOTS RENDERER (FROM leftActive / rightActive)
+        // DOTS RENDERER
         // ============================================================
         function renderBasicDots(dotClassName, activeCount, teamColor, isLeft) {
             const dots = document.getElementsByClassName(dotClassName);
@@ -1280,7 +1380,7 @@
         }
 
         // ============================================================
-        // DO-OR-DIE BANNER & NEXT DO-OR-DIE ROTATION (NO RAIDER NAME)
+        // DO-OR-DIE BANNER & NEXT DO-OR-DIE WARNING
         // ============================================================
         function handleDoOrDie(raidClockStr, isLeftRaid, leftEmpty, rightEmpty) {
             const dodLeftBanner  = document.getElementById('dod-left');
@@ -1508,7 +1608,7 @@
         }
 
         // ============================================================
-        // CENTER INFO (NO MAIN MATCH CLOCK) & SCORE POP & MATCH END
+        // 2-COLUMN CENTER INFO, SCORE POP & MATCH END
         // ============================================================
         function applyCenterStatus(data, id) {
             const statusEl  = document.getElementById('half-status');
@@ -1705,15 +1805,15 @@
         // TEAM STATS FULLSCREEN OVERLAY
         // ============================================================
         function handleOverlayScreens(data, leftName, rightName, leftColor, rightColor, ls, rs) {
-            const screen = (data.overlay_screen || data.currentOverlayScreen || '').trim();
+            const screen = String(data.overlay_screen || data.currentOverlayScreen || '').trim().toLowerCase();
+            const statsEl = document.getElementById('team-stats-overlay');
+
             if (screen === 'team_stats') {
                 renderTeamStats(data, leftName, rightName, leftColor, rightColor, ls, rs);
-                document.getElementById('team-stats-overlay').classList.add('show');
-                lastOverlayScreen = screen;
+                statsEl.classList.add('show');
                 updateMainStageVisibility();
             } else {
-                document.getElementById('team-stats-overlay').classList.remove('show');
-                lastOverlayScreen = '';
+                statsEl.classList.remove('show');
                 updateMainStageVisibility();
             }
         }
@@ -1774,9 +1874,9 @@
         }
 
         // ============================================================
-        // MATCH INTRO & TOSS + APP PROMO CYCLE
+        // MATCH INTRO, LOGO FALLBACK & REMOTE TOSS + APP PROMO CYCLE
         // ============================================================
-        let matchIntroState = { active: false, matchStarted: false };
+        let matchIntroState = { active: false, matchStarted: false, suspendedForOverlay: false };
         let promoCycleInterval = null;
         let showingPromo = false;
 
@@ -1788,6 +1888,22 @@
             const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
             const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
             return `${days[d.getDay()]} ${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        // Safe team logo loader: uses uploaded logo if valid, else falls back to player_profile_starting.png
+        function applyTeamLogoSafe(imgId, logoData) {
+            const img = document.getElementById(imgId);
+            if (!img) return;
+            const raw = String(logoData || '').trim();
+            const isValid = raw.startsWith('data:image') || /^https?:\/\//i.test(raw);
+
+            img.onerror = function() {
+                img.onerror = null;
+                if (!img.src.endsWith('player_profile_starting.png')) {
+                    img.src = DEFAULT_TEAM_IMG;
+                }
+            };
+            img.src = isValid ? raw : DEFAULT_TEAM_IMG;
         }
 
         function miRender(data) {
@@ -1805,10 +1921,8 @@
             document.getElementById('mi-left-bar-name').textContent  = leftName.toUpperCase();
             document.getElementById('mi-right-bar-name').textContent = rightName.toUpperCase();
 
-            const leftLogoImg  = document.getElementById('mi-left-logo');
-            const rightLogoImg = document.getElementById('mi-right-logo');
-            leftLogoImg.src  = (data.leftLogo  && String(data.leftLogo).startsWith('data:image'))  ? data.leftLogo  : DEFAULT_TEAM_IMG;
-            rightLogoImg.src = (data.rightLogo && String(data.rightLogo).startsWith('data:image')) ? data.rightLogo : DEFAULT_TEAM_IMG;
+            applyTeamLogoSafe('mi-left-logo',  data.leftLogo);
+            applyTeamLogoSafe('mi-right-logo', data.rightLogo);
 
             const venue = String(data.matchLocation || data.match_location || '').trim();
             const dateFormatted = formatMatchDateFromTimestamp(data.lastUpdated || data.last_updated || Date.now());
@@ -1816,62 +1930,154 @@
             document.getElementById('mi-sub-bar').textContent = segs.join('   •   ');
         }
 
-        function renderTossScreen(data) {
-            const winnerTextEl = document.getElementById('toss-winner-text');
-            const choiceTextEl = document.getElementById('toss-choice-text');
-            const accentLeftEl = document.getElementById('toss-accent-left');
-            const winnerBox    = document.getElementById('toss-winner-box');
-            const subText      = document.getElementById('toss-sub-text');
+        function tossHasData(data) {
+            if (!data) return false;
+            return String(data.toss_winner || '').trim().length > 0 && String(data.toss_choice || '').trim().length > 0;
+        }
 
-            const tossWinner = (data.toss_winner || '').trim().toUpperCase();
-            const tossChoice = (data.toss_choice || '').trim().toUpperCase();
+        function updateTossScreenContent(data, mode) {
+            const winnerBox    = document.getElementById('toss-winner-box');
+            const coinGif      = document.getElementById('toss-coin-gif');
+            const choiceText   = document.getElementById('toss-choice-text');
+            const winnerText   = document.getElementById('toss-winner-text');
+            const accentLeftEl = document.getElementById('toss-accent-left');
+            const subText      = document.getElementById('toss-sub-text');
+            const tossContent  = document.getElementById('toss-main-content');
+            const promoContent = document.getElementById('app-promo-content');
+
+            const hasData = tossHasData(data);
+            const isTossHappening = (!hasData && mode === 'remote-confirmed');
+
             const leftName   = (data.left_name  || 'TEAM A').trim().toUpperCase();
             const rightName  = (data.right_name || 'TEAM B').trim().toUpperCase();
             const leftColor  = data.leftColor  || data.left_color  || '#228B22';
             const rightColor = data.rightColor || data.right_color || '#1976D2';
 
-            if (tossWinner && tossChoice) {
+            if (hasData) {
                 winnerBox.classList.remove('hidden');
+                coinGif.classList.remove('show');
+                const tossWinner = String(data.toss_winner).trim().toUpperCase();
+                const tossChoice = String(data.toss_choice).trim().toUpperCase();
                 const isLeftWin = tossWinner === leftName;
                 const winnerColor = isLeftWin ? leftColor : rightColor;
                 const otherTeam = isLeftWin ? rightName : leftName;
+
                 accentLeftEl.style.background = `linear-gradient(90deg, ${winnerColor} 0%, rgba(255, 255, 255, 0) 78%)`;
-                winnerTextEl.innerText = `TOSS WON BY ${tossWinner}`;
-                choiceTextEl.innerText = (tossChoice === 'COURT' || tossChoice === 'DEFEND')
+                winnerText.innerText = `TOSS WON BY ${tossWinner}`;
+                choiceText.innerText = (tossChoice === 'COURT' || tossChoice === 'DEFEND')
                     ? `${otherTeam} TO RAID FIRST`
                     : `${tossWinner} TO RAID FIRST`;
                 subText.innerText = 'MATCH WILL START SOON...';
+                window._tossCoinPlayed = false;
+            } else if (isTossHappening) {
+                winnerBox.classList.add('hidden');
+                if (!window._tossCoinPlayed) { playEventSound('toss_coin'); window._tossCoinPlayed = true; }
+                if (window.epicGifBlobs.coin && !coinGif.dataset.blobReady) {
+                    const blobUrl = URL.createObjectURL(window.epicGifBlobs.coin);
+                    coinGif.dataset.blobReady = '1';
+                    coinGif.src = blobUrl;
+                }
+                coinGif.classList.add('show');
+                choiceText.innerText = 'TOSS TIME NOW';
+                subText.innerText    = 'TOSS IS HAPPENING RIGHT NOW';
             } else {
                 winnerBox.classList.add('hidden');
-                choiceTextEl.innerText = 'TOSS COMING UP NEXT';
-                subText.innerText = 'TOSS WILL HAPPEN VERY SOON...';
+                coinGif.classList.remove('show');
+                window._tossCoinPlayed = false;
+                choiceText.innerText = 'TOSS COMING UP NEXT';
+                subText.innerText    = 'TOSS WILL HAPPEN VERY SOON...';
             }
 
-            if (!promoCycleInterval) {
-                const tossContent  = document.getElementById('toss-main-content');
-                const promoContent = document.getElementById('app-promo-content');
+            if (isTossHappening) {
+                if (promoCycleInterval) { clearInterval(promoCycleInterval); promoCycleInterval = null; }
+                showingPromo = false;
+                promoContent.style.opacity = '0'; promoContent.style.display = 'none';
+                tossContent.style.display = 'flex';
+                setTimeout(() => tossContent.style.opacity = '1', 50);
+            } else if (!promoCycleInterval) {
                 showingPromo = false;
                 tossContent.style.display = 'flex'; tossContent.style.opacity = '1';
                 promoContent.style.display = 'none'; promoContent.style.opacity = '0';
-
                 promoCycleInterval = setInterval(() => {
                     if (showingPromo) {
                         promoContent.style.opacity = '0';
-                        setTimeout(() => {
-                            promoContent.style.display = 'none';
-                            tossContent.style.display = 'flex';
-                            setTimeout(() => tossContent.style.opacity = '1', 50);
-                        }, 400);
+                        setTimeout(() => { promoContent.style.display = 'none'; tossContent.style.display = 'flex'; setTimeout(() => tossContent.style.opacity = '1', 50); }, 400);
                     } else {
                         tossContent.style.opacity = '0';
-                        setTimeout(() => {
-                            tossContent.style.display = 'none';
-                            promoContent.style.display = 'flex';
-                            setTimeout(() => promoContent.style.opacity = '1', 50);
-                        }, 400);
+                        setTimeout(() => { tossContent.style.display = 'none'; promoContent.style.display = 'flex'; setTimeout(() => promoContent.style.opacity = '1', 50); }, 400);
                     }
                     showingPromo = !showingPromo;
                 }, 10000);
+            }
+        }
+
+        function isBasicMatchNotStarted(data, leftScore, rightScore, raidClockStr) {
+            const matchState = parseInt(data.matchState, 10) || 0;
+            const raidClock  = parseInt(raidClockStr, 10);
+            const raidStarted = !isNaN(raidClock) && raidClock > 0 && raidClock < 30;
+            return (matchState === 0 && leftScore === 0 && rightScore === 0 && !raidStarted);
+        }
+
+        function handleRemoteToss(data, leftScore, rightScore, raidClockStr) {
+            const overlayScreen = String(data.overlay_screen || data.currentOverlayScreen || '').trim().toLowerCase();
+            const isTossScreen  = overlayScreen === 'toss';
+            const tossOverlay   = document.getElementById('toss-result-overlay');
+            const notStarted    = isBasicMatchNotStarted(data, leftScore, rightScore, raidClockStr);
+
+            if (!notStarted) {
+                if (remoteTossActive) {
+                    remoteTossActive = false; remoteTossConfirmed = false; remoteTossSavedCycle = null;
+                    if (remoteTossConfirmTimer) { clearTimeout(remoteTossConfirmTimer); remoteTossConfirmTimer = null; }
+                    if (tossOverlay && tossOverlay.classList.contains('show')) hideTossScreen();
+                }
+                return;
+            }
+
+            if (isTossScreen) {
+                lastRemoteTossData = data;
+                if (!remoteTossActive) {
+                    remoteTossActive = true;
+                    remoteTossConfirmed = false;
+                    remoteTossSavedCycle = { currentState: preMatchCycle.currentState, timeRemaining: preMatchCycle.timeRemaining };
+                    preMatchCycle.active = false;
+                    if (preMatchCycle.rafId) { cancelAnimationFrame(preMatchCycle.rafId); preMatchCycle.rafId = null; }
+                    if (matchIntroState.active) hideMatchIntro();
+                    showTossScreen();
+
+                    if (remoteTossConfirmTimer) clearTimeout(remoteTossConfirmTimer);
+                    remoteTossConfirmTimer = setTimeout(() => {
+                        remoteTossConfirmTimer = null;
+                        remoteTossConfirmed = true;
+                        if (remoteTossActive && lastRemoteTossData) updateTossScreenContent(lastRemoteTossData, 'remote-confirmed');
+                    }, TOSS_TIME_CONFIRM_MS);
+                }
+                updateTossScreenContent(data, remoteTossConfirmed ? 'remote-confirmed' : 'remote-pending');
+                return;
+            }
+
+            if (!remoteTossActive) return;
+            remoteTossActive = false; remoteTossConfirmed = false;
+            if (remoteTossConfirmTimer) { clearTimeout(remoteTossConfirmTimer); remoteTossConfirmTimer = null; }
+
+            if (overlayScreen === 'team_stats') { hideTossScreen(); remoteTossSavedCycle = null; return; }
+
+            updateTossScreenContent(data, 'cycle');
+            if (tossHasData(data)) {
+                showTossScreen();
+                preMatchCycle.active = true; preMatchCycle.currentState = 'toss';
+                preMatchCycle.timeRemaining = 120000; preMatchCycle.lastTickTime = performance.now();
+                preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
+            } else {
+                const saved = remoteTossSavedCycle; remoteTossSavedCycle = null;
+                preMatchCycle.active = true; preMatchCycle.lastTickTime = performance.now();
+                if (saved && saved.currentState === 'toss') {
+                    preMatchCycle.currentState = 'toss'; preMatchCycle.timeRemaining = Math.max(5000, saved.timeRemaining);
+                    showTossScreen();
+                } else {
+                    preMatchCycle.currentState = 'intro'; preMatchCycle.timeRemaining = Math.max(5000, saved ? saved.timeRemaining : 10000);
+                    hideTossScreen(); showMatchIntro(data);
+                }
+                preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
             }
         }
 
@@ -1920,7 +2126,10 @@
             if (!preMatchCycle.lastTickTime) preMatchCycle.lastTickTime = timestamp;
             const delta = timestamp - preMatchCycle.lastTickTime;
             preMatchCycle.lastTickTime = timestamp;
-            preMatchCycle.timeRemaining -= delta;
+
+            if (!matchIntroState.suspendedForOverlay) {
+                preMatchCycle.timeRemaining -= delta;
+            }
 
             if (preMatchCycle.timeRemaining <= 0) {
                 if (preMatchCycle.currentState === 'intro') {
@@ -1946,10 +2155,10 @@
         }
 
         function handleMatchIntroScreen(data, leftScore, rightScore, raidClockStr) {
-            const matchState = parseInt(data.matchState, 10) || 0;
-            const raidClock  = parseInt(raidClockStr, 10);
-            const raidStarted = !isNaN(raidClock) && raidClock > 0 && raidClock < 30;
-            const notStarted = (matchState === 0 && leftScore === 0 && rightScore === 0 && !raidStarted);
+            if (remoteTossActive) return;
+            const overlayScreen = String(data.overlay_screen || data.currentOverlayScreen || '').trim().toLowerCase();
+            const overlayOpen = overlayScreen.length > 0 && overlayScreen !== 'none' && overlayScreen !== 'null';
+            const notStarted = isBasicMatchNotStarted(data, leftScore, rightScore, raidClockStr);
 
             if (!notStarted) {
                 matchIntroState.matchStarted = true;
@@ -1962,7 +2171,14 @@
 
             matchIntroState.matchStarted = false;
             miRender(data);
-            renderTossScreen(data);
+            updateTossScreenContent(data, 'cycle');
+
+            if (overlayOpen) {
+                if (matchIntroState.active) hideMatchIntro();
+                hideTossScreen();
+                matchIntroState.suspendedForOverlay = true;
+                return;
+            }
 
             if (!preMatchCycle.active) {
                 preMatchCycle.active = true;
@@ -1971,6 +2187,12 @@
                 preMatchCycle.lastTickTime = performance.now();
                 preMatchCycle.rafId = requestAnimationFrame(cyclePreMatchLoop);
                 showMatchIntro(data);
+            }
+
+            if (!overlayOpen && matchIntroState.suspendedForOverlay) {
+                matchIntroState.suspendedForOverlay = false;
+                if (preMatchCycle.currentState === 'intro') showMatchIntro(data);
+                else if (preMatchCycle.currentState === 'toss') showTossScreen();
             }
         }
     </script>
