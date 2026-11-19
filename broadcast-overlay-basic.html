@@ -278,7 +278,9 @@
         .epic-overlay.slide-down { animation: epicSlideDown 0.5s cubic-bezier(0.5, 0, 0.7, 1.15) forwards; }
         @keyframes epicSlideDown { from { transform: translateY(0); } to { transform: translateY(105%); } }
 
-        .epic-mat { position: absolute; left: 0; right: 0; bottom: 0; height: 240px; background-size: 100% 100%; background-repeat: no-repeat; background-position: bottom center; background-color: transparent; transform: translateY(100%); z-index: 1; overflow: hidden; will-change: transform; }
+        .epic-mat-img { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; max-height: 100%; object-fit: contain; object-position: bottom center; display: block; transform: translateY(100%); z-index: 1; will-change: transform; }
+        .epic-overlay.visible .epic-mat-img { animation: epicMatUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes epicMatUp { to { transform: translateY(0); } }
         .epic-overlay.animate-raid .epic-mat { background-image: url('images/super-raid-basic.webp'); }
         .epic-overlay.animate-tackle .epic-mat { background-image: url('images/super-tackle-basic.webp'); }
         .epic-overlay.visible .epic-mat { animation: epicMatUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
@@ -637,7 +639,7 @@
 
     <!-- EPIC ANIMATIONS (IMAGE-ONLY LITE) -->
     <div id="epic-overlay" class="epic-overlay">
-        <div class="epic-mat"></div>
+        <img id="epic-mat-img" class="epic-mat-img" src="" alt="">
     </div>
 
     <div id="epic-overlay-allout" class="allout-overlay">
@@ -1751,15 +1753,16 @@
                 }, 3800));
             } else {
                 const overlay = document.getElementById('epic-overlay');
+                const imgEl = document.getElementById('epic-mat-img');
                 overlay.className = 'epic-overlay';
                 void overlay.offsetWidth;
 
                 if (eventType === 'super_raid') {
                     playEventSound('super-raid');
-                    overlay.classList.add('animate-raid');
+                    imgEl.src = 'images/super-raid-basic.webp';
                 } else {
                     playEventSound('super-tackle');
-                    overlay.classList.add('animate-tackle');
+                    imgEl.src = 'images/super-tackle-basic.webp';
                 }
 
                 overlay.classList.add('visible');
@@ -1769,7 +1772,7 @@
                 }, 4000));
 
                 epicAnimationTimeoutIds.push(setTimeout(() => {
-                    overlay.classList.remove('visible', 'slide-down', 'animate-raid', 'animate-tackle');
+                    overlay.classList.remove('visible', 'slide-down');
                     epicIsPlaying = false;
                     flushPendingScores();
                 }, 4500));
