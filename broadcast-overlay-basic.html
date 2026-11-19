@@ -860,6 +860,7 @@
 
         let initialLoadDone = false;
         let prevMetrics = {
+            leftName: '', rightName: '', currentHalf: 1,
             lScore: 0, rScore: 0,
             lRaidPts: 0, rRaidPts: 0,
             lAllOutPts: 0, rAllOutPts: 0,
@@ -1234,8 +1235,12 @@
         function detectBasicEvents(data, leftName, rightName, leftScore, rightScore) {
             const lStats = data.team_stats_left  || {};
             const rStats = data.team_stats_right || {};
+            const currentHalf = parseInt(data.currentHalf ?? 1, 10) || 1;
 
             const cur = {
+                leftName: leftName,
+                rightName: rightName,
+                currentHalf: currentHalf,
                 lScore: leftScore,
                 rScore: rightScore,
                 lRaidPts: parseInt(data.leftRaidPoints  ?? lStats.raidPoints  ?? 0, 10) || 0,
@@ -1255,6 +1260,21 @@
             if (!initialLoadDone) {
                 prevMetrics = cur;
                 initialLoadDone = true;
+                return;
+            }
+
+            // Detect Halftime or Team Side Swap — silently sync baselines, trigger ZERO animations/alerts
+            const isHalfChanged = (cur.currentHalf !== prevMetrics.currentHalf);
+            const isTeamSwapped = (
+                cur.leftName === prevMetrics.rightName &&
+                cur.rightName === prevMetrics.leftName &&
+                cur.leftName !== cur.rightName
+            );
+
+            if (isHalfChanged || isTeamSwapped) {
+                prevMetrics = cur;
+                previousLeftScore = leftScore;
+                previousRightScore = rightScore;
                 return;
             }
 
