@@ -249,6 +249,7 @@
         .info-box { display: flex; align-items: center; justify-content: center; height: 24px; white-space: nowrap; color: #FFFFFF; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
         .info-box-left { border-right: 2px solid rgba(255, 255, 255, 0.35); }
         .center-info-inner.final-mode { background: linear-gradient(to bottom, #37474F, #212121); }
+        .center-info-inner.break-mode { background: linear-gradient(to bottom, #F57F17, #E65100); }
         .dots-right-wrap { width: 310px; height: 38px; clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%); padding: 4px; margin-left: 0px; position: relative; overflow: visible; transition: opacity 0.4s ease, transform 0.4s ease; }
         .dots-right-inner { width: 100%; height: 100%; clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); display: flex; align-items: center; justify-content: flex-start; padding-left: 45px; gap: 10px; padding-top: 5px; }
         .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #D4AF37; background: rgba(255,255,255,0.2); box-shadow: 0px 2px 4px rgba(0,0,0,0.8); transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease; }
@@ -1215,7 +1216,7 @@
 
                 applyCenterStatus(data, id);
 
-                const matchOver = parseInt(data.matchState, 10) === 3
+                const matchOver = parseInt(data.matchState, 10) === 4
                     || (data.half_status || '').toLowerCase().includes('over')
                     || (data.half_status || '').toLowerCase().includes('full time');
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
@@ -1635,14 +1636,19 @@
             const infoInner = document.getElementById('center-info-inner');
             const locEl     = document.getElementById('match-id');
 
-            const matchOver = parseInt(data.matchState, 10) === 3
-                || (data.half_status || '').toLowerCase().includes('over')
-                || (data.half_status || '').toLowerCase().includes('full time');
+            const rawStatus = (data.half_status || '').toLowerCase();
+            const matchState = parseInt(data.matchState, 10) || 0;
+            const matchOver = (matchState === 4) || rawStatus.includes('over') || rawStatus.includes('full time');
+            const isBreak   = (matchState === 2) || rawStatus.includes('break') || rawStatus.includes('half time');
 
-            infoInner.classList.remove('final-mode');
+            infoInner.classList.remove('break-mode', 'final-mode');
+
             if (matchOver) {
                 statusEl.innerText = "FULL TIME";
                 infoInner.classList.add('final-mode');
+            } else if (isBreak) {
+                statusEl.innerText = "HALF TIME BREAK";
+                infoInner.classList.add('break-mode');
             } else {
                 statusEl.innerText = data.half_status || "1st HALF";
             }
