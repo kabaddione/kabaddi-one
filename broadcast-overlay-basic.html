@@ -821,7 +821,7 @@
 
         let initialLoadDone = false;
         let prevMetrics = {
-            leftName: '', rightName: '', currentHalf: 1,
+            leftName: '', rightName: '', currentHalf: 1, matchState: 0,
             lScore: 0, rScore: 0,
             lRaidPts: 0, rRaidPts: 0,
             lAllOutPts: 0, rAllOutPts: 0,
@@ -1195,9 +1195,15 @@
         function detectBasicEvents(data, leftName, rightName, leftScore, rightScore) {
             const lStats = data.team_stats_left  || {};
             const rStats = data.team_stats_right || {};
+
             const currentHalf = parseInt(data.currentHalf ?? 1, 10) || 1;
+            const matchState  = parseInt(data.matchState  ?? 0, 10) || 0;
 
             const cur = {
+                leftName: leftName,
+                rightName: rightName,
+                currentHalf: currentHalf,
+                matchState: matchState,
                 leftName: leftName,
                 rightName: rightName,
                 currentHalf: currentHalf,
@@ -1224,27 +1230,30 @@
             }
 
             // Detect Halftime or Team Side Swap — silently sync baselines, trigger ZERO animations/alerts
-            const isHalfChanged = (cur.currentHalf !== prevMetrics.currentHalf);
-            const isTeamSwapped = (
+            const isHalfChanged     = (cur.currentHalf !== prevMetrics.currentHalf);
+            const isBreakTransition = (cur.matchState === 2 || prevMetrics.matchState === 2);
+            const isStateRewind     = (cur.matchState < prevMetrics.matchState);
+            const isTeamSwapped     = (
                 cur.leftName === prevMetrics.rightName &&
                 cur.rightName === prevMetrics.leftName &&
                 cur.leftName !== cur.rightName
             );
 
-            if (isHalfChanged || isTeamSwapped) {
+            if (isHalfChanged || isBreakTransition || isStateRewind || isTeamSwapped) {
                 prevMetrics = cur;
                 previousLeftScore = leftScore;
                 previousRightScore = rightScore;
                 return;
             }
-
-            // 1. Epic Animations
+            // 1. Epic Animations (Queued in order: Super Raid/Tackle first, then All Out)
+            if ((cur.lRaidPts - prevMetrics.lRaidPts) >= 3 || (cur.rRaidPts - prevMetrics.rRaidPts) >= 3) {
+                enqueueEpicAnimation('super_raid');
+            }
+            if (cur.lSuperTackles > prevMetrics.lSuperTackles || cur.rSuperTackles > prevMetrics.rSuperTackles) {
+                enqueueEpicAnimation('super_tackle');
+            }
             if (cur.lAllOutPts > prevMetrics.lAllOutPts || cur.rAllOutPts > prevMetrics.rAllOutPts) {
-                playEpicAnimation('all_out');
-            } else if (cur.lSuperTackles > prevMetrics.lSuperTackles || cur.rSuperTackles > prevMetrics.rSuperTackles) {
-                playEpicAnimation('super_tackle');
-            } else if ((cur.lRaidPts - prevMetrics.lRaidPts) >= 3 || (cur.rRaidPts - prevMetrics.rRaidPts) >= 3) {
-                playEpicAnimation('super_raid');
+                enqueueEpicAnimation('all_out');
             }
 
             // 2. Substitution Alerts
@@ -1682,6 +1691,26 @@
         // ============================================================
         let epicAnimationTimeoutIds = [];
         let epicIsPlaying = false;
+        let epicQueue = [];
+
+        function enqueueEpicAnimation(eventType) {
+            if (!epicIsPlaying) {
+                playEpicAnimation(eventType);
+            } else if (epicQueue[epicQueue.length - 1] !== eventType) {
+                epicQueue.push(eventType);
+            }
+        }
+
+        function finishCurrentEpic() {
+            if (epicQueue.length > 0) {
+                const nextEvent = epicQueue.shift();
+                playEpicAnimation(nextEvent);
+                return;
+            }
+            epicIsPlaying = false;
+            document.body.classList.remove('epic-active');
+            flushPendingScores();
+        }
 
         function createEpicParticles(container) {
             if (!container) return;
@@ -1747,10 +1776,12 @@
 
                 epicAnimationTimeoutIds.push(setTimeout(() => {
                     overlay.classList.remove('visible', 'exit');
-                    epicIsPlaying = false;
-                    flushPendingScores();
+                    finishCurrentEpic();
                 }, 3800));
             } else {
+                // Hide main scoreboard with the exact same slide-down/fade transition as Team Intro
+                document.body.classList.add('epic-active');
+
                 const overlay = document.getElementById('epic-overlay');
                 const imgEl = document.getElementById('epic-mat-img');
                 overlay.className = 'epic-overlay';
@@ -1769,12 +1800,10 @@
 
                 epicAnimationTimeoutIds.push(setTimeout(() => {
                     overlay.classList.remove('visible', 'slide-down');
-                    epicIsPlaying = false;
-                    flushPendingScores();
+                    finishCurrentEpic();
                 }, 4500));
             }
         }
-
         // ============================================================
         // TEAM STATS FULLSCREEN OVERLAY
         // ============================================================
