@@ -255,22 +255,259 @@
             .-btn { font-size: 18px; padding: 14px 16px; }
         }
 
-        /* ============ PRO PACKAGE SECTION (new) ============ */
-        .pro-package .premium-white-box { padding-top: 30px; }
-        .pro-package .giveaway-badge-img { top: -91px; width: 260px; }
-        .pro-headline { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 2.2rem); font-weight: 900; color: var(--app-dark-purple); line-height: 1.2; margin-bottom: 8px; margin-top: 30px; }
-        .pro-subheadline { font-size: 1.2rem; font-weight: 600; color: var(--app-dark-purple); margin-bottom: 20px; }
-        .pro-features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px; margin: 24px 0 30px; text-align: left; }
-        .pro-feature-item { display: flex; align-items: center; gap: 12px; font-size: 1rem; font-weight: 600; color: var(--app-dark-purple); padding: 6px 0; }
-        .pro-feature-item img { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; }
-        .pro-package .hero-graphics { display: none; }
-        .pro-package .timer-grid { display: none; }
+        /* ============ PRO PACKAGE SECTION (3D CONCAVE CAROUSEL) ============ */
+        .pro-package {
+            padding: 90px 0 80px;
+            background: radial-gradient(circle at 50% 20%, rgba(202, 150, 47, 0.10) 0%, rgba(10, 10, 26, 0) 65%);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            text-align: center;
+        }
 
+        .pro-package .section-header {
+            margin-bottom: 28px;
+            padding: 0 24px;
+        }
+
+        .pro-cta-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
+            padding: 0 24px;
+        }
+
+        .pro-buy-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(90deg, #CA962F, #F9D55F);
+            color: #3A1F04;
+            border: 2px solid rgba(249, 213, 95, 0.8);
+            border-radius: 50px;
+            padding: 14px 32px;
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 800;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            box-shadow: 0 8px 28px rgba(202, 150, 47, 0.35);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+        }
+
+        .pro-buy-pill:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 36px rgba(249, 213, 95, 0.5);
+        }
+
+        .pro-drag-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* 3D Carousel Stage */
+        .pro-carousel-wrapper {
+            position: relative;
+            width: 100%;
+            height: 410px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1100px;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: pan-y;
+            /* Soft fade on left & right screen edges */
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+        }
+
+        .pro-carousel-wrapper:active {
+            cursor: grabbing;
+        }
+
+        .pro-carousel-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pro-carousel-ring {
+            position: relative;
+            width: 240px;
+            height: 310px;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* Individual Pro Feature Card */
+        .pro-carousel-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 310px;
+            border-radius: 22px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: left;
+            background: linear-gradient(160deg, #1b1d36 0%, #101124 100%);
+            border: 1px solid rgba(249, 213, 95, 0.22);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pro-carousel-card:hover {
+            border-color: rgba(249, 213, 95, 0.65);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.75), 0 0 24px rgba(249, 213, 95, 0.2);
+        }
+
+        /* Distinct subtle card accents like Groww's cards */
+        .pro-carousel-card.card-new {
+            background: linear-gradient(155deg, #102a30 0%, #0d1428 60%, #1a1030 100%);
+            border-color: rgba(0, 255, 255, 0.35);
+        }
+        .pro-carousel-card.card-gold {
+            background: linear-gradient(155deg, #2b2112 0%, #141225 65%, #0e0e1f 100%);
+            border-color: rgba(249, 213, 95, 0.32);
+        }
+        .pro-carousel-card.card-purple {
+            background: linear-gradient(155deg, #271338 0%, #131126 65%, #0e0e1f 100%);
+            border-color: rgba(180, 120, 255, 0.3);
+        }
+
+        .pro-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .pro-card-title {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.25;
+            letter-spacing: -0.3px;
+        }
+
+        .pro-new-badge {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: var(--neon-gradient);
+            color: #240030;
+            box-shadow: 0 0 14px rgba(57, 255, 20, 0.45);
+        }
+
+        .pro-card-visual {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 14px 0;
+        }
+
+        .pro-card-icon-wrap {
+            width: 84px;
+            height: 84px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        .pro-card-icon-wrap img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+        }
+
+        .pro-card-icon-wrap i {
+            font-size: 2.2rem;
+            background: var(--neon-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pro-card-desc {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin: 0;
+        }
+
+        /* Tablet Responsiveness */
+        @media (max-width: 1024px) {
+            .pro-carousel-wrapper {
+                height: 370px;
+                perspective: 950px;
+            }
+            .pro-carousel-ring,
+            .pro-carousel-card {
+                width: 215px;
+                height: 285px;
+            }
+            .pro-card-title { font-size: 1.12rem; }
+            .pro-card-icon-wrap { width: 72px; height: 72px; }
+            .pro-card-icon-wrap img { width: 44px; height: 44px; }
+        }
+
+        /* Mobile Responsiveness */
         @media (max-width: 600px) {
-            .pro-features-grid { grid-template-columns: 1fr; gap: 6px; }
-            .pro-package .giveaway-badge-img { width: 180px; top: -62px; }
-            .pro-headline { font-size: 1.6rem; }
-            .pro-subheadline { font-size: 1rem; }
+            .pro-package {
+                padding: 60px 0 50px;
+            }
+            .pro-carousel-wrapper {
+                height: 330px;
+                perspective: 800px;
+                -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+                mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+            }
+            .pro-carousel-ring,
+            .pro-carousel-card {
+                width: 195px;
+                height: 265px;
+                padding: 18px 16px;
+                border-radius: 18px;
+            }
+            .pro-card-title { font-size: 1.02rem; }
+            .pro-card-desc { font-size: 0.78rem; }
+            .pro-card-icon-wrap { width: 64px; height: 64px; border-radius: 16px; }
+            .pro-card-icon-wrap img { width: 38px; height: 38px; }
+            .pro-card-icon-wrap i { font-size: 1.75rem; }
+            .pro-buy-pill {
+                font-size: 0.92rem;
+                padding: 12px 24px;
+                width: 100%;
+                max-width: 320px;
+            }
         }
 
         /* ============ FEATURES GRID ============ */
@@ -1483,62 +1720,202 @@
     </section>
 
     <!-- ============ PRO PACKAGE SECTION ============ -->
-    <section class="giveaway-hero pro-package" id="pro" aria-labelledby="pro-heading">
+    <!-- ============ PRO PACKAGE SECTION (3D CONCAVE CAROUSEL) ============ -->
+    <section class="pro-package" id="pro" aria-labelledby="pro-heading">
         <div class="container">
-            <div class="section-header reveal" style="margin-bottom: 120px;">
-                <span class="section-tag" style="color: #CA962F;">Kabaddione pro</span>
-                <h2 id="languages-heading">Subscribe <span class="highlight3">KabaddiOne Pro</span></h2>
-                <p>Kabaddi One Pro includes these 9 special premium features to manage the match and provide an authentic match-like experience.</p>
+            <div class="section-header reveal">
+                <span class="section-tag" style="color: #CA962F;">KabaddiOne Pro</span>
+                <h2 id="pro-heading">Subscribe <span class="highlight3">KabaddiOne Pro</span></h2>
+                <p>Unlock 13 powerful pro features designed for tournaments, live broadcasting, and pro-level match management.</p>
             </div>
-            <div class="premium-white-box reveal">
-                <img src="images/pro_badge_header.png" alt="KabaddiOne Pro" class="giveaway-badge-img no-shadow" id="proBadgeImg">
 
-                <div class="pro-headline">Upgrade To Pro. Unlock Amazing Features.</div>
-
-                <div style="font-weight:700; font-size:1.1rem; color:var(--app-dark-purple); margin-bottom:4px;">Pro Subscription Includes.</div>
-
-                <div class="pro-features-grid">
-                    <div class="pro-feature-item">
-                        <img src="images/player_profile.png" alt="Player Name and Profile">
-                        Player Name and Profile
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/jersey_number.png" alt="Jersey Number">
-                        Jersey Number
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/raider_name.png" alt="Raider Highlighter">
-                        Raider Name Highlighter
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/ad_remove.png" alt="No Ads">
-                        Permanent Ads Removal
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/log.png" alt="Match Logs">
-                        Detailed Match Timeline Logs
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/starting_7.png" alt="Starting 7">
-                        Starting 7 Setup
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/player_performance2.png" alt="Performance Tracker">
-                        Player's Performance Tracker
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/player_subs.png" alt="Live Substitution">
-                        Live Substitution
-                    </div>
-                    <div class="pro-feature-item">
-                        <img src="images/foul_cards.png" alt="Foul Cards">
-                        Foul Cards Use
-                    </div>
-                </div>
-
-                <a href="#" class="join-btn" id="buyNowBtn" style="background: linear-gradient(to right, #CA962F, #F9D55F); border: 2px solid #79490F;">
-                    <i class="fa-solid fa-cart-shopping" style="margin-right:8px; color: #79490F;"></i><span style="color: #79490F;"> Lifetime: <span id="proPriceDisplay">₹599</span> – Buy Now</span>
+            <div class="pro-cta-wrapper reveal">
+                <a href="https://play.google.com/store/apps/details?id=com.kabaddione.scoreboard" class="pro-buy-pill" id="buyNowBtn">
+                    <i class="fa-solid fa-crown"></i>
+                    <span>Lifetime: <span id="proPriceDisplay">₹599</span> – Buy Now</span>
                 </a>
+                <span class="pro-drag-hint"><i class="fa-solid fa-arrows-left-right"></i> Drag or swipe to explore all Pro features</span>
+            </div>
+        </div>
+
+        <div class="pro-carousel-wrapper" id="proCarouselWrapper" aria-label="KabaddiOne Pro Features Carousel">
+            <div class="pro-carousel-stage">
+                <div class="pro-carousel-ring" id="proCarouselRing">
+
+                    <!-- 1. NEW: Live Match Score -->
+                    <div class="pro-carousel-card card-new">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Live Match Score</div>
+                            <span class="pro-new-badge">NEW</span>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <i class="fa-solid fa-tower-broadcast"></i>
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Share live real-time match score links so fans can follow every raid online.</p>
+                    </div>
+
+                    <!-- 2. NEW: Live OBS Advance Overlay -->
+                    <div class="pro-carousel-card card-new">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Live OBS Advance Overlay</div>
+                            <span class="pro-new-badge">NEW</span>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <i class="fa-solid fa-tv"></i>
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Broadcast-grade live score overlays built for OBS, YouTube & tournament streams.</p>
+                    </div>
+
+                    <!-- 3. NEW: Tournament Management -->
+                    <div class="pro-carousel-card card-new">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Tournament Management</div>
+                            <span class="pro-new-badge">NEW</span>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Organise teams, schedules, points tables, and knockout rounds effortlessly.</p>
+                    </div>
+
+                    <!-- 4. NEW: Save Match to Cloud -->
+                    <div class="pro-carousel-card card-new">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Save Match to Cloud</div>
+                            <span class="pro-new-badge">NEW</span>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Auto-backup match history, lineups, and stats securely to the cloud.</p>
+                    </div>
+
+                    <!-- 5. Existing: Player Name and Profile -->
+                    <div class="pro-carousel-card card-gold">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Player Name & Profile</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/player_profile.png" alt="Player Name and Profile">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Create custom player profiles with names and photos for both squads.</p>
+                    </div>
+
+                    <!-- 6. Existing: Jersey Number -->
+                    <div class="pro-carousel-card card-purple">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Jersey Number</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/jersey_number.png" alt="Jersey Number">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Assign official jersey numbers to identify raiders and defenders instantly.</p>
+                    </div>
+
+                    <!-- 7. Existing: Raider Name Highlighter -->
+                    <div class="pro-carousel-card card-gold">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Raider Name Highlighter</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/raider_name.png" alt="Raider Highlighter">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Spotlight the active raider live on the scoreboard during every raid.</p>
+                    </div>
+
+                    <!-- 8. Existing: Permanent Ads Removal -->
+                    <div class="pro-carousel-card card-purple">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Permanent Ads Removal</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/ad_remove.png" alt="No Ads">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Enjoy a 100% distraction-free, ad-free scoring experience forever.</p>
+                    </div>
+
+                    <!-- 9. Existing: Detailed Match Timeline Logs -->
+                    <div class="pro-carousel-card card-gold">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Detailed Match Timeline Logs</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/log.png" alt="Match Logs">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Review raid-by-raid timestamps, points, tackles, and key turning points.</p>
+                    </div>
+
+                    <!-- 10. Existing: Starting 7 Setup -->
+                    <div class="pro-carousel-card card-purple">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Starting 7 Setup</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/starting_7.png" alt="Starting 7">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Configure each team's Starting 7 lineup before the opening whistle.</p>
+                    </div>
+
+                    <!-- 11. Existing: Player's Performance Tracker -->
+                    <div class="pro-carousel-card card-gold">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Player's Performance Tracker</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/player_performance2.png" alt="Performance Tracker">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Track individual raid points, tackle points, and Super 10 / High 5 stats.</p>
+                    </div>
+
+                    <!-- 12. Existing: Live Substitution -->
+                    <div class="pro-carousel-card card-purple">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Live Substitution</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/player_subs.png" alt="Live Substitution">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Swap players on and off the mat in real time without pausing the flow.</p>
+                    </div>
+
+                    <!-- 13. Existing: Foul Cards Use -->
+                    <div class="pro-carousel-card card-gold">
+                        <div class="pro-card-top">
+                            <div class="pro-card-title">Foul Cards Use</div>
+                        </div>
+                        <div class="pro-card-visual">
+                            <div class="pro-card-icon-wrap">
+                                <img src="images/foul_cards.png" alt="Foul Cards">
+                            </div>
+                        </div>
+                        <p class="pro-card-desc">Issue and log Green, Yellow, and Red disciplinary cards seamlessly.</p>
+                    </div>
+
+                </div>
             </div>
         </div>
     </section>
@@ -2063,6 +2440,118 @@
 
         console.log('%c🎁 Giveaway banner & Pro section loaded.',
             'color:#39FF14;font-weight:bold;');
+    </script>
+
+    <!-- ============ 3D CONCAVE PRO CAROUSEL SCRIPT ============ -->
+    <script>
+    (function () {
+        'use strict';
+
+        const wrapper = document.getElementById('proCarouselWrapper');
+        const ring    = document.getElementById('proCarouselRing');
+        if (!wrapper || !ring) return;
+
+        const cards = Array.from(ring.querySelectorAll('.pro-carousel-card'));
+        const total = cards.length;
+        const stepAngle = 360 / total;
+
+        let radius = 640;
+        let currentAngle = 0;
+        let autoSpeed = 0.14; // degrees per frame (higher = faster)
+        let isHovered = false;
+        let isDragging = false;
+        let startX = 0;
+        let lastX = 0;
+        let dragVelocity = 0;
+
+        // Calculate responsive concave radius so cards keep a clean gap on every screen
+        function layoutCarousel() {
+            const cardWidth = cards[0].offsetWidth || 240;
+            const gap = window.innerWidth <= 600 ? 22 : (window.innerWidth <= 1024 ? 28 : 36);
+            // Exact polygon radius formula: R = (cardWidth + gap) / (2 * tan(PI / total))
+            radius = Math.round((cardWidth + gap) / (2 * Math.tan(Math.PI / total)));
+
+            cards.forEach((card, i) => {
+                const angle = i * stepAngle;
+                card.style.transform = `rotateY(${angle}deg) translateZ(-${radius}px)`;
+            });
+        }
+
+        // Smoothly hide cards on the far back side of the cylinder so they never clip in front
+        function updateCardVisibility() {
+            cards.forEach((card, i) => {
+                let rel = ((i * stepAngle + currentAngle) % 360 + 360) % 360;
+                if (rel > 180) rel -= 360; // range: -180 to +180
+                const absRel = Math.abs(rel);
+
+                if (absRel > 88) {
+                    card.style.opacity = '0';
+                    card.style.pointerEvents = 'none';
+                } else if (absRel > 70) {
+                    const fade = 1 - (absRel - 70) / 18;
+                    card.style.opacity = fade.toFixed(2);
+                    card.style.pointerEvents = 'auto';
+                } else {
+                    card.style.opacity = '1';
+                    card.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
+        function animate() {
+            if (!isDragging) {
+                if (Math.abs(dragVelocity) > 0.02) {
+                    currentAngle += dragVelocity;
+                    dragVelocity *= 0.94; // smooth inertia decay
+                } else if (!isHovered) {
+                    currentAngle -= autoSpeed;
+                }
+            }
+
+            // Keep ring centred in the concave perspective
+            ring.style.transform = `translateZ(${radius * 0.25}px) rotateY(${currentAngle}deg)`;
+            updateCardVisibility();
+            requestAnimationFrame(animate);
+        }
+
+        // Mouse & Touch Drag Support
+        function onPointerDown(clientX) {
+            isDragging = true;
+            startX = clientX;
+            lastX = clientX;
+            dragVelocity = 0;
+        }
+
+        function onPointerMove(clientX) {
+            if (!isDragging) return;
+            const deltaX = clientX - lastX;
+            lastX = clientX;
+            // Inverted direction feels natural inside a concave cylinder
+            const deltaAngle = -deltaX * 0.22;
+            currentAngle += deltaAngle;
+            dragVelocity = deltaAngle;
+        }
+
+        function onPointerUp() {
+            isDragging = false;
+        }
+
+        wrapper.addEventListener('mouseenter', () => { isHovered = true; });
+        wrapper.addEventListener('mouseleave', () => { isHovered = false; isDragging = false; });
+
+        wrapper.addEventListener('mousedown', (e) => onPointerDown(e.clientX));
+        window.addEventListener('mousemove', (e) => onPointerMove(e.clientX));
+        window.addEventListener('mouseup', onPointerUp);
+
+        wrapper.addEventListener('touchstart', (e) => onPointerDown(e.touches[0].clientX), { passive: true });
+        wrapper.addEventListener('touchmove', (e) => onPointerMove(e.touches[0].clientX), { passive: true });
+        wrapper.addEventListener('touchend', onPointerUp, { passive: true });
+
+        window.addEventListener('resize', layoutCarousel);
+
+        layoutCarousel();
+        requestAnimationFrame(animate);
+    })();
     </script>
 
     <!-- ============ ⚡ LIVE MATCHES WIDGET ============ -->
