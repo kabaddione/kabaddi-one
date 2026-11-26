@@ -1587,6 +1587,11 @@
         let seenLogKeys = new Set();
         let initialLoadDone = false;
 
+        window.currentPlayerPhotos = {};
+        let lastPhotosSig = '';
+        let cachedStateJsonStr = null;
+        let cachedParsedState = null;
+
         let preMatchCycle = {
             active: false,
             currentState: 'none',
@@ -2385,9 +2390,20 @@ function syncRaidAudio(clock) {
                 .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
         }
+        function getPlayerPhotoUri(player) {
+            if (!player) return '';
+            const direct = String(player.imageUri || '').trim();
+            if (direct.length > 0) return direct;
+            if (player.id && window.currentPlayerPhotos && window.currentPlayerPhotos[player.id]) {
+                return String(window.currentPlayerPhotos[player.id]).trim();
+            }
+            return '';
+        }
+
         function resolvePlayerImage(player) {
-            if (player && player.imageUri && String(player.imageUri).startsWith('data:image')) {
-                return player.imageUri;
+            const uri = getPlayerPhotoUri(player);
+            if (uri && (uri.startsWith('data:image') || /^https?:\/\//i.test(uri))) {
+                return uri;
             }
             return DEFAULT_PLAYER_IMG;
         }
@@ -2497,7 +2513,7 @@ function syncRaidAudio(clock) {
                     const timeStr = log.timeStr || '';
                     const is2nd = timeStr.toLowerCase().includes('2nd') || timeStr.toLowerCase().includes('second');
                     const mMatch = timeStr.match(/(\d+)\s*'/);
-                    const minInHalf = mMatch ? parseInt(mMAtch[1]) : 0;
+                    const minInHalf = mMatch ? parseInt(mMatch[1]) : 0;
                     const logAbsMinute = is2nd ? (halfMins + minInHalf) : minInHalf;
                     if (logAbsMinute > targetMin) break;
                     if (log.scoreStr) {
@@ -3037,35 +3053,42 @@ function syncRaidAudio(clock) {
                 currentLeftColor  = leftColor;
                 currentRightColor = rightColor;
 
-                let state = null;
+                // 1. Capture separated player photos & detect if any photo changed
+                window.currentPlayerPhotos = data.player_photos || {};
+                const currentPhotosSig = Object.keys(window.currentPlayerPhotos)
+                    .sort()
+                    .map(k => k + ':' + String(window.currentPlayerPhotos[k] || '').length)
+                    .join('|');
+                const photosChanged = (currentPhotosSig !== lastPhotosSig);
+                lastPhotosSig = currentPhotosSig;
+
+                // 2. Parse state_json ONLY when it actually changes (skips JSON.parse on clock-only ticks)
+                let state = cachedParsedState;
                 if (data.state_json) {
-                    try {
-                        state = JSON.parse(data.state_json);
+                    if (data.state_json !== cachedStateJsonStr) {
+                        try {
+                            cachedParsedState = JSON.parse(data.state_json);
+                            cachedStateJsonStr = data.state_json;
+                            state = cachedParsedState;
+                        } catch (e) {
+                            window.__kabaddiLog('WARN', 'State JSON parse error', e);
+                        }
+                    }
 
-                        
+                    if (state) {
+                        window.latestMatchState = state;
+                        window.latestMatchData = data;
 
-                        // Keep global track of state for the background celebration monitor
-                window.latestMatchState = state;
-                window.latestMatchData = data;
-                        // Check for Super 10 / High Five
                         checkCelebrations(state, data);
-                        
-                        renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
-
                         renderDots('left-dot',  state.leftOutIds,  state.leftRosterJson,  leftColor);
                         renderDots('right-dot', state.rightOutIds, state.rightRosterJson, rightColor);
                         handleRaidTimers(state, data.raid_clock, leftColor, rightColor);
                         handleDoOrDie(state, data.raid_clock);
                         handleRaiderNameRotation(state, data, leftColor, rightColor);
-
                         updateRaidEventPopup(state, data);
-
                         handleEventTimeline(state);
-                    } catch (e) {
-                        window.__kabaddiLog('WARN', 'State JSON parse error', e);
                     }
                 }
-
                 const leftName  = data.left_name  || "TEAM A";
                 const rightName = data.right_name || "TEAM B";
 
@@ -3108,7 +3131,7 @@ function syncRaidAudio(clock) {
                     || (data.half_status || '').toLowerCase().includes('full time');
                 applyMatchEndBanner(matchOver, leftName, rightName, leftScore, rightScore, leftColor, rightColor);
 
-                handleOverlayScreens(data, state, leftColor, rightColor);
+                handleOverlayScreens(data, state, leftColor, rightColor, photosChanged);
                 handleRemoteToss(data);
                 handleMatchIntroScreen(data, state);
 
@@ -4169,7 +4192,7 @@ function syncRaidAudio(clock) {
         // ==========================================
         // REMOTE-CONTROLLED OVERLAY SCREENS
         // ==========================================
-        function handleOverlayScreens(data, state, leftColor, rightColor) {
+        function handleOverlayScreens(data, state, leftColor, rightColor, photosChanged = false) {
             const screen = (data.overlay_screen || '').trim();
             const team   = (data.overlay_screen_team || '').trim();
             const playerId = (data.overlay_screen_player_id || '').trim();
@@ -4191,7 +4214,7 @@ function syncRaidAudio(clock) {
                 const actualName = isLeft ? (data.left_name || 'TEAM A') : (data.right_name || 'TEAM B');
                 const actualColor = isLeft ? (data.left_color || '#009900') : (data.right_color || '#0055ff');
                 const rosterJson = state ? state[actualKey + 'RosterJson'] : null;
-                if (screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
+                if (photosChanged || screen !== lastOverlayScreen || team !== lastOverlayTeam || !document.getElementById('starting7-overlay').classList.contains('show')) {
                     renderStarting7(actualName, actualColor, rosterJson);
                     showFsOverlay('starting7-overlay');
                     lastOverlayScreen = screen;
@@ -4490,17 +4513,12 @@ function syncRaidAudio(clock) {
             const pool = starters.length ? starters : roster.filter(Boolean);
             if (!pool.length) return null;
 
-            const withImage = pool.find(p => p && p.imageUri && String(p.imageUri).trim().length > 0);
+            const withImage = pool.find(p => getPlayerPhotoUri(p).length > 0);
             return withImage || pool[0];
         }
 
         function miResolveImage(player) {
-            if (player && player.imageUri) {
-                const s = String(player.imageUri).trim();
-                if (s.startsWith('data:image')) return s;
-                if (/^https?:\/\//i.test(s)) return s;
-            }
-            return DEFAULT_PLAYER_IMG;
+            return resolvePlayerImage(player);
         }
 
         function miApplyTeamLogo(imgId, rosterJsonStr) {
@@ -4510,6 +4528,9 @@ function syncRaidAudio(clock) {
             const player = miPickTeamLogoPlayer(rosterJsonStr);
             const src = miResolveImage(player);
 
+            if (img.dataset.lastSrc === src) return;
+            img.dataset.lastSrc = src;
+
             img.onerror = function () {
                 img.onerror = null;
                 if (img.getAttribute('src') !== DEFAULT_PLAYER_IMG) img.src = DEFAULT_PLAYER_IMG;
@@ -4518,6 +4539,7 @@ function syncRaidAudio(clock) {
             img.alt = (player && player.name) ? String(player.name) : 'Team logo';
         }
 
+        
         function formatMatchDate(dateStr) {
             if (!dateStr) return '';
             let d;
