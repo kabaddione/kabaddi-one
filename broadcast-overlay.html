@@ -1543,7 +1543,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const urlParams = new URLSearchParams(window.location.search);
-        const matchId = urlParams.get('match');
+        const matchId = (urlParams.get('match') || '').trim();
 
         window.__kabaddiLog('INFO', 'URL matchId =', matchId);
 
@@ -2828,8 +2828,8 @@ function syncRaidAudio(clock) {
         // ==========================================
         function startBroadcastEngine() {
             const urlParams = new URLSearchParams(window.location.search);
-            const matchId = urlParams.get('match');
-            const matchCode = urlParams.get('code');
+            const matchId = (urlParams.get('match') || '').trim();
+            const matchCode = (urlParams.get('code') || '').trim();
 
             if (!matchId || !matchCode) {
                 window.top.location.href = "https://kabaddione.com/matches.html";
@@ -3042,7 +3042,11 @@ function syncRaidAudio(clock) {
                     return;
                 }
 
-                if (data.security_code && String(data.security_code).trim() !== matchCode.trim()) {
+                const dbCode = String(data.security_code || data.securityCode || '').trim().toUpperCase();
+                const urlCode = String(matchCode || '').trim().toUpperCase();
+                const hashRecoveredCode = (String(matchCode || '') + String(window.location.hash || '')).trim().toUpperCase();
+
+                if (dbCode && dbCode !== urlCode && dbCode !== hashRecoveredCode) {
                     window.top.location.href = "https://kabaddione.com/matches.html";
                     return;
                 }
