@@ -318,13 +318,18 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
     }
 
     /* Compact Search Bar (preserves existing search functionality) */
+    /* Compact Search Bar — paired cleanly between Live Matches & Filter Pills */
     .news-search-strip {
         position: relative;
         z-index: 1;
-        padding: 8px 24px 4px;
+        padding: 12px 24px 4px;
+    }
+    .news-search-strip .container {
+        max-width: var(--max-width);
+        margin: 0 auto;
     }
     .news-search-strip .search-wrap {
-        max-width: 600px;
+        max-width: 620px;
         margin: 0 auto;
         position: relative;
     }
@@ -335,10 +340,11 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         transform: translateY(-50%);
         color: var(--text-muted);
         font-size: 0.95rem;
+        pointer-events: none;
     }
     .search-wrap input {
         width: 100%;
-        padding: 13px 20px 13px 48px;
+        padding: 14px 20px 14px 48px;
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
         border-radius: 50px;
@@ -347,10 +353,12 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         outline: none;
         transition: var(--transition-fast);
         font-family: inherit;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     .search-wrap input:focus {
         border-color: var(--neon-cyan);
-        box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+        box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.12);
     }
 
     /* Responsive Breakpoints */
@@ -386,7 +394,7 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         .hero-dots { bottom: 16px; gap: 7px; padding: 6px 12px; }
         .hero-dot { width: 8px; height: 8px; }
         .hero-dot.active { width: 22px; }
-        .news-search-strip { padding: 6px 16px 0; }
+        .news-search-strip { padding: 8px 16px 2px; }
     }
 
 
@@ -624,7 +632,7 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
 
     
 
-    .filter-bar{display:flex;gap:10px;overflow-x:auto;padding:20px 0;position:relative;z-index:1}
+    .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 14px 0 20px; position: relative; z-index: 1; }
     .filter-bar::-webkit-scrollbar{display:none}
     .filter-bar-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;gap:10px;width:100%}
     .filter-pill{flex-shrink:0;padding:10px 20px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-secondary);font-weight:600;font-size:0.85rem;cursor:pointer;transition:var(--transition-fast);font-family:inherit;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
@@ -778,14 +786,6 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
 </section>
 {% endif %}
 
-<!-- COMPACT SEARCH BAR (keeps existing search working) -->
-<div class="news-search-strip">
-    <div class="search-wrap">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search articles, tutorials, teams...">
-    </div>
-</div>
-
 
 <!-- ⚡ LIVE MATCHES (auto-shows only when matches are ongoing) -->
 <section class="live-now-section" id="liveMatchesSection" aria-live="polite">
@@ -801,6 +801,14 @@ description: Latest kabaddi news, Pro Kabaddi coverage, tutorials, live scores, 
         <div class="scroll-row" id="liveMatchesRow"></div>
     </div>
 </section>
+
+<!-- COMPACT SEARCH BAR (keeps existing search working) -->
+<div class="news-search-strip">
+    <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search articles, tutorials, teams...">
+    </div>
+</div>
 
 <!-- FILTER PILLS -->
 <div class="filter-bar">
