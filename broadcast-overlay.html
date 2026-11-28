@@ -104,6 +104,7 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <meta name="description" content="KabaddiOne Professional Broadcast Overlay — real-time live kabaddi scoreboard for OBS streaming. Features raid timers, bonus & super tackle alerts, player performance graphics, team stats, substitution banners, and full match analytics.">
@@ -427,60 +428,614 @@
         .pos-right-corner{ top: 220px;  left: 5%;  }
         .pos-left-corner { top: 220px;  left: 95%; }
 
-        #team-stats-overlay { background: #000; }
-        #team-stats-overlay .ts-bg { position: absolute; inset: 0; background: url('/images/kabaddione_bg.jpg') center/cover no-repeat; z-index: 1; }
-        #team-stats-overlay .ts-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 2; }
-        #team-stats-overlay .ts-content { position: relative; z-index: 3; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: #FFF; scale: 1.3;}
-        #team-stats-overlay .ts-main-score { font-family: 'Segoe UI', sans-serif; font-weight: 900; font-size: 72px; color: #FFF; text-shadow: 5px 5px 10px #000; line-height: 1; }
-        #team-stats-overlay .ts-match-status { font-family: 'Segoe UI', sans-serif; font-weight: 700; font-size: 24px; color: #E040FB; text-shadow: 3px 3px 5px #000; margin-top: 6px; }
-        #team-stats-overlay .ts-divider { width: 200px; height: 3px; background: #E040FB; margin: 8px 0 20px; box-shadow: 0 0 15px rgba(224,64,251,0.9); }
-        #team-stats-overlay .ts-row-wrap { display: flex; align-items: center; justify-content: center; gap: 60px; margin-bottom: 12px; }
-        #team-stats-overlay .ts-pie-col { display: flex; flex-direction: column; gap: 26px; align-items: center; }
-        #team-stats-overlay .ts-pie-item { display: flex; flex-direction: column; align-items: center; }
-        #team-stats-overlay .ts-pie-label { font-family: 'Oswald', sans-serif; font-size: 15px; color: #FFF; text-align: center; margin-top: 8px; font-weight: 600; letter-spacing: 0.5px; }
-        #team-stats-overlay .ts-pie-ring { position: relative; width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(var(--pie-color, #00BCD4) 0deg var(--pie-deg, 0deg), rgba(255,255,255,0.15) var(--pie-deg, 0deg) 360deg); box-shadow: 0 0 20px rgba(0,0,0,0.6); transition: --pie-color 0.3s ease; }
-        #team-stats-overlay .ts-pie-ring::before { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: #1A1A2E; border: 1px solid rgba(255,255,255,0.08); }
-        #team-stats-overlay .ts-pie-value { position: relative; z-index: 2; font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700; color: #FFF; }
-        #team-stats-overlay .ts-table { display: flex; flex-direction: column; gap: 10px; min-width: 340px; }
-        #team-stats-overlay .ts-table-row { display: flex; align-items: center; justify-content: center; }
-        #team-stats-overlay .ts-cell { height: 46px; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-weight: 700; transition: background 0.4s ease; }
-        #team-stats-overlay .ts-cell-left, #team-stats-overlay .ts-cell-right { width: 70px; font-size: 22px; color: #FFF; background: rgba(255,255,255,0.08); }
-        #team-stats-overlay .ts-cell-left  { clip-path: polygon(15% 0px, 100% 0px, 100% 100%, 0px 100%); }
-        #team-stats-overlay .ts-cell-right { clip-path: polygon(0 0, 85% 0px, 100% 100%, 0px 100%); }
-        #team-stats-overlay .ts-cell-center { width: 240px; font-size: 17px; color: #000; background: #FFFFFF; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid rgba(0,0,0,0.15); border-bottom: 1px solid rgba(0,0,0,0.15); }
-        #team-stats-overlay .ts-teams-row { display: flex; align-items: center; justify-content: center; gap: 40px; margin-top: 25px; }
-        #team-stats-overlay .ts-team-label { font-family: 'Segoe UI', sans-serif; font-weight: 700; font-size: 28px; color: #FFF; text-shadow: 3px 3px 5px #000; text-transform: uppercase; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        #team-stats-overlay .ts-vs { font-family: 'Segoe UI', sans-serif; font-weight: 900; font-size: 44px; color: #9C27B0; text-shadow: 4px 4px 8px #000; }
+        /* ============================================================
+           TEAM STATS — GLASSMORPHIC BROADCAST REDESIGN (1920x1080)
+           ============================================================ */
+        #team-stats-overlay,
+        #team-stats-overlay * {
+            box-sizing: border-box;
+        }
+
+        #team-stats-overlay {
+            background: #050712;
+            font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+        }
+        #team-stats-overlay .ts-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/kabaddione_bg.jpg') center/cover no-repeat;
+            z-index: 1;
+        }
+        #team-stats-overlay .ts-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(8, 10, 26, 0.30) 0%, rgba(4, 5, 16, 0.72) 100%);
+            z-index: 2;
+        }
+        #team-stats-overlay .ts-content {
+            position: relative;
+            z-index: 3;
+            width: 1920px;
+            height: 1080px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 24px;
+            color: #FFFFFF;
+            scale: 1;
+        }
+
+        /* --- 1. TOP HEADER: TEAM STATISTICS + GOLD SLASHES --- */
+        #team-stats-overlay .ts-header-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            z-index: 5;
+            filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.85));
+        }
+        #team-stats-overlay .ts-header-slash {
+            width: 12px;
+            height: 68px;
+            background: linear-gradient(180deg, #FFF5B8 0%, #E5B94C 45%, #A67518 75%, #FFE07D 100%);
+            box-shadow: 0 0 18px rgba(255, 215, 100, 0.65);
+            flex-shrink: 0;
+        }
+        #team-stats-overlay .ts-header-slash.left {
+            transform: skewX(23deg);
+            margin-right: 10px;
+        }
+        #team-stats-overlay .ts-header-slash.right {
+            transform: skewX(-23deg);
+            margin-left: 10px;
+        }
+        #team-stats-overlay .ts-header-border {
+            padding: 2px;
+            background: linear-gradient(90deg, rgba(160, 210, 255, 0.55), rgba(255, 255, 255, 0.45), rgba(160, 210, 255, 0.55));
+            clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 28px 100%);
+        }
+        #team-stats-overlay .ts-header-box {
+            width: 610px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(24, 34, 58, 0.94) 0%, rgba(11, 16, 32, 0.96) 100%);
+            clip-path: polygon(0 0, 100% 0, calc(100% - 27px) 100%, 27px 100%);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        /* --- 2. MAIN GLASSMORPHIC CARD --- */
+        #team-stats-overlay .ts-glass-card {
+            position: relative;
+            width: 1540px;
+            height: 668px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(18, 24, 42, 0.78) 0%, rgba(10, 14, 28, 0.86) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(255, 255, 255, 0.24);
+            box-shadow: 0 28px 75px rgba(0, 0, 0, 0.80), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            overflow: hidden;
+            z-index: 4;
+        }
+
+        /* Dynamic Team-Color Top Corner Bars & Ambient Glows (Auto-colored by existing JS) */
+        #team-stats-overlay .ts-top-edge {
+            position: absolute;
+            top: 0;
+            width: 390px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.95;
+        }
+        #team-stats-overlay .ts-top-edge.ts-cell-left {
+            left: 0;
+            background: #22C55E;
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%),
+                                linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%);
+            box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.45);
+        }
+        #team-stats-overlay .ts-top-edge.ts-cell-right {
+            right: 0;
+            background: #0EA5E9;
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%);
+            box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.45);
+        }
+
+        #team-stats-overlay .ts-ambient-glow {
+            position: absolute;
+            top: -40px;
+            width: 440px;
+            height: 520px;
+            border-radius: 50%;
+            filter: blur(105px);
+            opacity: 0.30;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #team-stats-overlay .ts-ambient-glow.ts-cell-left {
+            left: -90px;
+            background: #22C55E;
+        }
+        #team-stats-overlay .ts-ambient-glow.ts-cell-right {
+            right: -90px;
+            background: #0EA5E9;
+        }
+
+        /* Subtle Side Edge Glow Lines */
+        #team-stats-overlay .ts-side-edge {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 2;
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 70%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 70%, transparent 100%);
+        }
+        #team-stats-overlay .ts-side-edge.ts-cell-left  { left: 0;  background: #22C55E; }
+        #team-stats-overlay .ts-side-edge.ts-cell-right { right: 0; background: #0EA5E9; }
+
+        /* 3-Column Card Layout */
+        #team-stats-overlay .ts-row-wrap {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 345px 1fr 345px;
+            align-items: stretch;
+            gap: 0;
+            margin: 0;
+        }
+
+        /* --- 3. LEFT & RIGHT STRIKE RATE RINGS --- */
+        #team-stats-overlay .ts-pie-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 38px;
+            padding: 26px 20px 44px;
+            position: relative;
+        }
+        #team-stats-overlay .ts-pie-col:first-child {
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        #team-stats-overlay .ts-pie-col:last-child {
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        #team-stats-overlay .ts-pie-item {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #team-stats-overlay .ts-pie-ring {
+            position: relative;
+            width: 188px;
+            height: 188px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(
+                var(--pie-color, #22C55E) 0deg var(--pie-deg, 0deg),
+                rgba(255, 255, 255, 0.16) var(--pie-deg, 0deg) 360deg
+            );
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), inset 0 2px 6px rgba(255, 255, 255, 0.25);
+        }
+        /* Active-Arc-Only Neon Glow (0% stays clean grey) */
+        #team-stats-overlay .ts-pie-ring::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--pie-color, #22C55E) 0deg var(--pie-deg, 0deg),
+                transparent var(--pie-deg, 0deg) 360deg
+            );
+            filter: blur(14px);
+            opacity: 0.72;
+            z-index: -1;
+            pointer-events: none;
+        }
+        /* Inner Donut Cutout */
+        #team-stats-overlay .ts-pie-ring::before {
+            content: '';
+            position: absolute;
+            inset: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 35%, rgba(28, 36, 56, 0.96) 0%, rgba(12, 16, 30, 0.98) 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.75);
+            z-index: 1;
+        }
+        #team-stats-overlay .ts-pie-value {
+            position: relative;
+            z-index: 2;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 46px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.85);
+        }
+        #team-stats-overlay .ts-pie-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: #F1F5F9;
+            text-align: center;
+            margin-top: 14px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+            white-space: nowrap;
+        }
+
+        /* --- 4. CENTER COLUMN: SCORE NOTCH + STAT ROWS --- */
+        #team-stats-overlay .ts-center-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 32px 54px;
+            position: relative;
+        }
+        #team-stats-overlay .ts-score-notch-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 4;
+        }
+        #team-stats-overlay .ts-score-notch-border {
+            width: 590px;
+            height: 146px;
+            padding: 0 2px 2px 2px;
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.85) 0%, rgba(192, 132, 252, 0.75) 45%, rgba(56, 189, 248, 0.85) 100%);
+            clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%);
+            filter: drop-shadow(0 6px 24px rgba(139, 92, 246, 0.40));
+        }
+        #team-stats-overlay .ts-score-notch-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 14px;
+            background: linear-gradient(180deg, rgba(22, 26, 48, 0.92) 0%, rgba(44, 30, 74, 0.90) 100%);
+            clip-path: polygon(2px 0, calc(100% - 2px) 0, calc(88% - 1px) calc(100% - 2px), calc(12% + 1px) calc(100% - 2px));
+        }
+        #team-stats-overlay .ts-main-score {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 86px;
+            color: #FFFFFF;
+            letter-spacing: 3px;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 4px 18px rgba(0, 0, 0, 0.85);
+        }
+        #team-stats-overlay .ts-status-pill-border {
+            margin-top: -22px;
+            z-index: 5;
+            padding: 1.5px;
+            background: linear-gradient(90deg, #C084FC 0%, #818CF8 50%, #38BDF8 100%);
+            clip-path: polygon(0 0, 100% 0, 91% 100%, 9% 100%);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
+        }
+        #team-stats-overlay .ts-match-status {
+            min-width: 224px;
+            padding: 6px 42px;
+            text-align: center;
+            background: linear-gradient(90deg, rgba(107, 33, 168, 0.92) 0%, rgba(55, 65, 120, 0.92) 50%, rgba(14, 116, 144, 0.92) 100%);
+            clip-path: polygon(0 0, 100% 0, 91% 100%, 9% 100%);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+            margin-top: 0;
+        }
+
+        /* --- 5. CENTER STATS TABLE (4 BEVELED ROWS) --- */
+        #team-stats-overlay .ts-table {
+            width: 100%;
+            max-width: 780px;
+            display: flex;
+            flex-direction: column;
+            gap: 17px;
+            min-width: 0;
+        }
+        #team-stats-overlay .ts-table-row {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            height: 76px;
+            width: 100%;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
+        }
+        #team-stats-overlay .ts-table .ts-cell {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            transition: background 0.4s ease;
+        }
+        #team-stats-overlay .ts-table .ts-cell-left,
+        #team-stats-overlay .ts-table .ts-cell-right {
+            width: 142px;
+            flex-shrink: 0;
+            font-size: 46px;
+            color: #FFFFFF;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+            box-shadow:
+                inset 0 2px 1px rgba(255, 255, 255, 0.55),
+                inset 0 18px 20px rgba(255, 255, 255, 0.22),
+                inset 0 -22px 24px rgba(0, 0, 0, 0.40);
+        }
+        #team-stats-overlay .ts-table .ts-cell-left {
+            background: #22C55E;
+            clip-path: polygon(16px 0, 100% 0, 100% 100%, 0 100%);
+            border-right: 2px solid rgba(255, 255, 255, 0.65);
+            padding-left: 8px;
+        }
+        #team-stats-overlay .ts-table .ts-cell-right {
+            background: #0EA5E9;
+            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
+            border-left: 2px solid rgba(255, 255, 255, 0.65);
+            padding-right: 8px;
+        }
+        #team-stats-overlay .ts-table .ts-cell-center {
+            flex: 1;
+            width: auto;
+            font-size: 27px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, rgba(32, 42, 68, 0.88) 0%, rgba(14, 20, 38, 0.94) 100%);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.24);
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.20);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+        }
+
+        /* --- 6. BOTTOM TEAM NAMES + VS BAR (OVERLAPS CARD BOTTOM) --- */
+        #team-stats-overlay .ts-teams-row {
+            position: relative;
+            z-index: 8;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 0;
+            margin-top: -40px;
+            height: 82px;
+            filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.85));
+        }
+
+        /* Optional Outer Slanted Accent Slashes */
+        #team-stats-overlay .ts-team-slash {
+            width: 8px;
+            height: 78px;
+            align-self: center;
+            opacity: 0.85;
+            flex-shrink: 0;
+        }
+        #team-stats-overlay .ts-team-slash.ts-cell-left {
+            background: #22C55E;
+            transform: skewX(20deg);
+            margin-right: 10px;
+        }
+        #team-stats-overlay .ts-team-slash.ts-cell-right {
+            background: #0EA5E9;
+            transform: skewX(-20deg);
+            margin-left: 10px;
+        }
+
+        /* Team Name Plates with Dynamic Team-Color Border & Bottom Sheen */
+        #team-stats-overlay .ts-team-plate {
+            position: relative;
+            width: 550px;
+            height: 82px;
+            padding: 2.5px;
+            display: flex;
+        }
+        #team-stats-overlay .ts-team-plate.ts-cell-left {
+            background: #22C55E;
+            clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 100%, 28px 100%);
+        }
+        #team-stats-overlay .ts-team-plate.ts-cell-right {
+            background: #0EA5E9;
+            clip-path: polygon(28px 0, 100% 0, calc(100% - 28px) 100%, 0 100%);
+        }
+        #team-stats-overlay .ts-team-plate-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 46px;
+            background: linear-gradient(180deg, rgba(16, 22, 38, 0.94) 0%, rgba(8, 12, 24, 0.97) 100%);
+            overflow: hidden;
+        }
+        #team-stats-overlay .ts-team-plate.ts-cell-left .ts-team-plate-inner {
+            clip-path: polygon(0 0, calc(100% - 27px) 0, 100% 100%, 27px 100%);
+        }
+        #team-stats-overlay .ts-team-plate.ts-cell-right .ts-team-plate-inner {
+            clip-path: polygon(27px 0, 100% 0, calc(100% - 27px) 100%, 0 100%);
+        }
+        #team-stats-overlay .ts-team-tint {
+            position: absolute;
+            inset: 0;
+            opacity: 0.30;
+            pointer-events: none;
+            z-index: 1;
+            -webkit-mask-image: linear-gradient(to top, black 0%, transparent 82%);
+            mask-image: linear-gradient(to top, black 0%, transparent 82%);
+        }
+        #team-stats-overlay .ts-team-label {
+            position: relative;
+            z-index: 2;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 32px;
+            letter-spacing: 1.5px;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Center VS Wedge */
+        #team-stats-overlay .ts-vs-box {
+            width: 168px;
+            height: 82px;
+            margin: 0 -22px;
+            position: relative;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 28px 100%);
+            background: linear-gradient(180deg, rgba(24, 18, 46, 0.94) 0%, rgba(14, 10, 32, 0.98) 100%);
+            border-bottom: 2px solid rgba(168, 85, 247, 0.55);
+        }
+        #team-stats-overlay .ts-vs {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 48px;
+            letter-spacing: 2px;
+            background: linear-gradient(180deg, #F3E8FF 0%, #C084FC 48%, #7E22CE 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.85));
+        }
+
+        /* --- 7. BOTTOM POWERED BY TRAPEZOID (SCOPED TO TEAM STATS ONLY) --- */
+        #team-stats-overlay .fs-powered-by {
+            margin-top: 0;
+            scale: 1;
+            width: 520px;
+            height: 58px;
+            padding: 0 36px;
+            gap: 12px;
+            border: none;
+            background: linear-gradient(180deg, rgba(16, 22, 38, 0.94) 0%, rgba(8, 12, 24, 0.98) 100%);
+            clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
+            box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.8));
+            z-index: 6;
+        }
+        #team-stats-overlay .fs-powered-by .fp-label {
+            font-family: 'Montserrat', sans-serif;
+            color: #CBD5E1;
+            font-size: 21px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+        }
+        #team-stats-overlay .fs-powered-by .fp-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 6px;
+            box-shadow: none;
+        }
+        #team-stats-overlay .fs-powered-by .fp-text {
+            font-family: 'Montserrat', sans-serif;
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-shadow: none;
+        }
+
         /* ============================================================
            TEAM STATS ANIMATIONS (INTRO & OUTRO)
            ============================================================ */
-        /* 1. Base Hidden States (Where elements go during Outro) */
-        #team-stats-overlay .ts-main-score { transform: translateY(-40px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        #team-stats-overlay .ts-match-status { transform: translateY(-30px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s; }
-        #team-stats-overlay .ts-divider { transform: scaleX(0); opacity: 0; transition: all 0.4s ease 0.1s; }
-        #team-stats-overlay .ts-teams-row { transform: translateY(30px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s; }
+        #team-stats-overlay .ts-header-wrap {
+            transform: translateY(-35px);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #team-stats-overlay .ts-glass-card {
+            transform: scale(0.95) translateY(24px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
+        }
+        #team-stats-overlay .ts-score-notch-wrap {
+            transform: translateY(-30px);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s;
+        }
+        #team-stats-overlay .ts-table-row {
+            transform: translateY(26px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #team-stats-overlay .ts-table-row:nth-child(1) { transition-delay: 0.14s; }
+        #team-stats-overlay .ts-table-row:nth-child(2) { transition-delay: 0.19s; }
+        #team-stats-overlay .ts-table-row:nth-child(3) { transition-delay: 0.24s; }
+        #team-stats-overlay .ts-table-row:nth-child(4) { transition-delay: 0.29s; }
 
-        /* Table Rows (Slide in sequentially) */
-        #team-stats-overlay .ts-table-row { transform: translateY(30px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        #team-stats-overlay .ts-table-row:nth-child(1) { transition-delay: 0.1s; }
-        #team-stats-overlay .ts-table-row:nth-child(2) { transition-delay: 0.15s; }
-        #team-stats-overlay .ts-table-row:nth-child(3) { transition-delay: 0.2s; }
-        #team-stats-overlay .ts-table-row:nth-child(4) { transition-delay: 0.25s; }
+        #team-stats-overlay .ts-pie-item {
+            transform: scale(0.65) translateY(24px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #team-stats-overlay .ts-pie-col .ts-pie-item:nth-child(1) { transition-delay: 0.18s; }
+        #team-stats-overlay .ts-pie-col .ts-pie-item:nth-child(2) { transition-delay: 0.28s; }
 
-        /* Pie Charts (Pop and scale sequentially) */
-        #team-stats-overlay .ts-pie-item { transform: scale(0.6) translateY(30px); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        #team-stats-overlay .ts-pie-col:first-child .ts-pie-item:nth-child(1) { transition-delay: 0.15s; }
-        #team-stats-overlay .ts-pie-col:first-child .ts-pie-item:nth-child(2) { transition-delay: 0.25s; }
-        #team-stats-overlay .ts-pie-col:last-child .ts-pie-item:nth-child(1) { transition-delay: 0.15s; }
-        #team-stats-overlay .ts-pie-col:last-child .ts-pie-item:nth-child(2) { transition-delay: 0.25s; }
+        #team-stats-overlay .ts-teams-row {
+            transform: translateY(32px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.20s;
+        }
+        #team-stats-overlay .fs-powered-by {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.45s ease 0.28s;
+        }
 
-        /* 2. Active States (Triggered automatically by .show on parent) */
-        #team-stats-overlay.show .ts-main-score,
-        #team-stats-overlay.show .ts-match-status,
+        /* Active States triggered by .show */
+        #team-stats-overlay.show .ts-header-wrap,
+        #team-stats-overlay.show .ts-glass-card,
+        #team-stats-overlay.show .ts-score-notch-wrap,
         #team-stats-overlay.show .ts-table-row,
-        #team-stats-overlay.show .ts-teams-row { transform: translateY(0); opacity: 1; }
-        #team-stats-overlay.show .ts-divider { transform: scaleX(1); opacity: 1; }
-        #team-stats-overlay.show .ts-pie-item { transform: scale(1) translateY(0); opacity: 1; }
+        #team-stats-overlay.show .ts-pie-item,
+        #team-stats-overlay.show .ts-teams-row,
+        #team-stats-overlay.show .fs-powered-by {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+        }
 
         
 
@@ -1282,63 +1837,128 @@
         <div class="ts-bg"></div>
         <div class="ts-overlay"></div>
         <div class="ts-content">
-            <div class="ts-main-score" id="ts-main-score">0 - 0</div>
-            <div class="ts-match-status" id="ts-match-status">STATS</div>
-            <div class="ts-divider"></div>
-            <div class="ts-row-wrap">
-                <div class="ts-pie-col">
-                    <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-left-raid-pie"><div class="ts-pie-value" id="ts-left-raid-val">0%</div></div>
-                        <div class="ts-pie-label">SUCCESSFUL<br>RAID</div>
-                    </div>
-                    <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-left-tackle-pie"><div class="ts-pie-value" id="ts-left-tackle-val">0%</div></div>
-                        <div class="ts-pie-label">SUCCESSFUL<br>TACKLE</div>
-                    </div>
+
+            <!-- TOP HEADER: TEAM STATISTICS -->
+            <div class="ts-header-wrap">
+                <div class="ts-header-slash left"></div>
+                <div class="ts-header-border">
+                    <div class="ts-header-box">TEAM STATISTICS</div>
                 </div>
-                <div class="ts-table">
-                    <div class="ts-table-row">
-                        <div class="ts-cell ts-cell-left"  id="ts-left-raid">0</div>
-                        <div class="ts-cell ts-cell-center">RAID POINTS</div>
-                        <div class="ts-cell ts-cell-right" id="ts-right-raid">0</div>
+                <div class="ts-header-slash right"></div>
+            </div>
+
+            <!-- MAIN GLASSMORPHIC PANEL -->
+            <div class="ts-glass-card">
+                <!-- Dynamic Team Color Accents (Auto-filled by existing JS) -->
+                <div class="ts-top-edge ts-cell-left"></div>
+                <div class="ts-top-edge ts-cell-right"></div>
+                <div class="ts-side-edge ts-cell-left"></div>
+                <div class="ts-side-edge ts-cell-right"></div>
+                <div class="ts-ambient-glow ts-cell-left"></div>
+                <div class="ts-ambient-glow ts-cell-right"></div>
+
+                <div class="ts-row-wrap">
+                    <!-- LEFT STRIKE RATE RINGS -->
+                    <div class="ts-pie-col">
+                        <div class="ts-pie-item">
+                            <div class="ts-pie-ring" id="ts-left-raid-pie">
+                                <div class="ts-pie-value" id="ts-left-raid-val">0%</div>
+                            </div>
+                            <div class="ts-pie-label">RAID STRIKE RATE</div>
+                        </div>
+                        <div class="ts-pie-item">
+                            <div class="ts-pie-ring" id="ts-left-tackle-pie">
+                                <div class="ts-pie-value" id="ts-left-tackle-val">0%</div>
+                            </div>
+                            <div class="ts-pie-label">TACKLE STRIKE RATE</div>
+                        </div>
                     </div>
-                    <div class="ts-table-row">
-                        <div class="ts-cell ts-cell-left"  id="ts-left-tackle">0</div>
-                        <div class="ts-cell ts-cell-center">TACKLE POINTS</div>
-                        <div class="ts-cell ts-cell-right" id="ts-right-tackle">0</div>
+
+                    <!-- CENTER SCORE NOTCH + 4 STAT ROWS -->
+                    <div class="ts-center-col">
+                        <div class="ts-score-notch-wrap">
+                            <div class="ts-score-notch-border">
+                                <div class="ts-score-notch-inner">
+                                    <div class="ts-main-score" id="ts-main-score">0 - 0</div>
+                                </div>
+                            </div>
+                            <div class="ts-status-pill-border">
+                                <div class="ts-match-status" id="ts-match-status">STATS</div>
+                            </div>
+                        </div>
+
+                        <div class="ts-table">
+                            <div class="ts-table-row">
+                                <div class="ts-cell ts-cell-left" id="ts-left-raid">0</div>
+                                <div class="ts-cell ts-cell-center">RAID POINTS</div>
+                                <div class="ts-cell ts-cell-right" id="ts-right-raid">0</div>
+                            </div>
+                            <div class="ts-table-row">
+                                <div class="ts-cell ts-cell-left" id="ts-left-tackle">0</div>
+                                <div class="ts-cell ts-cell-center">TACKLE POINTS</div>
+                                <div class="ts-cell ts-cell-right" id="ts-right-tackle">0</div>
+                            </div>
+                            <div class="ts-table-row">
+                                <div class="ts-cell ts-cell-left" id="ts-left-allout">0</div>
+                                <div class="ts-cell ts-cell-center">ALL OUT POINTS</div>
+                                <div class="ts-cell ts-cell-right" id="ts-right-allout">0</div>
+                            </div>
+                            <div class="ts-table-row">
+                                <div class="ts-cell ts-cell-left" id="ts-left-extra">0</div>
+                                <div class="ts-cell ts-cell-center">EXTRA POINTS</div>
+                                <div class="ts-cell ts-cell-right" id="ts-right-extra">0</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ts-table-row">
-                        <div class="ts-cell ts-cell-left"  id="ts-left-allout">0</div>
-                        <div class="ts-cell ts-cell-center">ALL OUT POINTS</div>
-                        <div class="ts-cell ts-cell-right" id="ts-right-allout">0</div>
-                    </div>
-                    <div class="ts-table-row">
-                        <div class="ts-cell ts-cell-left"  id="ts-left-extra">0</div>
-                        <div class="ts-cell ts-cell-center">EXTRA POINTS</div>
-                        <div class="ts-cell ts-cell-right" id="ts-right-extra">0</div>
-                    </div>
-                </div>
-                <div class="ts-pie-col">
-                    <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-right-raid-pie"><div class="ts-pie-value" id="ts-right-raid-val">0%</div></div>
-                        <div class="ts-pie-label">SUCCESSFUL<br>RAID</div>
-                    </div>
-                    <div class="ts-pie-item">
-                        <div class="ts-pie-ring" id="ts-right-tackle-pie"><div class="ts-pie-value" id="ts-right-tackle-val">0%</div></div>
-                        <div class="ts-pie-label">SUCCESSFUL<br>TACKLE</div>
+
+                    <!-- RIGHT STRIKE RATE RINGS -->
+                    <div class="ts-pie-col">
+                        <div class="ts-pie-item">
+                            <div class="ts-pie-ring" id="ts-right-raid-pie">
+                                <div class="ts-pie-value" id="ts-right-raid-val">0%</div>
+                            </div>
+                            <div class="ts-pie-label">RAID STRIKE RATE</div>
+                        </div>
+                        <div class="ts-pie-item">
+                            <div class="ts-pie-ring" id="ts-right-tackle-pie">
+                                <div class="ts-pie-value" id="ts-right-tackle-val">0%</div>
+                            </div>
+                            <div class="ts-pie-label">TACKLE STRIKE RATE</div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- BOTTOM TEAM NAMES + VS BAR -->
             <div class="ts-teams-row">
-                <div class="ts-team-label" id="ts-left-team-name">TEAM A</div>
-                <div class="ts-vs">VS</div>
-                <div class="ts-team-label" id="ts-right-team-name">TEAM B</div>
+                <div class="ts-team-slash ts-cell-left"></div>
+                <div class="ts-team-plate ts-cell-left">
+                    <div class="ts-team-plate-inner">
+                        <div class="ts-team-tint ts-cell-left"></div>
+                        <div class="ts-team-label" id="ts-left-team-name">TEAM A</div>
+                    </div>
+                </div>
+
+                <div class="ts-vs-box">
+                    <div class="ts-vs">VS</div>
+                </div>
+
+                <div class="ts-team-plate ts-cell-right">
+                    <div class="ts-team-plate-inner">
+                        <div class="ts-team-tint ts-cell-right"></div>
+                        <div class="ts-team-label" id="ts-right-team-name">TEAM B</div>
+                    </div>
+                </div>
+                <div class="ts-team-slash ts-cell-right"></div>
             </div>
+
+            <!-- BOTTOM POWERED BY TRAPEZOID -->
             <div class="fs-powered-by">
                 <span class="fp-label">Powered by</span>
                 <div class="fp-icon"><img src="/images/kabaddione_logo.png" alt=""></div>
                 <span class="fp-text">KabaddiOne</span>
             </div>
+
         </div>
     </div>
 
