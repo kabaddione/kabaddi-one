@@ -103,8 +103,7 @@
         });
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@600;700&family=Teko:wght@600;700&family=Mukta:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <meta name="description" content="KabaddiOne Professional Broadcast Overlay — real-time live kabaddi scoreboard for OBS streaming. Features raid timers, bonus & super tackle alerts, player performance graphics, team stats, substitution banners, and full match analytics.">
@@ -2301,6 +2300,237 @@
         .recent-score-text.show { transform: translateY(0); opacity: 1; }
         .recent-score-text.out { transform: translateY(-130%); opacity: 0; }
         .recent-score-text.below { transform: translateY(130%); opacity: 0; transition: none; }
+
+
+        /* ============================================================
+           GLOBAL MONTSERRAT TYPOGRAPHY & WEIGHT HIERARCHY
+           ============================================================ */
+        html,
+        body,
+        body *:not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands):not([class*="fa-"]) {
+            font-family: 'Montserrat', 'Segoe UI', sans-serif !important;
+        }
+
+        /* --- 1. MAIN SCOREBOARD BAR --- */
+        .logo-bar .logo-powered {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.6px;
+        }
+        .logo-bar .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+        .team-left-inner,
+        .team-right-inner {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+        }
+        .raider-name-text {
+            font-weight: 800;
+        }
+        .raider-name-text.dod-text {
+            font-size: 23px !important;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+        .recent-score-text {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+        }
+        .score-left-inner,
+        .score-right-inner {
+            font-size: 48px;
+            font-weight: 800;
+            padding-top: 0;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        #raid-timer {
+            top: 20px;
+            font-size: 32px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* --- 2. BOTTOM INFO BAR & MARQUEE TICKER --- */
+        .center-info-inner {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+        .info-box-center .gold-text {
+            font-size: 21px;
+            font-weight: 800;
+            margin-top: 0;
+            font-variant-numeric: tabular-nums;
+        }
+        #match-id {
+            font-size: 13px !important;
+            font-weight: 600;
+            letter-spacing: 0.8px !important;
+        }
+        .marquee-content {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.4px;
+        }
+
+        /* --- 3. LIVE ALERTS (DO-OR-DIE, BONUS/SUPER TACKLE, SUB, CARDS, SUSPENSION, L5) --- */
+        .dod-banner {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+        }
+        .rep-label {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+        .rep-marquee-content {
+            font-size: 19px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .sub-name,
+        .card-side-banner .sub-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .sub-badge {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+        .suspension-time {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.05;
+            font-variant-numeric: tabular-nums;
+        }
+        .suspension-player {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+            letter-spacing: 0.3px;
+        }
+        .l5-text {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+        .l5-pts {
+            font-size: 24px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* --- 4. MATCH END & SUPER 10 / HIGH FIVE CELEBRATIONS --- */
+        .me-final-score {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            padding-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        .me-result-text {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            margin-top: 4px;
+        }
+        .celebration-name {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .celebration-text {
+            font-size: 46px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            padding-top: 0;
+        }
+
+        /* --- 5. EPIC ANIMATIONS (SUPER RAID, SUPER TACKLE, ALL OUT) --- */
+        .epic-text-super,
+        .epic-text-event {
+            font-size: 96px;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+        .allout-overlay .allout-text {
+            font-size: 150px;
+            font-weight: 900;
+            letter-spacing: 12px;
+        }
+        .center-popup {
+            font-size: 62px;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+
+        /* --- 6. STARTING 7, MATCH INTRO, TOSS & LOADER --- */
+        .s7-name-top {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .s7-name-bottom {
+            font-size: 10.5px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+        }
+        .mi-badge-label {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.6px;
+        }
+        .mi-badge-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+        .mi-vs-text {
+            font-size: 62px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            padding-bottom: 0;
+        }
+        .mi-name-half {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+        .mi-sub-bar {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .toss-text-dark,
+        .toss-text-light {
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .toss-sub-bar {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+        }
+        .loader-text {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            font-variant-numeric: tabular-nums;
+        }
+        .audio-test-btn {
+            font-size: 15px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
