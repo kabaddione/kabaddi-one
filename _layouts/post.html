@@ -184,20 +184,27 @@ layout: default
         });
     });
 
-    /* =====================================================
-       VIEW COUNTER (CounterAPI.dev — free, no setup)
-       ===================================================== */
+    </script>
+
+<!-- Load Firebase App + Firestore SDK (matches news/index.html) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" crossorigin="anonymous"></script>
+
+<script>
+/* =====================================================
+   ARTICLE VIEW COUNTER — Isolated Named Firebase App
+   ===================================================== */
 (function () {
     'use strict';
 
-    /* ---------- 1. Guard: SDK might have failed to load ---------- */
-    if (typeof firebase === 'undefined') {
-        console.warn('[Counter] Firebase SDK not loaded.');
+    /* 1. Guard: ensure both Firebase App & Firestore SDKs are ready */
+    if (typeof firebase === 'undefined' || typeof firebase.firestore !== 'function') {
+        console.warn('[Counter] Firebase Firestore SDK not loaded.');
         document.querySelectorAll('.vc-num, [data-view-slug]').forEach(el => el.textContent = '—');
         return;
     }
 
-    /* ---------- 2. Your Firebase config ---------- */
+    /* 2. Firebase config for kabaddione-posts */
     const firebaseConfig = {
         apiKey: "AIzaSyAVfSqqTZMSc9A9EN9uBx8N8-Xre7VcjQE",
         authDomain: "kabaddione-posts.firebaseapp.com",
@@ -207,18 +214,32 @@ layout: default
         appId: "1:145975001123:web:d9ac46f68f00d5b6557196"
     };
 
-    /* ---------- 3. Init ---------- */
+    /* 3. Use a dedicated NAMED app so it never collides with default.html */
+    const APP_NAME = 'kabaddionePostsViews';
+    let app;
     try {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        app = firebase.apps.find(a => a.name === APP_NAME)
+            || firebase.initializeApp(firebaseConfig, APP_NAME);
     } catch (e) {
         console.error('[Counter] Firebase init failed:', e);
         document.querySelectorAll('.vc-num, [data-view-slug]').forEach(el => el.textContent = '—');
         return;
     }
 
-    const db = firebase.firestore();
-    const ARTICLE_ID = {{ page.slug | jsonify }};
+    const db = app.firestore();
+
+    /* Safe article slug (falls back to URL slug if page.slug is ever empty) */
+    const RAW_SLUG = {{ page.slug | jsonify }};
+    const ARTICLE_ID = (RAW_SLUG && String(RAW_SLUG).trim())
+        || location.pathname.replace(/\/+$/, '').split('/').pop().replace(/\.html$/i, '');
     const SESSION_KEY = 'kabaddione_viewed_' + ARTICLE_ID;
+
+    function safeSessionGet(key) {
+        try { return sessionStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSessionSet(key, val) {
+        try { sessionStorage.setItem(key, val); } catch (e) { /* ignore */ }
+    }
 
     function formatViews(n) {
         if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
@@ -231,38 +252,44 @@ layout: default
        ==================================================== */
     async function trackCurrentArticle() {
         const el = document.querySelector('.vc-num');
-        if (!el) return;
+        if (!el || !ARTICLE_ID) return;
 
         const docRef = db.collection('article_views').doc(ARTICLE_ID);
-        const alreadyViewed = sessionStorage.getItem(SESSION_KEY);
+        const alreadyViewed = safeSessionGet(SESSION_KEY);
 
-        try {
-            if (!alreadyViewed) {
+        /* Step A1: Increment once per browser session */
+        if (!alreadyViewed) {
+            try {
                 await docRef.set({
                     count: firebase.firestore.FieldValue.increment(1),
                     lastViewed: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
-                sessionStorage.setItem(SESSION_KEY, '1');
+                safeSessionSet(SESSION_KEY, '1');
+            } catch (writeErr) {
+                console.error('[Counter] Write/increment failed:', writeErr.code || writeErr.message, writeErr);
             }
+        }
+
+        /* Step A2: Always read & show current count even if write was skipped/blocked */
+        try {
             const snap = await docRef.get();
-            const count = snap.exists ? (snap.data().count || 0) : 0;
+            const count = snap.exists ? (Number(snap.data().count) || 0) : 0;
             el.textContent = formatViews(count);
-        } catch (err) {
-            console.error('[Counter] Firestore error:', err.code || err.message);
-            el.textContent = '—';
+        } catch (readErr) {
+            console.error('[Counter] Read failed:', readErr.code || readErr.message, readErr);
+            el.textContent = '0';
         }
     }
 
     /* ====================================================
-       B. ⭐ RELATED CARDS — read-only display ⭐
-       (This was the missing piece!)
+       B. RELATED CARDS — read-only display
        ==================================================== */
     function loadRelatedView(el) {
         const slug = el.dataset.viewSlug;
         if (!slug) return;
         db.collection('article_views').doc(slug).get()
             .then(snap => {
-                el.textContent = snap.exists ? formatViews(snap.data().count || 0) : '0';
+                el.textContent = snap.exists ? formatViews(Number(snap.data().count) || 0) : '0';
             })
             .catch(() => { el.textContent = '0'; });
     }
@@ -285,10 +312,10 @@ layout: default
         }
     }
 
-    /* ---------- Kick off ---------- */
+    /* Kick off */
     function start() {
-        trackCurrentArticle();   // current article's view count
-        initRelatedViews();      // related cards' view counts
+        trackCurrentArticle();
+        initRelatedViews();
     }
 
     if (document.readyState === 'loading') {
@@ -297,4 +324,5 @@ layout: default
         start();
     }
 })();
+</script>
 </script>
